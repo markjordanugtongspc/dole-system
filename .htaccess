@@ -1,0 +1,9 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /github/dole-system/
+
+    # Allow /dashboard to map to /frontend/dashboard/index.php
+    RewriteRule ^dashboard/?$ frontend/dashboard/index.php [L,NC]
+
+    # Optional: Handle other routes if needed
+</IfModule>

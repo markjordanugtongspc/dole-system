@@ -1,0 +1,226 @@
+/* Google Fonts - Montserrat */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* Philippine Flag Color Palette */
+:root {
+    --royal-blue: #0038A8;
+    --philippine-red: #CE1126;
+    --golden-yellow: #FCD116;
+}
+
+/* Custom Tailwind utilities */
+@layer utilities {
+    .bg-royal-blue {
+        background-color: var(--royal-blue);
+    }
+
+    .bg-philippine-red {
+        background-color: var(--philippine-red);
+    }
+
+    .bg-golden-yellow {
+        background-color: var(--golden-yellow);
+    }
+
+    .text-royal-blue {
+        color: var(--royal-blue);
+    }
+
+    .text-philippine-red {
+        color: var(--philippine-red);
+    }
+
+    .text-golden-yellow {
+        color: var(--golden-yellow);
+    }
+
+    .border-royal-blue {
+        border-color: var(--royal-blue);
+    }
+}
+
+/* Neutral Color Palette for Dashboard */
+:root {
+    --bg-soft: #f8fafc;
+    --border-light: #e2e8f0;
+    --text-heading: #0f172a;
+    --text-body: #475569;
+}
+
+@layer utilities {
+    .bg-neutral-primary-soft {
+        background-color: var(--bg-soft);
+    }
+
+    .bg-neutral-primary-medium {
+        background-color: #ffffff;
+    }
+
+    .bg-neutral-secondary-soft {
+        background-color: #f1f5f9;
+    }
+
+    .bg-neutral-tertiary-medium {
+        background-color: #f8fafc;
+    }
+
+    .border-default {
+        border-color: var(--border-light);
+    }
+
+    .border-default-medium {
+        border-color: #e2e8f0;
+    }
+
+    .text-heading {
+        color: var(--text-heading);
+    }
+
+    .text-body {
+        color: var(--text-body);
+    }
+
+    .text-fg-brand {
+        color: var(--royal-blue);
+    }
+
+    .bg-brand {
+        background-color: var(--royal-blue);
+    }
+
+    .hover\:bg-brand-strong:hover {
+        background-color: #002d86;
+    }
+
+    .rounded-base {
+        border-radius: 0.75rem;
+    }
+}
+
+body {
+    font-family: 'Montserrat', 'Gotham', 'Century Gothic', sans-serif;
+    color: var(--text-body);
+    background-color: var(--bg-soft);
+}
+
+/* ================================================
+   Loading & Animation Styles
+   Prevents FOUC (Flash of Unstyled Content)
+   ================================================ */
+
+/* Page Loader Overlay */
+.page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0038A8 0%, #0052CC 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+}
+
+.page-loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Spinner Animation */
+.loader-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #FCD116;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Skeleton Pulse Animation */
+@keyframes skeleton-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.skeleton {
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Content Fade In */
+.content-fade-in {
+    animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Login Exit Animations */
+@keyframes slide-left {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+@keyframes slide-right {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.animate-slide-left {
+    animation: slide-left 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slide-right {
+    animation: slide-right 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
