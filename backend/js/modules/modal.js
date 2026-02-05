@@ -194,9 +194,9 @@ function showBeneficiaryModal(data) {
                         <span id="doc-text-badge-${targetId}" class="text-[8px] ${config.textClass} font-black uppercase px-2 py-0.5 rounded border tracking-tighter shadow-sm">${log.status}</span>
                     </div>
                     <div class="doc-edit-mode-container hidden flex justify-end gap-1">
-                        <button data-status="verified" data-target="${targetId}" title="Verify" class="doc-status-btn p-1.5 rounded-lg bg-green-50 text-green-600 border border-green-200 hover:bg-green-500 hover:text-white transition-all"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg></button>
-                        <button data-status="pending" data-target="${targetId}" title="Pending" class="doc-status-btn p-1.5 rounded-lg bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-400 hover:text-white transition-all"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
-                        <button data-status="declined" data-target="${targetId}" title="Decline" class="doc-status-btn p-1.5 rounded-lg bg-red-50 text-red-700 border border-red-200 hover:bg-red-500 hover:text-white transition-all"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                        <button data-status="verified" data-target="${targetId}" title="Verify" class="doc-status-btn cursor-pointer p-1.5 rounded-lg bg-green-50 text-green-600 border border-green-200 hover:bg-green-500 hover:text-white transition-all"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg></button>
+                        <button data-status="pending" data-target="${targetId}" title="Pending" class="doc-status-btn cursor-pointer p-1.5 rounded-lg bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-400 hover:text-white transition-all"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
+                        <button data-status="declined" data-target="${targetId}" title="Decline" class="doc-status-btn cursor-pointer p-1.5 rounded-lg bg-red-50 text-red-700 border border-red-200 hover:bg-red-500 hover:text-white transition-all"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg></button>
                     </div>
                 </td>
                 <!-- Archive Overlay -->
@@ -556,12 +556,23 @@ function showBeneficiaryModal(data) {
                     .animate-toast-in {
                         animation: toast-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
                     }
-                    .swipe-row {
-                        touch-action: pan-y;
-                        cursor: grab;
-                    }
                     .swipe-row:active {
                         cursor: grabbing;
+                    }
+                    .doc-status-btn.active-status[data-status="verified"] {
+                        background-color: #22c55e !important;
+                        color: white !important;
+                        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+                    }
+                    .doc-status-btn.active-status[data-status="pending"] {
+                        background-color: #fb923c !important;
+                        color: white !important;
+                        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+                    }
+                    .doc-status-btn.active-status[data-status="declined"] {
+                        background-color: #ef4444 !important;
+                        color: white !important;
+                        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
                     }
                 `;
                 document.head.appendChild(style);
@@ -675,6 +686,13 @@ function showBeneficiaryModal(data) {
                     indicator.classList.add('scale-125');
                     setTimeout(() => indicator.classList.remove('scale-125'), 200);
                 }
+
+                // Handle Persistent Active State
+                const btnGroup = btn.closest('div');
+                if (btnGroup) {
+                    btnGroup.querySelectorAll('.doc-status-btn').forEach(b => b.classList.remove('active-status'));
+                    btn.classList.add('active-status');
+                }
             });
 
             // Swipe-to-Archive Logic
@@ -775,15 +793,7 @@ function showBeneficiaryModal(data) {
                         row.style.opacity = '0';
                         setTimeout(() => {
                             row.remove();
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'success',
-                                title: 'Entry Archived',
-                                showConfirmButton: false,
-                                timer: 2000,
-                                customClass: { popup: 'animate-toast-in' }
-                            });
+                            showToastOverlap('Entry Archived', 'success');
                         }, 300);
                     }
                 }
@@ -904,9 +914,9 @@ function showBeneficiaryModal(data) {
                         </div>
                         <div class="doc-view-mode-container hidden"><span id="doc-text-badge-${targetId}" class="text-[8px] text-orange-600 bg-orange-50 border-orange-200 font-black uppercase px-2 py-0.5 rounded border tracking-tighter">PENDING</span></div>
                         <div class="doc-edit-mode-container flex items-center gap-1.5 shrink-0">
-                            <button data-status="verified" data-target="${targetId}" class="doc-status-btn cursor-pointer w-7 h-7 flex items-center justify-center rounded-lg border bg-green-50 text-green-700 hover:bg-green-500 hover:text-white"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg></button>
-                            <button data-status="pending" data-target="${targetId}" class="doc-status-btn cursor-pointer w-7 h-7 flex items-center justify-center rounded-lg border bg-orange-50 text-orange-700 hover:bg-orange-400 hover:text-white"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
-                            <button data-status="declined" data-target="${targetId}" class="doc-status-btn cursor-pointer w-7 h-7 flex items-center justify-center rounded-lg border bg-red-50 text-red-700 hover:bg-red-500 hover:text-white"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                            <button data-status="verified" data-target="${targetId}" class="doc-status-btn cursor-pointer w-7 h-7 flex items-center justify-center rounded-lg border bg-green-50 text-green-700 hover:bg-green-500 hover:text-white transition-all"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg></button>
+                            <button data-status="pending" data-target="${targetId}" class="doc-status-btn cursor-pointer w-7 h-7 flex items-center justify-center rounded-lg border bg-orange-50 text-orange-700 hover:bg-orange-400 hover:text-white transition-all"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button>
+                            <button data-status="declined" data-target="${targetId}" class="doc-status-btn cursor-pointer w-7 h-7 flex items-center justify-center rounded-lg border bg-red-50 text-red-700 hover:bg-red-500 hover:text-white transition-all"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg></button>
                         </div>
                     `;
                     list.appendChild(newLi); setupDocRenaming(newLi);
@@ -1436,4 +1446,51 @@ function getStatusColor(status) {
     if (status.toUpperCase() === 'RESIGNED') return 'bg-neutral-800 text-white border-neutral-900';
     if (status.toUpperCase() === 'ABSORBED') return 'bg-green-600 text-white border-green-700';
     return 'bg-gray-100 text-gray-600';
+}
+
+/**
+ * Helper to show toast notifications WITHOUT closing open SweetAlert2 modals
+ */
+function showToastOverlap(message, icon = 'success') {
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-5 right-5 z-[50000] flex items-center gap-3 bg-white border border-gray-100 rounded-2xl p-4 shadow-2xl animate-toast-in min-w-[280px] pointer-events-none select-none';
+
+    const iconConfigs = {
+        success: {
+            colors: 'bg-green-50 text-green-600 border-green-100',
+            path: 'M5 13l4 4L19 7',
+            label: 'Success'
+        },
+        error: {
+            colors: 'bg-red-50 text-red-600 border-red-100',
+            path: 'M6 18L18 6M6 6l12 12',
+            label: 'Error'
+        },
+        info: {
+            colors: 'bg-blue-50 text-blue-600 border-blue-100',
+            path: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+            label: 'Info'
+        }
+    };
+
+    const config = iconConfigs[icon] || iconConfigs.success;
+
+    toast.innerHTML = `
+        <div class="w-10 h-10 rounded-xl ${config.colors} flex items-center justify-center border shadow-sm">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="${config.path}" /></svg>
+        </div>
+        <div class="flex flex-col">
+            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">${config.label}</span>
+            <span class="text-[13px] font-black text-gray-700 leading-tight">${message}</span>
+        </div>
+    `;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-20px) scale(0.95)';
+        toast.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        setTimeout(() => toast.remove(), 500);
+    }, 2500);
 }

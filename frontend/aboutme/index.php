@@ -58,7 +58,7 @@
         <main class="flex-1 relative overflow-y-auto focus:outline-none scroll-smooth sm:ml-64">
 
             <!-- Cover Photo / Banner (Solid Professional Color) -->
-            <div class="relative h-64 bg-teal-600 overflow-hidden shadow-inner">
+            <div class="relative h-64 bg-sky-950 overflow-hidden shadow-inner">
                 <div class="absolute inset-0 bg-[url('../../assets/img/pattern.svg')] opacity-10 mix-blend-overlay">
                 </div>
                 <!-- Decorative Elements -->
@@ -115,25 +115,70 @@
                                 Tech Stack</h3>
                             <div class="grid grid-cols-3 gap-2">
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-white transition-colors cursor-default text-center truncate">Laravel</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-red-500 transition-colors cursor-default text-center truncate">Laravel</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-white transition-colors cursor-default text-center truncate">PHP</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-purple-900 transition-colors cursor-default text-center truncate">PHP</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-white transition-colors cursor-default text-center truncate">Tailwind</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-sky-500 transition-colors cursor-default text-center truncate">Tailwind</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-white transition-colors cursor-default text-center truncate">Flowbite</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-sky-500 transition-colors cursor-default text-center">Flowbite</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-white transition-colors cursor-default text-center truncate">HTML5</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-orange-500 transition-colors cursor-default text-center truncate">HTML5</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-white transition-colors cursor-default text-center truncate">JS</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-yellow-400 transition-colors cursor-default text-center truncate">JS</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-white transition-colors cursor-default text-center truncate">MySQL</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-cyan-600 transition-colors cursor-default text-center truncate">MySQL</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-white transition-colors cursor-default text-center truncate">Vite</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-fuchsia-500 transition-colors cursor-default text-center truncate">Vite</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-white transition-colors cursor-default text-center truncate">NodeJS</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-emerald-500 transition-colors cursor-default text-center truncate">NodeJS</span>
                             </div>
                         </div>
+
+                        <!-- Social Connect -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                            <h3
+                                class="text-sm font-black text-gray-900 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">
+                                Social Connect</h3>
+                            <div class="flex flex-col gap-3">
+                                <a href="https://github.com/markjordanugtongspc" target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="flex items-center text-sm text-gray-600 hover:text-royal-blue transition-colors group">
+                                    <div
+                                        class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center mr-3 group-hover:bg-royal-blue group-hover:text-white transition-all">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium">GitHub</span>
+                                </a>
+                                <a href="https://www.facebook.com/100004797129873/" target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="flex items-center text-sm text-gray-600 hover:text-blue-600 transition-colors group">
+                                    <div
+                                        class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center mr-3 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium">Facebook</span>
+                                </a>
+                                <a href="#" target="_blank" rel="noopener noreferrer"
+                                    class="flex items-center text-sm text-gray-600 hover:text-indigo-500 transition-colors group">
+                                    <div
+                                        class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center mr-3 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C.533 9.048-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium">Discord</span>
+                                </a>
+                            </div>
+                        </div>
+
 
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                             <h3
@@ -161,32 +206,86 @@
                     </div>
 
                     <!-- Right Column: Biography & Details (Wider) -->
-                    <div class="lg:col-span-3 space-y-10">
+                    <div class="lg:col-span-3 space-y-8">
 
                         <!-- Biography -->
-                        <div class="bg-white rounded-2xl p-8 h-full border border-slate-100 shadow-sm">
-                            <h2 class="text-2xl font-black text-royal-blue mb-4 flex items-center gap-3">
+                        <div class="bg-white rounded-2xl p-8 border border-slate-100 shadow-sm">
+                            <h2 class="text-2xl font-black text-royal-blue mb-3 flex items-center gap-3">
                                 <span class="w-8 h-1 bg-golden-yellow rounded-full"></span>
                                 About the Developer
                             </h2>
                             <div class="prose prose-slate max-w-none text-gray-600 leading-relaxed font-medium">
-                                <p class="mb-4">
+                                <p class="mb-3">
                                     I am <strong class="text-gray-900">Mark Jordan Ugtong</strong>, the sole developer
                                     behind the <strong>DOLE-GIP System</strong>. This project was conceptualized and
                                     built during my tenure as an <strong>OJT Intern</strong>, tasked with modernizing
                                     how the department manages Government Internship Program beneficiaries.
                                 </p>
-                                <p class="mb-4">
+                                <p class="mb-3">
                                     As a student, I embraced the challenge of creating a full-stack solution that is not
                                     only functional but also intuitive and visually compliant with modern standards. My
                                     development philosophy focuses on clean code, responsive design (using TailwindCSS),
                                     and secure data handling (PHP/MySQL) to ensure the system serves the public interest
                                     effectively.
                                 </p>
-                                <div class="bg-blue-50 border-l-4 border-royal-blue p-4 rounded-r-lg mt-6">
+                                <div class="bg-blue-50 border-l-4 border-royal-blue p-4 rounded-r-lg mt-4">
                                     <p class="text-sm text-royal-blue font-bold italic">
                                         "Transforming requirements into functional reality through dedication and code."
                                     </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Core Development Principles -->
+                        <div class="bg-white rounded-2xl p-8 border border-slate-100 shadow-sm">
+                            <h2 class="text-2xl font-black text-royal-blue mb-6 flex items-center gap-3">
+                                <span class="w-8 h-1 bg-royal-blue rounded-full"></span>
+                                Core Development Principles
+                            </h2>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <!-- Efficiency -->
+                                <div class="space-y-3 group">
+                                    <div
+                                        class="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="font-bold text-gray-900">Performance</h4>
+                                    <p class="text-xs text-gray-500 leading-relaxed font-medium">System-wide
+                                        optimization ensuring blazing-fast response times for complex government data
+                                        processing.</p>
+                                </div>
+
+                                <!-- Security -->
+                                <div class="space-y-3 group">
+                                    <div
+                                        class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="font-bold text-gray-900">Security</h4>
+                                    <p class="text-xs text-gray-500 leading-relaxed font-medium">Enterprise-grade
+                                        security protocols implemented to safeguard sensitive DOLE beneficiary
+                                        information.</p>
+                                </div>
+
+                                <!-- Scalability -->
+                                <div class="space-y-3 group">
+                                    <div
+                                        class="w-12 h-12 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="font-bold text-gray-900">Scalability</h4>
+                                    <p class="text-xs text-gray-500 leading-relaxed font-medium">A modular system
+                                        architecture designed to grow seamlessly alongside future department
+                                        requirements.</p>
                                 </div>
                             </div>
                         </div>
