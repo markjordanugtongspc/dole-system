@@ -1,4 +1,7 @@
-<?php require_once '../../config/vite.php'; ?>
+<?php
+require_once '../../config/vite.php';
+require_once '../../config/db.php'; // Loads .env and provides env() helper
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -394,7 +397,15 @@
                             <!-- Right Side - Form -->
                             <div
                                 class="md:w-[60%] p-10 lg:p-14 bg-white rounded-b-[2.5rem] md:rounded-bl-none md:rounded-r-[2.5rem]">
-                                <form class="space-y-6" onsubmit="return handleContactSubmit(event)">
+                                <!-- FormSubmit.co Integration -->
+                                <form
+                                    action="https://formsubmit.co/<?php echo env('FORMSUBMIT_EMAIL', 'your@email.com'); ?>"
+                                    method="POST" class="space-y-6" onsubmit="return handleContactSubmit(event)">
+                                    <!-- Configuration Fields -->
+                                    <input type="hidden" name="_captcha" value="false">
+                                    <input type="hidden" name="_template" value="table">
+                                    <input type="hidden" name="_subject" value="New Contact Form Submission - DOLE-GIP">
+
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <!-- Full Name -->
                                         <div>
@@ -428,7 +439,7 @@
                                                 class="block text-xs font-black text-gray-700 mb-2 uppercase tracking-wider">I
                                                 am interested in</label>
                                             <select name="interest" required
-                                                class="w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white transition-all">
+                                                class="w-full px-4 py-3 border border-gray-100 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-slate-50/50 focus:bg-white transition-all">
                                                 <option value="">Select an Option</option>
                                                 <option value="Technical Support">Technical Support</option>
                                                 <option value="System Demo">System Demo</option>
@@ -445,13 +456,13 @@
                                             Message</label>
                                         <textarea name="message" rows="5" required
                                             placeholder="How can I help you today?"
-                                            class="w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white transition-all resize-none"></textarea>
+                                            class="w-full px-4 py-3 border border-gray-100 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-slate-50/50 focus:bg-white transition-all resize-none"></textarea>
                                     </div>
 
                                     <!-- Submit -->
                                     <div class="flex justify-end">
                                         <button type="submit"
-                                            class="w-full md:w-auto py-4 px-10 bg-teal-600 text-white font-black rounded-xl shadow-lg hover:bg-teal-700 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 uppercase tracking-widest text-sm flex items-center justify-center gap-2">
+                                            class="w-full md:w-auto py-4 px-10 bg-teal-600 text-white font-black rounded-xl shadow-lg hover:bg-teal-700 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 uppercase tracking-widest text-sm flex items-center justify-center gap-2 cursor-pointer">
                                             Send Message
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -1,3 +1,4 @@
+import { getBasePath } from './auth.js';
 import Swal from 'sweetalert2';
 
 /**
@@ -65,22 +66,239 @@ export function showLoginSuccess() {
     });
 }
 
-/**
- * LDN Modal Module
- * Handles the display of beneficiary details and data entry using SweetAlert2
- */
-
 export function initModalHandler() {
     // Expose the functions to the global window object
-    window.viewBeneficiary = function (data) {
-        showBeneficiaryModal(data);
+    window.viewBeneficiary = async function (data) {
+        try {
+            // Fetch real logs and docs from database
+            const [arRes, dtrRes, docRes] = await Promise.all([
+                fetch(`${getBasePath()}api/logs.php?type=ar&gip_id=${encodeURIComponent(data.id)}`),
+                fetch(`${getBasePath()}api/logs.php?type=dtr&gip_id=${encodeURIComponent(data.id)}`),
+                fetch(`${getBasePath()}api/logs.php?type=docs&gip_id=${encodeURIComponent(data.id)}`)
+            ]);
+
+            const arData = await arRes.json();
+            const dtrData = await dtrRes.json();
+            const docData = await docRes.json();
+
+            data.arLogs = arData.success ? arData.logs : [];
+            data.dtrLogs = dtrData.success ? dtrData.logs : [];
+            data.docs = docData.success ? docData.logs : [];
+
+            showBeneficiaryModal(data);
+        } catch (error) {
+            console.error('Error fetching logs/docs:', error);
+            data.arLogs = [];
+            data.dtrLogs = [];
+            data.docs = [];
+            showBeneficiaryModal(data);
+        }
     };
-    window.showAddDataModal = function () {
-        showAddDataModal();
+    window.showAddDataModal = function (data) {
+        showAddDataModal(data);
     };
     window.editBeneficiary = function (data) {
         showAddDataModal(data);
     };
+    window.showExportConfigModal = function (callback) {
+        showExportConfigModal(callback);
+    };
+}
+
+/**
+ * Configuration Modal for Reports
+ */
+export function showExportConfigModal(callback) {
+    const currentFilters = window.getExportFilters ? window.getExportFilters() : {
+        office: 'ALL',
+        status: 'ALL',
+        search: '',
+        sort: 'name',
+        section: 'ALL',
+        columns: ['id', 'name', 'office', 'position', 'startdate', 'enddate', 'status']
+    };
+
+    const modalHtml = `
+        <div class="text-left font-montserrat p-1 overflow-visible">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 bg-royal-blue/10 rounded-2xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div>
+                    <h2 class="text-xl font-black text-heading leading-tight italic">Report Generator</h2>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Configure your data output</p>
+                </div>
+            </div>
+
+            <form id="export-config-form" class="space-y-6">
+                <!-- Main Filter Grid (3 columns on MD) -->
+                <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-1.5 h-4 bg-royal-blue rounded-full"></span>
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Global Filters</label>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Search Beneficiary</label>
+                            <div class="relative group">
+                                <input type="text" id="export-search" value="${currentFilters.search}" placeholder="Name or ID..." 
+                                    class="w-full bg-white border border-gray-200 rounded-xl px-9 py-2.5 text-xs font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
+                                <svg class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Office Category</label>
+                            <div class="relative group">
+                                <select id="export-office" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
+                                    <option value="ALL" ${currentFilters.office === 'ALL' ? 'selected' : ''}>ALL OFFICES</option>
+                                    <option value="DOLE" ${currentFilters.office === 'DOLE' ? 'selected' : ''}>DOLE LDNPFO</option>
+                                    <option value="LGU" ${currentFilters.office === 'LGU' ? 'selected' : ''}>LGU / LOCAL GOVT</option>
+                                    <option value="DICT" ${currentFilters.office === 'DICT' ? 'selected' : ''}>DICT</option>
+                                    <option value="DEPED" ${currentFilters.office === 'DEPED' ? 'selected' : ''}>DEPED</option>
+                                </select>
+                                <svg class="w-3.5 h-3.5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Sort Data By</label>
+                            <div class="relative group">
+                                <select id="export-sort" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
+                                    <option value="name" ${currentFilters.sort === 'name' ? 'selected' : ''}>NAME (A-Z)</option>
+                                    <option value="startdate" ${currentFilters.sort === 'startdate' ? 'selected' : ''}>START DATE (NEWEST)</option>
+                                    <option value="id" ${currentFilters.sort === 'id' ? 'selected' : ''}>ID NUMBER</option>
+                                    <option value="office" ${currentFilters.sort === 'office' ? 'selected' : ''}>OFFICE NAME</option>
+                                </select>
+                                <svg class="w-3.5 h-3.5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100/50">
+                        <!-- Employment Status -->
+                        <div>
+                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Employment Status Filter</label>
+                            <div class="flex flex-wrap gap-1.5">
+                                ${['ALL', 'ONGOING', 'ABSORBED', 'RESIGNED', 'EXPIRED'].map(s => {
+        const configs = { 'ALL': 'peer-checked:bg-blue-600', 'ONGOING': 'peer-checked:bg-green-500', 'ABSORBED': 'peer-checked:bg-teal-600', 'RESIGNED': 'peer-checked:bg-gray-700', 'EXPIRED': 'peer-checked:bg-red-600' };
+        return `
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="export-status" value="${s}" ${currentFilters.status === s ? 'checked' : ''} class="hidden peer">
+                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                        </label>
+                                    `;
+    }).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Display Section -->
+                        <div>
+                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Report Volume Section</label>
+                            <div class="flex gap-1.5">
+                                ${[
+            { id: 'ALL', label: 'All', color: 'peer-checked:bg-emerald-600' },
+            { id: 'ACTIVE', label: 'Active', color: 'peer-checked:bg-green-500' },
+            { id: 'ARCHIVED', label: 'Archived', color: 'peer-checked:bg-red-600' }
+        ].map(s => `
+                                    <label class="cursor-pointer flex-1">
+                                        <input type="radio" name="export-section" value="${s.id}" ${currentFilters.section === s.id ? 'checked' : ''} class="hidden peer">
+                                        <div class="py-1.5 bg-white border border-gray-100 rounded-lg flex items-center justify-center gap-1.5 transition-all ${s.color} peer-checked:text-white peer-checked:border-transparent shadow-sm">
+                                            <span class="text-[9px] font-black uppercase tracking-tight">${s.label}</span>
+                                        </div>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100 mt-4">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-1.5 h-4 bg-golden-yellow rounded-full"></span>
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Output Column Selection</label>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        ${['ID', 'Name', 'Office', 'Position', 'Start Date', 'End Date', 'Status'].map(col => {
+            const val = col.toLowerCase().replace(' ', '');
+            const isChecked = currentFilters.columns.includes(val);
+            const id = `col-switch-${val}`;
+            return `
+                                <label for="${id}" class="flex items-center gap-2 px-3 py-2 bg-white border border-gray-100 rounded-lg cursor-pointer hover:border-emerald-500/30 transition-all group select-none shadow-sm">
+                                    <div class="relative flex items-center shrink-0 scale-90">
+                                        <input type="checkbox" id="${id}" name="export-column" value="${val}" ${isChecked ? 'checked' : ''} class="sr-only peer">
+                                        <div class="w-8 h-4.5 bg-gray-200 rounded-full peer peer-checked:bg-emerald-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:shadow-sm after:transition-all peer-checked:after:translate-x-3.5"></div>
+                                    </div>
+                                    <span class="text-[9px] font-black text-gray-600 uppercase tracking-tight group-hover:text-emerald-600">${col}</span>
+                                </label>
+                            `;
+        }).join('')}
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-royal-blue text-white font-black text-[10px] uppercase tracking-[0.2em] py-3.5 rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Apply Profile Configuration
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    Swal.fire({
+        html: modalHtml,
+        width: '680px',
+        showConfirmButton: false,
+        showCloseButton: true,
+        padding: '1.5rem',
+        customClass: {
+            container: 'font-montserrat',
+            popup: 'rounded-[1.5rem] shadow-2xl overflow-visible ldn-modal-popup',
+            closeButton: 'focus:outline-none bg-gray-50 border-none swal2-custom-close cursor-pointer'
+        },
+        didOpen: (popup) => {
+            const form = popup.querySelector('#export-config-form');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const columnCheckboxes = form.querySelectorAll('input[name="export-column"]:checked');
+                const selectedColumns = Array.from(columnCheckboxes).map(cb => cb.value);
+
+                const statusRadio = form.querySelector('input[name="export-status"]:checked');
+                const sectionRadio = form.querySelector('input[name="export-section"]:checked');
+
+                const filters = {
+                    office: form.querySelector('#export-office').value,
+                    status: statusRadio ? statusRadio.value : (currentFilters.status || 'ALL'),
+                    search: form.querySelector('#export-search').value.trim().toLowerCase(),
+                    sort: form.querySelector('#export-sort').value,
+                    section: sectionRadio ? sectionRadio.value : 'ALL',
+                    columns: selectedColumns
+                };
+
+                callback(filters);
+                Swal.close();
+
+                // Show tiny success feedback
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Generator pattern updated',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'rounded-xl shadow-lg border border-emerald-100'
+                    }
+                });
+            });
+        }
+    });
 }
 
 const COMMON_COURSES = [
@@ -102,6 +320,19 @@ const COMMON_COURSES = [
     "High School Graduate"
 ];
 
+const COMMON_NATURE_OF_WORK = [
+    "Administrative Support",
+    "Office Clerk",
+    "Data Encoder",
+    "Messenger",
+    "Utility Worker",
+    "Scanning Officer",
+    "Filing Clerk",
+    "Receptionist",
+    "Customer Service Assist.",
+    "Technical Support Assist."
+];
+
 function calculateAge(birthday) {
     if (!birthday) return '';
     const birthDate = new Date(birthday);
@@ -118,27 +349,36 @@ function showBeneficiaryModal(data) {
     // Current Page Index for the Right Grid (0 = Info, 1 = Documents/etc)
     let rightGridPage = 0;
 
-    // Mock Data for Visualization (Dela Cruz)
-    const isMock = data.name && data.name.toLowerCase().includes('dela cruz');
-    const arLogs = isMock ? [
-        { period: 'Jan 01 - 15, 2025', date: 'Jan 16, 2025', status: 'verified' },
-        { period: 'Jan 16 - 31, 2025', date: 'Feb 01, 2025', status: 'verified' },
-        { period: 'Feb 01 - 15, 2025', date: 'Feb 14, 2025', status: 'pending' }
-    ] : [];
-    const dtrLogs = isMock ? [
-        { period: 'Feb 01, 2026', date: 'Feb 01, 2026', status: 'verified', day: 'MONDAY' },
-        { period: 'Feb 02, 2026', date: 'Feb 02, 2026', status: 'verified', day: 'TUESDAY' },
-        { period: 'Feb 03, 2026', date: 'Feb 03, 2026', status: 'pending', day: 'WEDNESDAY' }
-    ] : [];
+    // Use logs and docs fetched from database
+    const arLogs = data.arLogs || [];
+    const dtrLogs = data.dtrLogs || [];
+    const dbDocs = data.docs || [];
+
+    // Merge default required documents with database records
+    const defaultDocs = ['GIP FORM', 'BIRTH CERTIFICATE', 'DIPLOMA', 'TOR', 'VALID ID'];
+    const displayDocs = defaultDocs.map(name => {
+        // Case-insensitive search to prevent duplicates (e.g., 'Birth Certificate' vs 'BIRTH CERTIFICATE')
+        const found = dbDocs.find(d => d.name.toUpperCase() === name.toUpperCase());
+        return found ? found : { name, status: 'PENDING', id: null };
+    });
+
+    // Append any custom docs from DB that are not in the default list
+    dbDocs.forEach(d => {
+        const isDefault = defaultDocs.some(defName => defName.toUpperCase() === d.name.toUpperCase());
+        if (!isDefault) displayDocs.push(d);
+    });
 
     const getRowHtml = (log, type, i) => {
         const configs = {
             verified: { bg: 'bg-green-500', icon: 'M5 13l4 4L19 7', textClass: 'text-green-600 bg-green-50 border-green-200' },
             pending: { bg: 'bg-orange-400', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', textClass: 'text-orange-600 bg-orange-50 border-orange-200' },
-            declined: { bg: 'bg-red-500', icon: 'M6 18L18 6M6 6l12 12', textClass: 'text-red-600 bg-red-50 border-red-200' }
+            declined: { bg: 'bg-red-500', icon: 'M6 18L18 6M6 6l12 12', textClass: 'text-red-600 bg-red-50 border-red-200' },
+            VERIFIED: { bg: 'bg-green-500', icon: 'M5 13l4 4L19 7', textClass: 'text-green-600 bg-green-50 border-green-200' },
+            PENDING: { bg: 'bg-orange-400', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', textClass: 'text-orange-600 bg-orange-50 border-orange-200' },
+            DECLINED: { bg: 'bg-red-500', icon: 'M6 18L18 6M6 6l12 12', textClass: 'text-red-600 bg-red-50 border-red-200' }
         };
-        const config = configs[log.status];
-        const targetId = `${type}-${i}`;
+        const config = configs[log.status] || configs.pending;
+        const targetId = `${type}-${log.id || i}`;
 
         // Manila Time Formatting (Date Only)
         const nowMnl = new Date().toLocaleString('en-US', {
@@ -241,11 +481,11 @@ function showBeneficiaryModal(data) {
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:divide-x lg:divide-gray-100">
                 
                 <!-- LEFT GRID: Basic Information -->
-                <div class="space-y-4 pr-0 lg:pr-6">
-                    <div class="bg-gray-50/50 rounded-xl p-4 border border-gray-100 shadow-sm">
-                        <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black mb-3 border-b border-gray-100 pb-1.5">Personal Profile</p>
+                <div class="space-y-3 pr-0 lg:pr-6">
+                    <div class="bg-gray-50/50 rounded-xl p-3.5 border border-gray-100 shadow-sm">
+                        <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black mb-2.5 border-b border-gray-100 pb-1.5">Personal Profile</p>
                         
-                        <div class="space-y-4">
+                        <div class="space-y-3">
                              <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="text-[9px] text-gray-400 font-black uppercase tracking-widest block mb-1">Contact No.</label>
@@ -257,7 +497,7 @@ function showBeneficiaryModal(data) {
                                 </div>
                             </div>
 
-                             <div class="grid grid-cols-2 gap-4">
+                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="text-[9px] text-gray-400 font-black uppercase tracking-widest block mb-1">Birthday</label>
                                     <p class="text-sm font-black text-heading uppercase">${data.birthday || 'N/A'}</p>
@@ -275,8 +515,8 @@ function showBeneficiaryModal(data) {
                         </div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                        <label class="text-[9px] text-gray-400 font-black uppercase tracking-widest block mb-1.5">Educational Attainment</label>
+                    <div class="bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm">
+                        <label class="text-[9px] text-gray-400 font-black uppercase tracking-widest block mb-1">Educational Attainment</label>
                         <div class="flex items-center gap-3">
                              <div class="w-8 h-8 rounded-lg bg-golden-yellow/10 flex items-center justify-center text-golden-yellow border border-golden-yellow/20 shadow-sm">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
@@ -285,26 +525,14 @@ function showBeneficiaryModal(data) {
                         </div>
                     </div>
 
-                    <div class="pt-2">
-                         <label class="text-[9px] text-gray-400 font-black uppercase tracking-widest block mb-2">Primary Contract Duration</label>
-                         <div class="grid grid-cols-2 gap-3 text-center">
-                            <div class="bg-gray-100/50 rounded-lg p-3 border border-gray-200/50">
-                                <span class="text-[8px] text-gray-400 block uppercase font-bold tracking-tight mb-0.5">Start Date</span>
-                                <span class="text-[11px] font-black text-royal-blue uppercase">${data.startDate || 'Jan 01 2025'}</span>
-                            </div>
-                            <div class="bg-gray-100/50 rounded-lg p-3 border border-gray-200/50">
-                                <span class="text-[8px] text-gray-400 block uppercase font-bold tracking-tight mb-0.5">End Date</span>
-                                <span class="text-[11px] font-black text-royal-blue uppercase">${data.endDate || 'Jun 30 2025'}</span>
-                            </div>
-                         </div>
-                    </div>
+
                 </div>
 
                 <!-- RIGHT GRID: Work Details & Docs (Paginated) -->
-                <div class="space-y-4 pl-0 lg:pl-6 relative min-h-[350px]">
+                <div class="space-y-3 pl-0 lg:pl-6 relative h-[410px]">
                     <!-- Pagination Toggles -->
                     <button id="modal-prev-btn" 
-                        class="absolute top-36 -left-6 w-10 h-10 rounded-full transition-all duration-300 cursor-pointer flex items-center justify-center group text-royal-blue hover:scale-110 active:scale-95 hidden" 
+                        class="absolute top-37 -left-6 w-10 h-10 rounded-full transition-all duration-300 cursor-pointer flex items-center justify-center group text-royal-blue hover:scale-110 active:scale-95 hidden" 
                         title="Back">
                         <svg class="w-6 h-6 transform translate-y-[1px] group-hover:-translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
@@ -319,8 +547,8 @@ function showBeneficiaryModal(data) {
                         </svg>
                     </button>
                     
-                    <div id="modal-page-0" class="transition-opacity duration-300 space-y-4">
-                        <div class="bg-gray-50/50 rounded-xl p-4 border border-gray-100 shadow-sm">
+                    <div id="modal-page-0" class="transition-opacity duration-300 space-y-3 h-full overflow-y-auto custom-scrollbar pr-1">
+                        <div class="bg-gray-50/50 rounded-xl p-3.5 border border-gray-100 shadow-sm">
                              <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black mb-3">Work Registry</p>
                              <div class="flex items-center gap-3">
                                 <div class="p-2 bg-blue-50 rounded-lg border border-blue-100">
@@ -335,12 +563,12 @@ function showBeneficiaryModal(data) {
                             </div>
                         </div>
 
-                         <div class="bg-white border border-gray-100 p-4 rounded-xl shadow-sm">
+                         <div class="bg-white border border-gray-100 p-3.5 rounded-xl shadow-sm">
                             <label class="text-[9px] text-gray-400 font-black block mb-1 uppercase tracking-widest">Designation / Role</label>
                             <p class="text-sm font-black text-heading">${data.designation}</p>
                         </div>
                         
-                         <div class="bg-gray-50/30 p-4 rounded-xl border border-dashed border-gray-200">
+                         <div class="bg-gray-50/30 p-3.5 rounded-xl border border-dashed border-gray-200">
                             <label class="text-[9px] text-gray-400 font-black block mb-1 uppercase tracking-widest">Replacement History</label>
                              <p class="text-xs text-gray-500 font-medium italic">${data.replacement || 'None found.'}</p>
                         </div>
@@ -361,8 +589,8 @@ function showBeneficiaryModal(data) {
                         </div>
                     </div>
 
-                    <div id="modal-page-1" class="hidden transition-opacity duration-300 h-full">
-                         <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm h-full flex flex-col">
+                    <div id="modal-page-1" class="hidden transition-opacity duration-300 h-full overflow-hidden">
+                         <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm h-full flex flex-col">
                             <div class="mb-4 border-b border-gray-50 pb-2 flex items-center justify-between">
                                 <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black flex items-center gap-2">
                                     <svg class="w-4 h-4 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -373,40 +601,51 @@ function showBeneficiaryModal(data) {
                                 </button>
                             </div>
                             <ul id="docs-list-static" class="space-y-4 flex-1 pt-2 pl-2">
-                                ${['GIP FORM', 'Birth Certificate', 'Diploma', 'TOR', 'Valid ID'].map((doc, i) => `
-                                    <li class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50 p-3 pt-4 sm:pt-3 rounded-xl border border-gray-100 group/doc transition-all hover:bg-white hover:shadow-md">
-                                        <div id="doc-indicator-static-${i}" class="absolute -top-2 -left-2 w-5 h-5 rounded-full border-2 border-white shadow-md flex items-center justify-center bg-orange-400 text-white z-10 transition-transform group-hover/doc:scale-110">
+                                ${displayDocs.map((doc, i) => {
+        const docId = doc.id || `static-${i}`;
+        const targetId = `docs-${docId}`;
+        const statusConfigs = {
+            VERIFIED: { bg: 'bg-green-500', icon: 'M5 13l4 4L19 7', textClass: 'text-green-600 bg-green-50 border-green-200' },
+            PENDING: { bg: 'bg-orange-400', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', textClass: 'text-orange-600 bg-orange-50 border-orange-200' },
+            DECLINED: { bg: 'bg-red-500', icon: 'M6 18L18 6M6 6l12 12', textClass: 'text-red-600 bg-red-50 border-red-200' }
+        };
+        const config = statusConfigs[doc.status.toUpperCase()] || statusConfigs.PENDING;
+
+        return `
+                                    <li class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50 p-3 pt-4 sm:pt-3 rounded-xl border border-gray-100 group/doc transition-all hover:bg-white hover:shadow-md h-auto">
+                                        <div id="doc-indicator-${targetId}" class="absolute -top-2 -left-2 w-5 h-5 rounded-full border-2 border-white shadow-md flex items-center justify-center ${config.bg} text-white z-10 transition-transform group-hover/doc:scale-110">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path id="doc-path-static-${i}" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                <path id="doc-path-${targetId}" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="${config.icon}" />
                                             </svg>
                                         </div>
                                         <div class="flex-1 min-w-0 pr-2">
-                                            <span class="doc-name-display text-[11px] font-black text-gray-700 truncate block cursor-text hover:text-royal-blue transition-colors" title="${doc}">${doc}</span>
-                                            <input type="text" value="${doc}" class="doc-name-edit hidden w-full bg-white border border-royal-blue/30 rounded px-1.5 py-0.5 text-[11px] font-black text-royal-blue outline-none ring-2 ring-royal-blue/10">
+                                            <span class="doc-name-display text-[11px] font-black text-gray-700 truncate block cursor-text hover:text-royal-blue transition-colors" title="${doc.name}">${doc.name}</span>
+                                            <input type="text" value="${doc.name}" class="doc-name-edit hidden w-full bg-white border border-royal-blue/30 rounded px-1.5 py-0.5 text-[11px] font-black text-royal-blue outline-none ring-2 ring-royal-blue/10">
                                         </div>
                                         <div class="doc-view-mode-container shrink-0 flex items-center">
-                                            <span id="doc-text-badge-static-${i}" class="text-[8px] text-orange-600 bg-orange-50 border-orange-200 font-black uppercase px-2 py-0.5 rounded border tracking-tighter shadow-sm">PENDING</span>
+                                            <span id="doc-text-badge-${targetId}" class="text-[8px] ${config.textClass} font-black uppercase px-2 py-0.5 rounded border tracking-tighter shadow-sm">${doc.status}</span>
                                         </div>
                                         <div class="doc-edit-mode-container hidden flex items-center gap-1.5 shrink-0">
-                                            <button data-status="verified" data-target="static-${i}" title="Mark as Verified" class="doc-status-btn cursor-pointer w-7 h-7 flex items-center justify-center rounded-lg transition-all border bg-green-50 text-green-700 border-green-200 hover:bg-green-500 hover:text-white">
+                                            <button data-status="verified" data-target="${targetId}" data-docname="${doc.name}" title="Mark as Verified" class="doc-status-btn cursor-pointer w-7 h-7 flex items-center justify-center rounded-lg transition-all border bg-green-50 text-green-700 border-green-200 hover:bg-green-500 hover:text-white">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                                             </button>
-                                            <button data-status="pending" data-target="static-${i}" title="Mark as Pending" class="doc-status-btn cursor-pointer w-7 h-7 flex items-center justify-center rounded-lg transition-all border bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-400 hover:text-white">
+                                            <button data-status="pending" data-target="${targetId}" data-docname="${doc.name}" title="Mark as Pending" class="doc-status-btn cursor-pointer w-7 h-7 flex items-center justify-center rounded-lg transition-all border bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-400 hover:text-white">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                             </button>
-                                            <button data-status="declined" data-target="static-${i}" title="Mark as Declined" class="doc-status-btn cursor-pointer w-7 h-7 flex items-center justify-center rounded-lg transition-all border bg-red-50 text-red-700 border-red-200 hover:bg-red-500 hover:text-white">
+                                            <button data-status="declined" data-target="${targetId}" data-docname="${doc.name}" title="Mark as Declined" class="doc-status-btn cursor-pointer w-7 h-7 flex items-center justify-center rounded-lg transition-all border bg-red-50 text-red-700 border-red-200 hover:bg-red-500 hover:text-white">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
                                             </button>
                                         </div>
                                     </li>
-                                `).join('')}
+                                `;
+    }).join('')}
                             </ul>
                         </div>
                     </div>
 
-                    <div id="modal-page-2" class="hidden h-full flex flex-col gap-4">
+                    <div id="modal-page-2" class="hidden h-full flex flex-col gap-3">
                         <!-- Accomplishment Report Section -->
-                        <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex-1 flex flex-col min-h-0 overflow-hidden">
+                        <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm flex-1 flex flex-col min-h-0 overflow-hidden">
                             <div class="mb-3 border-b border-gray-50 pb-2 flex items-center justify-between">
                                 <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black flex items-center gap-2">
                                     <svg class="w-4 h-4 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -438,7 +677,7 @@ function showBeneficiaryModal(data) {
                         </div>
 
                         <!-- Daily Time Record Section -->
-                        <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex-1 flex flex-col min-h-0 overflow-hidden">
+                        <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm flex-1 flex flex-col min-h-0 overflow-hidden">
                             <div class="mb-3 border-b border-gray-50 pb-2 flex items-center justify-between">
                                 <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black flex items-center gap-2">
                                     <svg class="w-4 h-4 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -602,7 +841,7 @@ function showBeneficiaryModal(data) {
                     const btns = [prevBtn, nextBtn].filter(Boolean);
                     btns.forEach(btn => {
                         if (rightGridPage === 2) {
-                            btn.style.top = '229px';
+                            btn.style.top = '185px';
                         } else {
                             btn.style.top = ''; // Reset to top-36 from CSS
                         }
@@ -637,12 +876,22 @@ function showBeneficiaryModal(data) {
                     if (isEditing) {
                         btn.classList.remove('bg-royal-blue', 'text-white', 'shadow-md');
                         btn.classList.add('text-gray-400');
+                        btn.setAttribute('title', 'Manage Documentation Status');
                         btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>`;
                         section.querySelectorAll('.doc-name-edit').forEach(el => el.classList.add('hidden'));
                         section.querySelectorAll('.doc-name-display').forEach(el => el.classList.remove('hidden'));
+
+                        // Show success toast when saving
+                        if (btn.classList.contains('toggle-docs-edit')) {
+                            showToastOverlap('Required Documents Saved Successfully', 'success');
+                        } else if (btn.classList.contains('toggle-logs-edit')) {
+                            const title = section.querySelector('p')?.innerText.trim() || 'Logs';
+                            showToastOverlap(`${title} Saved Successfully`, 'success');
+                        }
                     } else {
                         btn.classList.add('bg-royal-blue', 'text-white', 'shadow-md');
                         btn.classList.remove('text-gray-400');
+                        btn.setAttribute('title', 'Save Changes');
                         btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
                     }
                     section.querySelectorAll('.doc-view-mode-container').forEach(el => el.classList.toggle('hidden'));
@@ -651,47 +900,127 @@ function showBeneficiaryModal(data) {
             });
 
             // Status Toggler Logic (Delegated)
-            popup.addEventListener('click', (e) => {
+            popup.addEventListener('click', async (e) => {
                 const btn = e.target.closest('.doc-status-btn');
                 if (!btn) return;
                 e.preventDefault();
-                const status = btn.dataset.status;
+
+                const status = btn.dataset.status.toUpperCase();
                 const targetId = btn.dataset.target;
-                const indicator = popup.querySelector(`#doc-indicator-${targetId}`);
-                const path = popup.querySelector(`#doc-path-${targetId}`);
-                const textBadge = popup.querySelector(`#doc-text-badge-${targetId}`);
-                const submitDateLabel = popup.querySelector(`#submit-date-${targetId}`);
 
-                const statusConfigs = {
-                    verified: { bg: 'bg-green-500', icon: 'M5 13l4 4L19 7', textClass: 'text-green-600 bg-green-50 border-green-200' },
-                    pending: { bg: 'bg-orange-400', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', textClass: 'text-orange-600 bg-orange-50 border-orange-200' },
-                    declined: { bg: 'bg-red-500', icon: 'M6 18L18 6M6 6l12 12', textClass: 'text-red-600 bg-red-50 border-red-200' }
-                };
-                const config = statusConfigs[status];
+                // Determine type and original ID
+                const isAR = targetId.startsWith('ar-');
+                const isDTR = targetId.startsWith('dtr-');
+                const isDocs = targetId.startsWith('docs-');
 
-                if (indicator) {
-                    indicator.className = (targetId.includes('static') || targetId.includes('custom')) ?
-                        `absolute -top-2 -left-2 w-5 h-5 rounded-full border-2 border-white shadow-md flex items-center justify-center ${config.bg} text-white z-10 transition-transform group-hover/doc:scale-110` :
-                        `w-3.5 h-3.5 rounded-full ${config.bg} text-white flex items-center justify-center shadow-sm`;
-                }
-                if (path) path.setAttribute('d', config.icon);
-                if (textBadge) {
-                    textBadge.className = `text-[8px] ${config.textClass} font-black uppercase px-2 py-0.5 rounded border tracking-tighter shadow-sm`;
-                    textBadge.innerText = status;
-                }
-                if (submitDateLabel && targetId.includes('ar-')) {
-                    submitDateLabel.innerText = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: '2-digit', year: 'numeric' });
-                }
-                if (indicator) {
-                    indicator.classList.add('scale-125');
-                    setTimeout(() => indicator.classList.remove('scale-125'), 200);
+                const logIdStr = targetId.split('-').pop(); // Handle 'static-0', '123', etc.
+                const isNewDoc = isDocs && targetId.includes('static-');
+
+                // Helper to update UI
+                function updateUIOnly() {
+                    const indicator = popup.querySelector(`#doc-indicator-${targetId}`);
+                    const pathEl = popup.querySelector(`#doc-path-${targetId}`);
+                    const textBadge = popup.querySelector(`#doc-text-badge-${targetId}`);
+
+                    const statusConfigs = {
+                        VERIFIED: { bg: 'bg-green-500', icon: 'M5 13l4 4L19 7', textClass: 'text-green-600 bg-green-50 border-green-200' },
+                        PENDING: { bg: 'bg-orange-400', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', textClass: 'text-orange-600 bg-orange-50 border-orange-200' },
+                        DECLINED: { bg: 'bg-red-500', icon: 'M6 18L18 6M6 6l12 12', textClass: 'text-red-600 bg-red-50 border-red-200' }
+                    };
+                    const config = statusConfigs[status];
+
+                    if (indicator) {
+                        indicator.className = (isDocs) ?
+                            `absolute -top-2 -left-2 w-5 h-5 rounded-full border-2 border-white shadow-md flex items-center justify-center ${config.bg} text-white z-10 transition-transform group-hover/doc:scale-110` :
+                            `w-3.5 h-3.5 rounded-full ${config.bg} text-white flex items-center justify-center shadow-sm`;
+                    }
+                    if (pathEl) pathEl.setAttribute('d', config.icon);
+                    if (textBadge) {
+                        textBadge.className = `text-[8px] ${config.textClass} font-black uppercase px-2 py-0.5 rounded border tracking-tighter shadow-sm`;
+                        textBadge.innerText = status;
+                    }
+
+                    const btnGroup = btn.closest('div');
+                    if (btnGroup) {
+                        btnGroup.querySelectorAll('.doc-status-btn').forEach(b => b.classList.remove('active-status'));
+                        btn.classList.add('active-status');
+                    }
                 }
 
-                // Handle Persistent Active State
-                const btnGroup = btn.closest('div');
-                if (btnGroup) {
-                    btnGroup.querySelectorAll('.doc-status-btn').forEach(b => b.classList.remove('active-status'));
-                    btn.classList.add('active-status');
+                try {
+                    // 1. UPDATE UI FIRST (using current ID)
+                    updateUIOnly();
+
+                    // 2. PERSIST TO DATABASE
+                    let response;
+                    const type = isAR ? 'ar' : (isDTR ? 'dtr' : 'docs');
+
+                    if (isNewDoc) {
+                        // First time updating a "static" doc -> POST to create it
+                        response = await fetch(`${getBasePath()}api/logs.php`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                type: 'docs',
+                                gip_id: data.id,
+                                document_name: btn.dataset.docname,
+                                status: status
+                            })
+                        });
+                    } else {
+                        // Update existing record
+                        response = await fetch(`${getBasePath()}api/logs.php`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                type: type,
+                                id: logIdStr,
+                                status: status
+                            })
+                        });
+                    }
+
+                    const result = await response.json();
+
+                    if (!result.success) {
+                        throw new Error(result.error || 'Failed to update status');
+                    }
+
+                    // 3. ID TRANSITION (only for brand new docs)
+                    // If it was a new doc, update its ID in the DOM to avoid multiple POSTs
+                    if (isNewDoc && result.id) {
+                        const newId = `docs-${result.id}`;
+                        // Update all IDs/targets in this LI
+                        const li = btn.closest('li');
+                        li.querySelectorAll(`[id$="${targetId}"]`).forEach(el => {
+                            el.id = el.id.replace(targetId, newId);
+                        });
+                        li.querySelectorAll(`[data-target="${targetId}"]`).forEach(el => {
+                            el.dataset.target = newId;
+                        });
+                    }
+
+                    const submitDateLabel = popup.querySelector(`#submit-date-${targetId}`);
+                    if (submitDateLabel && isAR) {
+                        submitDateLabel.innerText = new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: '2-digit', year: 'numeric' });
+                    }
+
+                    // Show success toast for individual status update
+                    const typeLabel = isAR ? 'Report' : (isDTR ? 'DTR' : 'Document');
+                    const statusLower = status.toLowerCase();
+                    const statusDisplay = statusLower.charAt(0).toUpperCase() + statusLower.slice(1);
+                    showToastOverlap(`${typeLabel} marked as ${statusDisplay}`, 'success');
+                } catch (error) {
+                    console.error('Status Update Error:', error);
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'error',
+                        title: 'Failed to update status',
+                        text: error.message,
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
                 }
             });
 
@@ -725,42 +1054,6 @@ function showBeneficiaryModal(data) {
 
                     if (Math.abs(currentX) >= threshold) {
                         // Snap to open state (Threshold reached)
-                        targetRow.style.transform = `translateX(-100%)`; // Move fully out? No, maybe just enough to show overlay? 
-                        // Actually, previous logic was moving out. User wants "pause/confirmation".
-                        // Let's snap it slightly off-screen or just keep it fully covered by overlay? 
-                        // The overlay is inside the row, covering it? 
-                        // Wait, structure: <tr class="relative overflow-hidden"> <td>...</td> <td colspan="3"><div class="absolute inset-0"></div></td>
-                        // If we translate the ROW, the overlay moves with it?
-                        // Actually, the swipe usually moves the content to reveal something behind, OR it moves the whole row.
-
-                        // Let's assume the previous logic: `translateX(-100%)` moved the row OFF screen?
-                        // If we want to show the overlay which is absolute inset-0 (covering the row), we probably want the row to stay in place but maybe reveal the overlay?
-                        // No, the previous code was: `targetRow.style.transform = translateX(-100%)`. This moves the row TO THE LEFT.
-                        // If the overlay is `absolute inset-0`, it is moving WITH the row.
-
-                        // Ah, let's look at the structure.
-                        // The overlay is `absolute inset-0` inside a cell? No.
-                        // It is in a `td` with `colspan="3"`.
-
-                        // Let's change the interaction.
-                        // We slide the row to the left. The overlay should appear.
-                        // If we just want to show the overlay, maybe we don't translate the row away?
-                        // Or maybe we treat the "archive" action as "swiping left to reveal actions"?
-
-                        // Let's try this:
-                        // When swiping left, we translation the row content?
-                        // The `swipe-row` class is on the `TR`.
-
-                        // If I move the TR `translateX(-100%)`, it goes off screen.
-                        // I probably want to keep it visible but showing the overlay.
-
-                        // Revised Logic:
-                        // 1. Overlay is initially `opacity-0` and `pointer-events-none`.
-                        // 2. As we swipe, we increase opacity.
-                        // 3. If threshold reached, we keep the overlay visible (`opacity: 1`) and enable pointer events.
-                        // 4. We DO NOT translate the row off screen yet. We snap it back to 0? Or keep it slightly translated?
-                        // If we snap back to 0, it looks like nothing happened, but the overlay is now on top.
-
                         targetRow.style.transform = 'translateX(0)'; // Snap back to place
                         if (overlay) {
                             overlay.style.opacity = '1';
@@ -836,43 +1129,102 @@ function showBeneficiaryModal(data) {
 
             // Generic Add Log Logic
             popup.querySelectorAll('.add-log-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', async () => {
                     const type = btn.dataset.type;
                     const body = popup.querySelector(`#${type}-logs-body`);
                     const existingRows = body.querySelectorAll('tr');
                     const newIndex = existingRows.length;
-                    const log = { period: '', date: new Date(), status: 'pending' };
+                    const log = { period: '', date: new Date(), status: 'PENDING' };
                     let nextPeriod;
                     const startDateStr = data.startDate || 'Jan 01, 2025';
                     const baseDate = new Date(startDateStr);
 
                     if (type === 'dtr') {
                         const now = new Date();
-                        nextPeriod = now.toLocaleString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+                        nextPeriod = now.toISOString().split('T')[0];
+                        log.date = nextPeriod;
                         log.day = now.toLocaleString('en-US', { weekday: 'long' }).toUpperCase();
                     } else if (existingRows.length === 0) {
+                        // First AR: Use start date as base
                         const monthStr = baseDate.toLocaleString('en-US', { month: 'short' });
-                        nextPeriod = baseDate.getDate() <= 15 ? `${monthStr} 01 - 15, ${baseDate.getFullYear()}` : `${monthStr} 16 - ${new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 0).getDate()}, ${baseDate.getFullYear()}`;
+                        const day = baseDate.getDate();
+                        const year = baseDate.getFullYear();
+                        const month = baseDate.getMonth();
+
+                        if (day <= 15) {
+                            nextPeriod = `${monthStr} 01 - 15, ${year}`;
+                        } else {
+                            const lastDay = new Date(year, month + 1, 0).getDate();
+                            nextPeriod = `${monthStr} 16 - ${lastDay}, ${year}`;
+                        }
                     } else {
+                        // Calculate next period based on last entry
                         const lastText = existingRows[newIndex - 1].querySelector('[id^="period-text"]').innerText;
                         try {
-                            const mStr = lastText.split(' ')[0];
-                            const yr = parseInt(lastText.split(',')[1].trim());
-                            const mIdx = new Date(Date.parse(mStr + " 1, 2012")).getMonth();
-                            if (lastText.includes('01 - 15')) {
-                                nextPeriod = `${mStr} 16 - ${new Date(yr, mIdx + 1, 0).getDate()}, ${yr}`;
+                            // Parse: "Jan 01 - 15, 2026" or "Jan 16 - 31, 2026"
+                            const parts = lastText.split(',');
+                            const yearPart = parseInt(parts[1].trim());
+                            const monthDayPart = parts[0].trim(); // "Jan 01 - 15" or "Jan 16 - 31"
+                            const monthStr = monthDayPart.split(' ')[0]; // "Jan"
+                            const monthIdx = new Date(Date.parse(monthStr + " 1, 2012")).getMonth();
+
+                            if (monthDayPart.includes('01 - 15')) {
+                                // Last was 1-15, next is 16-end
+                                const lastDay = new Date(yearPart, monthIdx + 1, 0).getDate();
+                                nextPeriod = `${monthStr} 16 - ${lastDay}, ${yearPart}`;
                             } else {
-                                const nextM = new Date(yr, mIdx + 1, 1);
-                                nextPeriod = `${nextM.toLocaleString('en-US', { month: 'short' })} 01 - 15, ${nextM.getFullYear()}`;
+                                // Last was 16-end, next is 1-15 of next month
+                                const nextDate = new Date(yearPart, monthIdx + 1, 1);
+                                const nextMonthStr = nextDate.toLocaleString('en-US', { month: 'short' });
+                                const nextYear = nextDate.getFullYear();
+                                nextPeriod = `${nextMonthStr} 01 - 15, ${nextYear}`;
                             }
-                        } catch (e) { nextPeriod = "Next Period"; }
+                        } catch (e) {
+                            console.error('Period calculation error:', e);
+                            // Fallback to current date
+                            const now = new Date();
+                            const monthStr = now.toLocaleString('en-US', { month: 'short' });
+                            nextPeriod = `${monthStr} 01 - 15, ${now.getFullYear()}`;
+                        }
                     }
                     log.period = nextPeriod;
-                    const temp = document.createElement('tbody');
-                    temp.innerHTML = getRowHtml(log, type, newIndex);
-                    const newRow = temp.firstElementChild;
-                    body.appendChild(newRow);
-                    bindDynamicInputs();
+
+                    // PERSIST TO DATABASE IMMEDIATELY
+                    btn.disabled = true;
+                    try {
+                        const postData = {
+                            type: type,
+                            gip_id: data.id,
+                            status: 'PENDING'
+                        };
+                        if (type === 'ar') postData.period = nextPeriod;
+                        else {
+                            postData.record_date = nextPeriod;
+                            postData.weekday = log.day;
+                        }
+
+                        const response = await fetch(`${getBasePath()}api/logs.php`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(postData)
+                        });
+                        const result = await response.json();
+                        if (result.success) {
+                            log.id = result.id;
+                            const temp = document.createElement('tbody');
+                            temp.innerHTML = getRowHtml(log, type, newIndex);
+                            const newRow = temp.firstElementChild;
+                            body.appendChild(newRow);
+                            bindDynamicInputs();
+                        } else {
+                            throw new Error(result.error);
+                        }
+                    } catch (err) {
+                        console.error('Failed to add log:', err);
+                        Swal.showValidationMessage(`Failed to add: ${err.message}`);
+                    } finally {
+                        btn.disabled = false;
+                    }
                 });
             });
 
@@ -925,6 +1277,19 @@ function showBeneficiaryModal(data) {
             }
 
             bindDynamicInputs();
+        },
+        willClose: () => {
+            // Clear draft if the modal is closed without a successful save
+            // This assumes successful save explicitly clears it.
+            // If the modal is closed by clicking the close button or outside,
+            // and it's a new entry, we clear the draft.
+            const form = document.querySelector('#add-beneficiary-form');
+            const draftKey = 'add_beneficiary_draft';
+            const isEdit = form?.dataset.isEdit === 'true'; // Assuming you add data-is-edit to form
+
+            if (!isEdit) {
+                localStorage.removeItem(draftKey);
+            }
         }
     });
 }
@@ -954,7 +1319,7 @@ function showAddDataModal(data = null) {
                 </div>
             </div>
 
-            <form id="add-beneficiary-form" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <form id="add-beneficiary-form" class="grid grid-cols-1 lg:grid-cols-2 gap-5" data-is-edit="${isEdit}">
                 <!-- LEFT COLUMN: Personal Info Card -->
                 <div class="bg-gray-50/40 rounded-xl p-4 border border-gray-100 shadow-sm flex flex-col space-y-4">
                     <div class="flex items-center gap-2 mb-1">
@@ -1003,8 +1368,11 @@ function showAddDataModal(data = null) {
                                 <div class="relative" id="education-container">
                                     <input type="text" name="education" id="education-input" autocomplete="off"
                                         value="${data?.education || ''}" 
-                                        class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[12px] font-bold focus:ring-4 focus:ring-[#2e7d32]/10 focus:border-[#2e7d32] outline-none transition-all shadow-sm placeholder:text-gray-300" 
+                                        class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 pl-9 text-[12px] font-bold focus:ring-4 focus:ring-[#2e7d32]/10 focus:border-[#2e7d32] outline-none transition-all shadow-sm placeholder:text-gray-300" 
                                         placeholder="Course/Level...">
+                                    <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                                    </div>
                                     <div id="course-suggestions" class="hidden absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat divide-y divide-gray-50 p-1.5">
                                         ${COMMON_COURSES.map(course => `
                                             <div class="course-option px-3 py-2 text-[10px] font-bold text-gray-600 hover:bg-[#e8f5e9] hover:text-[#2e7d32] rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
@@ -1047,7 +1415,7 @@ function showAddDataModal(data = null) {
                             <label class="text-[9px] text-gray-400 font-black uppercase block mb-1 transition-colors group-focus-within:text-royal-blue">ID Number</label>
                             <div class="flex items-center">
                                 <div class="bg-royal-blue border border-royal-blue rounded-l-lg px-3 py-2 text-[10px] font-black text-white font-mono shadow-sm">ROX-RD-ESIG-2025-</div>
-                                <input type="text" name="id_number" id="id-number-input" 
+                                <input type="text" name="id_number_suffix" id="id-number-input" 
                                     value="${data?.id ? data.id.split('-').pop() : ''}" 
                                     class="flex-1 bg-white border border-gray-200 border-l-0 rounded-r-lg px-3 py-2 text-[11px] font-black text-royal-blue font-mono outline-none focus:ring-4 focus:ring-royal-blue/10 focus:border-royal-blue transition-all" 
                                     placeholder="0001">
@@ -1074,7 +1442,19 @@ function showAddDataModal(data = null) {
 
                         <div class="group">
                             <label class="text-[9px] text-gray-400 font-black uppercase block mb-1">Nature of Work <span class="text-red-500">*</span></label>
-                            <input type="text" name="designation" value="${data?.designation || ''}" required class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[12px] font-bold focus:ring-4 focus:ring-royal-blue/10 focus:border-royal-blue outline-none transition-all shadow-sm placeholder:text-gray-300" placeholder="e.g. Administrative Support">
+                            <div class="relative" id="work-container">
+                                <input type="text" name="designation" id="designation-input" autocomplete="off"
+                                    value="${data?.designation || ''}" required 
+                                    class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[12px] font-bold focus:ring-4 focus:ring-royal-blue/10 focus:border-royal-blue outline-none transition-all shadow-sm placeholder:text-gray-300" 
+                                    placeholder="e.g. Administrative Support">
+                                <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat divide-y divide-gray-50 p-1.5">
+                                    ${COMMON_NATURE_OF_WORK.map(work => `
+                                        <div class="work-option px-3 py-2 text-[10px] font-bold text-gray-600 hover:bg-blue-50 hover:text-royal-blue rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
+                                            ${work}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
                         </div>
 
                         <div class="group">
@@ -1083,21 +1463,33 @@ function showAddDataModal(data = null) {
                         </div>
 
                         <div class="group">
-                            <label class="text-[9px] text-gray-400 font-black uppercase block mb-1.5">Status</label>
-                            <div class="flex gap-2 items-center">
-                                <select name="remarks" id="remarks-select" class="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-[12px] font-black focus:ring-4 focus:ring-[#2e7d32]/10 focus:border-[#2e7d32] outline-none transition-all shadow-sm cursor-pointer appearance-none">
-                                    <option value="ONGOING" ${data?.remarks === 'ONGOING' ? 'selected' : ''}>ONGOING</option>
-                                    <option value="EXPIRED" ${data?.remarks === 'EXPIRED' ? 'selected' : ''}>EXPIRED</option>
-                                    <option value="RESIGNED" ${data?.remarks === 'RESIGNED' ? 'selected' : ''}>RESIGNED</option>
-                                    <option value="ABSORBED" ${data?.remarks === 'ABSORBED' ? 'selected' : ''}>ABSORBED</option>
-                                </select>
+                            <label class="text-[9px] text-gray-400 font-black uppercase block mb-2">Employment Status Record</label>
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <div class="flex flex-wrap gap-2 p-1.5 bg-gray-50 border border-gray-100 rounded-xl shadow-inner flex-1">
+                                    ${(() => {
+            const statusConfigs = {
+                'ONGOING': 'peer-checked:bg-green-400 peer-checked:text-white peer-checked:border-green-400',
+                'EXPIRED': 'peer-checked:bg-philippine-red peer-checked:text-white peer-checked:border-philippine-red',
+                'RESIGNED': 'peer-checked:bg-neutral-800 peer-checked:text-white peer-checked:border-neutral-800',
+                'ABSORBED': 'peer-checked:bg-royal-blue peer-checked:text-white peer-checked:border-royal-blue'
+            };
+            return ['ONGOING', 'EXPIRED', 'RESIGNED', 'ABSORBED'].map(s => `
+                                            <label class="cursor-pointer relative min-w-[80px]">
+                                                <input type="radio" name="remarks" value="${s}" ${data?.remarks === s ? 'checked' : ''} class="hidden peer remarks-radio">
+                                                <span class="px-3 py-1.5 rounded-lg border border-transparent text-[10px] font-black text-gray-400 uppercase tracking-widest ${statusConfigs[s] || ''} transition-all block text-center cursor-pointer shadow-sm">
+                                                    ${s}
+                                                </span>
+                                            </label>
+                                        `).join('');
+        })()}
+                                </div>
                                 <div class="flex items-center gap-1.5">
                                     <button type="button" id="absorb-btn" 
-                                        class="px-3 py-2.5 rounded-lg bg-[#2e7d32] text-white text-[10px] font-black hover:bg-[#1b5e20] transition-all duration-300 shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
+                                        class="px-3 py-3 rounded-xl bg-[#2e7d32] text-white text-[10px] font-black hover:bg-[#1b5e20] transition-all duration-300 shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
                                         ABSORB
                                     </button>
                                     <button type="button" id="resign-btn" 
-                                        class="px-3 py-2.5 rounded-lg bg-[#ce1126] text-white text-[10px] font-black hover:bg-[#b71c1c] transition-all duration-300 shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
+                                        class="px-3 py-3 rounded-xl bg-[#ce1126] text-white text-[10px] font-black hover:bg-[#b71c1c] transition-all duration-300 shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
                                         RESIGN
                                     </button>
                                 </div>
@@ -1205,9 +1597,22 @@ function showAddDataModal(data = null) {
             // Remarks and End Date Logic
             const startDateInput = popup.querySelector('input[name="startDate"]');
             const endDateInput = popup.querySelector('input[name="endDate"]');
-            const remarksSelect = popup.querySelector('#remarks-select');
+            const remarksRadios = popup.querySelectorAll('input[name="remarks"]');
 
-            if (startDateInput && endDateInput && remarksSelect) {
+            const getSelectedRemarks = () => {
+                const checked = popup.querySelector('input[name="remarks"]:checked');
+                return checked ? checked.value : 'ONGOING';
+            };
+
+            const setSelectedRemarks = (val) => {
+                const radio = popup.querySelector(`input[name="remarks"][value="${val}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            };
+
+            if (startDateInput && endDateInput && remarksRadios.length > 0) {
                 // Auto-set End Date based on Start Date (e.g., 6 months later)
                 startDateInput.addEventListener('change', (e) => {
                     if (e.target.value) {
@@ -1218,6 +1623,20 @@ function showAddDataModal(data = null) {
                         }
                         updateRemarks();
                     }
+                });
+
+                // Auto-uppercase for all text inputs as per senior request
+                const textInputs = popup.querySelectorAll('input[type="text"], textarea');
+                textInputs.forEach(input => {
+                    // Skip GIP ID suffix input to keep it numeric mostly
+                    if (input.id === 'id-number-input' || input.id === 'full-id-input') return;
+
+                    input.addEventListener('input', () => {
+                        const start = input.selectionStart;
+                        const end = input.selectionEnd;
+                        input.value = input.value.toUpperCase();
+                        input.setSelectionRange(start, end);
+                    });
                 });
 
                 const updateRemarks = () => {
@@ -1231,16 +1650,16 @@ function showAddDataModal(data = null) {
                         end.setHours(0, 0, 0, 0);
                         now.setHours(0, 0, 0, 0);
 
+                        let newStatus = 'ONGOING';
                         if (end < now) {
-                            remarksSelect.value = 'EXPIRED';
+                            newStatus = 'EXPIRED';
                         } else if (start && start <= now) {
-                            remarksSelect.value = 'ONGOING';
+                            newStatus = 'ONGOING';
                         } else if (start && start > now) {
-                            // If start is in future, still ONGOING as default status for new hires
-                            remarksSelect.value = 'ONGOING';
-                        } else {
-                            remarksSelect.value = 'ONGOING';
+                            newStatus = 'ONGOING';
                         }
+
+                        setSelectedRemarks(newStatus);
                     }
                 };
 
@@ -1249,7 +1668,8 @@ function showAddDataModal(data = null) {
                 // Absorption Content Helper
                 const extensionContainer = popup.querySelector('#extension-log-container');
                 const updateAbsorptionLog = () => {
-                    if (remarksSelect.value === 'ABSORBED') {
+                    const status = getSelectedRemarks();
+                    if (status === 'ABSORBED') {
                         const date = data?.absorbDate || new Date().toLocaleString('en-US', {
                             timeZone: 'Asia/Manila',
                             month: 'short',
@@ -1275,79 +1695,139 @@ function showAddDataModal(data = null) {
                     }
                 };
 
+                // Listen for manual radio changes
+                remarksRadios.forEach(r => r.addEventListener('change', updateAbsorptionLog));
+
                 // Resign Button Logic
                 const resignBtn = popup.querySelector('#resign-btn');
                 const absorbBtn = popup.querySelector('#absorb-btn');
 
                 if (resignBtn) {
                     resignBtn.addEventListener('click', () => {
-                        if (remarksSelect.value === 'RESIGNED') {
+                        const current = getSelectedRemarks();
+                        if (current === 'RESIGNED') {
                             updateRemarks();
                         } else {
-                            remarksSelect.value = 'RESIGNED';
+                            setSelectedRemarks('RESIGNED');
                         }
-                        updateAbsorptionLog();
                     });
                 }
 
                 if (absorbBtn) {
                     absorbBtn.addEventListener('click', () => {
-                        if (remarksSelect.value === 'ABSORBED') {
+                        const current = getSelectedRemarks();
+                        if (current === 'ABSORBED') {
                             updateRemarks();
                         } else {
-                            remarksSelect.value = 'ABSORBED';
+                            setSelectedRemarks('ABSORBED');
                         }
-                        updateAbsorptionLog();
                     });
                 }
 
                 // Initial check
-                if (data?.remarks !== 'RESIGNED' && data?.remarks !== 'ABSORBED') {
+                const initialRemarks = getSelectedRemarks();
+                if (initialRemarks !== 'RESIGNED' && initialRemarks !== 'ABSORBED') {
                     updateRemarks();
                 }
                 updateAbsorptionLog();
             }
 
             // Custom Course Suggestion Logic
-            const eduInput = popup.querySelector('#education-input');
-            const eduSuggestions = popup.querySelector('#course-suggestions');
-            const eduOptions = popup.querySelectorAll('.course-option');
+            // Setup Course Suggestions
+            setupSuggestions('education-input', 'course-suggestions', 'course-option');
+            // Setup Nature of Work Suggestions
+            setupSuggestions('designation-input', 'work-suggestions', 'work-option');
 
-            if (eduInput && eduSuggestions) {
-                const showSuggestions = () => eduSuggestions.classList.remove('hidden');
-                const hideSuggestions = () => setTimeout(() => eduSuggestions.classList.add('hidden'), 200);
+            function setupSuggestions(inputId, containerId, optionClass) {
+                const input = popup.querySelector(`#${inputId}`);
+                const container = popup.querySelector(`#${containerId}`);
+                if (!input || !container) return;
 
-                eduInput.addEventListener('focus', showSuggestions);
-                eduInput.addEventListener('blur', hideSuggestions);
+                input.addEventListener('focus', () => container.classList.remove('hidden'));
 
-                eduInput.addEventListener('input', (e) => {
-                    const val = e.target.value.toLowerCase();
-                    let hasMatch = false;
-
-                    eduOptions.forEach(opt => {
-                        const text = opt.textContent.trim().toLowerCase();
-                        if (text.includes(val)) {
-                            opt.classList.remove('hidden');
-                            hasMatch = true;
-                        } else {
-                            opt.classList.add('hidden');
-                        }
-                    });
-
-                    if (hasMatch) showSuggestions();
-                    else eduSuggestions.classList.add('hidden');
+                // Hide when filtering if empty or click outside handled by document
+                document.addEventListener('click', (e) => {
+                    if (!input.contains(e.target) && !container.contains(e.target)) {
+                        container.classList.add('hidden');
+                    }
                 });
 
-                eduOptions.forEach(opt => {
+                input.addEventListener('input', () => {
+                    const filter = input.value.toLowerCase();
+                    const options = container.querySelectorAll(`.${optionClass}`);
+                    let hasVisible = false;
+                    options.forEach(opt => {
+                        const txt = opt.innerText.toLowerCase();
+                        if (txt.includes(filter)) {
+                            opt.style.display = 'block';
+                            hasVisible = true;
+                        } else {
+                            opt.style.display = 'none';
+                        }
+                    });
+                    // Show/Hide based on matches
+                    if (hasVisible) container.classList.remove('hidden');
+                    else container.classList.add('hidden');
+                });
+
+                container.querySelectorAll(`.${optionClass}`).forEach(opt => {
                     opt.addEventListener('click', () => {
-                        eduInput.value = opt.textContent.trim();
-                        eduSuggestions.classList.add('hidden');
+                        input.value = opt.innerText.trim();
+                        container.classList.add('hidden');
+                        // Trigger change event for auto-save
+                        input.dispatchEvent(new Event('change'));
+                        input.dispatchEvent(new Event('input'));
                     });
                 });
             }
 
-            // Form Submission Simulation
+            // --- AUTO-SAVE / DRAFT FEATURE ---
             const form = popup.querySelector('#add-beneficiary-form');
+            const draftKey = 'add_beneficiary_draft';
+
+            // Only load draft for NEW entries (not edits) to avoid overwriting real data with old drafts
+            if (!isEdit) {
+                const draftData = localStorage.getItem(draftKey);
+                if (draftData) {
+                    try {
+                        const parsedDraft = JSON.parse(draftData);
+                        Object.entries(parsedDraft).forEach(([name, value]) => {
+                            const field = form.elements[name];
+                            // Handle cases for radio/checkbox groups if any (currently mostly text/select)
+                            if (field && (field.type !== 'file' && field.type !== 'hidden')) {
+                                field.value = value;
+                            }
+                        });
+                        // Specific check specifically for ID suffix input which might be separate from hidden ID
+                        if (parsedDraft.id_number_suffix) {
+                            const idInput = popup.querySelector('#id-number-input');
+                            if (idInput) idInput.value = parsedDraft.id_number_suffix;
+                        }
+                    } catch (e) {
+                        console.error('Error loading draft', e);
+                    }
+                }
+            }
+
+            // Save changes to localStorage
+            form.addEventListener('input', (e) => {
+                // Don't save if editing existing record (optional, but requested behavior implies saving form state)
+                // User said: "Show Add Data Modal... DATA in INPUTS... unless user literally click CANCEL"
+                // So we save draft regardless, but maybe use a different key for edit vs add?
+                // For simplicity and safety, let's only do it for 'Add' mode so we don't carry over edits to other records.
+                if (!isEdit) {
+                    const formData = new FormData(form);
+                    const obj = {};
+                    formData.forEach((value, key) => obj[key] = value);
+                    // Manually add the ID number suffix input since it might not be in FormData if name is reused/complex
+                    const idNumInput = popup.querySelector('#id-number-input');
+                    if (idNumInput) obj['id_number_suffix'] = idNumInput.value;
+
+                    localStorage.setItem(draftKey, JSON.stringify(obj));
+                }
+            });
+
+            // Form Submission Simulation
             if (form) {
                 form.addEventListener('submit', (e) => {
                     e.preventDefault();
@@ -1401,21 +1881,62 @@ function showAddDataModal(data = null) {
                         beneficiaryData[key] = value;
                     });
 
+                    // Prepare ID logic
+                    const idSuffix = popup.querySelector('#id-number-input')?.value;
+                    const fullIdFromSuffix = (idSuffix && idSuffix.trim()) ? `ROX-RD-ESIG-2025-${idSuffix.padStart(4, '0')}` : null;
+
+                    if (isEdit) {
+                        // In edit mode, 'id' is for identifying the record to update
+                        beneficiaryData.id = data?.id; // Original ID
+                        if (fullIdFromSuffix) {
+                            beneficiaryData.gip_id = fullIdFromSuffix; // Potential new GIP ID
+                        }
+                    } else {
+                        // In add mode, 'id' determines PUT vs POST in ldngip.js
+                        // We set it to null to force POST even if fullIdFromSuffix exists
+                        beneficiaryData.id = null;
+                        if (fullIdFromSuffix) {
+                            beneficiaryData.gip_id = fullIdFromSuffix; // Preferred ID
+                        }
+                    }
+
+                    // Remove the suffix field as API doesn't expect it
+                    delete beneficiaryData.id_number_suffix;
+
                     // Call the simulation function from LDNgip.js
                     if (window.addBeneficiaryData) {
-                        window.addBeneficiaryData(beneficiaryData);
+                        (async () => {
+                            const success = await window.addBeneficiaryData(beneficiaryData);
 
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: `Record ${isEdit ? 'Updated' : 'Added'} Successfully`,
-                            showConfirmButton: false,
-                            timer: 2000,
-                            timerProgressBar: true
-                        });
+                            if (success) {
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: `Record ${isEdit ? 'Updated' : 'Added'} Successfully`,
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    timerProgressBar: true
+                                });
 
-                        Swal.close();
+                                // Use a small delay before closing to let user see toast if they like, 
+                                // but Swal.close() closes everything. 
+                                // Actually, Swal.fire (toast) doesn't close the current modal if called correctly, 
+                                // but if we want to close the Add Modal:
+                                setTimeout(() => {
+                                    // Close the main modal popup (not the toast)
+                                    // Since Swal.fire for toast might be separate, but usually Swal is one instance.
+                                    // In this case, we close the main one.
+                                    Swal.close();
+                                }, 500);
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Save Failed',
+                                    text: 'There was an error saving the record to the database.'
+                                });
+                            }
+                        })();
                     }
                 });
             }
@@ -1494,3 +2015,81 @@ function showToastOverlap(message, icon = 'success') {
         setTimeout(() => toast.remove(), 500);
     }, 2500);
 }
+
+/**
+ * CONTACT FORM HANDLER - FORMSUBMIT.CO
+ * This function intercepts the contact form submission on the 'About Me' page.
+ * It sends the data asynchronously to formsubmit.co and shows a SweetAlert2
+ * toast notification instead of redirecting the user.
+ */
+window.handleContactSubmit = async function (event) {
+    event.preventDefault();
+    const form = event.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnContent = submitBtn.innerHTML;
+
+    // Show loading state on button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Sending...
+    `;
+
+    try {
+        const formData = new FormData(form);
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            // SUCCESS: Show SweetAlert2 Toast
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Message Sent Successfully!',
+                text: 'Thank you for reaching out. I will get back to you soon!',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                },
+                customClass: {
+                    popup: 'rounded-2xl border-l-4 border-teal-500 shadow-2xl'
+                }
+            });
+            form.reset();
+        } else {
+            throw new Error('Failed to send');
+        }
+    } catch (error) {
+        // ERROR: Show Error Toast
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: 'Oops! Something went wrong.',
+            text: 'Could not send your message. Please try again later.',
+            showConfirmButton: false,
+            timer: 4000,
+            customClass: {
+                popup: 'rounded-2xl border-l-4 border-red-500 shadow-2xl'
+            }
+        });
+    } finally {
+        // Restore button state
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnContent;
+    }
+
+    return false;
+};

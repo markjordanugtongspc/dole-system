@@ -8,6 +8,7 @@ import { initLoginHandler, initLogoutHandler, initSmartLoader } from './modules/
 import { initCharts } from './modules/charts.js';
 import { initLDNPage } from './modules/ldngip.js';
 import { initModalHandler } from './modules/modal.js';
+import { initExportPage } from './modules/export.js';
 
 // Initialize Smart Loader immediately
 initSmartLoader();
@@ -16,12 +17,20 @@ initSmartLoader();
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOLE System initialized');
 
+    const path = window.location.pathname;
+
     // Initialize modules
     initLoginHandler();
     initLogoutHandler();
     initCharts();
     initLDNPage();
     initModalHandler();
+    initAutoYear();
+
+    // Page specific initialization
+    if (path.includes('/export/')) {
+        initExportPage();
+    }
 
     // Add password toggle functionality
     initPasswordToggle();
@@ -99,6 +108,21 @@ function injectFavicon() {
         basePath = path.substring(0, path.indexOf('/dole-system/') + '/dole-system/'.length);
     }
 
+
+
     // Construct absolute path to image
     img.src = `${basePath}frontend/images/logo/doleiligan.png`;
+}
+
+/**
+ * Initialize Auto Year Detector
+ * Finds elements with class 'auto-year' and sets text to current year
+ */
+export function initAutoYear() {
+    const yearElements = document.querySelectorAll('.auto-year');
+    const currentYear = new Date().getFullYear();
+
+    yearElements.forEach(el => {
+        el.textContent = currentYear;
+    });
 }

@@ -281,47 +281,13 @@ require_once __DIR__ . '/../../config/vite.php';
                 <!-- Education Profile (Flowbite Radial Template - Bluish) -->
                 <div
                     class="max-w-full w-full bg-[#f8fafc] border border-slate-200 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[320px]">
-                    <div class="flex justify-between mb-4">
-                        <div class="flex items-center">
-                            <div class="flex justify-center items-center">
-                                <h5 class="text-xl font-black text-royal-blue me-1">Education Attainment</h5>
-                                <svg data-popover-target="edu-progress-popover" data-popover-placement="bottom"
-                                    class="w-4 h-4 text-slate-400 hover:text-royal-blue cursor-pointer ms-1"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M9.529 9.988a2.502 2.502 0 1 1 5 .191A2.441 2.441 0 0 1 12 12.582V14m-.01 3.008H12M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>
-                                <div data-popover id="edu-progress-popover" role="tooltip"
-                                    class="absolute z-10 p-3 invisible inline-block text-sm text-slate-500 transition-opacity duration-300 bg-white border border-slate-200 rounded-lg shadow-lg opacity-0 w-72">
-                                    <div>
-                                        <h3 class="font-semibold text-royal-blue mb-2">Education Distribution</h3>
-                                        <p class="mb-4 text-xs">This chart visualizes the breakdown of beneficiaries
-                                            based on their highest educational attainment.</p>
-                                        <a href="#"
-                                            class="flex items-center font-medium text-royal-blue hover:underline text-xs">
-                                            Read more
-                                            <svg class="w-4 h-4 ms-1 rtl:rotate-180" aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <path stroke="currentColor" stroke-linecap="round"
-                                                    stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 12H5m14 0-4 4m4-4-4-4" />
-                                            </svg>
-                                        </a>
-                                    </div>
-                                    <div data-popper-arrow></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white border border-slate-200 p-2.5 rounded-lg">
+                    <!-- Education Stats Grid Moved to Top -->
+                    <div class="bg-white border border-slate-200 p-2.5 rounded-lg mb-4">
                         <div class="grid grid-cols-2 gap-2 mb-2">
                             <dl
                                 class="bg-blue-50 border border-blue-100 rounded-lg flex flex-col items-center justify-center h-[60px]">
                                 <dt
-                                    class="w-6 h-6 rounded-full bg-blue-100 text-royal-blue text-xs font-bold flex items-center justify-center mb-0.5">
+                                    class="px-2 h-6 rounded-full bg-blue-100 text-royal-blue text-xs font-bold flex items-center justify-center mb-0.5 min-w-[40px]">
                                     285</dt>
                                 <dd class="text-royal-blue text-[10px] font-bold text-center leading-tight">
                                     College<br>Grad
@@ -330,7 +296,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             <dl
                                 class="bg-yellow-50 border border-yellow-100 rounded-lg flex flex-col items-center justify-center h-[60px]">
                                 <dt
-                                    class="w-6 h-6 rounded-full bg-yellow-100 text-golden-yellow text-xs font-bold flex items-center justify-center mb-0.5">
+                                    class="px-2 h-6 rounded-full bg-yellow-100 text-golden-yellow text-xs font-bold flex items-center justify-center mb-0.5 min-w-[40px]">
                                     198</dt>
                                 <dd class="text-golden-yellow text-[10px] font-bold text-center leading-tight">
                                     College<br>Level</dd>
@@ -338,7 +304,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             <dl
                                 class="bg-red-50 border border-red-100 rounded-lg flex flex-col items-center justify-center h-[60px]">
                                 <dt
-                                    class="w-6 h-6 rounded-full bg-red-100 text-philippine-red text-xs font-bold flex items-center justify-center mb-0.5">
+                                    class="px-2 h-6 rounded-full bg-red-100 text-philippine-red text-xs font-bold flex items-center justify-center mb-0.5 min-w-[40px]">
                                     142</dt>
                                 <dd class="text-philippine-red text-[10px] font-bold text-center leading-tight">
                                     HS<br>Grad
@@ -347,7 +313,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             <dl
                                 class="bg-gray-50 border border-gray-200 rounded-lg flex flex-col items-center justify-center h-[60px]">
                                 <dt
-                                    class="w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center mb-0.5">
+                                    class="px-2 h-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center mb-0.5 min-w-[90px]">
                                     59</dt>
                                 <dd class="text-gray-600 text-[10px] font-bold text-center leading-tight">Senior<br>High
                                 </dd>
@@ -381,6 +347,41 @@ require_once __DIR__ . '/../../config/vite.php';
                                     class="inline-flex items-center bg-orange-50 text-orange-600 text-[10px] font-bold px-1.5 py-0.5 rounded border border-orange-200">
                                     18</dd>
                             </dl>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between mb-2">
+                        <div class="flex items-center w-full">
+                            <div class="flex justify-center items-center w-full">
+                                <h5 class="text-[12px] font-black uppercase tracking-widest text-slate-400 me-2">Education Attainment</h5>
+                                <svg data-popover-target="edu-progress-popover" data-popover-placement="bottom"
+                                    class="w-4 h-4 text-slate-400 hover:text-royal-blue cursor-pointer"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9.529 9.988a2.502 2.502 0 1 1 5 .191A2.441 2.441 0 0 1 12 12.582V14m-.01 3.008H12M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                <div data-popover id="edu-progress-popover" role="tooltip"
+                                    class="absolute z-10 p-3 invisible inline-block text-sm text-slate-500 transition-opacity duration-300 bg-white border border-slate-200 rounded-lg shadow-lg opacity-0 w-72">
+                                    <div>
+                                        <h3 class="font-semibold text-royal-blue mb-2">Education Distribution</h3>
+                                        <p class="mb-4 text-xs">This chart visualizes the breakdown of beneficiaries
+                                            based on their highest educational attainment.</p>
+                                        <a href="#"
+                                            class="flex items-center font-medium text-royal-blue hover:underline text-xs">
+                                            Read more
+                                            <svg class="w-4 h-4 ms-1 rtl:rotate-180" aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <path stroke="currentColor" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 12H5m14 0-4 4m4-4-4-4" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                    <div data-popper-arrow></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

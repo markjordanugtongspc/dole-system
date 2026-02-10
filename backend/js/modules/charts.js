@@ -158,7 +158,7 @@ export function initCharts() {
         series: [42, 29, 21, 9], // Approximated Percentages for Radial Bar
         colors: [royalBlue, goldenYellow, philippineRed, '#94a3b8'], // Blue, Yellow, Red, Slate-400
         chart: {
-            height: 280,
+            height: 300,
             width: "100%",
             type: "radialBar",
             sparkline: {
@@ -198,7 +198,7 @@ export function initCharts() {
             fontWeight: 600,
             fontSize: '11px',
             textAnchor: 'start',
-            offsetY: 10,
+            offsetY: 7, // Adjusted to fix legend positioning (inset: 0px)
             markers: {
                 radius: 12
             }

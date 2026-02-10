@@ -24,6 +24,7 @@ export default defineConfig({
                 server.watcher.add([
                     'frontend/**/*.php',
                     'backend/**/*.php',
+                    'ARCHIVED/**/*.php',
                     'index.php',
                     'backend/css/**/*.css',
                 ]);

@@ -5,14 +5,19 @@
         class="h-full px-4 py-4 overflow-y-auto bg-royal-blue border-e border-royal-blue/20 pt-20 flex flex-col justify-between">
         <ul class="space-y-3 font-medium">
             <?php
+            // Calculate base URL (same logic as vite.php for consistency)
+            $projectRoot = str_replace('\\', '/', dirname(dirname(dirname(__DIR__))));
+            $docRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
+            $baseUrl = str_ireplace($docRoot, '', $projectRoot);
+            $baseUrl = rtrim($baseUrl, '/');
 
             $current_uri = $_SERVER['REQUEST_URI'];
-            $is_dashboard = (strpos($current_uri, '/frontend/dashboard/') !== false || strpos($current_uri, '/frontend/dashboard/index.php') !== false || substr($current_uri, -19) === '/frontend/dashboard');
-            // More robust check for LDN - GIP (covers both directory match and specific file match)
-            $is_ldn = (strpos($current_uri, '/frontend/LDN/') !== false || strpos($current_uri, '/frontend/LDN/index.php') !== false || substr($current_uri, -13) === '/frontend/LDN');
+            $is_dashboard = (strpos($current_uri, '/frontend/dashboard/') !== false);
+            $is_ldn = (strpos($current_uri, '/frontend/LDN/') !== false);
+            $is_export = (strpos($current_uri, '/frontend/export/') !== false);
             ?>
             <li>
-                <a href="../../frontend/dashboard/"
+                <a href="<?php echo $baseUrl; ?>/frontend/dashboard/"
                     class="flex items-center px-4 py-3 rounded-lg group cursor-pointer transition-all duration-200 border-b-2 <?php echo $is_dashboard ? 'text-white font-black bg-white/20 border-white' : 'text-white/80 hover:bg-white/10 hover:text-white border-transparent hover:scale-105'; ?>">
                     <svg class="transition-transform duration-200 <?php echo $is_dashboard ? 'w-5 h-5 text-white scale-105' : 'w-5 h-5 text-white/80 group-hover:text-white group-hover:scale-110'; ?>"
                         viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -24,44 +29,16 @@
                         Dashboard</span>
                 </a>
             </li>
-            <!-- LDN - GIP with Split Link/Dropdown -->
-            <li class="relative group/nav">
-                <div
-                    class="flex items-center rounded-lg transition-all duration-200 border-b-2 <?php echo $is_ldn ? 'bg-white/20 border-white shadow-lg' : 'hover:bg-white/10 border-transparent hover:scale-105'; ?>">
-                    <a href="../../frontend/LDN/"
-                        class="flex-1 flex items-center px-4 py-3 text-white/80 group-hover:text-white transition-colors <?php echo $is_ldn ? 'text-white font-black' : 'text-white/80'; ?>">
-                        <img src="./../images/search-map.png" alt="Search Map Icon"
-                            class="w-5 h-5 filter invert brightness-100 transition-transform duration-200 <?php echo $is_ldn ? 'brightness-200 scale-105' : 'group-hover:invert group-hover:brightness-200 group-hover:scale-105'; ?>" />
-                        <span
-                            class="ms-3 transition-all duration-200 <?php echo $is_ldn ? 'translate-x-1' : ''; ?> whitespace-nowrap">LDN
-                            - GIP</span>
-                    </a>
-                    <button type="button" data-collapse-toggle="dropdown-ldn"
-                        class="px-3 py-4 text-white/30 hover:text-white transition-all duration-300">
-                        <svg class="w-3 h-3 transition-transform duration-300 <?php echo $is_ldn ? 'rotate-180' : 'group-focus-within/nav:rotate-180'; ?>"
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                </div>
-                <ul id="dropdown-ldn" class="<?php echo $is_ldn ? 'block' : 'hidden'; ?> py-2 space-y-1 ps-12">
-                    <li>
-                        <a href="../../frontend/LDN/"
-                            class="flex items-center w-full p-2 text-[11px] font-bold text-white/50 transition-all duration-200 rounded-lg group hover:text-white hover:bg-white/5">
-                            <span
-                                class="w-1.5 h-1.5 rounded-full bg-white/20 me-2 group-hover:bg-white transition-colors"></span>
-                            Masterlist View
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="flex items-center w-full p-2 text-[11px] font-bold text-white/50 transition-all duration-200 rounded-lg group hover:text-white hover:bg-white/5">
-                            <span
-                                class="w-1.5 h-1.5 rounded-full bg-white/20 me-2 group-hover:bg-white transition-colors"></span>
-                            Statistics & Charts
-                        </a>
-                    </li>
-                </ul>
+            <!-- LDN - GIP Link (Simplified) -->
+            <li>
+                <a href="<?php echo $baseUrl; ?>/frontend/LDN/"
+                    class="flex items-center px-4 py-3 rounded-lg group cursor-pointer transition-all duration-200 border-b-2 <?php echo $is_ldn ? 'text-white font-black bg-white/20 border-white' : 'text-white/80 hover:bg-white/10 hover:text-white border-transparent hover:scale-105'; ?>">
+                    <img src="<?php echo $baseUrl; ?>/frontend/images/search-map.png" alt="Search Map Icon"
+                        class="w-5 h-5 filter invert brightness-100 transition-transform duration-200 <?php echo $is_ldn ? 'brightness-200 scale-105' : 'group-hover:invert group-hover:brightness-200 group-hover:scale-105'; ?>" />
+                    <span
+                        class="ms-3 whitespace-nowrap transition-all duration-200 <?php echo $is_ldn ? 'translate-x-1' : ''; ?>">LDN
+                        - GIP</span>
+                </a>
             </li>
 
             <!-- Integrated Monitoring & Data Items -->
@@ -72,18 +49,20 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012-2" />
                     </svg>
-                    <span class="ms-3 whitespace-nowrap">Monitoring</span>
+                    <span class="ms-3 whitespace-nowrap">LDN - SPES</span>
                 </a>
             </li>
 
             <li class="pt-2">
-                <a href="#"
-                    class="flex items-center px-4 py-3 text-white/80 rounded-lg hover:bg-white/10 hover:text-white group transition-all duration-200 hover:scale-105 cursor-pointer border-b-2 border-transparent">
-                    <svg class="w-5 h-5 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="<?php echo $baseUrl; ?>/frontend/export/"
+                    class="flex items-center px-4 py-3 rounded-lg group cursor-pointer transition-all duration-200 border-b-2 <?php echo $is_export ? 'text-white font-black bg-white/20 border-white' : 'text-white/80 hover:bg-white/10 hover:text-white border-transparent hover:scale-105'; ?>">
+                    <svg class="w-5 h-5 <?php echo $is_export ? 'text-white scale-105' : 'text-white/80 group-hover:text-white'; ?>"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span class="ms-3 whitespace-nowrap">Raw Data Export</span>
+                    <span class="ms-3 whitespace-nowrap <?php echo $is_export ? 'translate-x-1' : ''; ?>">Print / Export
+                        Data</span>
                 </a>
             </li>
 
@@ -102,7 +81,7 @@
             $is_aboutme = (strpos($current_uri, '/frontend/aboutme/') !== false || strpos($current_uri, '/frontend/aboutme/index.php') !== false || substr($current_uri, -17) === '/frontend/aboutme');
             ?>
 
-            <li>
+            <!-- <li>
                 <a href="#"
                     class="flex items-center px-4 py-3 text-white/80 rounded-lg hover:bg-white/10 hover:text-white group transition-all duration-200 hover:scale-105 cursor-pointer border-b-2 border-transparent">
                     <svg class="w-5 h-5 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,11 +90,11 @@
                     </svg>
                     <span class="ms-3 whitespace-nowrap">User Management</span>
                 </a>
-            </li>
+            </li> -->
 
             <!-- About Developer Section -->
             <li class="pt-4 mt-4 border-t border-white/10">
-                <a href="../../frontend/aboutme/"
+                <a href="<?php echo $baseUrl; ?>/frontend/aboutme/"
                     class="flex items-center px-4 py-3 rounded-lg group cursor-pointer transition-all duration-200 border-b-2 <?php echo $is_aboutme ? 'text-white font-black bg-white/20 border-white' : 'text-white/80 hover:bg-white/10 hover:text-white border-transparent hover:scale-105'; ?>">
                     <svg class="w-5 h-5 <?php echo $is_aboutme ? 'text-white scale-105' : 'text-white/80 group-hover:text-white'; ?>"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">

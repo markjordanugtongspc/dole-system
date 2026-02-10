@@ -47,10 +47,16 @@ function isViteRunning()
  */
 function getBaseUrl()
 {
-    $scriptName = $_SERVER['SCRIPT_NAME'];
-    $dir = dirname($scriptName);
-    // If it's the root, normalize to empty string, otherwise ensure leading/trailing slashes are handled
-    return rtrim($dir, '/\\');
+    // Get the physical path of the project root (one level up from this file)
+    $projectRoot = str_replace('\\', '/', dirname(__DIR__));
+
+    // Get the document root
+    $docRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
+
+    // Calculate the URL path relative to doc root (case-insensitive for windows)
+    $baseUrl = str_ireplace($docRoot, '', $projectRoot);
+
+    return rtrim($baseUrl, '/');
 }
 
 /**

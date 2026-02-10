@@ -1,7 +1,47 @@
-node_modules/
-dist/
-.vite/
-*.log
-.DS_Store
-*.md
+# Environment Configuration
 .env
+config/.env
+
+# Database Backups
+*.sql.backup
+*.sql.bak
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node Modules
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build Output
+dist/
+build/
+.cache/
+
+# Logs
+*.log
+logs/
+*.md
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+
+# PHP
+vendor/
+composer.lock
+
+# XAMPP Specific
+xampp/
+htdocs/phpmyadmin/

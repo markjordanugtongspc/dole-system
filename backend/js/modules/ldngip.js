@@ -1,79 +1,38 @@
+import { getBasePath } from './auth.js';
+import Swal from 'sweetalert2';
 
 /**
  * LDN Handling Module
- * Handles data simulation, rendering, and sorting for the LDN page
+ * Handles data fetching from backend API, rendering, and sorting for the LDN page
  */
 
-// Initial Simulated Data
-let beneficiaries = [
-    {
-        name: "Dela Cruz, Juan M.",
-        id: "ROX-RD-ESIG-2025-0002",
-        office: "DOLE Field Office",
-        remarks: "ONGOING",
-        contact: "0912-345-6789",
-        address: "Poblacion, Iligan City",
-        birthday: "2002-05-15",
-        gender: "Male",
-        education: "BS Information Technology",
-        startDate: "2025-01-16",
-        endDate: "2025-07-15",
-        seriesNo: "2025-02-132",
-        designation: "Administrative Support / Technical-Aide",
-        replacement: "N/A"
-    },
-    {
-        name: "Santos, Maria Clara P.",
-        id: "ROX-RD-ESIG-2025-0045",
-        office: "DepEd Division Office",
-        remarks: "ONGOING",
-        contact: "0998-765-4321",
-        address: "Suarez, Iligan City",
-        birthday: "2000-02-10",
-        gender: "Female",
-        education: "Bachelor of Secondary Education",
-        startDate: "2025-02-01",
-        endDate: "2025-08-01",
-        seriesNo: "2025-02-140",
-        designation: "Data Encoding / Office Clerk",
-        replacement: "N/A"
-    },
-    {
-        name: "Penduko, Pedro A.",
-        id: "ROX-RD-ESIG-2024-0992",
-        office: "LGU Kauswagan",
-        remarks: "EXPIRED",
-        contact: "0955-111-2222",
-        address: "Kauswagan, Lanao del Norte",
-        birthday: "1997-11-20",
-        gender: "Male",
-        education: "High School Graduate",
-        startDate: "2024-06-15",
-        endDate: "2024-12-15",
-        seriesNo: "2024-06-055",
-        designation: "General Services / Utility",
-        replacement: "Replaced by: Juanita A."
-    },
-    {
-        name: "Gomez, Ana Marie S.",
-        id: "ROX-RD-ESIG-2025-0101",
-        office: "DICT Field Team",
-        remarks: "ONGOING",
-        contact: "0922-333-4444",
-        address: "Tubod, Lanao del Norte",
-        birthday: "2003-08-01",
-        gender: "Female",
-        education: "BS Computer Science",
-        startDate: "2025-03-01",
-        endDate: "2025-09-01",
-        seriesNo: "2025-03-010",
-        designation: "Technical Support Assistant",
-        replacement: "N/A"
+// Beneficiaries data loaded from database
+let beneficiaries = [];
+/**
+ * Load beneficiaries from backend API
+ */
+async function loadBeneficiaries() {
+    try {
+        const response = await fetch(`${getBasePath()}api/beneficiaries.php`);
+        const data = await response.json();
+
+        if (data.success) {
+            beneficiaries = data.beneficiaries || [];
+            renderTable();
+        } else {
+            console.error('Failed to load beneficiaries:', data.error);
+            beneficiaries = [];
+            renderTable();
+        }
+    } catch (error) {
+        console.error('Error fetching beneficiaries:', error);
+        beneficiaries = [];
+        renderTable();
     }
-];
+}
 
 export function initLDNPage() {
-    renderTable();
+    loadBeneficiaries(); // Load from database
     initLDNHeader();
     initSearch();
 }
@@ -85,7 +44,7 @@ export function renderTable(dataToRender = beneficiaries) {
     if (dataToRender.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="px-6 py-10 text-center text-gray-400 font-medium">
+                <td colspan="7" class="px-6 py-10 text-center text-gray-400 font-medium">
                     <div class="flex flex-col items-center gap-2">
                         <svg class="w-10 h-10 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -111,6 +70,22 @@ export function renderTable(dataToRender = beneficiaries) {
                 <span class="${getOfficeClass(data.office)} text-xs font-bold px-2.5 py-0.5 rounded">
                     ${data.office}
                 </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="bg-blue-50/50 rounded-lg px-3 py-1.5 border border-blue-100/60 inline-flex items-center gap-2 shadow-sm">
+                    <div class="p-1 px-1.5 bg-blue-100/50 rounded-md">
+                        <svg class="w-3.5 h-3.5 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <span class="text-[11px] font-black text-royal-blue uppercase tracking-tight">${data.startDateFormatted || data.startDate || 'N/A'}</span>
+                </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="bg-red-50/50 rounded-lg px-3 py-1.5 border border-red-100/60 inline-flex items-center gap-2 shadow-sm">
+                    <div class="p-1 px-1.5 bg-red-100/50 rounded-md">
+                        <svg class="w-3.5 h-3.5 text-philippine-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <span class="text-[11px] font-black text-philippine-red uppercase tracking-tight">${data.endDateFormatted || data.endDate || 'N/A'}</span>
+                </div>
             </td>
             <td class="px-6 py-4">
                 <span class="${getStatusClass(data.remarks)} text-xs font-bold px-2.5 py-0.5 rounded uppercase border">
@@ -186,20 +161,111 @@ export function sortData(criteria) {
     renderTable();
 }
 
-export function addBeneficiary(data) {
-    // Logic to update if ID exists, otherwise add new
-    const index = beneficiaries.findIndex(b => b.id === data.id);
-    if (index !== -1) {
-        beneficiaries[index] = data;
-    } else {
-        beneficiaries.unshift(data);
+export async function addBeneficiary(data) {
+    try {
+        // Determine if this is an update (has existing ID) or new record
+        const method = data.id ? 'PUT' : 'POST';
+
+        // Automatically capitalize text fields as per senior request
+        const capitalizedData = { ...data };
+        const fieldsToCapitalize = ['name', 'address', 'education', 'designation'];
+
+        fieldsToCapitalize.forEach(field => {
+            if (capitalizedData[field] && typeof capitalizedData[field] === 'string') {
+                capitalizedData[field] = capitalizedData[field].toUpperCase().trim();
+            }
+        });
+
+        const response = await fetch(`${getBasePath()}api/beneficiaries.php`, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(capitalizedData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Reload beneficiaries from database
+            await loadBeneficiaries();
+            return true;
+        } else {
+            console.error('Failed to save beneficiary:', result.error);
+            return false;
+        }
+    } catch (error) {
+        console.error('Error saving beneficiary:', error);
+        return false;
     }
-    renderTable();
 }
 
-export function archiveRecord(id) {
-    beneficiaries = beneficiaries.filter(b => b.id !== id);
-    renderTable();
+export async function archiveRecord(id) {
+    // Show Modern Confirmation Modal
+    const result = await Swal.fire({
+        title: '<span class="text-xl font-black text-heading uppercase tracking-tight">Confirm Archive</span>',
+        html: `
+            <div class="py-4">
+                <p class="text-sm font-medium text-gray-500">Are you sure you want to archive this record?</p>
+                <p class="text-[10px] font-black text-philippine-red mt-1 uppercase tracking-widest">ID: ${id}</p>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: `
+            <div class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                <span>YES</span>
+            </div>
+        `,
+        cancelButtonText: `
+            <div class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                <span>NO</span>
+            </div>
+        `,
+        reverseButtons: true,
+        customClass: {
+            container: 'font-montserrat',
+            popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100',
+            confirmButton: 'bg-green-50 text-green-700 hover:bg-green-600 hover:text-white font-black text-xs px-6 py-2.5 rounded-xl transition-all border border-green-200 shadow-sm mx-2 cursor-pointer',
+            cancelButton: 'bg-red-50 text-red-700 hover:bg-red-600 hover:text-white font-black text-xs px-6 py-2.5 rounded-xl transition-all border border-red-200 shadow-sm mx-2 cursor-pointer'
+        },
+        buttonsStyling: false
+    });
+
+    if (!result.isConfirmed) return false;
+
+    try {
+        const response = await fetch(`${getBasePath()}api/beneficiaries.php?id=${encodeURIComponent(id)}&action=archive`, {
+            method: 'PATCH'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Record Archived',
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            });
+            await loadBeneficiaries();
+            return true;
+        } else {
+            throw new Error(data.error || 'Failed to archive');
+        }
+    } catch (error) {
+        console.error('Error archiving beneficiary:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Archive Failed',
+            text: error.message
+        });
+        return false;
+    }
 }
 
 function initLDNHeader() {

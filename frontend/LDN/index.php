@@ -196,6 +196,12 @@ require_once __DIR__ . '/../../config/vite.php';
                             <th scope="col" class="px-6 py-3 font-medium">
                                 OFFICE/PLACE OF ASSIGNMENT
                             </th>
+                            <th scope="col" class="px-6 py-3 font-medium whitespace-nowrap">
+                                START DATE
+                            </th>
+                            <th scope="col" class="px-6 py-3 font-medium whitespace-nowrap">
+                                END DATE
+                            </th>
                             <th scope="col" class="px-6 py-3 font-medium">
                                 REMARKS
                             </th>
