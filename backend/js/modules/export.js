@@ -169,7 +169,11 @@ window.exportToExcel = function () {
         <body>
             <table>
                 <tr><td colspan="${columns.length}" class="title">DOLE LDNPFO - BENEFICIARY REPORT</td></tr>
-                <tr><td colspan="${columns.length}" style="color: #64748b; font-size: 10px;">Generated on: ${new Date().toLocaleString()}</td></tr>
+                <tr><td colspan="${columns.length}" style="color: #64748b; font-size: 10px;">Generated on: ${new Intl.DateTimeFormat('en-PH', {
+        timeZone: 'Asia/Manila',
+        dateStyle: 'long',
+        timeStyle: 'short'
+    }).format(new Date())}</td></tr>
                 <tr><td colspan="${columns.length}"></td></tr>
                 <tr height="40">
                     ${columns.map(c => `<th class="header cell">${COL_MAP[c] || c.toUpperCase()}</th>`).join('')}
