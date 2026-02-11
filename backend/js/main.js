@@ -7,8 +7,10 @@ import 'flowbite';
 import { initLoginHandler, initLogoutHandler, initSmartLoader } from './modules/auth.js';
 import { initCharts } from './modules/charts.js';
 import { initLDNPage } from './modules/ldngip.js';
-import { initModalHandler } from './modules/modal.js';
+import { initModalHandler, updateUIProfile } from './modules/modal.js';
 import { initExportPage } from './modules/export.js';
+import { getBasePath } from './modules/auth.js';
+
 
 // Initialize Smart Loader immediately
 initSmartLoader();
@@ -26,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initLDNPage();
     initModalHandler();
     initAutoYear();
+    loadUserProfile();
 
     // Page specific initialization
     if (path.includes('/export/')) {
@@ -125,4 +128,19 @@ export function initAutoYear() {
     yearElements.forEach(el => {
         el.textContent = currentYear;
     });
+}
+
+/**
+ * Fetch current user profile and update UI
+ */
+async function loadUserProfile() {
+    try {
+        const response = await fetch(`${getBasePath()}api/profile.php`);
+        const result = await response.json();
+        if (result.success) {
+            updateUIProfile(result.profile);
+        }
+    } catch (error) {
+        console.error('Error loading user profile:', error);
+    }
 }

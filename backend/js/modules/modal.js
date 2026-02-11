@@ -103,7 +103,192 @@ export function initModalHandler() {
     window.showExportConfigModal = function (callback) {
         showExportConfigModal(callback);
     };
+    window.showProfileModal = function () {
+        showProfileModal();
+    };
 }
+
+/**
+ * Show User Profile Modal
+ */
+export async function showProfileModal() {
+    try {
+        const response = await fetch(`${getBasePath()}api/profile.php`);
+        const result = await response.json();
+
+        if (result.success) {
+            const profile = result.profile;
+            renderProfileModal(profile);
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: result.error || 'Failed to load profile'
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+    }
+}
+
+function renderProfileModal(profile) {
+    const avatarUrl = profile.profile_picture_path ? `${getBasePath()}${profile.profile_picture_path}` : null;
+    const initials = profile.full_name ? profile.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'US';
+
+    const modalHtml = `
+        <div class="text-left font-montserrat p-1 overflow-visible">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 bg-royal-blue/10 rounded-2xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                </div>
+                <div>
+                    <h2 class="text-xl font-black text-heading leading-tight italic">User Profile</h2>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Manage your personal information</p>
+                </div>
+            </div>
+
+            <form id="profile-edit-form" class="space-y-6">
+                <div class="flex flex-col items-center mb-6">
+                    <div class="relative group">
+                        <div id="profile-avatar-preview" class="w-24 h-24 rounded-full border-4 border-royal-blue/10 overflow-hidden bg-gray-100 flex items-center justify-center text-royal-blue text-2xl font-black shadow-lg">
+                            ${avatarUrl ? `<img src="${avatarUrl}" class="w-full h-full object-cover" />` : initials}
+                        </div>
+                        <label for="profile-pic-input" class="absolute bottom-0 right-0 w-8 h-8 bg-royal-blue text-white rounded-full flex items-center justify-center cursor-pointer shadow-md hover:scale-110 transition-transform border-2 border-white">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </label>
+                        <input type="file" id="profile-pic-input" name="profile_pic" class="hidden" accept="image/*">
+                    </div>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase mt-2 tracking-widest">Click icon to change avatar</p>
+                </div>
+
+                <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100 space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Username</label>
+                        <div class="relative">
+                            <input type="text" value="${profile.username}" disabled
+                                class="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-gray-400 cursor-not-allowed">
+                            <svg class="w-3.5 h-3.5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
+                        <input type="text" id="profile-full-name" name="full_name" value="${profile.full_name}" placeholder="Your full name"
+                            class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-royal-blue text-white font-black text-[10px] uppercase tracking-[0.2em] py-3.5 rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        Save Profile Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    Swal.fire({
+        html: modalHtml,
+        width: '450px',
+        showConfirmButton: false,
+        showCloseButton: true,
+        padding: '1.5rem',
+        customClass: {
+            container: 'font-montserrat',
+            popup: 'rounded-[1.5rem] shadow-2xl overflow-visible ldn-modal-popup',
+            closeButton: 'focus:outline-none bg-gray-50 border-none swal2-custom-close cursor-pointer'
+        },
+        didOpen: (popup) => {
+            const form = popup.querySelector('#profile-edit-form');
+            const picInput = popup.querySelector('#profile-pic-input');
+            const preview = popup.querySelector('#profile-avatar-preview');
+
+            // Preview image
+            picInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover" />`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+
+                try {
+                    const saveResponse = await fetch(`${getBasePath()}api/profile.php`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const saveResult = await saveResponse.json();
+
+                    if (saveResult.success) {
+                        // Update UI and LocalStorage
+                        if (saveResult.profile) {
+                            localStorage.setItem('user', JSON.stringify(saveResult.profile));
+                            // Trigger UI update for sidebar and other elements
+                            updateUIProfile(saveResult.profile);
+                        }
+
+                        Swal.close();
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Profile Updated',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Update Failed',
+                            text: saveResult.error || 'Something went wrong'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error saving profile:', error);
+                }
+            });
+        }
+    });
+}
+
+/**
+ * Update global UI elements with new profile data
+ */
+export function updateUIProfile(profile) {
+    const avatarUrl = profile.profile_picture_path ? `${getBasePath()}${profile.profile_picture_path}` : null;
+    const initials = profile.full_name ? profile.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'US';
+
+    // Update Sidebar elements
+    const sidebarNameElements = document.querySelectorAll('.sidebar-user-name');
+    const sidebarAvatarElements = document.querySelectorAll('.sidebar-user-avatar');
+
+    sidebarNameElements.forEach(el => el.textContent = profile.full_name);
+    sidebarAvatarElements.forEach(el => {
+        if (avatarUrl) {
+            el.innerHTML = `<img src="${avatarUrl}" class="w-full h-full object-cover" />`;
+        } else {
+            el.textContent = initials;
+        }
+    });
+
+    // Save to LocalStorage for other pages
+    localStorage.setItem('user_full_name', profile.full_name);
+    if (avatarUrl) {
+        localStorage.setItem('user_avatar', avatarUrl);
+    }
+}
+
 
 /**
  * Configuration Modal for Reports

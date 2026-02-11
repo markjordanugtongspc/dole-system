@@ -80,7 +80,8 @@ require_once __DIR__ . '/../../config/vite.php';
                             <path
                                 d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                         </svg>
-                        <span class="text-xs font-bold text-royal-blue">684 Beneficiaries</span>
+                        <span class="text-xs font-bold text-royal-blue"><span
+                                class="metric-total-beneficiaries">...</span> Beneficiaries</span>
                     </div>
                     <button id="logoutBtn"
                         class="flex items-center text-xs font-bold text-philippine-red hover:bg-red-50 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer border border-philippine-red/20 uppercase hover:scale-105">
@@ -118,8 +119,8 @@ require_once __DIR__ . '/../../config/vite.php';
                             <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Total Beneficiaries
                             </p>
                             <h3
-                                class="text-3xl font-black text-royal-blue group-hover:scale-110 transition-transform duration-300 origin-left">
-                                684</h3>
+                                class="text-3xl font-black text-royal-blue group-hover:scale-110 transition-transform duration-300 origin-left metric-total-beneficiaries">
+                                ...</h3>
                         </div>
                         <div
                             class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center transition-colors duration-300">
@@ -137,8 +138,8 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div>
                             <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Female Ratio</p>
                             <h3
-                                class="text-3xl font-black text-philippine-red group-hover:scale-110 transition-transform duration-300 origin-left">
-                                58%</h3>
+                                class="text-3xl font-black text-philippine-red group-hover:scale-110 transition-transform duration-300 origin-left metric-female-ratio">
+                                ...</h3>
                         </div>
                         <div
                             class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center transition-colors duration-300">
@@ -157,8 +158,8 @@ require_once __DIR__ . '/../../config/vite.php';
                             <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Deployment Sites
                             </p>
                             <h3
-                                class="text-3xl font-black text-golden-yellow group-hover:scale-110 transition-transform duration-300 origin-left">
-                                10</h3>
+                                class="text-3xl font-black text-golden-yellow group-hover:scale-110 transition-transform duration-300 origin-left metric-deployment-sites">
+                                ...</h3>
                         </div>
                         <div
                             class="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center transition-colors duration-300">
@@ -177,8 +178,8 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div>
                             <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Avg Age Range</p>
                             <h3
-                                class="text-3xl font-black text-heading group-hover:scale-110 transition-transform duration-300 origin-left">
-                                18-30</h3>
+                                class="text-3xl font-black text-heading group-hover:scale-110 transition-transform duration-300 origin-left metric-avg-age-range">
+                                ...</h3>
                         </div>
                         <div
                             class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center transition-colors duration-300">
@@ -199,7 +200,8 @@ require_once __DIR__ . '/../../config/vite.php';
                     class="max-w-full w-full bg-[#f8fafc] border border-slate-200 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[320px]">
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <h5 class="text-3xl font-black text-royal-blue leading-none">684</h5>
+                            <h5 class="text-3xl font-black text-royal-blue leading-none metric-total-beneficiaries">...
+                            </h5>
                             <p class="text-sm font-semibold text-slate-500 mt-1">Workforce Assigned</p>
                         </div>
                         <div
@@ -209,7 +211,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2" d="M12 6v13m0-13 4 4m-4-4-4 4" />
                             </svg>
-                            12% Growth
+                            <span class="metric-growth">12%</span> Growth
                         </div>
                     </div>
 
@@ -287,8 +289,8 @@ require_once __DIR__ . '/../../config/vite.php';
                             <dl
                                 class="bg-blue-50 border border-blue-100 rounded-lg flex flex-col items-center justify-center h-[60px]">
                                 <dt
-                                    class="px-2 h-6 rounded-full bg-blue-100 text-royal-blue text-xs font-bold flex items-center justify-center mb-0.5 min-w-[40px]">
-                                    285</dt>
+                                    class="px-2 h-6 rounded-full bg-blue-100 text-royal-blue text-xs font-bold flex items-center justify-center mb-0.5 min-w-[40px] count-college-grad">
+                                    ...</dt>
                                 <dd class="text-royal-blue text-[10px] font-bold text-center leading-tight">
                                     College<br>Grad
                                 </dd>
@@ -296,16 +298,16 @@ require_once __DIR__ . '/../../config/vite.php';
                             <dl
                                 class="bg-yellow-50 border border-yellow-100 rounded-lg flex flex-col items-center justify-center h-[60px]">
                                 <dt
-                                    class="px-2 h-6 rounded-full bg-yellow-100 text-golden-yellow text-xs font-bold flex items-center justify-center mb-0.5 min-w-[40px]">
-                                    198</dt>
+                                    class="px-2 h-6 rounded-full bg-yellow-100 text-golden-yellow text-xs font-bold flex items-center justify-center mb-0.5 min-w-[40px] count-college-lvl">
+                                    ...</dt>
                                 <dd class="text-golden-yellow text-[10px] font-bold text-center leading-tight">
                                     College<br>Level</dd>
                             </dl>
                             <dl
                                 class="bg-red-50 border border-red-100 rounded-lg flex flex-col items-center justify-center h-[60px]">
                                 <dt
-                                    class="px-2 h-6 rounded-full bg-red-100 text-philippine-red text-xs font-bold flex items-center justify-center mb-0.5 min-w-[40px]">
-                                    142</dt>
+                                    class="px-2 h-6 rounded-full bg-red-100 text-philippine-red text-xs font-bold flex items-center justify-center mb-0.5 min-w-[40px] count-hs-grad">
+                                    ...</dt>
                                 <dd class="text-philippine-red text-[10px] font-bold text-center leading-tight">
                                     HS<br>Grad
                                 </dd>
@@ -313,8 +315,8 @@ require_once __DIR__ . '/../../config/vite.php';
                             <dl
                                 class="bg-gray-50 border border-gray-200 rounded-lg flex flex-col items-center justify-center h-[60px]">
                                 <dt
-                                    class="px-2 h-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center mb-0.5 min-w-[90px]">
-                                    59</dt>
+                                    class="px-2 h-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center mb-0.5 min-w-[90px] count-senior-high">
+                                    ...</dt>
                                 <dd class="text-gray-600 text-[10px] font-bold text-center leading-tight">Senior<br>High
                                 </dd>
                             </dl>
@@ -353,7 +355,8 @@ require_once __DIR__ . '/../../config/vite.php';
                     <div class="flex justify-between mb-2">
                         <div class="flex items-center w-full">
                             <div class="flex justify-center items-center w-full">
-                                <h5 class="text-[12px] font-black uppercase tracking-widest text-slate-400 me-2">Education Attainment</h5>
+                                <h5 class="text-[12px] font-black uppercase tracking-widest text-slate-400 me-2">
+                                    Education Attainment</h5>
                                 <svg data-popover-target="edu-progress-popover" data-popover-placement="bottom"
                                     class="w-4 h-4 text-slate-400 hover:text-royal-blue cursor-pointer"
                                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -436,7 +439,7 @@ require_once __DIR__ . '/../../config/vite.php';
                     <div class="flex justify-between border-slate-200 border-b pb-3">
                         <dl>
                             <dt class="text-sm font-semibold text-slate-500">Top Role</dt>
-                            <dd class="text-2xl font-black text-royal-blue leading-none mt-1">Admin Support</dd>
+                            <dd class="text-2xl font-black text-royal-blue leading-none mt-1 metric-top-role">...</dd>
                         </dl>
                         <div>
                             <span
@@ -454,11 +457,11 @@ require_once __DIR__ . '/../../config/vite.php';
                     <div class="grid grid-cols-2 py-2">
                         <dl>
                             <dt class="text-[10px] font-semibold text-slate-500 mb-0.5">Office Based</dt>
-                            <dd class="text-base font-bold text-royal-blue">215</dd>
+                            <dd class="text-base font-bold text-royal-blue count-office-based">...</dd>
                         </dl>
                         <dl>
                             <dt class="text-[10px] font-semibold text-slate-500 mb-0.5">Field Based</dt>
-                            <dd class="text-base font-bold text-philippine-red">469</dd>
+                            <dd class="text-base font-bold text-philippine-red count-field-based">...</dd>
                         </dl>
                     </div>
 

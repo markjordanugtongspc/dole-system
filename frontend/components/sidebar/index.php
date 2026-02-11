@@ -116,11 +116,11 @@
                 <div class="bg-gradient-to-r from-royal-blue to-blue-700 p-4">
                     <div class="flex items-center">
                         <div
-                            class="w-12 h-12 rounded-full bg-golden-yellow flex items-center justify-center text-royal-blue font-black text-base shadow-lg">
+                            class="w-12 h-12 rounded-full bg-golden-yellow flex items-center justify-center text-royal-blue font-black text-base shadow-lg sidebar-user-avatar overflow-hidden">
                             AD
                         </div>
                         <div class="ms-3 text-left">
-                            <p class="text-sm font-bold text-white">Admin User</p>
+                            <p class="text-sm font-bold text-white sidebar-user-name">Admin User</p>
                             <p class="text-xs text-white/80 truncate">admin@dole.gov.ph</p>
                         </div>
                     </div>
@@ -129,7 +129,7 @@
                 <!-- Menu Items -->
                 <ul class="py-2 text-sm text-gray-700">
                     <li>
-                        <a href="#"
+                        <a href="javascript:void(0)" onclick="showProfileModal()"
                             class="flex items-center px-4 py-2.5 hover:bg-blue-50 hover:text-royal-blue transition-colors">
                             <svg class="w-4 h-4 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -167,11 +167,11 @@
             <button id="profileDropdownButton" data-dropdown-toggle="profileDropdown" data-dropdown-placement="top"
                 class="flex items-center w-full p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02] cursor-pointer border border-white/10">
                 <div
-                    class="w-10 h-10 rounded-full bg-golden-yellow flex items-center justify-center text-royal-blue font-black text-sm shadow-inner group-hover:scale-110 transition-transform">
+                    class="w-10 h-10 rounded-full bg-golden-yellow flex items-center justify-center text-royal-blue font-black text-sm shadow-inner group-hover:scale-110 transition-transform sidebar-user-avatar overflow-hidden">
                     AD
                 </div>
                 <div class="ms-3 text-left flex-1">
-                    <p class="text-xs font-bold text-white">Admin User</p>
+                    <p class="text-xs font-bold text-white sidebar-user-name">Admin User</p>
                     <p class="text-[10px] text-white/60 truncate">admin@dole.gov.ph</p>
                 </div>
                 <svg class="w-4 h-4 text-white transition-transform duration-200" fill="none" stroke="currentColor"
