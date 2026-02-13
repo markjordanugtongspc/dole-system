@@ -1,4 +1,5 @@
 import { getBasePath } from './auth.js';
+import { createNotification } from './notifications.js';
 import Swal from 'sweetalert2';
 
 /**
@@ -187,6 +188,11 @@ export async function addBeneficiary(data) {
         const result = await response.json();
 
         if (result.success) {
+            // Trigger notification for new records
+            if (method === 'POST') {
+                createNotification(`New user <strong>${capitalizedData.name}</strong> added. pending "Required Documents" for review.`, 'success');
+            }
+
             // Reload beneficiaries from database
             await loadBeneficiaries();
             return true;

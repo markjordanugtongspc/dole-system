@@ -10,6 +10,7 @@ import { initLDNPage } from './modules/ldngip.js';
 import { initModalHandler, updateUIProfile } from './modules/modal.js';
 import { initExportPage } from './modules/export.js';
 import { getBasePath } from './modules/auth.js';
+import { initNotifications } from './modules/notifications.js';
 
 
 // Initialize Smart Loader immediately
@@ -29,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initModalHandler();
     initAutoYear();
     loadUserProfile();
+    initNotifications();
 
     // Page specific initialization
     if (path.includes('/export/')) {

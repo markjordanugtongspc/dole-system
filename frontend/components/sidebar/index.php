@@ -15,6 +15,7 @@
             $is_dashboard = (strpos($current_uri, '/frontend/dashboard/') !== false);
             $is_ldn = (strpos($current_uri, '/frontend/LDN/') !== false);
             $is_export = (strpos($current_uri, '/frontend/export/') !== false);
+            $is_settings = (strpos($current_uri, '/frontend/user/settings/') !== false);
             ?>
             <li>
                 <a href="<?php echo $baseUrl; ?>/frontend/dashboard/"
@@ -111,17 +112,17 @@
         <div class="mt-auto">
             <!-- Dropdown menu (appears above button) -->
             <div id="profileDropdown"
-                class="z-10 hidden bg-white rounded-xl shadow-2xl w-64 mb-3 border border-blue-100 overflow-hidden">
+                class="z-10 hidden bg-white rounded-xl shadow-2xl w-56 mb-3 border border-blue-100 overflow-hidden">
                 <!-- User Info Header -->
-                <div class="bg-gradient-to-r from-royal-blue to-blue-700 p-4">
+                <div class="bg-gradient-to-r from-royal-blue to-blue-700 p-3">
                     <div class="flex items-center">
                         <div
-                            class="w-12 h-12 rounded-full bg-golden-yellow flex items-center justify-center text-royal-blue font-black text-base shadow-lg sidebar-user-avatar overflow-hidden">
+                            class="w-10 h-10 rounded-full bg-transparent border-2 border-white/30 flex items-center justify-center text-white font-black text-xs shadow-lg sidebar-user-avatar overflow-hidden">
                             AD
                         </div>
-                        <div class="ms-3 text-left">
-                            <p class="text-sm font-bold text-white sidebar-user-name">Admin User</p>
-                            <p class="text-xs text-white/80 truncate">admin@dole.gov.ph</p>
+                        <div class="ms-2.5 text-left">
+                            <p class="text-[11px] font-bold text-white sidebar-user-name leading-tight">Admin User</p>
+                            <p class="text-[9px] text-white/80 truncate">admin@dole.gov.ph</p>
                         </div>
                     </div>
                 </div>
@@ -139,15 +140,19 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#"
-                            class="flex items-center px-4 py-2.5 hover:bg-blue-50 hover:text-royal-blue transition-colors">
-                            <svg class="w-4 h-4 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span class="font-semibold">Settings</span>
+                        <a href="<?php echo $baseUrl; ?>/frontend/user/settings/"
+                            class="flex items-center px-4 py-2.5 transition-colors <?php echo $is_settings ? 'text-gray-900 bg-gray-50/50' : 'hover:bg-blue-50 hover:text-royal-blue text-gray-700'; ?>">
+                            <div
+                                class="flex items-center w-full <?php echo $is_settings ? 'font-black border-b-2 border-gray-300 pb-1 me-4' : ''; ?>">
+                                <svg class="w-4 h-4 me-3 <?php echo $is_settings ? 'text-gray-600' : ''; ?>" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span class="<?php echo $is_settings ? '' : 'font-semibold'; ?>">Settings</span>
+                            </div>
                         </a>
                     </li>
                     <li class="border-t border-gray-100 mt-1 pt-1">
@@ -167,7 +172,7 @@
             <button id="profileDropdownButton" data-dropdown-toggle="profileDropdown" data-dropdown-placement="top"
                 class="flex items-center w-full p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02] cursor-pointer border border-white/10">
                 <div
-                    class="w-10 h-10 rounded-full bg-golden-yellow flex items-center justify-center text-royal-blue font-black text-sm shadow-inner group-hover:scale-110 transition-transform sidebar-user-avatar overflow-hidden">
+                    class="w-10 h-10 rounded-full bg-transparent border-2 border-white/30 flex items-center justify-center text-white font-black text-sm shadow-inner group-hover:scale-110 transition-transform sidebar-user-avatar overflow-hidden">
                     AD
                 </div>
                 <div class="ms-3 text-left flex-1">

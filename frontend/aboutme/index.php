@@ -41,6 +41,7 @@ require_once '../../config/db.php'; // Loads .env and provides env() helper
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
+                        <?php include __DIR__ . '/../components/notification.php'; ?>
                         <a href="../../frontend/dashboard/"
                             class="flex items-center text-xs font-bold text-royal-blue hover:bg-blue-50 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer border border-royal-blue/20 uppercase hover:scale-105">
                             <svg class="w-4 h-4 me-2" fill="currentColor" viewBox="0 0 20 20">

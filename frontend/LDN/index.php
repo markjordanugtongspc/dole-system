@@ -71,6 +71,7 @@ require_once __DIR__ . '/../../config/vite.php';
                     </a>
                 </div>
                 <div class="flex items-center gap-3">
+                    <?php include __DIR__ . '/../components/notification.php'; ?>
                     <button id="logoutBtn"
                         class="flex items-center text-xs font-bold text-philippine-red hover:bg-red-50 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer border border-philippine-red/20 uppercase hover:scale-105">
                         <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"

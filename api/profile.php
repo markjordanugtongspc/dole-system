@@ -34,9 +34,9 @@ try {
 
     // GET: Fetch profile
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $stmt = $pdo->prepare("SELECT username, full_name, profile_picture_path FROM users WHERE user_id = ?");
+        $stmt = $pdo->prepare("SELECT user_id, username, email, full_name, profile_picture_path, bio_graphy, home_address, phone_number, languages, date_of_birth, gender, religion, notifications_enabled FROM users WHERE user_id = ?");
         $stmt->execute([$user_id]);
-        $user = $stmt->fetch();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
             echo json_encode(['success' => true, 'profile' => $user]);
@@ -46,41 +46,71 @@ try {
         exit;
     }
 
-    // POST: Update profile
+    // POST: Update profile or password
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Handle Password Change first if requested
+        if (isset($_POST['action']) && $_POST['action'] === 'change_password') {
+            $currentPassword = $_POST['current_password'] ?? '';
+            $newPassword = $_POST['new_password'] ?? '';
+            $confirmPassword = $_POST['confirm_password'] ?? '';
+
+            if ($newPassword !== $confirmPassword) {
+                echo json_encode(['success' => false, 'error' => 'Passwords do not match']);
+                exit;
+            }
+
+            // Verify current password
+            $stmt = $pdo->prepare("SELECT password_hash FROM users WHERE user_id = ?");
+            $stmt->execute([$user_id]);
+            $user = $stmt->fetch();
+
+            if ($user && password_verify($currentPassword, $user['password_hash'])) {
+                $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("UPDATE users SET password_hash = ? WHERE user_id = ?");
+                $stmt->execute([$newHash, $user_id]);
+                echo json_encode(['success' => true, 'message' => 'Password updated successfully']);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Incorrect current password']);
+            }
+            exit;
+        }
+
+        // Standard Profile Update
         $fullName = $_POST['full_name'] ?? '';
+        $bio = $_POST['bio_graphy'] ?? '';
+        $address = $_POST['home_address'] ?? '';
+        $phone = $_POST['phone_number'] ?? '';
+        $languages = $_POST['languages'] ?? '';
+        $dob = $_POST['date_of_birth'] ?? null;
+        $gender = $_POST['gender'] ?? '';
+        $religion = $_POST['religion'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $notifications = isset($_POST['notifications_enabled']) ? (int) $_POST['notifications_enabled'] : 1;
+
         $profilePicPath = null;
 
         // Handle File Upload
         if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
             $fileTmpPath = $_FILES['profile_pic']['tmp_name'];
             $fileName = $_FILES['profile_pic']['name'];
-            $fileSize = $_FILES['profile_pic']['size'];
-            $fileType = $_FILES['profile_pic']['type'];
-            $fileNameCmps = explode(".", $fileName);
-            $fileExtension = strtolower(end($fileNameCmps));
+            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
-            // Allowed extensions
             $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg');
 
             if (in_array($fileExtension, $allowedfileExtensions)) {
-                // Directory: frontend/images/profiles/admin/
                 $uploadPath = __DIR__ . '/../frontend/images/profiles/admin/';
                 if (!file_exists($uploadPath)) {
                     mkdir($uploadPath, 0777, true);
                 }
 
-                // New filename: user_id + timestamp
                 $newFileName = 'profile_' . $user_id . '_' . time() . '.' . $fileExtension;
                 $dest_path = $uploadPath . $newFileName;
 
                 if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                    // Update the path in database
-                    // Store relative path for frontend access
                     $profilePicPath = 'frontend/images/profiles/admin/' . $newFileName;
 
-                    $stmt = $pdo->prepare("UPDATE users SET full_name = ?, profile_picture_path = ? WHERE user_id = ?");
-                    $stmt->execute([$fullName, $profilePicPath, $user_id]);
+                    $stmt = $pdo->prepare("UPDATE users SET full_name = ?, email = ?, bio_graphy = ?, home_address = ?, phone_number = ?, languages = ?, date_of_birth = ?, gender = ?, religion = ?, notifications_enabled = ?, profile_picture_path = ? WHERE user_id = ?");
+                    $stmt->execute([$fullName, $email, $bio, $address, $phone, $languages, $dob, $gender, $religion, $notifications, $profilePicPath, $user_id]);
                 } else {
                     echo json_encode(['success' => false, 'error' => 'Error moving the uploaded file']);
                     exit;
@@ -90,15 +120,15 @@ try {
                 exit;
             }
         } else {
-            // No file uploaded, just update name
-            $stmt = $pdo->prepare("UPDATE users SET full_name = ? WHERE user_id = ?");
-            $stmt->execute([$fullName, $user_id]);
+            // No file uploaded
+            $stmt = $pdo->prepare("UPDATE users SET full_name = ?, email = ?, bio_graphy = ?, home_address = ?, phone_number = ?, languages = ?, date_of_birth = ?, gender = ?, religion = ?, notifications_enabled = ? WHERE user_id = ?");
+            $stmt->execute([$fullName, $email, $bio, $address, $phone, $languages, $dob, $gender, $religion, $notifications, $user_id]);
         }
 
         // Return updated profile
-        $stmt = $pdo->prepare("SELECT username, full_name, profile_picture_path FROM users WHERE user_id = ?");
+        $stmt = $pdo->prepare("SELECT user_id, username, email, full_name, profile_picture_path, bio_graphy, home_address, phone_number, languages, date_of_birth, gender, religion, notifications_enabled FROM users WHERE user_id = ?");
         $stmt->execute([$user_id]);
-        $user = $stmt->fetch();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         echo json_encode(['success' => true, 'message' => 'Profile updated successfully', 'profile' => $user]);
         exit;

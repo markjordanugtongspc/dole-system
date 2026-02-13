@@ -176,6 +176,12 @@ function renderProfileModal(profile) {
                         <input type="text" id="profile-full-name" name="full_name" value="${profile.full_name}" placeholder="Your full name"
                             class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
                     </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                        <input type="email" id="profile-email" name="email" value="${profile.email || ''}" placeholder="yourname@gmail.com"
+                            class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
+                    </div>
                 </div>
 
                 <div class="pt-2">
