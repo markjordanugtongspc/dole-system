@@ -101,7 +101,7 @@ async function initSettings() {
                     icon: 'success',
                     title: 'System Synced',
                     text: 'Your profile information has been updated successfully.',
-                    timer: 2000,
+                    timer: 3000,
                     showConfirmButton: false,
                     customClass: {
                         popup: 'rounded-3xl border border-blue-50'
@@ -165,7 +165,7 @@ async function initSettings() {
                     icon: 'success',
                     title: 'Security Updated',
                     text: 'Your password has been changed successfully.',
-                    timer: 2000,
+                    timer: 3000,
                     showConfirmButton: false
                 });
             } else {

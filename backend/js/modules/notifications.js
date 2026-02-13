@@ -10,6 +10,7 @@ let notificationSound = null;
 let notificationPermission = 'default';
 let unreadCount = 0;
 let notificationCheckInterval = null;
+let lastNotifiedId = localStorage.getItem('last_notified_id') ? parseInt(localStorage.getItem('last_notified_id')) : 0;
 
 /**
  * Initialize notification system
@@ -85,7 +86,7 @@ async function requestNotificationPermission() {
                     icon: 'success',
                     title: 'Notifications Enabled!',
                     text: 'You will now receive real-time updates.',
-                    timer: 2000,
+                    timer: 3000,
                     showConfirmButton: false
                 });
             }
@@ -345,7 +346,8 @@ window.markAllAsRead = async function () {
 
     if (!notificationList) return;
 
-    // 1. Immediate UI Feedback (Litteral Removal)
+    // 1. Immediate UI Feedback
+    updateBadgeCount(0); // Clear badge instantly
     notificationList.innerHTML = `
         <div class="flex flex-col items-center justify-center py-12 px-4 transition-opacity duration-300">
             <svg class="w-16 h-16 text-emerald-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -373,18 +375,16 @@ window.markAllAsRead = async function () {
                 icon: 'success',
                 title: 'Inbox Cleared',
                 showConfirmButton: false,
-                timer: 1500,
+                timer: 3000,
                 timerProgressBar: true
             });
-
-            // Update local badge count instantly
-            updateBadgeCount(0);
 
             // Reload to show empty state
             loadNotifications();
         }
     } catch (error) {
         console.error('Error marking all as read:', error);
+        loadNotifications(); // Rollback/Refresh on error
     }
 };
 
@@ -395,9 +395,18 @@ window.markAsRead = async function (notificationId) {
     const basePath = getBasePath();
     const item = document.querySelector(`[data-notification-id="${notificationId}"]`);
 
+    // 1. Instant UI Feedback
     if (item) {
-        item.style.opacity = '0.5';
-        item.style.pointerEvents = 'none';
+        item.style.opacity = '0'; // Fade out
+        item.style.height = '0'; // Collapse
+        item.style.padding = '0';
+        item.style.overflow = 'hidden';
+        item.style.transition = 'all 0.3s ease';
+    }
+
+    // Decrement badge locally for instant feel
+    if (unreadCount > 0) {
+        updateBadgeCount(unreadCount - 1);
     }
 
     try {
@@ -407,10 +416,11 @@ window.markAsRead = async function (notificationId) {
             body: JSON.stringify({ action: 'mark_read', notification_id: notificationId })
         });
 
-        // Instant removal/reload
+        // Sync with server state
         loadNotifications();
     } catch (error) {
         console.error('Error marking notification as read:', error);
+        loadNotifications(); // Rollback/Refresh on error
     }
 };
 
@@ -435,14 +445,22 @@ async function checkForNewNotifications() {
         const result = await response.json();
 
         if (result.success && result.has_new) {
-            // Play sound
-            playNotificationSound();
+            const latest = result.latest_notification;
 
-            // Show browser notification
-            showBrowserNotification(result.latest_notification);
+            // Only pling and notify if this is a NEW ID we haven't seen in this session/storage
+            if (latest && latest.id > lastNotifiedId) {
+                lastNotifiedId = latest.id;
+                localStorage.setItem('last_notified_id', lastNotifiedId);
 
-            // Update UI
-            updateBadgeCount(result.unread_count);
+                // Play sound
+                playNotificationSound();
+
+                // Show browser notification
+                showBrowserNotification(latest);
+
+                // Update UI badge
+                updateBadgeCount(result.unread_count);
+            }
         }
     } catch (error) {
         console.error('Error checking notifications:', error);

@@ -188,25 +188,25 @@ require_once __DIR__ . '/../../config/vite.php';
                     <!-- Primary Color Header -->
                     <thead class="text-sm text-white bg-royal-blue border-b border-royal-blue/20">
                         <tr>
-                            <th scope="col" class="px-6 py-3 font-medium whitespace-nowrap">
+                            <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
                                 ID NO.
                             </th>
-                            <th scope="col" class="px-6 py-3 font-medium">
-                                NAME (Last Name, First Name, MI)
+                            <th scope="col" class="px-4 py-2.5 font-medium text-center" title="Last Name, First Name, Middle Initial">
+                                NAME
                             </th>
-                            <th scope="col" class="px-6 py-3 font-medium">
-                                OFFICE/PLACE OF ASSIGNMENT
+                            <th scope="col" class="px-4 py-2.5 font-medium text-center">
+                                OFFICE / PLACE OF ASSIGNMENT
                             </th>
-                            <th scope="col" class="px-6 py-3 font-medium whitespace-nowrap">
+                            <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
                                 START DATE
                             </th>
-                            <th scope="col" class="px-6 py-3 font-medium whitespace-nowrap">
+                            <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
                                 END DATE
                             </th>
-                            <th scope="col" class="px-6 py-3 font-medium">
+                            <th scope="col" class="px-4 py-2.5 font-medium text-center">
                                 REMARKS
                             </th>
-                            <th scope="col" class="px-6 py-3 font-medium">
+                            <th scope="col" class="px-4 py-2.5 font-medium text-center">
                                 Action
                             </th>
                         </tr>

@@ -51,7 +51,7 @@ export function showLoginSuccess() {
                 <p class="text-xs text-gray-500 mt-3">Redirecting to dashboard...</p>
             </div>
         `,
-        timer: 1500,
+        timer: 3000,
         timerProgressBar: true,
         showConfirmButton: false,
         showCloseButton: false,
@@ -250,7 +250,7 @@ function renderProfileModal(profile) {
                             icon: 'success',
                             title: 'Profile Updated',
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 3000,
                             timerProgressBar: true
                         });
                     } else {
@@ -481,7 +481,7 @@ export function showExportConfigModal(callback) {
                     icon: 'success',
                     title: 'Generator pattern updated',
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 3000,
                     timerProgressBar: true,
                     customClass: {
                         popup: 'rounded-xl shadow-lg border border-emerald-100'
@@ -2100,26 +2100,22 @@ function showAddDataModal(data = null) {
                             const success = await window.addBeneficiaryData(beneficiaryData);
 
                             if (success) {
-                                Swal.fire({
-                                    toast: true,
-                                    position: 'top-end',
-                                    icon: 'success',
-                                    title: `Record ${isEdit ? 'Updated' : 'Added'} Successfully`,
-                                    showConfirmButton: false,
-                                    timer: 2000,
-                                    timerProgressBar: true
-                                });
+                                // 1. Close the main input modal first
+                                Swal.close();
 
-                                // Use a small delay before closing to let user see toast if they like, 
-                                // but Swal.close() closes everything. 
-                                // Actually, Swal.fire (toast) doesn't close the current modal if called correctly, 
-                                // but if we want to close the Add Modal:
+                                // 2. Show the toast AFTER the main modal is closed
+                                // We use a tiny delay to ensure the modal closing animation doesn't interfere
                                 setTimeout(() => {
-                                    // Close the main modal popup (not the toast)
-                                    // Since Swal.fire for toast might be separate, but usually Swal is one instance.
-                                    // In this case, we close the main one.
-                                    Swal.close();
-                                }, 500);
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'success',
+                                        title: `Record ${isEdit ? 'Updated' : 'Added'} Successfully`,
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        timerProgressBar: true
+                                    });
+                                }, 100);
                             } else {
                                 Swal.fire({
                                     icon: 'error',

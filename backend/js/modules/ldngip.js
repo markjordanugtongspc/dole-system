@@ -61,39 +61,29 @@ export function renderTable(dataToRender = beneficiaries) {
     tbody.innerHTML = dataToRender.map(data => `
         <tr class="bg-blue-50 border-b border-blue-100 hover:bg-blue-100 transition-colors group cursor-pointer"
             onclick='viewBeneficiary(${JSON.stringify(data)})'>
-            <th scope="row" class="px-6 py-4 font-medium text-heading whitespace-nowrap font-mono text-xs">
+            <th scope="row" class="px-4 py-3 font-medium text-heading whitespace-nowrap font-mono text-xs">
                 ${data.id}
             </th>
-            <td class="px-6 py-4 font-bold text-royal-blue">
+            <td class="px-4 py-3 font-bold text-royal-blue">
                 ${data.name}
             </td>
-            <td class="px-6 py-4">
+            <td class="px-4 py-3">
                 <span class="${getOfficeClass(data.office)} text-xs font-bold px-2.5 py-0.5 rounded">
                     ${data.office}
                 </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <div class="bg-blue-50/50 rounded-lg px-3 py-1.5 border border-blue-100/60 inline-flex items-center gap-2 shadow-sm">
-                    <div class="p-1 px-1.5 bg-blue-100/50 rounded-md">
-                        <svg class="w-3.5 h-3.5 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    </div>
-                    <span class="text-[11px] font-black text-royal-blue uppercase tracking-tight">${data.startDateFormatted || data.startDate || 'N/A'}</span>
-                </div>
+            <td class="px-4 py-3 whitespace-nowrap text-center">
+                <span class="text-[11px] font-black text-royal-blue uppercase tracking-tight">${data.startDateFormatted || data.startDate || 'N/A'}</span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <div class="bg-red-50/50 rounded-lg px-3 py-1.5 border border-red-100/60 inline-flex items-center gap-2 shadow-sm">
-                    <div class="p-1 px-1.5 bg-red-100/50 rounded-md">
-                        <svg class="w-3.5 h-3.5 text-philippine-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    </div>
-                    <span class="text-[11px] font-black text-philippine-red uppercase tracking-tight">${data.endDateFormatted || data.endDate || 'N/A'}</span>
-                </div>
+            <td class="px-4 py-3 whitespace-nowrap text-center">
+                <span class="text-[11px] font-black text-philippine-red uppercase tracking-tight">${data.endDateFormatted || data.endDate || 'N/A'}</span>
             </td>
-            <td class="px-6 py-4">
+            <td class="px-4 py-3">
                 <span class="${getStatusClass(data.remarks)} text-xs font-bold px-2.5 py-0.5 rounded uppercase border">
                     ${data.remarks}
                 </span>
             </td>
-            <td class="px-6 py-4 flex gap-2">
+            <td class="px-4 py-3 flex gap-2">
                 <button type="button"
                     class="font-medium text-royal-blue hover:scale-110 transition-transform p-1 cursor-pointer"
                     title="Edit Details" onclick='event.stopPropagation(); editBeneficiary(${JSON.stringify(data)})'>
@@ -255,7 +245,7 @@ export async function archiveRecord(id) {
                 icon: 'success',
                 title: 'Record Archived',
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 3000,
                 timerProgressBar: true
             });
             await loadBeneficiaries();

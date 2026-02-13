@@ -148,14 +148,15 @@ require_once __DIR__ . '/../../config/vite.php';
     ?>
     <table class="w-full text-xs text-left border-collapse">
         <thead class="text-white bg-royal-blue font-bold uppercase tracking-wider text-[10px]">
-            <tr>
-                <th class="px-2 py-2 border border-royal-blue text-center w-[8%]">ID</th>
-                <th class="px-2 py-2 border border-royal-blue w-[25%]">Name</th>
-                <th class="px-2 py-2 border border-royal-blue w-[20%]">Office / Assignment</th>
-                <th class="px-2 py-2 border border-royal-blue w-[15%]">Position</th>
-                <th class="px-2 py-2 border border-royal-blue w-[12%]">Start Date</th>
-                <th class="px-2 py-2 border border-royal-blue w-[12%]">End Date</th>
-                <th class="px-2 py-2 border border-royal-blue text-center w-[8%]">Status</th>
+            <tr class="text-center">
+                <th class="px-2 py-2 border border-royal-blue w-[8%]">ID NO.</th>
+                <th class="px-2 py-2 border border-royal-blue w-[25%]" title="Last Name, First Name, Middle Initial">
+                    NAME</th>
+                <th class="px-2 py-2 border border-royal-blue w-[20%]">OFFICE / PLACE OF ASSIGNMENT</th>
+                <th class="px-2 py-2 border border-royal-blue w-[15%] text-xs">DESIGNATION</th>
+                <th class="px-2 py-2 border border-royal-blue w-[12%]">START DATE</th>
+                <th class="px-2 py-2 border border-royal-blue w-[12%]">END DATE</th>
+                <th class="px-2 py-2 border border-royal-blue w-[8%]">STATUS</th>
             </tr>
         </thead>
         <tbody id="print-table-body" class="text-[10px] font-medium text-gray-700">

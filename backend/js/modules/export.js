@@ -222,18 +222,22 @@ window.exportToExcel = function () {
 
 const COL_MAP = {
     id: 'ID NO.',
-    name: 'Name',
-    office: 'Office',
-    position: 'Designation',
-    status: 'Status',
-    startdate: 'Start Date',
-    enddate: 'End Date'
+    name: 'NAME',
+    office: 'OFFICE',
+    position: 'DESIGNATION',
+    status: 'STATUS',
+    startdate: 'START DATE',
+    enddate: 'END DATE'
 };
 
-function generateTableHeader(columns, classes = "px-6 py-5") {
+function generateTableHeader(columns, classes = "px-4 py-2.5") {
     return `
-        <tr class="text-[11px] text-white uppercase bg-royal-blue font-bold tracking-widest">
-            ${columns.map(c => `<th scope="col" class="${classes}">${COL_MAP[c] || c.toUpperCase()}</th>`).join('')}
+        <tr class="text-[11px] text-white uppercase bg-royal-blue font-bold tracking-widest text-center">
+            ${columns.map(c => {
+        let tooltip = '';
+        if (c === 'name') tooltip = ' title="Last Name, First Name, Middle Initial"';
+        return `<th scope="col" class="${classes}"${tooltip}>${COL_MAP[c] || c.toUpperCase()}</th>`;
+    }).join('')}
         </tr>
     `;
 }
@@ -247,9 +251,9 @@ function generateTableRow(row, columns, isPrint = false) {
         if (c === 'status') val = row.remarks || 'N/A';
 
         if (isPrint) {
-            let classes = "px-3 py-2 border-r border-gray-200";
-            if (c === 'id') classes += " font-mono text-center font-bold";
-            if (c === 'name') classes += " font-bold text-black uppercase leading-tight";
+            let classes = "px-2 py-2 border-r border-gray-200 text-center";
+            if (c === 'id') classes += " font-mono font-bold";
+            if (c === 'name') classes += " font-bold text-black uppercase leading-tight text-left";
             if (c === 'status') {
                 const colors = { 'ABSORBED': 'text-golden-yellow', 'RESIGNED': 'text-slate-500', 'EXPIRED': 'text-philippine-red', 'ONGOING': 'text-green-600' };
                 classes += ` text-center font-bold uppercase ${colors[val] || 'text-gray-500'}`;
@@ -257,14 +261,16 @@ function generateTableRow(row, columns, isPrint = false) {
             if (c === 'startdate' || c === 'enddate') classes += " text-center font-mono text-[9px]";
             return `<td class="${classes}">${val}</td>`;
         } else {
-            if (c === 'id') return `<th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap font-mono text-xs">${val}</th>`;
-            if (c === 'name') return `<td class="px-6 py-4 font-bold text-royal-blue group-hover/row:translate-x-1 transition-transform uppercase">${val}</td>`;
-            if (c === 'office') return `<td class="px-6 py-4"><span class="bg-white text-blue-700 px-2 py-0.5 rounded text-[10px] border border-blue-100 font-bold shadow-sm">${val}</span></td>`;
+            if (c === 'id') return `<th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap font-mono text-xs text-center">${val}</th>`;
+            if (c === 'name') return `<td class="px-4 py-3 font-bold text-royal-blue group-hover/row:translate-x-1 transition-transform uppercase">${val}</td>`;
+            if (c === 'office') return `<td class="px-4 py-3 text-center"><span class="bg-white text-blue-700 px-2 py-0.5 rounded text-[10px] border border-blue-100 font-bold shadow-sm">${val}</span></td>`;
             if (c === 'status') {
                 const colors = { 'ABSORBED': 'bg-golden-yellow/10 text-golden-yellow border-golden-yellow/20', 'RESIGNED': 'bg-slate-100 text-slate-500 border-slate-200', 'EXPIRED': 'bg-red-50 text-philippine-red border-red-100', 'ONGOING': 'bg-green-50 text-green-600 border-green-100' };
-                return `<td class="px-6 py-4"><span class="${colors[val] || 'bg-gray-100 text-gray-700 border-gray-200'} px-2 py-0.5 rounded text-xs border uppercase font-bold text-[10px] shadow-sm">${val}</span></td>`;
+                return `<td class="px-4 py-3 text-center"><span class="${colors[val] || 'bg-gray-100 text-gray-700 border-gray-200'} px-2 py-0.5 rounded text-xs border uppercase font-bold text-[10px] shadow-sm">${val}</span></td>`;
             }
-            return `<td class="px-6 py-4 text-xs font-semibold text-gray-500">${val}</td>`;
+            if (c === 'startdate') return `<td class="px-4 py-3 text-center text-[11px] font-black text-royal-blue uppercase tracking-tight">${val}</td>`;
+            if (c === 'enddate') return `<td class="px-4 py-3 text-center text-[11px] font-black text-philippine-red uppercase tracking-tight">${val}</td>`;
+            return `<td class="px-4 py-3 text-xs font-semibold text-gray-500 text-center">${val}</td>`;
         }
     }).join('');
 }
@@ -345,8 +351,12 @@ function renderPrintTable(data) {
     const tbody = document.getElementById('print-table-body');
 
     thead.innerHTML = `
-        <tr class="text-white bg-royal-blue font-bold uppercase tracking-wider text-[10px]">
-            ${activeColumns.map(c => `<th class="px-3 py-2 border border-royal-blue ${c === 'id' || c === 'status' ? 'text-center' : ''}">${COL_MAP[c] || c.toUpperCase()}</th>`).join('')}
+        <tr class="text-white bg-royal-blue font-bold uppercase tracking-wider text-[10px] text-center">
+            ${activeColumns.map(c => {
+        let tooltip = '';
+        if (c === 'name') tooltip = ' title="Last Name, First Name, Middle Initial"';
+        return `<th class="px-3 py-2 border border-royal-blue"${tooltip}>${COL_MAP[c] || c.toUpperCase()}</th>`;
+    }).join('')}
         </tr>
     `;
 
