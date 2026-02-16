@@ -428,10 +428,10 @@ window.markAsRead = async function (notificationId) {
  * Start polling for new notifications
  */
 function startNotificationPolling() {
-    // Check every 30 seconds
+    // Check every 10 seconds (reduced from 30s for better real-time sync)
     notificationCheckInterval = setInterval(async () => {
         await checkForNewNotifications();
-    }, 30000);
+    }, 10000);
 }
 
 /**

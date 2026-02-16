@@ -1,5 +1,6 @@
 import { getBasePath } from './auth.js';
 import { createNotification } from './notifications.js';
+import { pollingManager, apiGet, showToast, reinitFlowbite, generateChecksum } from './ajax-manager.js';
 import Swal from 'sweetalert2';
 
 /**
@@ -9,6 +10,7 @@ import Swal from 'sweetalert2';
 
 // Beneficiaries data loaded from database
 let beneficiaries = [];
+let lastDataChecksum = null; // For detecting data changes
 /**
  * Load beneficiaries from backend API
  */
@@ -36,6 +38,41 @@ export function initLDNPage() {
     loadBeneficiaries(); // Load from database
     initLDNHeader();
     initSearch();
+    initAutoRefresh(); // Start real-time polling
+}
+
+/**
+ * Initialize auto-refresh polling for real-time data sync
+ */
+function initAutoRefresh() {
+    const ldnTable = document.getElementById('beneficiary-table-body');
+
+    // Only start polling if we're on the LDN page
+    if (!ldnTable) return;
+
+    pollingManager.start('beneficiaries', async () => {
+        const result = await apiGet('api/beneficiaries.php');
+
+        if (result.success && result.data.beneficiaries) {
+            const newData = result.data.beneficiaries;
+            const newChecksum = generateChecksum(newData);
+
+            // Only update if data actually changed
+            if (lastDataChecksum && newChecksum !== lastDataChecksum) {
+                beneficiaries = newData;
+                renderTable();
+                reinitFlowbite();
+
+                showToast(
+                    'Data Synced',
+                    'Beneficiary list has been updated',
+                    'info'
+                );
+            }
+
+            lastDataChecksum = newChecksum;
+        }
+    }, 10000); // Poll every 10 seconds
 }
 
 export function renderTable(dataToRender = beneficiaries) {
@@ -105,6 +142,9 @@ export function renderTable(dataToRender = beneficiaries) {
             </td>
         </tr>
     `).join('');
+
+    // Re-initialize Flowbite components after DOM update
+    reinitFlowbite();
 }
 
 function getOfficeClass(office) {

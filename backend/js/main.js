@@ -4,6 +4,7 @@
  */
 import '../css/main.css';
 import 'flowbite';
+import { initFlowbite } from 'flowbite';
 import { initLoginHandler, initLogoutHandler, initSmartLoader } from './modules/auth.js';
 import { initCharts } from './modules/charts.js';
 import { initLDNPage } from './modules/ldngip.js';
@@ -15,6 +16,9 @@ import { initNotifications } from './modules/notifications.js';
 
 // Initialize Smart Loader immediately
 initSmartLoader();
+
+// Make Flowbite's initFlowbite globally available for AJAX re-initialization
+window.initFlowbite = initFlowbite;
 
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

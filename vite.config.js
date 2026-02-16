@@ -49,7 +49,9 @@ export default defineConfig({
         origin: process.env.VITE_ORIGIN || undefined,
 
         hmr: {
-            // protocol: 'ws', // Standard websocket
+            // Setting host to true allows the HMR connection to automatically use 
+            // the IP/Host from which the page was loaded.
+            host: true,
             clientPort: 5173,
         },
         watch: {
