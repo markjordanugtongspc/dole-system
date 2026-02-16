@@ -34,16 +34,17 @@ export default defineConfig({
     server: {
         // Listen on all network interfaces (0.0.0.0) to allow LAN access
         // This makes the dev server accessible from other devices on the same network
-        host: '0.0.0.0',
+        // host: true enables Vite to listen on all local IPv4 and IPv6 addresses.
+        host: true,
         port: 5173,
-        strictPort: false, // Allow fallback if 5173 is locked
+        strictPort: true, // Use exactly 5173 or error (prevents hidden port jumping)
         cors: true,
 
-        // Allow access via all hostnames in development
+        // Allow all hostnames (critical for cross-laptop access)
         allowedHosts: true,
 
-        // Optional: Force a specific origin for assets if auto-detection fails
-        origin: undefined,
+        // Restore the dynamic origin check
+        origin: process.env.VITE_ORIGIN || undefined,
 
         hmr: {
             // Setting host to true allows the HMR connection to automatically use 
