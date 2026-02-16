@@ -439,27 +439,36 @@ function startNotificationPolling() {
  */
 async function checkForNewNotifications() {
     const basePath = getBasePath();
+    const dropdown = document.getElementById('notificationDropdown');
 
     try {
         const response = await fetch(`${basePath}api/notifications.php?check_new=1`);
         const result = await response.json();
 
-        if (result.success && result.has_new) {
-            const latest = result.latest_notification;
+        if (result.success) {
+            // ALWAYS update the badge count to stay in sync with other devices
+            updateBadgeCount(result.unread_count);
 
-            // Only pling and notify if this is a NEW ID we haven't seen in this session/storage
-            if (latest && latest.id > lastNotifiedId) {
-                lastNotifiedId = latest.id;
-                localStorage.setItem('last_notified_id', lastNotifiedId);
+            // If the notification list is currently open/visible, refresh the content
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                const listResponse = await fetch(`${basePath}api/notifications.php`);
+                const listData = await listResponse.json();
+                if (listData.success) {
+                    renderNotifications(listData.notifications);
+                }
+            }
 
-                // Play sound
-                playNotificationSound();
+            // Only play "Pling" and show alert if there's a truly NEW notification
+            if (result.has_new) {
+                const latest = result.latest_notification;
 
-                // Show browser notification
-                showBrowserNotification(latest);
+                if (latest && latest.id > lastNotifiedId) {
+                    lastNotifiedId = latest.id;
+                    localStorage.setItem('last_notified_id', lastNotifiedId);
 
-                // Update UI badge
-                updateBadgeCount(result.unread_count);
+                    playNotificationSound();
+                    showBrowserNotification(latest);
+                }
             }
         }
     } catch (error) {

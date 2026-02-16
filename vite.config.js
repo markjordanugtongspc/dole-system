@@ -36,17 +36,14 @@ export default defineConfig({
         // This makes the dev server accessible from other devices on the same network
         host: '0.0.0.0',
         port: 5173,
-        strictPort: true,
+        strictPort: false, // Allow fallback if 5173 is locked
         cors: true,
 
-        // Allow access via IP addresses (crucial for Vite 7+)
+        // Allow access via all hostnames in development
         allowedHosts: true,
 
-        // Origin is intentionally omitted to allow Vite to auto-detect the correct URL
-        // based on the request. This works seamlessly with the PHP vite() helper which
-        // uses HTTP_HOST to generate the correct asset URLs.
-        // Optional: Set VITE_ORIGIN env var to override (e.g., VITE_ORIGIN=http://192.168.1.124:5173)
-        origin: process.env.VITE_ORIGIN || undefined,
+        // Optional: Force a specific origin for assets if auto-detection fails
+        origin: undefined,
 
         hmr: {
             // Setting host to true allows the HMR connection to automatically use 
