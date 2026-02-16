@@ -18,16 +18,16 @@
             $is_settings = (strpos($current_uri, '/frontend/user/settings/') !== false);
             ?>
             <li>
-                <a href="<?php echo $baseUrl; ?>/frontend/dashboard/"
+                <a href="<?php echo $baseUrl; ?>/frontend/dashboard/" title="Analytics Dashboard"
                     class="flex items-center px-4 py-3 rounded-lg group cursor-pointer transition-all duration-200 border-b-2 <?php echo $is_dashboard ? 'text-white font-black bg-white/20 border-white' : 'text-white/80 hover:bg-white/10 hover:text-white border-transparent hover:scale-105'; ?>">
-                    <svg class="transition-transform duration-200 <?php echo $is_dashboard ? 'w-5 h-5 text-white scale-105' : 'w-5 h-5 text-white/80 group-hover:text-white group-hover:scale-110'; ?>"
-                        viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M18 18V2H2v16h16zM16 5H4V4h12v1zM7 7v3h3c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3zm1 2V7c1.1 0 2 .9 2 2H8zm8-1h-4V7h4v1zm0 3h-4V9h4v2zm0 2h-4v-1h4v1zm0 3H4v-1h12v1z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="<?php echo $is_dashboard ? '2.5' : '1.5'; ?>" stroke="currentColor"
+                        class="w-5 h-5 transition-all duration-200 <?php echo $is_dashboard ? 'text-white scale-110' : 'text-white/80 group-hover:text-white group-hover:scale-110'; ?>">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
                     </svg>
                     <span
-                        class="ms-3 whitespace-nowrap transition-all duration-200 <?php echo $is_dashboard ? 'translate-x-1' : ''; ?>">Analytics
-                        Dashboard</span>
+                        class="ms-3 whitespace-nowrap transition-all duration-200 <?php echo $is_dashboard ? 'translate-x-1' : ''; ?>">Dashboard</span>
                 </a>
             </li>
             <!-- LDN - GIP Link (Simplified) -->
