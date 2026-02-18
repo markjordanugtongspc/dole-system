@@ -21,6 +21,20 @@ require_once __DIR__ . '/../../config/vite.php';
                 });
             }
         })();
+
+        // Dark Mode FOUC Prevention: apply theme before paint
+        (function () {
+            var theme = localStorage.getItem('color-theme');
+            if (!theme) {
+                var match = document.cookie.match(/(?:^|; )color-theme=([^;]*)/);
+                theme = match ? decodeURIComponent(match[1]) : null;
+            }
+            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
     </script>
 
     <!-- Vite Assets -->
@@ -191,7 +205,8 @@ require_once __DIR__ . '/../../config/vite.php';
                             <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
                                 ID NO.
                             </th>
-                            <th scope="col" class="px-4 py-2.5 font-medium text-center" title="Last Name, First Name, Middle Initial">
+                            <th scope="col" class="px-4 py-2.5 font-medium text-center"
+                                title="Last Name, First Name, Middle Initial">
                                 NAME
                             </th>
                             <th scope="col" class="px-4 py-2.5 font-medium text-center">

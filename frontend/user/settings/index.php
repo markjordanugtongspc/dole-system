@@ -23,6 +23,23 @@ require_once __DIR__ . '/../../../config/vite.php';
     <?php vite('backend/js/main.js'); ?>
     <?php vite('backend/js/modules/settings.js'); ?>
 
+    <!-- Dark Mode FOUC Prevention: apply theme before paint -->
+    <script>
+        (function () {
+            var theme = localStorage.getItem('color-theme');
+            if (!theme) {
+                // Check cookie fallback
+                var match = document.cookie.match(/(?:^|; )color-theme=([^;]*)/);
+                theme = match ? decodeURIComponent(match[1]) : null;
+            }
+            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+
 </head>
 
 <body class="bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 antialiased settings-body">
@@ -335,14 +352,17 @@ require_once __DIR__ . '/../../../config/vite.php';
                                     </label>
                                 </div>
 
-                                <div class="flex items-center justify-between py-4 opacity-50 cursor-not-allowed">
+                                <div class="flex items-center justify-between py-4">
                                     <div>
                                         <h4 class="text-sm font-bold text-gray-700">Dark Mode</h4>
                                         <p class="text-xs text-gray-500 mt-1">Switch to dark theme</p>
                                     </div>
-                                    <span
-                                        class="px-3 py-1 bg-gray-100 rounded-lg text-[10px] font-bold text-gray-500 uppercase">Coming
-                                        Soon</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="pref-dark-mode" class="sr-only peer">
+                                        <div
+                                            class="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-royal-blue">
+                                        </div>
+                                    </label>
                                 </div>
                             </div>
 

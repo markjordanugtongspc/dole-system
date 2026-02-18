@@ -12,10 +12,13 @@ import { initModalHandler, updateUIProfile } from './modules/modal.js';
 import { initExportPage } from './modules/export.js';
 import { getBasePath } from './modules/auth.js';
 import { initNotifications } from './modules/notifications.js';
-
+import { initDarkMode } from './modules/darkmode.js';
 
 // Initialize Smart Loader immediately
 initSmartLoader();
+
+// Apply dark/light theme ASAP to prevent FOUC
+initDarkMode();
 
 // Make Flowbite's initFlowbite globally available for AJAX re-initialization
 window.initFlowbite = initFlowbite;

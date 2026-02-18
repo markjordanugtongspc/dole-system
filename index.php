@@ -10,13 +10,27 @@ require_once __DIR__ . '/config/db.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - DOLE System</title>
 
-    <!-- Dynamic Favicon injected by main.js -->
+    <!-- Dark Mode FOUC Prevention: apply theme before paint -->
+    <script>
+        (function () {
+            var theme = localStorage.getItem('color-theme');
+            if (!theme) {
+                var match = document.cookie.match(/(?:^|; )color-theme=([^;]*)/);
+                theme = match ? decodeURIComponent(match[1]) : null;
+            }
+            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
 
     <!-- Vite Assets -->
     <?php vite('backend/js/main.js'); ?>
 </head>
 
-<body class="min-h-screen flex">
+<body class="min-h-screen flex bg-white dark:bg-slate-900 transition-colors duration-300">
     <!-- Page Loader (Hidden immediately if loaded class is present) -->
     <div id="page-loader" class="page-loader">
         <div class="loader-spinner"></div>
@@ -29,9 +43,9 @@ require_once __DIR__ . '/config/db.php';
             <!-- Logo -->
             <div class="mb-10">
                 <div
-                    class="w-56 h-56 mx-auto bg-white rounded-full shadow-2xl flex items-center justify-center p-6 overflow-hidden">
+                    class="w-56 h-56 mx-auto bg-white dark:bg-royal-blue/20 rounded-full shadow-2xl flex items-center justify-center p-6 border-4 border-white/10 dark:border-white/5 overflow-hidden transition-all duration-500">
                     <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo"
-                        class="w-full h-full object-contain rounded-full">
+                        class="w-full h-full object-contain rounded-full drop-shadow-2xl">
                 </div>
             </div>
 
@@ -44,50 +58,52 @@ require_once __DIR__ . '/config/db.php';
     </div>
 
     <!-- RIGHT SIDE - Login Form -->
-    <div id="right-panel" class="flex w-full lg:w-1/2 items-center justify-center bg-white px-6 py-12">
+    <div id="right-panel"
+        class="flex w-full lg:w-1/2 items-center justify-center bg-white dark:bg-slate-900 px-6 py-12 transition-colors duration-300">
         <div class="w-full max-w-md">
 
             <!-- Mobile Logo (shows only on mobile) -->
             <div class="lg:hidden text-center mb-8">
                 <div
-                    class="w-24 h-24 mx-auto bg-white rounded-full shadow-lg flex items-center justify-center mb-4 p-2 overflow-hidden">
+                    class="w-24 h-24 mx-auto bg-white dark:bg-royal-blue/20 rounded-full shadow-lg flex items-center justify-center mb-4 p-2 border-2 border-white/10 dark:border-white/5 overflow-hidden">
                     <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo"
                         class="w-full h-full object-contain rounded-full">
                 </div>
-                <h2 class="text-2xl font-bold text-royal-blue">DOLE System</h2>
-                <p class="text-xs text-gray-500 font-semibold">Republic of the Philippines</p>
+                <h2 class="text-2xl font-bold text-royal-blue dark:text-blue-400 transition-colors">DOLE System</h2>
+                <p class="text-xs text-gray-500 dark:text-slate-400 font-semibold transition-colors">Republic of the Philippines</p>
             </div>
 
             <!-- Login Form Card -->
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
+            <div
+                class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-200 dark:border-slate-700 p-8 transition-all duration-300">
                 <div class="mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-                    <p class="text-gray-600">Sign in to your account</p>
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back</h2>
+                    <p class="text-gray-600 dark:text-slate-400">Sign in to your account</p>
                 </div>
 
                 <form id="loginForm" class="space-y-6">
                     <!-- Username Field -->
                     <div>
-                        <label for="username" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label for="username" class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2 transition-colors">
                             Username
                         </label>
                         <input type="text" id="username" name="username" required autocomplete="username"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-royal-blue focus:ring-2 focus:ring-blue-100 transition-colors outline-none"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20 transition-all outline-none"
                             placeholder="Enter your username" />
                     </div>
 
                     <!-- Password Field -->
                     <div>
-                        <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label for="password" class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2 transition-colors">
                             Password
                         </label>
                         <div class="relative">
                             <input type="password" id="password" name="password" required
                                 autocomplete="current-password"
-                                class="w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 focus:border-royal-blue focus:ring-2 focus:ring-blue-100 transition-colors outline-none"
+                                class="w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20 transition-all outline-none"
                                 placeholder="Enter your password" />
                             <button type="button" id="togglePassword"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors">
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white transition-colors">
                                 <!-- Eye Open Icon -->
                                 <svg class="eye-open w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -110,7 +126,7 @@ require_once __DIR__ . '/config/db.php';
                         <div class="flex items-center">
                             <input type="checkbox" id="rememberMe" name="rememberMe"
                                 class="w-4 h-4 rounded border-gray-300 text-royal-blue focus:ring-blue-100 cursor-pointer" />
-                            <label for="rememberMe" class="ml-2 text-sm text-gray-700 cursor-pointer">
+                            <label for="rememberMe" class="ml-2 text-sm text-gray-700 dark:text-slate-400 cursor-pointer transition-colors">
                                 Remember me
                             </label>
                         </div>
@@ -121,13 +137,13 @@ require_once __DIR__ . '/config/db.php';
 
                     <!-- Login Button -->
                     <button type="submit"
-                        class="w-full bg-royal-blue text-white font-semibold py-3 rounded-lg hover:bg-blue-800 transition-colors shadow-lg hover:shadow-xl">
+                        class="w-full bg-royal-blue text-white font-semibold py-3 rounded-lg hover:bg-blue-800 transition-all shadow-lg hover:shadow-xl cursor-pointer active:scale-[0.98]">
                         Sign In
                     </button>
                 </form>
 
                 <!-- Footer -->
-                <div class="mt-8 text-center text-sm text-gray-500">
+                <div class="mt-8 text-center text-sm text-gray-500 dark:text-slate-500 transition-colors">
                     <p>&copy; 2026 Department of Labor and Employment</p>
                     <p class="mt-1">Republic of the Philippines</p>
                 </div>
