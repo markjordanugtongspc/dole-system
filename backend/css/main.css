@@ -48,6 +48,13 @@
     --text-body: #475569;
 }
 
+.dark {
+    --bg-soft: #1e293b;
+    --border-light: #334155;
+    --text-heading: #ffffff;
+    --text-body: #94a3b8;
+}
+
 @layer utilities {
     .bg-neutral-primary-soft {
         background-color: var(--bg-soft);
@@ -58,11 +65,11 @@
     }
 
     .bg-neutral-secondary-soft {
-        background-color: #f1f5f9;
+        background-color: var(--border-light);
     }
 
     .bg-neutral-tertiary-medium {
-        background-color: #f8fafc;
+        background-color: var(--bg-soft);
     }
 
     .border-default {
@@ -423,15 +430,16 @@ select:focus {
 }
 
 /* ── Dashboard Chart Cards ── */
-.dark .bg-\[#f8fafc\] {
-    background-color: #1e293b !important;
+.bg-\[\#f8fafc\],
+.bg-neutral-primary-soft,
+.bg-neutral-primary-medium,
+.bg-neutral-secondary-soft,
+.bg-neutral-tertiary-medium {
+    background-color: var(--bg-soft) !important;
 }
 
-.dark .bg-neutral-primary-soft,
-.dark .bg-neutral-primary-medium,
-.dark .bg-neutral-secondary-soft,
-.dark .bg-neutral-tertiary-medium {
-    background-color: #1e293b !important;
+.dark .text-gray-400 {
+    color: #94a3b8 !important;
 }
 
 /* ── Stat/Info Badges ── */

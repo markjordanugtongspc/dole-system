@@ -20,7 +20,7 @@ const getThemeColors = () => isDark() ? {
     text: '#0f172a', // user's light mode text
     muted: '#64748b', // user's light mode muted
     grid: '#f1f5f9', // user's light mode grid
-    cardBg: '#ffffff',
+    cardBg: '#f8fafc', // Adjusted to match dashboard container exactly
     tooltipBg: '#ffffff',
     tooltipBorder: '#e2e8f0'
 };
@@ -34,26 +34,38 @@ const COLORS = {
     mutedSlate: () => isDark() ? '#94a3b8' : '#94a3b8' // Using original value for education chart
 };
 
+// Data Cache to avoid re-fetching on theme change
+let cachedRawData = null;
+
 /**
  * Initialize all dashboard charts
  */
 export async function initCharts() {
     let rawData = [];
-    try {
-        const response = await fetch(`${getBasePath()}api/beneficiaries.php`);
-        const result = await response.json();
-        if (result.success) {
-            rawData = result.beneficiaries || [];
-        } else {
-            console.error('Failed to load chart data:', result.error);
+
+    if (cachedRawData) {
+        rawData = cachedRawData;
+    } else {
+        try {
+            const response = await fetch(`${getBasePath()}api/beneficiaries.php`);
+            const result = await response.json();
+            if (result.success) {
+                rawData = result.beneficiaries || [];
+                cachedRawData = rawData; // Cache it
+            } else {
+                console.error('Failed to load chart data:', result.error);
+                return;
+            }
+        } catch (error) {
+            console.error('Error fetching chart data:', error);
             return;
         }
-    } catch (error) {
-        console.error('Error fetching chart data:', error);
-        return;
     }
 
     if (rawData.length === 0) return;
+
+    // Clear existing charts to prevent duplication on theme change
+    document.querySelectorAll('[id$="-chart"]').forEach(el => el.innerHTML = '');
 
     const theme = getThemeColors();
     const stats = processBeneficiaryData(rawData);

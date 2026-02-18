@@ -51,59 +51,15 @@ export function applyTheme(theme) {
     // Sync all toggle buttons/checkboxes on the page
     syncToggleUI(theme);
 
-    // REAL-TIME DOM CLEANUP: Remove dark mode specific classes when switching to light mode
-    if (theme === 'light') {
-        cleanAllDarkClasses();
-        // Setup observer for dynamic content (like modals)
-        if (!window.themeObserver) {
-            window.themeObserver = new MutationObserver((mutations) => {
-                if (localStorage.getItem(THEME_KEY) === 'light') {
-                    mutations.forEach(m => m.addedNodes.forEach(node => {
-                        if (node.nodeType === 1) { // Element node
-                            cleanDarkClasses(node);
-                            node.querySelectorAll?.('[class*="dark:"]').forEach(cleanDarkClasses);
-                        }
-                    }));
-                }
-            });
-            window.themeObserver.observe(document.body, { childList: true, subtree: true });
-        }
-    } else {
-        // Disconnect if switching to dark
-        if (window.themeObserver) {
-            window.themeObserver.disconnect();
-            window.themeObserver = null;
-        }
-    }
-
     // Dispatch a custom event for other modules (like charts.js) to react
     document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme } }));
-}
-
-/**
- * Helper to clean classes starting with dark: from a specific element
- */
-function cleanDarkClasses(el) {
-    if (!el.classList) return;
-    const toRemove = [];
-    el.classList.forEach(cls => {
-        if (cls.startsWith('dark:')) toRemove.push(cls);
-    });
-    toRemove.forEach(cls => el.classList.remove(cls));
-}
-
-/**
- * Clean all existing dark: classes in the document
- */
-function cleanAllDarkClasses() {
-    document.querySelectorAll('[class*="dark:"]').forEach(cleanDarkClasses);
 }
 
 // ─── Toggle ───────────────────────────────────────────────────────────────────
 
 export function toggleTheme() {
-    const current = resolveTheme();
-    applyTheme(current === 'dark' ? 'light' : 'dark');
+    const theme = resolveTheme();
+    applyTheme(theme === 'dark' ? 'light' : 'dark');
 }
 
 // ─── UI Sync ─────────────────────────────────────────────────────────────────
