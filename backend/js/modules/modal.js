@@ -512,16 +512,16 @@ const COMMON_COURSES = [
 ];
 
 const COMMON_NATURE_OF_WORK = [
-    "Administrative Support",
-    "Office Clerk",
-    "Data Encoder",
-    "Messenger",
-    "Utility Worker",
-    "Scanning Officer",
-    "Filing Clerk",
-    "Receptionist",
-    "Customer Service Assist.",
-    "Technical Support Assist."
+    "Administrative Support (Records)",
+    "Office Clerk (Finance Section)",
+    "Data Encoder (TSSD/LIMS)",
+    "Messenger / Liaison Officer",
+    "Utility Worker (Maintenance)",
+    "Scanning & Digitization Officer",
+    "Filing Clerk (Administrative)",
+    "Receptionist / Front Desk",
+    "IT Technical Support Assist.",
+    "Project Monitoring Assist."
 ];
 
 function calculateAge(birthday) {
@@ -1632,16 +1632,26 @@ function showAddDataModal(data = null) {
                         </div>
 
                         <div class="group">
-                            <label class="text-[9px] text-gray-400 font-black uppercase block mb-1">Nature of Work <span class="text-red-500">*</span></label>
+                            <label class="text-[9px] text-gray-400 font-black uppercase block mb-1 tracking-widest">Nature of Work <span class="text-red-500">*</span></label>
                             <div class="relative" id="work-container">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                </div>
                                 <input type="text" name="designation" id="designation-input" autocomplete="off"
                                     value="${data?.designation || ''}" required 
-                                    class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[12px] font-bold focus:ring-4 focus:ring-royal-blue/10 focus:border-royal-blue outline-none transition-all shadow-sm placeholder:text-gray-300" 
+                                    class="w-full bg-white border border-gray-200 rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold focus:ring-4 focus:ring-royal-blue/10 focus:border-royal-blue outline-none transition-all shadow-sm placeholder:text-gray-300" 
                                     placeholder="e.g. Administrative Support">
-                                <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat divide-y divide-gray-50 p-1.5">
+                                <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] max-h-56 overflow-y-auto font-montserrat divide-y divide-gray-50 p-2 transform origin-top transition-all duration-200">
+                                    <div class="px-2 py-1.5 mb-1.5 border-b border-gray-100">
+                                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Quick Select Roles</p>
+                                    </div>
                                     ${COMMON_NATURE_OF_WORK.map(work => `
-                                        <div class="work-option px-3 py-2 text-[10px] font-bold text-gray-600 hover:bg-blue-50 hover:text-royal-blue rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
-                                            ${work}
+                                        <div class="work-option px-3 py-2.5 text-[10px] font-black text-slate-600 hover:bg-blue-50/80 hover:text-royal-blue rounded-lg cursor-pointer transition-all flex items-center justify-between group/opt active:scale-[0.98]">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-1.5 h-1.5 rounded-full bg-gray-200 group-hover/opt:bg-royal-blue transition-colors"></div>
+                                                ${work}
+                                            </div>
+                                            <svg class="w-3 h-3 opacity-0 group-hover/opt:opacity-100 transition-opacity text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                                         </div>
                                     `).join('')}
                                 </div>

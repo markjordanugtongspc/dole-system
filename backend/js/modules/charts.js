@@ -36,13 +36,32 @@ export async function initCharts() {
     // 3. Update Summary Metrics (if elements exist)
     updateSummaryMetrics(stats);
 
-    // --- 1. WORKFORCE DISTRIBUTION (Office/Place of Assignment) ---
-    // Sort offices by count descending and take top 10
-    const topOffices = Object.entries(stats.offices)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10);
+    // --- 1. EMPLOYMENT STATUS BREAKDOWN (Replaces duplicate Workforce Distribution) ---
+    const statusCounts = {
+        'ONGOING': 0,
+        'EXPIRED': 0,
+        'ABSORBED': 0,
+        'RESIGNED': 0
+    };
+    rawData.forEach(b => {
+        const remarks = (b.remarks || 'ONGOING').toUpperCase().trim();
+        if (statusCounts.hasOwnProperty(remarks)) {
+            statusCounts[remarks]++;
+        } else {
+            statusCounts['ONGOING']++;
+        }
+    });
 
-    const workforceOptions = {
+    const statusLabels = Object.keys(statusCounts);
+    const statusData = Object.values(statusCounts);
+    const statusColors = ['#22c55e', philippineRed, royalBlue, '#1e293b'];
+    const activeRate = rawData.length > 0 ? Math.round((statusCounts['ONGOING'] / rawData.length) * 100) : 0;
+
+    // Update status metrics on the card
+    document.querySelectorAll('.metric-active-count').forEach(el => el.textContent = statusCounts['ONGOING']);
+    document.querySelectorAll('.metric-active-rate').forEach(el => el.textContent = activeRate + '%');
+
+    const statusOptions = {
         chart: {
             height: "100%",
             maxWidth: "100%",
@@ -50,33 +69,36 @@ export async function initCharts() {
             fontFamily: "Montserrat, sans-serif",
             dropShadow: { enabled: false },
             toolbar: { show: false },
+            sparkline: { enabled: true }
         },
         tooltip: {
             enabled: true,
-            x: { show: false },
+            theme: 'light',
+            style: { fontSize: '11px' },
+            x: { show: true },
         },
         fill: {
             type: "gradient",
             gradient: {
-                opacityFrom: 0.55,
-                opacityTo: 0,
-                shade: royalBlue,
-                gradientToColors: [royalBlue],
+                opacityFrom: 0.6,
+                opacityTo: 0.05,
+                shade: '#22c55e',
+                gradientToColors: ['#22c55e'],
             },
         },
         dataLabels: { enabled: false },
-        stroke: { width: 6, curve: 'smooth' },
+        stroke: { width: 4, curve: 'smooth' },
         grid: {
             show: false,
             padding: { left: 2, right: 2, top: 0 },
         },
         series: [{
-            name: "Assignees",
-            data: topOffices.map(o => o[1]),
-            color: royalBlue,
+            name: "GIPs",
+            data: statusData,
+            color: '#22c55e',
         }],
         xaxis: {
-            categories: topOffices.map(o => o[0]),
+            categories: statusLabels,
             labels: { show: false },
             axisBorder: { show: false },
             axisTicks: { show: false },
@@ -85,7 +107,7 @@ export async function initCharts() {
     };
 
     if (document.getElementById("workforce-chart")) {
-        new ApexCharts(document.getElementById("workforce-chart"), workforceOptions).render();
+        new ApexCharts(document.getElementById("workforce-chart"), statusOptions).render();
     }
 
     // --- 2. GENDER DEMOGRAPHICS (M/F Distribution) ---
@@ -99,44 +121,59 @@ export async function initCharts() {
         series: [femalePct, malePct],
         colors: [philippineRed, royalBlue],
         chart: {
-            height: 280,
+            height: "100%",
+            width: "100%",
             type: "donut",
             fontFamily: "Montserrat, sans-serif",
+            toolbar: { show: false },
         },
+        stroke: { colors: ["transparent"], lineCap: "round" },
         labels: ["Female", "Male"],
         plotOptions: {
             pie: {
                 donut: {
-                    size: "70%",
+                    size: "75%",
                     labels: {
                         show: true,
-                        name: { show: true, fontSize: '14px', fontWeight: 600 },
+                        name: { show: true, fontSize: '12px', fontWeight: 600, color: '#64748b' },
                         value: {
                             show: true,
-                            fontSize: '24px',
+                            fontSize: '28px',
                             fontWeight: 'bold',
+                            color: '#0f172a',
                             formatter: (val) => val + '%'
                         },
                         total: {
                             show: true,
-                            label: "Total Beneficiaries",
-                            fontSize: '12px',
-                            fontWeight: 600,
-                            formatter: () => rawData.length.toString()
+                            label: "Population",
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            color: '#64748b',
+                            formatter: (w) => {
+                                const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                return Math.round(total / w.globals.series.length) + '% avg';
+                            }
                         }
                     }
                 }
             }
         },
-        legend: { position: "bottom", fontSize: '13px', fontWeight: 600 },
+        legend: {
+            show: true,
+            position: "bottom",
+            fontSize: '13px',
+            fontWeight: 600,
+            horizontalAlign: 'center',
+            markers: { radius: 12, width: 10, height: 10 }
+        },
         dataLabels: {
             enabled: true,
+            dropShadow: { enabled: false },
+            style: { fontSize: '12px', fontWeight: 'bold' },
             formatter: (val) => Math.round(val) + '%'
         },
-        title: {
-            text: "Gender Distribution",
-            align: "center",
-            style: { fontSize: '16px', fontWeight: 'bold', color: '#0f172a' }
+        states: {
+            hover: { filter: { type: 'darken', value: 0.9 } }
         }
     };
 
@@ -155,22 +192,55 @@ export async function initCharts() {
         series: eduSeries,
         colors: [royalBlue, goldenYellow, philippineRed, '#94a3b8'],
         chart: {
-            height: 300,
+            height: 380,
             width: "100%",
             type: "radialBar",
-            sparkline: { enabled: true },
+            sparkline: { enabled: false },
             fontFamily: "Montserrat, sans-serif",
+            toolbar: { show: false },
         },
         plotOptions: {
             radialBar: {
-                track: { background: '#e2e8f0' },
-                dataLabels: { show: false },
-                hollow: { margin: 0, size: "32%" }
+                track: {
+                    background: '#f1f5f9',
+                    strokeWidth: '95%',
+                },
+                dataLabels: {
+                    name: {
+                        show: true,
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        color: '#64748b',
+                        offsetY: -10
+                    },
+                    value: {
+                        show: true,
+                        fontSize: '26px',
+                        fontWeight: 700,
+                        color: '#0f172a',
+                        offsetY: 6,
+                        formatter: (val) => val + '%'
+                    },
+                    total: {
+                        show: true,
+                        label: 'Graduates',
+                        color: '#64748b',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        formatter: () => {
+                            const gradPct = rawData.length > 0
+                                ? Math.round((stats.education['College Grad'] / rawData.length) * 100)
+                                : 0;
+                            return gradPct + '% of total';
+                        }
+                    }
+                },
+                hollow: { margin: 15, size: '32%' }
             },
         },
         grid: {
             show: false,
-            padding: { left: 2, right: 2, top: -23, bottom: -20 },
+            padding: { top: -30, bottom: -20 },
         },
         labels: eduLabels,
         legend: {
@@ -178,13 +248,14 @@ export async function initCharts() {
             position: "bottom",
             fontFamily: "Montserrat, sans-serif",
             fontWeight: 600,
-            fontSize: '11px',
-            textAnchor: 'start',
-            offsetY: 7,
-            markers: { radius: 12 }
+            fontSize: '13px',
+            offsetY: 10,
+            markers: { radius: 12, width: 10, height: 10, offsetX: -4 }
         },
         tooltip: {
             enabled: true,
+            theme: 'light',
+            style: { fontSize: '12px' },
             y: { formatter: (value) => value + '%' }
         }
     };
@@ -224,24 +295,49 @@ export async function initCharts() {
         chart: {
             type: "bar",
             width: "100%",
-            height: "100%",
+            height: 320,
             fontFamily: "Montserrat, sans-serif",
-            toolbar: { show: false }
+            toolbar: { show: false },
+            sparkline: { enabled: false }
         },
         plotOptions: {
             bar: {
                 horizontal: true,
-                borderRadius: 6,
+                borderRadius: 4,
+                barHeight: '60%',
                 dataLabels: { position: "top" },
             },
         },
-        legend: { position: "bottom", fontWeight: 600 },
+        dataLabels: {
+            enabled: false // More compact without individual labels on bars
+        },
+        legend: {
+            position: "bottom",
+            fontWeight: 700,
+            fontSize: '11px',
+            markers: { radius: 12 }
+        },
         xaxis: {
             categories: jobCategories,
-            labels: { style: { fontWeight: 600 } }
+            labels: {
+                style: { fontWeight: 700, fontSize: '10px', colors: '#64748b' }
+            }
         },
-        yaxis: { labels: { style: { fontWeight: 600 } } },
-        grid: { strokeDashArray: 4, padding: { top: -20 } },
+        yaxis: {
+            labels: {
+                style: { fontWeight: 700, fontSize: '10px', colors: '#1e293b' },
+                maxWidth: 150
+            }
+        },
+        grid: {
+            borderColor: '#f1f5f9',
+            strokeDashArray: 4,
+            padding: { top: -20, bottom: 0, left: 10 }
+        },
+        tooltip: {
+            theme: 'light',
+            style: { fontSize: '11px' }
+        }
     };
 
     if (document.getElementById("job-roles-chart")) {
@@ -258,30 +354,83 @@ export async function initCharts() {
     ];
 
     const ageOptions = {
-        series: [{ name: "Beneficiaries", data: ageSeriesData }],
+        series: [{ name: "GIPs", data: ageSeriesData }],
         chart: {
             type: "bar",
-            height: 250,
+            height: 320,
             fontFamily: "Montserrat, sans-serif",
-            toolbar: { show: false }
+            toolbar: { show: false },
+            sparkline: { enabled: false }
         },
-        colors: [philippineRed],
+        colors: [royalBlue],
         plotOptions: {
-            bar: { borderRadius: 6, columnWidth: '65%' }
+            bar: {
+                borderRadius: 10,
+                columnWidth: '45%',
+                distributed: false,
+                dataLabels: { position: 'top' }
+            }
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shade: 'light',
+                type: "vertical",
+                shadeIntensity: 0.3,
+                gradientToColors: ['#60a5fa'], // Lighter blue for a premium gradient
+                inverseColors: false,
+                opacityFrom: 1,
+                opacityTo: 0.8,
+                stops: [0, 100]
+            },
         },
         dataLabels: {
             enabled: true,
-            style: { colors: ['#fff'], fontWeight: 'bold' }
+            offsetY: -30,
+            style: {
+                fontSize: '13px',
+                colors: ["#1e293b"],
+                fontWeight: 800,
+                fontFamily: "Montserrat, sans-serif"
+            },
+            formatter: (val) => val
         },
         xaxis: {
-            categories: ageCategories.map(c => c + " years"),
-            labels: { style: { fontWeight: 600 } }
+            categories: ageCategories,
+            labels: {
+                style: {
+                    fontWeight: 700,
+                    colors: '#64748b',
+                    fontSize: '11px'
+                },
+                offsetY: 5
+            },
+            axisBorder: { show: false },
+            axisTicks: { show: false }
         },
-        yaxis: { title: { text: "Count", style: { fontWeight: 600 } } },
-        title: {
-            text: "Age Distribution",
-            align: "left",
-            style: { fontWeight: 'bold' }
+        yaxis: {
+            show: true,
+            labels: {
+                style: {
+                    fontWeight: 600,
+                    colors: '#94a3b8',
+                    fontSize: '10px'
+                }
+            }
+        },
+        grid: {
+            borderColor: '#f1f5f9',
+            strokeDashArray: 6,
+            yaxis: { lines: { show: true } },
+            padding: { left: 10, right: 10, top: 15 }
+        },
+        tooltip: {
+            theme: 'light',
+            style: { fontSize: '12px', fontFamily: 'Montserrat, sans-serif' },
+            y: {
+                formatter: (val) => val + " Beneficiaries",
+                title: { formatter: () => 'Count:' }
+            }
         }
     };
 
@@ -321,8 +470,8 @@ function processBeneficiaryData(data) {
 
         // Gender count
         const gender = (b.gender || 'Unknown').trim();
-        const simplifiedGender = gender === 'F' || gender === 'Female' ? 'Female' : 
-                               (gender === 'M' || gender === 'Male' ? 'Male' : 'Unknown');
+        const simplifiedGender = gender === 'F' || gender === 'Female' ? 'Female' :
+            (gender === 'M' || gender === 'Male' ? 'Male' : 'Unknown');
         stats.genders[simplifiedGender] = (stats.genders[simplifiedGender] || 0) + 1;
 
         // Education mapping
@@ -369,9 +518,12 @@ function updateSummaryMetrics(stats) {
     const femaleCount = stats.genders['Female'] || 0;
     const maleCount = stats.genders['Male'] || 0;
     const totalGender = femaleCount + maleCount;
+
     const femaleRatioText = totalGender > 0 ? Math.round((femaleCount / totalGender) * 100) + '%' : '0%';
-    const ratioElements = document.querySelectorAll('.metric-female-ratio');
-    ratioElements.forEach(el => el.textContent = femaleRatioText);
+    const maleRatioText = totalGender > 0 ? Math.round((maleCount / totalGender) * 100) + '%' : '0%';
+
+    document.querySelectorAll('.metric-female-ratio').forEach(el => el.textContent = femaleRatioText);
+    document.querySelectorAll('.metric-male-ratio').forEach(el => el.textContent = maleRatioText);
 
     // Deployment Sites
     const siteCount = Object.keys(stats.offices).length;
@@ -382,7 +534,7 @@ function updateSummaryMetrics(stats) {
     const avgAge = stats.ageCount > 0 ? Math.round(stats.totalAge / stats.ageCount) : 0;
     const ageElements = document.querySelectorAll('.metric-avg-age');
     ageElements.forEach(el => el.textContent = avgAge);
-    
+
     // Also update the range label if needed
     const ageRangeElements = document.querySelectorAll('.metric-avg-age-range');
     ageRangeElements.forEach(el => el.textContent = '18-30'); // Keeping static range for now or calculating if preferred
@@ -412,8 +564,8 @@ function updateSummaryMetrics(stats) {
 
     document.querySelectorAll('.count-office-based').forEach(el => el.textContent = officeCount);
     document.querySelectorAll('.count-field-based').forEach(el => el.textContent = fieldCount);
-    
+
     // Top Role
-    const topRole = Object.entries(stats.designations).sort((a,b) => b[1]-a[1])[0]?.[0] || 'N/A';
+    const topRole = Object.entries(stats.designations).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
     document.querySelectorAll('.metric-top-role').forEach(el => el.textContent = topRole);
 }

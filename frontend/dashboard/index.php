@@ -203,9 +203,9 @@ require_once __DIR__ . '/../../config/vite.php';
                     class="max-w-full w-full bg-[#f8fafc] border border-slate-200 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[320px]">
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <h5 class="text-3xl font-black text-royal-blue leading-none metric-total-beneficiaries">...
+                            <h5 class="text-3xl font-black text-green-600 leading-none metric-active-count">...
                             </h5>
-                            <p class="text-sm font-semibold text-slate-500 mt-1">Workforce Assigned</p>
+                            <p class="text-sm font-semibold text-slate-500 mt-1">Active GIPs</p>
                         </div>
                         <div
                             class="flex items-center px-2.5 py-0.5 mt-1.5 text-xs font-bold text-green-600 bg-green-50 rounded-full border border-green-200 text-center">
@@ -214,7 +214,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2" d="M12 6v13m0-13 4 4m-4-4-4 4" />
                             </svg>
-                            <span class="metric-growth">12%</span> Growth
+                            <span class="metric-active-rate">...</span> Active
                         </div>
                     </div>
 
@@ -274,8 +274,49 @@ require_once __DIR__ . '/../../config/vite.php';
                 </div>
 
                 <div
-                    class="bg-[#f8fafc] border border-slate-200 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow min-h-[320px] flex flex-col">
-                    <div id="gender-chart" class="flex-1"></div>
+                    class="max-w-full w-full bg-[#f8fafc] border border-slate-200 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[320px]">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h5 class="text-xl font-black text-royal-blue leading-none">Gender Demographics</h5>
+                            <p class="text-sm font-semibold text-slate-500 mt-1">Workforce Diversity</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <div
+                                class="flex items-center px-2 py-1 text-[10px] font-bold text-philippine-red bg-red-50 rounded-lg border border-red-100">
+                                <span class="w-2 h-2 rounded-full bg-philippine-red me-1.5"></span>
+                                Female: <span class="metric-female-ratio ms-1">...</span>
+                            </div>
+                            <div
+                                class="flex items-center px-2 py-1 text-[10px] font-bold text-royal-blue bg-blue-50 rounded-lg border border-blue-100">
+                                <span class="w-2 h-2 rounded-full bg-royal-blue me-1.5"></span>
+                                Male: <span class="metric-male-ratio ms-1">...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="gender-chart" class="flex-1 w-full"></div>
+
+                    <div class="grid grid-cols-1 items-center border-t border-slate-200 justify-between mt-4">
+                        <div class="flex justify-between items-center pt-4">
+                            <div class="flex items-center text-xs font-bold text-slate-500 italic">
+                                <svg class="w-3.5 h-3.5 me-1 text-royal-blue" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                Aggregated statistics
+                            </div>
+                            <a href="#"
+                                class="inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-xs hover:underline">
+                                View Report
+                                <svg class="w-3 h-3 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M19 12H5m14 0-4 4m4-4-4-4" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -283,126 +324,79 @@ require_once __DIR__ . '/../../config/vite.php';
             <!-- Secondary Charts Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
-                <!-- Education Profile (Flowbite Radial Template - Bluish) -->
+                <!-- Education Profile (Enhanced Modern Layout) -->
                 <div
-                    class="max-w-full w-full bg-[#f8fafc] border border-slate-200 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[320px]">
-                    <!-- Education Stats Grid Moved to Top -->
-                    <div class="bg-white border border-slate-200 p-2.5 rounded-lg mb-4">
-                        <div class="grid grid-cols-2 gap-2 mb-2">
-                            <dl
-                                class="bg-blue-50 border border-blue-100 rounded-lg flex flex-col items-center justify-center h-[60px]">
-                                <dt
-                                    class="px-2 h-6 rounded-full bg-blue-100 text-royal-blue text-xs font-bold flex items-center justify-center mb-0.5 min-w-[40px] count-college-grad">
-                                    ...</dt>
-                                <dd class="text-royal-blue text-[10px] font-bold text-center leading-tight">
-                                    College<br>Grad
-                                </dd>
-                            </dl>
-                            <dl
-                                class="bg-yellow-50 border border-yellow-100 rounded-lg flex flex-col items-center justify-center h-[60px]">
-                                <dt
-                                    class="px-2 h-6 rounded-full bg-yellow-100 text-golden-yellow text-xs font-bold flex items-center justify-center mb-0.5 min-w-[40px] count-college-lvl">
-                                    ...</dt>
-                                <dd class="text-golden-yellow text-[10px] font-bold text-center leading-tight">
-                                    College<br>Level</dd>
-                            </dl>
-                            <dl
-                                class="bg-red-50 border border-red-100 rounded-lg flex flex-col items-center justify-center h-[60px]">
-                                <dt
-                                    class="px-2 h-6 rounded-full bg-red-100 text-philippine-red text-xs font-bold flex items-center justify-center mb-0.5 min-w-[40px] count-hs-grad">
-                                    ...</dt>
-                                <dd class="text-philippine-red text-[10px] font-bold text-center leading-tight">
-                                    HS<br>Grad
-                                </dd>
-                            </dl>
-                            <dl
-                                class="bg-gray-50 border border-gray-200 rounded-lg flex flex-col items-center justify-center h-[60px]">
-                                <dt
-                                    class="px-2 h-6 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center mb-0.5 min-w-[90px] count-senior-high">
-                                    ...</dt>
-                                <dd class="text-gray-600 text-[10px] font-bold text-center leading-tight">Senior<br>High
-                                </dd>
-                            </dl>
+                    class="max-w-full w-full bg-[#f8fafc] border border-slate-200 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[420px]">
+
+                    <!-- Education Stats Grid - Modern Responsive Layout -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        <div
+                            class="bg-white border border-slate-100 rounded-xl p-4 shadow-xs flex flex-col items-center justify-center hover:border-blue-200 hover:shadow-md transition-all duration-300 group">
+                            <span
+                                class="text-3xl font-black text-royal-blue count-college-grad group-hover:scale-110 transition-transform">...</span>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">College
+                                Grad</span>
                         </div>
-                        <button data-collapse-toggle="more-details-edu" type="button"
-                            class="hover:underline text-[10px] text-slate-500 font-bold inline-flex items-center">
-                            Show details
-                            <svg class="w-3 h-3 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="m19 9-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div id="more-details-edu" class="border-t border-slate-200 pt-2 mt-2 space-y-1 hidden">
-                            <dl class="flex items-center justify-between">
-                                <dt class="text-slate-500 text-[10px] font-normal">Completion Rate:</dt>
-                                <dd
-                                    class="inline-flex items-center bg-green-50 text-green-600 text-[10px] font-bold px-1.5 py-0.5 rounded border border-green-200">
-                                    <svg class="w-2.5 h-2.5 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                        fill="none" viewBox="0 0 24 24">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M12 6v13m0-13 4 4m-4-4-4 4" />
-                                    </svg>
-                                    42%
-                                </dd>
-                            </dl>
-                            <dl class="flex items-center justify-between">
-                                <dt class="text-slate-500 text-[10px] font-normal">Pending Req:</dt>
-                                <dd
-                                    class="inline-flex items-center bg-orange-50 text-orange-600 text-[10px] font-bold px-1.5 py-0.5 rounded border border-orange-200">
-                                    18</dd>
-                            </dl>
+                        <div
+                            class="bg-white border border-slate-100 rounded-xl p-4 shadow-xs flex flex-col items-center justify-center hover:border-yellow-200 hover:shadow-md transition-all duration-300 group">
+                            <span
+                                class="text-3xl font-black text-golden-yellow count-college-lvl group-hover:scale-110 transition-transform">...</span>
+                            <span
+                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 text-center">College
+                                Level</span>
+                        </div>
+                        <div
+                            class="bg-white border border-slate-100 rounded-xl p-4 shadow-xs flex flex-col items-center justify-center hover:border-red-200 hover:shadow-md transition-all duration-300 group">
+                            <span
+                                class="text-3xl font-black text-philippine-red count-hs-grad group-hover:scale-110 transition-transform">...</span>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">HS
+                                Grad</span>
+                        </div>
+                        <div
+                            class="bg-white border border-slate-100 rounded-xl p-4 shadow-xs flex flex-col items-center justify-center hover:border-slate-300 hover:shadow-md transition-all duration-300 group">
+                            <span
+                                class="text-3xl font-black text-slate-500 count-senior-high group-hover:scale-110 transition-transform">...</span>
+                            <span
+                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 text-center font-mono">Senior
+                                High</span>
                         </div>
                     </div>
 
-                    <div class="flex justify-between mb-2">
-                        <div class="flex items-center w-full">
-                            <div class="flex justify-center items-center w-full">
-                                <h5 class="text-[12px] font-black uppercase tracking-widest text-slate-400 me-2">
-                                    Education Attainment</h5>
-                                <svg data-popover-target="edu-progress-popover" data-popover-placement="bottom"
-                                    class="w-4 h-4 text-slate-400 hover:text-royal-blue cursor-pointer"
+                    <div class="flex flex-col items-center mb-4">
+                        <div class="flex items-center mb-1">
+                            <h5 class="text-sm font-black uppercase tracking-[0.2em] text-slate-400">
+                                Education Profile</h5>
+                            <button data-popover-target="edu-progress-popover" class="ms-2">
+                                <svg class="w-4 h-4 text-slate-300 hover:text-royal-blue transition-colors cursor-pointer"
                                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                                     viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="2"
                                         d="M9.529 9.988a2.502 2.502 0 1 1 5 .191A2.441 2.441 0 0 1 12 12.582V14m-.01 3.008H12M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                 </svg>
-                                <div data-popover id="edu-progress-popover" role="tooltip"
-                                    class="absolute z-10 p-3 invisible inline-block text-sm text-slate-500 transition-opacity duration-300 bg-white border border-slate-200 rounded-lg shadow-lg opacity-0 w-72">
-                                    <div>
-                                        <h3 class="font-semibold text-royal-blue mb-2">Education Distribution</h3>
-                                        <p class="mb-4 text-xs">This chart visualizes the breakdown of beneficiaries
-                                            based on their highest educational attainment.</p>
-                                        <a href="#"
-                                            class="flex items-center font-medium text-royal-blue hover:underline text-xs">
-                                            Read more
-                                            <svg class="w-4 h-4 ms-1 rtl:rotate-180" aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <path stroke="currentColor" stroke-linecap="round"
-                                                    stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 12H5m14 0-4 4m4-4-4-4" />
-                                            </svg>
-                                        </a>
-                                    </div>
-                                    <div data-popper-arrow></div>
-                                </div>
-                            </div>
+                            </button>
+                        </div>
+                        <div data-popover id="edu-progress-popover" role="tooltip"
+                            class="absolute z-10 p-3 invisible inline-block text-sm text-slate-500 transition-opacity duration-300 bg-white border border-slate-200 rounded-lg shadow-lg opacity-0 w-72 leading-relaxed">
+                            <h3 class="font-bold text-royal-blue mb-1">Education Distribution</h3>
+                            <p class="text-xs">Visualizes the percentage breakdown of beneficiaries based on their
+                                highest educational attainment.</p>
+                            <div data-popper-arrow></div>
                         </div>
                     </div>
 
                     <!-- Radial Chart -->
                     <div class="flex-1 flex justify-center items-center py-2" id="education-chart"></div>
 
-                    <div class="grid grid-cols-1 items-center border-t border-slate-200 justify-between">
-                        <div class="flex justify-between items-center pt-2 md:pt-3">
+                    <div class="grid grid-cols-1 items-center border-t border-slate-200 justify-between mt-4">
+                        <div class="flex justify-between items-center pt-4">
                             <!-- Button -->
                             <button id="dropdownLastDaysEduButton" data-dropdown-toggle="LastDaysEdudropdown"
                                 data-dropdown-placement="bottom"
-                                class="text-[10px] font-bold text-slate-500 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-wider"
+                                class="text-[10px] font-black text-slate-400 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-[0.15em] transition-colors"
                                 type="button">
-                                Last 7 days
-                                <svg class="w-2.5 h-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                Previous 7 Days
+                                <svg class="w-3 h-3 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="2" d="m19 9-7 7-7-7" />
@@ -411,23 +405,28 @@ require_once __DIR__ . '/../../config/vite.php';
                             <!-- Dropdown menu -->
                             <div id="LastDaysEdudropdown"
                                 class="z-10 hidden bg-white divide-y divide-slate-100 rounded-lg shadow-xl w-44 border border-slate-200">
-                                <ul class="py-2 text-sm text-slate-700" aria-labelledby="dropdownLastDaysEduButton">
+                                <ul class="py-2 text-xs font-bold text-slate-600"
+                                    aria-labelledby="dropdownLastDaysEduButton">
                                     <li><a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors">Yesterday</a>
+                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors uppercase">Yesterday</a>
                                     </li>
                                     <li><a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors">Today</a></li>
-                                    <li><a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last 7
+                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors uppercase">Today</a>
+                                    </li>
+                                    <li><a href="#"
+                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors uppercase">Last 7
                                             days</a></li>
-                                    <li><a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last 30
-                                            days</a></li>
+                                    <li><a href="#"
+                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors uppercase">Last
+                                            30 days</a></li>
                                 </ul>
                             </div>
                             <a href="#"
-                                class="inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-[10px] hover:underline">
-                                Report
-                                <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                class="inline-flex items-center uppercase tracking-widest font-black text-royal-blue hover:text-blue-800 text-[10px] group">
+                                View Full Report
+                                <svg class="w-3 h-3 ms-2 transform group-hover:translate-x-1 transition-transform"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="2" d="M19 12H5m14 0-4 4m4-4-4-4" />
                                 </svg>
@@ -442,7 +441,8 @@ require_once __DIR__ . '/../../config/vite.php';
                     <div class="flex justify-between border-slate-200 border-b pb-3">
                         <dl>
                             <dt class="text-sm font-semibold text-slate-500">Top Role</dt>
-                            <dd class="text-2xl font-black text-royal-blue leading-none mt-1 metric-top-role">...</dd>
+                            <dd class="text-2xl font-black text-royal-blue leading-none mt-1 metric-top-role">...
+                            </dd>
                         </dl>
                         <div>
                             <span
@@ -497,15 +497,18 @@ require_once __DIR__ . '/../../config/vite.php';
                                             class="block px-4 py-2 hover:bg-slate-50 transition-colors">Today</a>
                                     </li>
                                     <li>
-                                        <a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last 7
+                                        <a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last
+                                            7
                                             days</a>
                                     </li>
                                     <li>
-                                        <a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last 30
+                                        <a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last
+                                            30
                                             days</a>
                                     </li>
                                     <li>
-                                        <a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last 90
+                                        <a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last
+                                            90
                                             days</a>
                                     </li>
                                 </ul>
@@ -523,49 +526,90 @@ require_once __DIR__ . '/../../config/vite.php';
                     </div>
                 </div>
 
-                <!-- Age Demographics (Full Width Landscape) -->
+                <!-- Age Demographics (Modern Landscape Visualization) -->
                 <div
-                    class="lg:col-span-2 bg-[#f8fafc] border border-slate-200 rounded-xl p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow min-h-[300px] flex flex-col">
-                    <div class="mb-4">
-                        <h5 class="text-xl font-black text-royal-blue">Age Demographics</h5>
-                        <p class="text-sm font-semibold text-slate-500 mt-1">Distribution by Age Groups</p>
+                    class="lg:col-span-2 bg-[#f8fafc] border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-500 min-h-[350px] flex flex-col group/age">
+                    <div class="flex justify-between items-center mb-8">
+                        <div class="flex items-center">
+                            <div
+                                class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center me-4 border border-blue-100 shadow-sm group-hover/age:border-royal-blue group-hover/age:bg-blue-100 group-hover/age:scale-105 transition-all duration-300">
+                                <svg class="w-6 h-6 text-royal-blue group-hover/age:scale-110 transition-transform"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h5 class="text-xl font-black text-royal-blue uppercase tracking-tight">Age Demographics
+                                </h5>
+                                <p class="text-[11px] font-black text-slate-400 mt-1 uppercase tracking-[0.2em]">
+                                    Workforce Distribution Pattern</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Average
+                                    Age</span>
+                                <div class="flex items-baseline justify-end gap-1">
+                                    <h4 class="text-3xl font-black text-royal-blue leading-none metric-avg-age">...</h4>
+                                    <span class="text-xs font-bold text-slate-400">YRS</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="age-chart" class="flex-1"></div>
+                    <div id="age-chart" class="flex-1 w-full"></div>
                 </div>
 
             </div>
 
-            <!-- Data Privacy Notice -->
-            <div class="bg-blue-50 border-l-4 border-royal-blue rounded-r-xl p-5 mb-6">
-                <div class="flex items-start">
-                    <svg class="w-5 h-5 text-royal-blue mt-0.5 mr-3 flex-shrink-0" fill="currentColor"
-                        viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    <div>
-                        <h4 class="text-sm font-bold text-royal-blue mb-1">Data Privacy Compliance</h4>
-                        <p class="text-xs text-gray-700 leading-relaxed">
-                            This dashboard displays aggregated statistical data only. All Personally Identifiable
-                            Information (PII) including names, contact numbers, addresses, and ID numbers have been
-                            excluded from visualization in compliance with RA 10173 (Data Privacy Act of 2012).
-                        </p>
+            <!-- Dashboard Footer with Privacy & Credits -->
+            <footer class="mt-10 mb-4 border-t border-slate-200 pt-6">
+                <div class="flex flex-col md:flex-row justify-between items-start gap-6">
+                    <div class="bg-blue-50/50 border-l-4 border-royal-blue rounded-r-xl p-5 flex-1">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 bg-royal-blue/10 rounded-lg shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-royal-blue" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="text-[10px] font-black text-royal-blue uppercase tracking-widest mb-1">
+                                    Statistical Compliance Notice</h4>
+                                <p class="text-[11px] text-slate-500 font-medium leading-relaxed">
+                                    This dashboard visualizes aggregated statistical patterns only. PII is
+                                    strictly excluded in compliance with <span
+                                        class="font-bold text-royal-blue">RA 10173 (Data Privacy Act of 2012)</span>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center md:items-end justify-center shrink-0">
+                        <div
+                            class="flex items-center gap-3 mb-2 opacity-40 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-500">
+                            <img src="../../frontend/images/logo/doleiligan.png" class="h-7" alt="DOLE">
+                            <div class="w-px h-5 bg-slate-300"></div>
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">GIP
+                                Monitoring</span>
+                        </div>
+                        <p class="text-[8px] font-bold text-slate-300 uppercase tracking-widest">© 2026 DOLE-LDNPFO |
+                            GIP SYSTEM V4.1</p>
                     </div>
                 </div>
-            </div>
-
+            </footer>
         </div>
-    </div>
 
-    <script>
-        // Security check - redirect if not logged in
-        if (localStorage.getItem('isLoggedIn') !== 'true') {
-            const path = window.location.pathname;
-            const base = path.includes('/dole-system/') ? path.substring(0, path.indexOf('/dole-system/') + '/dole-system/'.length) : '';
-            window.location.href = `${base}`;
-        }
-    </script>
+        <script>
+            // Security check - redirect if not logged in
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                const path = window.location.pathname;
+                const base = path.includes('/dole-system/') ? path.substring(0, path.indexOf('/dole-system/') + '/dole-system/'.length) : '';
+                window.location.href = `${base}`;
+            }
+        </script>
 
 </body>
 
