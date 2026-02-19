@@ -25,20 +25,6 @@ require_once __DIR__ . '/../../config/vite.php';
                 });
             }
         })();
-
-        // Dark Mode FOUC Prevention: apply theme before paint
-        (function () {
-            var theme = localStorage.getItem('color-theme');
-            if (!theme) {
-                var match = document.cookie.match(/(?:^|; )color-theme=([^;]*)/);
-                theme = match ? decodeURIComponent(match[1]) : null;
-            }
-            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        })();
     </script>
 
     <!-- Vite Assets -->
@@ -214,15 +200,15 @@ require_once __DIR__ . '/../../config/vite.php';
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
 
                 <div
-                    class="max-w-full w-full bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[320px] transition-colors duration-300">
+                    class="max-w-full w-full bg-[#f8fafc] border border-slate-200 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[320px]">
                     <div class="flex justify-between items-start mb-4">
                         <div>
                             <h5 class="text-3xl font-black text-green-600 leading-none metric-active-count">...
                             </h5>
-                            <p class="text-sm font-semibold text-slate-500 dark:text-slate-400 mt-1">Active GIPs</p>
+                            <p class="text-sm font-semibold text-slate-500 mt-1">Active GIPs</p>
                         </div>
                         <div
-                            class="flex items-center px-2.5 py-0.5 mt-1.5 text-xs font-bold text-green-600 bg-green-50 dark:bg-green-900/20 rounded-full border border-green-200 dark:border-green-800/30 text-center">
+                            class="flex items-center px-2.5 py-0.5 mt-1.5 text-xs font-bold text-green-600 bg-green-50 rounded-full border border-green-200 text-center">
                             <svg class="w-3 h-3 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -234,13 +220,12 @@ require_once __DIR__ . '/../../config/vite.php';
 
                     <div id="workforce-chart" class="flex-1 w-full"></div>
 
-                    <div
-                        class="grid grid-cols-1 items-center border-t border-slate-200 dark:border-slate-700 justify-between mt-4">
+                    <div class="grid grid-cols-1 items-center border-t border-slate-200 justify-between mt-4">
                         <div class="flex justify-between items-center pt-4">
                             <!-- Button -->
                             <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown"
                                 data-dropdown-placement="bottom"
-                                class="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-royal-blue dark:hover:text-blue-400 text-center inline-flex items-center uppercase tracking-wider"
+                                class="text-xs font-bold text-slate-500 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-wider"
                                 type="button">
                                 Last 7 days
                                 <svg class="w-3 h-3 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -251,9 +236,8 @@ require_once __DIR__ . '/../../config/vite.php';
                             </button>
                             <!-- Dropdown menu -->
                             <div id="lastDaysdropdown"
-                                class="z-10 hidden bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 rounded-lg shadow-xl w-44 border border-slate-200 dark:border-slate-700">
-                                <ul class="py-2 text-sm text-slate-700 dark:text-slate-300"
-                                    aria-labelledby="dropdownDefaultButton">
+                                class="z-10 hidden bg-white divide-y divide-slate-100 rounded-lg shadow-xl w-44 border border-slate-200">
+                                <ul class="py-2 text-sm text-slate-700" aria-labelledby="dropdownDefaultButton">
                                     <li>
                                         <a href="#"
                                             class="block px-4 py-2 hover:bg-slate-50 transition-colors">Yesterday</a>
@@ -277,7 +261,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 </ul>
                             </div>
                             <a href="#"
-                                class="inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs hover:underline">
+                                class="inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-xs hover:underline">
                                 View Details
                                 <svg class="w-3 h-3 ms-1.5 rtl:rotate-180" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -290,22 +274,20 @@ require_once __DIR__ . '/../../config/vite.php';
                 </div>
 
                 <div
-                    class="max-w-full w-full bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[320px] transition-all duration-300">
+                    class="max-w-full w-full bg-[#f8fafc] border border-slate-200 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[320px]">
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <h5 class="text-xl font-black text-royal-blue dark:text-blue-400 leading-none">Gender
-                                Demographics</h5>
-                            <p class="text-sm font-semibold text-slate-500 dark:text-slate-400 mt-1">Workforce Diversity
-                            </p>
+                            <h5 class="text-xl font-black text-royal-blue leading-none">Gender Demographics</h5>
+                            <p class="text-sm font-semibold text-slate-500 mt-1">Workforce Diversity</p>
                         </div>
                         <div class="flex gap-2">
                             <div
-                                class="flex items-center px-2 py-1 text-[10px] font-bold text-philippine-red bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800/30">
+                                class="flex items-center px-2 py-1 text-[10px] font-bold text-philippine-red bg-red-50 rounded-lg border border-red-100">
                                 <span class="w-2 h-2 rounded-full bg-philippine-red me-1.5"></span>
                                 Female: <span class="metric-female-ratio ms-1">...</span>
                             </div>
                             <div
-                                class="flex items-center px-2 py-1 text-[10px] font-bold text-royal-blue bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800/30">
+                                class="flex items-center px-2 py-1 text-[10px] font-bold text-royal-blue bg-blue-50 rounded-lg border border-blue-100">
                                 <span class="w-2 h-2 rounded-full bg-royal-blue me-1.5"></span>
                                 Male: <span class="metric-male-ratio ms-1">...</span>
                             </div>
@@ -314,8 +296,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                     <div id="gender-chart" class="flex-1 w-full"></div>
 
-                    <div
-                        class="grid grid-cols-1 items-center border-t border-slate-200 dark:border-slate-700 justify-between mt-4">
+                    <div class="grid grid-cols-1 items-center border-t border-slate-200 justify-between mt-4">
                         <div class="flex justify-between items-center pt-4">
                             <div class="flex items-center text-xs font-bold text-slate-500 italic">
                                 <svg class="w-3.5 h-3.5 me-1 text-royal-blue" fill="currentColor" viewBox="0 0 20 20">
@@ -326,7 +307,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 Aggregated statistics
                             </div>
                             <a href="#"
-                                class="inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs hover:underline">
+                                class="inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-xs hover:underline">
                                 View Report
                                 <svg class="w-3 h-3 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     fill="none" viewBox="0 0 24 24">
@@ -345,48 +326,45 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <!-- Education Profile (Enhanced Modern Layout) -->
                 <div
-                    class="max-w-full w-full bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[420px] transition-colors duration-300">
+                    class="max-w-full w-full bg-[#f8fafc] border border-slate-200 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[420px]">
 
                     <!-- Education Stats Grid - Modern Responsive Layout -->
                     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                         <div
-                            class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl p-4 shadow-xs flex flex-col items-center justify-center hover:border-blue-200 dark:hover:border-blue-500/50 hover:shadow-md transition-all duration-300 group">
+                            class="bg-white border border-slate-100 rounded-xl p-4 shadow-xs flex flex-col items-center justify-center hover:border-blue-200 hover:shadow-md transition-all duration-300 group">
                             <span
-                                class="text-3xl font-black text-royal-blue dark:text-blue-400 count-college-grad group-hover:scale-110 transition-transform">...</span>
-                            <span
-                                class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1 text-center">College
+                                class="text-3xl font-black text-royal-blue count-college-grad group-hover:scale-110 transition-transform">...</span>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">College
                                 Grad</span>
                         </div>
                         <div
-                            class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl p-4 shadow-xs flex flex-col items-center justify-center hover:border-yellow-200 dark:hover:border-yellow-500/50 hover:shadow-md transition-all duration-300 group">
+                            class="bg-white border border-slate-100 rounded-xl p-4 shadow-xs flex flex-col items-center justify-center hover:border-yellow-200 hover:shadow-md transition-all duration-300 group">
                             <span
                                 class="text-3xl font-black text-golden-yellow count-college-lvl group-hover:scale-110 transition-transform">...</span>
                             <span
-                                class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1 text-center">College
+                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 text-center">College
                                 Level</span>
                         </div>
                         <div
-                            class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl p-4 shadow-xs flex flex-col items-center justify-center hover:border-red-200 dark:hover:border-red-500/50 hover:shadow-md transition-all duration-300 group">
+                            class="bg-white border border-slate-100 rounded-xl p-4 shadow-xs flex flex-col items-center justify-center hover:border-red-200 hover:shadow-md transition-all duration-300 group">
                             <span
                                 class="text-3xl font-black text-philippine-red count-hs-grad group-hover:scale-110 transition-transform">...</span>
-                            <span
-                                class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1 text-center">HS
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">HS
                                 Grad</span>
                         </div>
                         <div
-                            class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl p-4 shadow-xs flex flex-col items-center justify-center hover:border-slate-300 dark:hover:border-slate-600/50 hover:shadow-md transition-all duration-300 group">
+                            class="bg-white border border-slate-100 rounded-xl p-4 shadow-xs flex flex-col items-center justify-center hover:border-slate-300 hover:shadow-md transition-all duration-300 group">
                             <span
-                                class="text-3xl font-black text-slate-500 dark:text-slate-400 count-senior-high group-hover:scale-110 transition-transform">...</span>
+                                class="text-3xl font-black text-slate-500 count-senior-high group-hover:scale-110 transition-transform">...</span>
                             <span
-                                class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1 text-center font-mono">Senior
+                                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 text-center font-mono">Senior
                                 High</span>
                         </div>
                     </div>
 
                     <div class="flex flex-col items-center mb-4">
                         <div class="flex items-center mb-1">
-                            <h5
-                                class="text-sm font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+                            <h5 class="text-sm font-black uppercase tracking-[0.2em] text-slate-400">
                                 Education Profile</h5>
                             <button data-popover-target="edu-progress-popover" class="ms-2">
                                 <svg class="w-4 h-4 text-slate-300 hover:text-royal-blue transition-colors cursor-pointer"
@@ -399,8 +377,8 @@ require_once __DIR__ . '/../../config/vite.php';
                             </button>
                         </div>
                         <div data-popover id="edu-progress-popover" role="tooltip"
-                            class="absolute z-10 p-3 invisible inline-block text-sm text-slate-500 dark:text-slate-400 transition-opacity duration-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg opacity-0 w-72 leading-relaxed">
-                            <h3 class="font-bold text-royal-blue dark:text-blue-400 mb-1">Education Distribution</h3>
+                            class="absolute z-10 p-3 invisible inline-block text-sm text-slate-500 transition-opacity duration-300 bg-white border border-slate-200 rounded-lg shadow-lg opacity-0 w-72 leading-relaxed">
+                            <h3 class="font-bold text-royal-blue mb-1">Education Distribution</h3>
                             <p class="text-xs">Visualizes the percentage breakdown of beneficiaries based on their
                                 highest educational attainment.</p>
                             <div data-popper-arrow></div>
@@ -410,13 +388,12 @@ require_once __DIR__ . '/../../config/vite.php';
                     <!-- Radial Chart -->
                     <div class="flex-1 flex justify-center items-center py-2" id="education-chart"></div>
 
-                    <div
-                        class="grid grid-cols-1 items-center border-t border-slate-200 dark:border-slate-700 justify-between mt-4">
+                    <div class="grid grid-cols-1 items-center border-t border-slate-200 justify-between mt-4">
                         <div class="flex justify-between items-center pt-4">
                             <!-- Button -->
                             <button id="dropdownLastDaysEduButton" data-dropdown-toggle="LastDaysEdudropdown"
                                 data-dropdown-placement="bottom"
-                                class="text-[10px] font-black text-slate-400 dark:text-slate-500 hover:text-royal-blue dark:hover:text-blue-400 text-center inline-flex items-center uppercase tracking-[0.15em] transition-colors"
+                                class="text-[10px] font-black text-slate-400 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-[0.15em] transition-colors"
                                 type="button">
                                 Previous 7 Days
                                 <svg class="w-3 h-3 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -427,21 +404,20 @@ require_once __DIR__ . '/../../config/vite.php';
                             </button>
                             <!-- Dropdown menu -->
                             <div id="LastDaysEdudropdown"
-                                class="z-10 hidden bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 rounded-lg shadow-xl w-44 border border-slate-200 dark:border-slate-700">
-                                <ul class="py-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+                                class="z-10 hidden bg-white divide-y divide-slate-100 rounded-lg shadow-xl w-44 border border-slate-200">
+                                <ul class="py-2 text-xs font-bold text-slate-600"
                                     aria-labelledby="dropdownLastDaysEduButton">
                                     <li><a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors uppercase">Yesterday</a>
+                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors uppercase">Yesterday</a>
                                     </li>
                                     <li><a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors uppercase">Today</a>
+                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors uppercase">Today</a>
                                     </li>
                                     <li><a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors uppercase">Last
-                                            7
+                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors uppercase">Last 7
                                             days</a></li>
                                     <li><a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors uppercase">Last
+                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors uppercase">Last
                                             30 days</a></li>
                                 </ul>
                             </div>
@@ -461,18 +437,16 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <!-- Job Roles (Flowbite Revenue Template - Bluish) -->
                 <div
-                    class="max-w-full w-full bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[320px] transition-colors duration-300">
-                    <div class="flex justify-between border-slate-200 dark:border-slate-700 border-b pb-3">
+                    class="max-w-full w-full bg-[#f8fafc] border border-slate-200 rounded-xl shadow-sm p-4 md:p-6 flex flex-col min-h-[320px]">
+                    <div class="flex justify-between border-slate-200 border-b pb-3">
                         <dl>
-                            <dt class="text-sm font-semibold text-slate-500 dark:text-slate-400">Top Role</dt>
-                            <dd
-                                class="text-2xl font-black text-royal-blue dark:text-blue-400 leading-none mt-1 metric-top-role">
-                                ...
+                            <dt class="text-sm font-semibold text-slate-500">Top Role</dt>
+                            <dd class="text-2xl font-black text-royal-blue leading-none mt-1 metric-top-role">...
                             </dd>
                         </dl>
                         <div>
                             <span
-                                class="inline-flex items-center bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/30 text-green-600 dark:text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                                class="inline-flex items-center bg-green-50 border border-green-200 text-green-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                                 <svg class="w-2.5 h-2.5 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -485,27 +459,23 @@ require_once __DIR__ . '/../../config/vite.php';
 
                     <div class="grid grid-cols-2 py-2">
                         <dl>
-                            <dt class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-0.5">Office Based
-                            </dt>
-                            <dd class="text-base font-bold text-royal-blue dark:text-blue-400 count-office-based">...
-                            </dd>
+                            <dt class="text-[10px] font-semibold text-slate-500 mb-0.5">Office Based</dt>
+                            <dd class="text-base font-bold text-royal-blue count-office-based">...</dd>
                         </dl>
                         <dl>
-                            <dt class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-0.5">Field Based
-                            </dt>
+                            <dt class="text-[10px] font-semibold text-slate-500 mb-0.5">Field Based</dt>
                             <dd class="text-base font-bold text-philippine-red count-field-based">...</dd>
                         </dl>
                     </div>
 
                     <div id="job-roles-chart" class="flex-1 w-full"></div>
 
-                    <div
-                        class="grid grid-cols-1 items-center border-t border-slate-200 dark:border-slate-700 justify-between mt-2">
+                    <div class="grid grid-cols-1 items-center border-t border-slate-200 justify-between mt-2">
                         <div class="flex justify-between items-center pt-2 md:pt-3">
                             <!-- Button -->
                             <button id="dropdownLastDays3Button" data-dropdown-toggle="LastDays3dropdown"
                                 data-dropdown-placement="bottom"
-                                class="text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-royal-blue dark:hover:text-blue-400 text-center inline-flex items-center uppercase tracking-wider"
+                                class="text-[10px] font-bold text-slate-500 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-wider"
                                 type="button">
                                 Last 7 days
                                 <svg class="w-2.5 h-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -516,39 +486,35 @@ require_once __DIR__ . '/../../config/vite.php';
                             </button>
                             <!-- Dropdown menu -->
                             <div id="LastDays3dropdown"
-                                class="z-10 hidden bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700 rounded-lg shadow-xl w-44 border border-slate-200 dark:border-slate-700">
-                                <ul class="py-2 text-sm text-slate-700 dark:text-slate-300"
-                                    aria-labelledby="dropdownLastDays3Button">
+                                class="z-10 hidden bg-white divide-y divide-slate-100 rounded-lg shadow-xl w-44 border border-slate-200">
+                                <ul class="py-2 text-sm text-slate-700" aria-labelledby="dropdownLastDays3Button">
                                     <li>
                                         <a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Yesterday</a>
+                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors">Yesterday</a>
                                     </li>
                                     <li>
                                         <a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Today</a>
+                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors">Today</a>
                                     </li>
                                     <li>
-                                        <a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Last
+                                        <a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last
                                             7
                                             days</a>
                                     </li>
                                     <li>
-                                        <a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Last
+                                        <a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last
                                             30
                                             days</a>
                                     </li>
                                     <li>
-                                        <a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Last
+                                        <a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last
                                             90
                                             days</a>
                                     </li>
                                 </ul>
                             </div>
                             <a href="#"
-                                class="inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-[10px] hover:underline">
+                                class="inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-[10px] hover:underline">
                                 Roles Report
                                 <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -562,7 +528,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <!-- Age Demographics (Modern Landscape Visualization) -->
                 <div
-                    class="lg:col-span-2 bg-[#f8fafc] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-500 min-h-[350px] flex flex-col group/age">
+                    class="lg:col-span-2 bg-[#f8fafc] border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-500 min-h-[350px] flex flex-col group/age">
                     <div class="flex justify-between items-center mb-8">
                         <div class="flex items-center">
                             <div
@@ -598,28 +564,24 @@ require_once __DIR__ . '/../../config/vite.php';
             </div>
 
             <!-- Dashboard Footer with Privacy & Credits -->
-            <footer class="mt-10 mb-4 border-t border-slate-200 dark:border-slate-800 pt-6">
+            <footer class="mt-10 mb-4 border-t border-slate-200 pt-6">
                 <div class="flex flex-col md:flex-row justify-between items-start gap-6">
-                    <div
-                        class="bg-blue-50/50 dark:bg-blue-900/10 border-l-4 border-royal-blue dark:border-blue-500 rounded-r-xl p-5 flex-1">
+                    <div class="bg-blue-50/50 border-l-4 border-royal-blue rounded-r-xl p-5 flex-1">
                         <div class="flex items-start gap-3">
-                            <div class="p-2 bg-royal-blue/10 dark:bg-blue-900/30 rounded-lg shrink-0 mt-0.5">
-                                <svg class="w-4 h-4 text-royal-blue dark:text-blue-400" fill="currentColor"
-                                    viewBox="0 0 20 20">
+                            <div class="p-2 bg-royal-blue/10 rounded-lg shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-royal-blue" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd"
                                         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
                                         clip-rule="evenodd" />
                                 </svg>
                             </div>
                             <div>
-                                <h4
-                                    class="text-[10px] font-black text-royal-blue dark:text-blue-400 uppercase tracking-widest mb-1">
+                                <h4 class="text-[10px] font-black text-royal-blue uppercase tracking-widest mb-1">
                                     Statistical Compliance Notice</h4>
-                                <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                                <p class="text-[11px] text-slate-500 font-medium leading-relaxed">
                                     This dashboard visualizes aggregated statistical patterns only. PII is
                                     strictly excluded in compliance with <span
-                                        class="font-bold text-royal-blue dark:text-blue-400">RA
-                                        10173 (Data Privacy Act of 2012)</span>.
+                                        class="font-bold text-royal-blue">RA 10173 (Data Privacy Act of 2012)</span>.
                                 </p>
                             </div>
                         </div>

@@ -130,5 +130,17 @@ export function initDarkMode() {
     });
 }
 
+// ─── Theme Query Helper ──────────────────────────────────────────────────────
+
+/**
+ * Returns true if the current theme is dark.
+ * Use this in modules that need to build theme-aware HTML at render-time
+ * (e.g. modals that generate HTML strings instead of using Tailwind dark: prefix).
+ */
+export function isDarkMode() {
+    return document.documentElement.classList.contains('dark');
+}
+
 // Expose globally for inline onclick usage (e.g. sidebar button)
 window.toggleTheme = toggleTheme;
+window.isDarkMode = isDarkMode;

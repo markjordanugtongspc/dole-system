@@ -1,4 +1,5 @@
 import { getBasePath } from './auth.js';
+import { isDarkMode } from './darkmode.js';
 import Swal from 'sweetalert2';
 
 /**
@@ -1495,78 +1496,148 @@ function showAddDataModal(data = null) {
         'M12 4v16m8-8H4';
     const headerTitle = isEdit ? 'Edit Beneficiary' : 'New Beneficiary';
 
+    // ── Theme-aware class resolver ──────────────────────────────────────────
+    // Check theme ONCE at render-time. Light mode = your original "old code" classes.
+    // Dark mode = modern slate-based dark theme. No more dark: prefixes needed.
+    const dk = isDarkMode();
+
+    // Reusable theme tokens
+    const t = {
+        // Borders
+        borderBase: dk ? 'border-slate-800' : 'border-gray-100/80',
+        borderCard: dk ? 'border-slate-800' : 'border-gray-100',
+        borderInput: dk ? 'border-slate-700' : 'border-gray-200',
+        borderSugg: dk ? 'border-slate-700' : 'border-gray-200',
+        borderDivide: dk ? 'divide-slate-700' : 'divide-gray-50',
+        borderSuggHead: dk ? 'border-slate-700' : 'border-gray-100',
+        borderStatus: dk ? 'border-slate-700' : 'border-gray-100',
+        // Backgrounds
+        bgCard: dk ? 'bg-slate-900/40' : 'bg-gray-50/40',
+        bgInput: dk ? 'bg-slate-900' : 'bg-white',
+        bgAgeInput: dk ? 'bg-slate-800/50' : 'bg-gray-100/80',
+        bgSugg: dk ? 'bg-slate-800' : 'bg-white',
+        bgStatusWrap: dk ? 'bg-slate-800/50' : 'bg-gray-50',
+        bgActionBar: dk ? 'bg-slate-800/80' : 'bg-gray-50',
+        bgSaveBtn: dk ? 'bg-green-600 hover:bg-green-700' : 'bg-[#2e7d32] hover:bg-[#1b5e20]',
+        bgCancelBtn: dk ? 'bg-red-900/20' : 'bg-[#fef2f2]',
+        // Text colors
+        textHeading: dk ? 'text-green-500' : 'text-[#2e7d32]',
+        textSubtitle: dk ? 'text-slate-500' : 'text-gray-400',
+        textLabel: dk ? 'text-slate-500' : 'text-gray-400',
+        textSectionTitle: dk ? 'text-slate-400' : 'text-gray-500',
+        textInput: dk ? 'text-white' : 'text-slate-900',
+        textAge: dk ? 'text-green-400' : 'text-[#2e7d32]',
+        textWorkSuggHead: dk ? 'text-slate-500' : 'text-slate-400',
+        textWorkOpt: dk ? 'text-slate-300' : 'text-slate-600',
+        textCourseOpt: dk ? 'text-slate-300' : 'text-gray-600',
+        textCancel: dk ? 'text-red-400' : 'text-red-700',
+        // Focus rings
+        focusGreen: dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]',
+        focusBlue: dk ? 'focus:ring-blue-500/10 focus:border-blue-500' : 'focus:ring-royal-blue/10 focus:border-royal-blue',
+        focusYellow: dk ? 'focus:ring-yellow-500/10 focus:border-yellow-500' : 'focus:ring-golden-yellow/10 focus:border-golden-yellow',
+        focusRed: dk ? 'focus:ring-red-500/10 focus:border-red-500' : 'focus:ring-philippine-red/10 focus:border-philippine-red',
+        // Group focus
+        gfGreen: dk ? 'group-focus-within:text-green-500' : 'group-focus-within:text-[#2e7d32]',
+        gfBlue: dk ? 'group-focus-within:text-blue-500' : 'group-focus-within:text-royal-blue',
+        // Header icon
+        iconBg: dk ? 'bg-green-900/20' : 'bg-[#e8f5e9]',
+        iconText: dk ? 'text-green-400' : 'text-[#2e7d32]',
+        iconBorder: dk ? 'border-green-800/30' : 'border-[#c8e6c9]',
+        // Section dots
+        dotGreen: dk ? 'bg-green-500' : 'bg-[#2e7d32]',
+        dotBlue: dk ? 'bg-blue-500' : 'bg-royal-blue',
+        // ID prefix badge
+        idBadgeBg: dk ? 'bg-blue-600 border-blue-600' : 'bg-royal-blue border-royal-blue',
+        idText: dk ? 'text-white' : 'text-royal-blue',
+        // Placeholder
+        placeholder: dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300',
+        // Hover states for suggestions
+        courseHover: dk ? 'hover:bg-green-900/40 hover:text-green-400' : 'hover:bg-[#e8f5e9] hover:text-[#2e7d32]',
+        workHover: dk ? 'hover:bg-blue-900/40 hover:text-blue-400' : 'hover:bg-blue-50/80 hover:text-royal-blue',
+        workDot: dk ? 'bg-slate-700 group-hover/opt:bg-blue-500' : 'bg-gray-200 group-hover/opt:bg-royal-blue',
+        workArrow: dk ? 'text-blue-400' : 'text-royal-blue',
+        // Icon colors
+        iconColor: dk ? 'text-slate-500' : 'text-gray-400',
+        // Cancel border
+        cancelBorder: dk ? 'border-red-900/30' : 'border-[#fee2e2]',
+        // Save shadow
+        saveShadow: dk ? 'hover:shadow-green-500/20' : 'hover:shadow-[#2e7d32]/40',
+        // Action bar border
+        actionBarBorder: dk ? 'border-slate-700' : 'border-gray-100/80',
+    };
+
     const formContent = `
         <div class="text-left font-montserrat user-select-none relative">
             <!-- Modal Header -->
-            <div class="mb-4 pb-3 border-b border-gray-100/80 dark:border-slate-800 flex items-center justify-between transition-colors">
+            <div class="mb-4 pb-3 border-b ${t.borderBase} flex items-center justify-between">
                 <div>
-                    <h3 class="text-xl font-black text-[#2e7d32] dark:text-green-500 flex items-center gap-2.5">
-                        <div class="p-2 bg-[#e8f5e9] dark:bg-green-900/20 rounded-lg text-[#2e7d32] dark:text-green-400 border border-[#c8e6c9] dark:border-green-800/30 shadow-sm">
+                    <h3 class="text-xl font-black ${t.textHeading} flex items-center gap-2.5">
+                        <div class="p-2 ${t.iconBg} rounded-lg ${t.iconText} border ${t.iconBorder} shadow-sm">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="${headerIcon}" /></svg>
                         </div>
                         ${headerTitle}
                     </h3>
-                    <p class="text-[10px] text-slate-500 dark:text-slate-500 font-bold mt-1 uppercase tracking-widest pl-11">Enter the details of the GIP beneficiary below.</p>
+                    <p class="text-[10px] ${t.textSubtitle} font-bold mt-1 uppercase tracking-widest pl-11">Enter the details of the GIP beneficiary below.</p>
                 </div>
             </div>
 
             <form id="add-beneficiary-form" class="grid grid-cols-1 lg:grid-cols-2 gap-5" data-is-edit="${isEdit}">
                 <!-- LEFT COLUMN: Personal Info Card -->
-                <div class="bg-white dark:bg-slate-900/40 rounded-xl p-4 border border-gray-100 dark:border-slate-800 shadow-sm flex flex-col space-y-4 transition-colors">
+                <div class="${t.bgCard} rounded-xl p-4 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
                     <div class="flex items-center gap-2 mb-1">
-                        <div class="w-1 h-5 bg-[#2e7d32] dark:bg-green-500 rounded-full"></div>
-                        <p class="text-[9px] uppercase font-black text-slate-500 dark:text-slate-400 tracking-widest">Personal & Educational Information</p>
+                        <div class="w-1 h-5 ${t.dotGreen} rounded-full"></div>
+                        <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest">Personal & Educational Information</p>
                     </div>
                     
                     <div class="space-y-3.5">
                         <div class="group">
-                            <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1 transition-colors group-focus-within:text-[#2e7d32] dark:group-focus-within:text-green-500">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
-                            <input type="text" name="name" value="${data?.name || ''}" required class="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[12px] font-bold text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2e7d32]/10 dark:focus:ring-green-500/10 focus:border-[#2e7d32] dark:focus:border-green-500 outline-none transition-all shadow-sm placeholder:text-slate-400 dark:placeholder:text-slate-600" placeholder="e.g. Dela Cruz, Juan M.">
+                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" value="${data?.name || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="e.g. Dela Cruz, Juan M.">
                         </div>
                         
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1 transition-colors group-focus-within:text-[#2e7d32] dark:group-focus-within:text-green-500">Contact No. <span class="text-red-500">*</span></label>
-                                <input type="text" name="contact" value="${data?.contact || ''}" required class="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[12px] font-bold text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2e7d32]/10 dark:focus:ring-green-500/10 focus:border-[#2e7d32] dark:focus:border-green-500 outline-none transition-all shadow-sm placeholder:text-slate-400 dark:placeholder:text-slate-600 font-mono" placeholder="09XX-XXX-XXXX">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Contact No. <span class="text-red-500">*</span></label>
+                                <input type="text" name="contact" value="${data?.contact || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} font-mono" placeholder="09XX-XXX-XXXX">
                             </div>
                             <div class="group">
-                                <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1 transition-colors group-focus-within:text-[#2e7d32] dark:group-focus-within:text-green-500">Address</label>
-                                <input type="text" name="address" value="${data?.address || ''}" class="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[12px] font-bold text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2e7d32]/10 dark:focus:ring-green-500/10 focus:border-[#2e7d32] dark:focus:border-green-500 outline-none transition-all shadow-sm placeholder:text-slate-400 dark:placeholder:text-slate-600" placeholder="Barangay, City">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="group">
-                                <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1 transition-colors group-focus-within:text-[#2e7d32] dark:group-focus-within:text-green-500">Birthday</label>
-                                <input type="date" name="birthday" value="${data?.birthday || ''}" id="birthday-input" class="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[12px] font-bold text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2e7d32]/10 dark:focus:ring-green-500/10 focus:border-[#2e7d32] dark:focus:border-green-500 outline-none transition-all shadow-sm uppercase">
-                            </div>
-                            <div class="group">
-                                <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1 transition-colors group-focus-within:text-[#2e7d32] dark:group-focus-within:text-green-500">Age</label>
-                                <input type="text" name="age" value="${data?.age || ''}" id="age-display" readonly class="w-full bg-white dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[12px] font-black text-[#2e7d32] dark:text-green-400 cursor-not-allowed outline-none font-mono" placeholder="Auto">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Address</label>
+                                <input type="text" name="address" value="${data?.address || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="Barangay, City">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1 transition-colors group-focus-within:text-[#2e7d32] dark:group-focus-within:text-green-500">Gender</label>
-                                <select name="gender" class="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[12px] font-bold text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2e7d32]/10 dark:focus:ring-green-500/10 focus:border-[#2e7d32] dark:focus:border-green-500 outline-none transition-all shadow-sm cursor-pointer appearance-none">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Birthday</label>
+                                <input type="date" name="birthday" value="${data?.birthday || ''}" id="birthday-input" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm uppercase">
+                            </div>
+                            <div class="group">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Age</label>
+                                <input type="text" name="age" value="${data?.age || ''}" id="age-display" readonly class="w-full ${t.bgAgeInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-black ${t.textAge} cursor-not-allowed outline-none font-mono" placeholder="Auto">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="group">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Gender</label>
+                                <select name="gender" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm cursor-pointer appearance-none">
                                     <option value="Male" ${data?.gender === 'Male' ? 'selected' : ''}>Male</option>
                                     <option value="Female" ${data?.gender === 'Female' ? 'selected' : ''}>Female</option>
                                 </select>
                             </div>
                             <div class="group">
-                                <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1 transition-colors group-focus-within:text-[#2e7d32] dark:group-focus-within:text-green-500">Education</label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Education</label>
                                 <div class="relative" id="education-container">
                                     <input type="text" name="education" id="education-input" autocomplete="off"
                                         value="${data?.education || ''}" 
-                                        placeholder="Course/Level..." 
-                                        class="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 pl-9 text-[12px] font-bold text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2e7d32]/10 dark:focus:ring-green-500/10 focus:border-[#2e7d32] dark:focus:border-green-500 outline-none transition-all shadow-sm placeholder:text-slate-400 dark:placeholder:text-slate-600">
+                                        class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 pl-9 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" 
+                                        placeholder="Course/Level...">
                                     <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
-                                        <svg class="w-4 h-4 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                                        <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                                     </div>
-                                    <div id="course-suggestions" class="hidden absolute left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat divide-y divide-gray-50 dark:divide-slate-700 p-1.5 transition-all">
+                                    <div id="course-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
                                         ${COMMON_COURSES.map(course => `
-                                            <div class="course-option px-3 py-2 text-[10px] font-bold text-gray-600 dark:text-slate-300 hover:bg-[#e8f5e9] dark:hover:bg-green-900/40 hover:text-[#2e7d32] dark:hover:text-green-400 rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
+                                            <div class="course-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
                                                 ${course}
                                             </div>
                                         `).join('')}
@@ -1579,36 +1650,36 @@ function showAddDataModal(data = null) {
                     <div class="pt-1">
                         <div class="flex items-center gap-2 mb-2">
                             <div class="w-1 h-5 bg-golden-yellow rounded-full"></div>
-                            <p class="text-[9px] uppercase font-black text-slate-500 tracking-widest">Contract Duration</p>
+                            <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest">Contract Duration</p>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1">Start Date <span class="text-red-500">*</span></label>
-                                <input type="date" name="startDate" value="${data?.startDate || ''}" required class="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[12px] font-bold text-gray-900 dark:text-white focus:ring-4 focus:ring-golden-yellow/10 dark:focus:ring-yellow-500/10 focus:border-golden-yellow dark:focus:border-yellow-500 outline-none transition-all shadow-sm uppercase">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">Start Date <span class="text-red-500">*</span></label>
+                                <input type="date" name="startDate" value="${data?.startDate || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusYellow} outline-none transition-all shadow-sm uppercase">
                             </div>
                             <div class="group">
-                                <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1">End Date <span class="text-red-500">*</span></label>
-                                <input type="date" name="endDate" value="${data?.endDate || ''}" required class="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[12px] font-bold text-gray-900 dark:text-white focus:ring-4 focus:ring-philippine-red/10 dark:focus:ring-red-500/10 focus:border-philippine-red dark:focus:border-red-500 outline-none transition-all shadow-sm uppercase">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">End Date <span class="text-red-500">*</span></label>
+                                <input type="date" name="endDate" value="${data?.endDate || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusRed} outline-none transition-all shadow-sm uppercase">
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- RIGHT COLUMN: Work Details Card -->
-                <div class="bg-white dark:bg-slate-900/40 rounded-xl p-4 border border-gray-100 dark:border-slate-800 shadow-sm flex flex-col space-y-4 transition-colors">
+                <div class="${t.bgCard} rounded-xl p-4 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
                     <div class="flex items-center gap-2 mb-1">
-                        <div class="w-1 h-5 bg-royal-blue dark:bg-blue-500 rounded-full"></div>
-                        <p class="text-[9px] uppercase font-black text-slate-500 dark:text-slate-400 tracking-widest">Work & Administrative Data</p>
+                        <div class="w-1 h-5 ${t.dotBlue} rounded-full"></div>
+                        <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest">Work & Administrative Data</p>
                     </div>
                     
                     <div class="space-y-3.5">
                          <div class="group">
-                            <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1 transition-colors group-focus-within:text-royal-blue dark:group-focus-within:text-blue-500">ID Number</label>
+                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">ID Number</label>
                             <div class="flex items-center">
-                                <div class="bg-royal-blue dark:bg-blue-600 border border-royal-blue dark:border-blue-600 rounded-l-lg px-3 py-2 text-[10px] font-black text-white font-mono shadow-sm">ROX-RD-ESIG-2025-</div>
+                                <div class="${t.idBadgeBg} rounded-l-lg px-3 py-2 text-[10px] font-black text-white font-mono shadow-sm">ROX-RD-ESIG-2025-</div>
                                 <input type="text" name="id_number_suffix" id="id-number-input" 
                                     value="${data?.id ? data.id.split('-').pop() : ''}" 
-                                    class="flex-1 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 border-l-0 rounded-r-lg px-3 py-2 text-[11px] font-black text-royal-blue dark:text-white font-mono outline-none focus:ring-4 focus:ring-royal-blue/10 dark:focus:ring-blue-500/10 focus:border-royal-blue dark:focus:border-blue-500 transition-all" 
+                                    class="flex-1 ${t.bgInput} border ${t.borderInput} border-l-0 rounded-r-lg px-3 py-2 text-[11px] font-black ${t.idText} font-mono outline-none focus:ring-4 ${t.focusBlue} transition-all" 
                                     placeholder="0001">
                                 <input type="hidden" name="id" id="full-id-input" value="${data?.id || ''}">
                             </div>
@@ -1616,8 +1687,8 @@ function showAddDataModal(data = null) {
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1 transition-colors group-focus-within:text-royal-blue dark:group-focus-within:text-blue-500">Assigned Office</label>
-                                <select name="office" class="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[12px] font-bold text-gray-900 dark:text-white focus:ring-4 focus:ring-royal-blue/10 dark:focus:ring-blue-500/10 focus:border-royal-blue dark:focus:border-blue-500 outline-none transition-all shadow-sm cursor-pointer appearance-none">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Assigned Office</label>
+                                <select name="office" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm cursor-pointer appearance-none">
                                     <option value="DOLE" ${data?.office?.includes('DOLE') ? 'selected' : ''}>DOLE Field Office</option>
                                     <option value="LGU" ${data?.office?.includes('LGU') ? 'selected' : ''}>LGU</option>
                                     <option value="DEPED" ${data?.office?.includes('DEPED') ? 'selected' : ''}>DEPED</option>
@@ -1626,32 +1697,32 @@ function showAddDataModal(data = null) {
                                 </select>
                             </div>
                             <div class="group">
-                                <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1 transition-colors group-focus-within:text-royal-blue dark:group-focus-within:text-blue-500">Series Number</label>
-                                <input type="text" name="seriesNo" value="${data?.seriesNo || ''}" class="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[12px] font-black text-royal-blue dark:text-white font-mono focus:ring-4 focus:ring-royal-blue/10 dark:focus:ring-blue-500/10 focus:border-royal-blue dark:focus:border-blue-500 outline-none transition-all shadow-sm" placeholder="2025-00-000">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Series Number</label>
+                                <input type="text" name="seriesNo" value="${data?.seriesNo || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-black ${dk ? 'text-white' : 'text-royal-blue'} font-mono focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm" placeholder="2025-00-000">
                             </div>
                         </div>
 
                         <div class="group">
-                            <label class="text-[9px] text-gray-400 dark:text-slate-500 font-black uppercase block mb-1 tracking-widest transition-colors group-focus-within:text-royal-blue dark:group-focus-within:text-blue-500">Nature of Work <span class="text-red-500">*</span></label>
+                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 tracking-widest ${dk ? '' : 'transition-colors'} ${dk ? '' : 'group-focus-within:text-royal-blue'}">Nature of Work <span class="text-red-500">*</span></label>
                             <div class="relative" id="work-container">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="w-3.5 h-3.5 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    <svg class="w-3.5 h-3.5 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                                 </div>
                                 <input type="text" name="designation" id="designation-input" autocomplete="off"
                                     value="${data?.designation || ''}" required 
-                                    class="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold text-gray-900 dark:text-white focus:ring-4 focus:ring-royal-blue/10 dark:focus:ring-blue-500/10 focus:border-royal-blue dark:focus:border-blue-500 outline-none transition-all shadow-sm placeholder:text-slate-400 dark:placeholder:text-slate-600" 
+                                    class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
                                     placeholder="e.g. Administrative Support">
-                                <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-2xl z-[100] max-h-56 overflow-y-auto font-montserrat divide-y divide-gray-50 dark:divide-slate-700 p-2 transform origin-top transition-all duration-200">
-                                    <div class="px-2 py-1.5 mb-1.5 border-b border-gray-100 dark:border-slate-700">
-                                        <p class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Quick Select Roles</p>
+                                <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2 transform origin-top transition-all duration-200">
+                                    <div class="px-2 py-1.5 mb-1.5 border-b ${t.borderSuggHead}">
+                                        <p class="text-[9px] font-black ${t.textWorkSuggHead} uppercase tracking-widest">Quick Select Roles</p>
                                     </div>
                                     ${COMMON_NATURE_OF_WORK.map(work => `
-                                        <div class="work-option px-3 py-2.5 text-[10px] font-black text-slate-600 dark:text-slate-300 hover:bg-blue-50/80 dark:hover:bg-blue-900/40 hover:text-royal-blue dark:hover:text-blue-400 rounded-lg cursor-pointer transition-all flex items-center justify-between group/opt active:scale-[0.98]">
+                                        <div class="work-option px-3 py-2.5 text-[10px] font-black ${t.textWorkOpt} ${t.workHover} rounded-lg cursor-pointer transition-all flex items-center justify-between group/opt active:scale-[0.98]">
                                             <div class="flex items-center gap-3">
-                                                <div class="w-1.5 h-1.5 rounded-full bg-gray-200 dark:bg-slate-700 group-hover/opt:bg-royal-blue dark:group-hover/opt:bg-blue-500 transition-colors"></div>
+                                                <div class="w-1.5 h-1.5 rounded-full ${t.workDot} transition-colors"></div>
                                                 ${work}
                                             </div>
-                                            <svg class="w-3 h-3 opacity-0 group-hover/opt:opacity-100 transition-opacity text-royal-blue dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                            <svg class="w-3 h-3 opacity-0 group-hover/opt:opacity-100 transition-opacity ${t.workArrow}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                                         </div>
                                     `).join('')}
                                 </div>
@@ -1659,14 +1730,14 @@ function showAddDataModal(data = null) {
                         </div>
 
                         <div class="group">
-                            <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-1">Replacement History (Optional)</label>
-                            <textarea name="replacement" rows="2" class="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[11px] font-bold text-gray-900 dark:text-white focus:ring-4 focus:ring-royal-blue/10 dark:focus:ring-blue-500/10 focus:border-royal-blue dark:focus:border-blue-500 outline-none transition-all shadow-sm placeholder:text-slate-400 dark:placeholder:text-slate-600 resize-none min-h-[60px]">${data?.replacement || ''}</textarea>
+                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">Replacement History (Optional)</label>
+                            <textarea name="replacement" rows="2" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[11px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder} resize-none min-h-[60px]">${data?.replacement || ''}</textarea>
                         </div>
 
                         <div class="group">
-                            <label class="text-[9px] text-slate-500 dark:text-slate-500 font-black uppercase block mb-2">Employment Status Record</label>
+                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-2">Employment Status Record</label>
                             <div class="flex flex-wrap gap-2 items-center">
-                                <div class="flex flex-wrap gap-2 p-1.5 bg-gray-50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-700 rounded-xl shadow-inner flex-1 transition-colors">
+                                <div class="flex flex-wrap gap-2 p-1.5 ${t.bgStatusWrap} border ${t.borderStatus} rounded-xl shadow-inner flex-1">
                                     ${(() => {
             const statusConfigs = {
                 'ONGOING': 'peer-checked:bg-green-400 peer-checked:text-white peer-checked:border-green-400',
@@ -1705,15 +1776,15 @@ function showAddDataModal(data = null) {
             </form>
 
             <!-- Action Bar -->
-            <div class="mt-6 flex justify-end items-center gap-3 -mx-8 -mb-8 p-4 rounded-b-2xl bg-gray-50 dark:bg-slate-800/80 border-t border-gray-100/80 dark:border-slate-700 transition-colors">
+            <div class="mt-6 flex justify-end items-center gap-3 -mx-8 -mb-8 p-4 rounded-b-2xl ${t.bgActionBar} border-t ${t.actionBarBorder}">
                 <button type="submit" form="add-beneficiary-form"
-                    class="group flex items-center gap-2.5 px-6 py-3 bg-[#2e7d32] dark:bg-green-600 text-white font-black rounded-xl hover:bg-[#1b5e20] dark:hover:bg-green-700 transition-all duration-300 shadow-lg hover:shadow-[#2e7d32]/40 dark:hover:shadow-green-500/20 cursor-pointer text-[12px] transform active:scale-[0.98]">
+                    class="group flex items-center gap-2.5 px-6 py-3 ${t.bgSaveBtn} text-white font-black rounded-xl transition-all duration-300 shadow-lg ${t.saveShadow} cursor-pointer text-[12px] transform active:scale-[0.98]">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                     <span>${isEdit ? 'UPDATE RECORD' : 'SAVE RECORD'}</span>
                 </button>
 
                 <button type="button" id="cancel-modal-btn"
-                    class="group flex items-center gap-2.5 px-6 py-3 bg-[#fef2f2] dark:bg-red-900/20 text-red-700 dark:text-red-400 font-bold rounded-xl hover:bg-[#ce1126] hover:text-white transition-all duration-300 shadow-sm border border-[#fee2e2] dark:border-red-900/30 hover:border-[#ce1126] cursor-pointer text-[12px] active:scale-[0.98]">
+                    class="group flex items-center gap-2.5 px-6 py-3 ${t.bgCancelBtn} ${t.textCancel} font-bold rounded-xl hover:bg-[#ce1126] hover:text-white transition-all duration-300 shadow-sm border ${t.cancelBorder} hover:border-[#ce1126] cursor-pointer text-[12px] active:scale-[0.98]">
                     <svg class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
                     <span>CANCEL</span>
                 </button>
@@ -1881,14 +1952,14 @@ function showAddDataModal(data = null) {
                             hour12: true
                         });
                         extensionContainer.innerHTML = `
-                            <p class="text-[9px] uppercase font-black text-green-600 dark:text-green-500 border-b border-green-100 dark:border-slate-800 pb-0.5">Absorption Log</p>
-                            <div class="bg-green-50/50 dark:bg-green-900/10 rounded-lg p-3 border border-green-100 dark:border-green-900/30 flex items-center justify-between mt-2 transition-colors">
+                            <p class="text-[9px] uppercase font-black ${dk ? 'text-green-500' : 'text-green-600'} border-b ${dk ? 'border-slate-800' : 'border-green-100'} pb-0.5">Absorption Log</p>
+                            <div class="${dk ? 'bg-green-900/10 border-green-900/30' : 'bg-green-50/50 border-green-100'} rounded-lg p-3 border flex items-center justify-between mt-2">
                                 <div>
-                                    <label class="text-[9px] text-green-600 dark:text-green-500 font-bold uppercase block mb-0.5">Absorption Date & Time</label>
-                                    <p class="text-[11px] font-black text-green-700 dark:text-green-400 uppercase">${date}</p>
+                                    <label class="text-[9px] ${dk ? 'text-green-500' : 'text-green-600'} font-bold uppercase block mb-0.5">Absorption Date & Time</label>
+                                    <p class="text-[11px] font-black ${dk ? 'text-green-400' : 'text-green-700'} uppercase">${date}</p>
                                     <input type="hidden" name="absorbDate" value="${date}">
                                 </div>
-                                <svg class="w-5 h-5 text-green-500 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <svg class="w-5 h-5 ${dk ? 'text-green-400' : 'text-green-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
                         `;
                     } else {
