@@ -142,13 +142,14 @@ export function initLoginHandler() {
                     }
 
                     // Set login flags
+                    const hasLoggedInBefore = localStorage.getItem('hasLoggedInBefore') === 'true';
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('hasLoggedInBefore', 'true');
                     localStorage.setItem('user', JSON.stringify(result.user));
 
                     // Show Success Modal then Trigger Opening Animation
-                    await showLoginSuccess();
-                    playOpeningAnimation();
+                    await showLoginSuccess(hasLoggedInBefore);
+                    playOpeningAnimation(hasLoggedInBefore);
                 } else {
                     showAuthError();
                     passwordInput.value = '';
@@ -169,18 +170,44 @@ export function initLoginHandler() {
 /**
  * Play the "Opening" animation on the panels then redirect
  */
-function playOpeningAnimation() {
+function playOpeningAnimation(fast = false) {
     const leftPanel = document.getElementById('left-panel');
     const rightPanel = document.getElementById('right-panel');
+    const leftPanelContent = document.getElementById('left-panel-content');
+    const rightPanelContent = document.getElementById('right-panel-content');
 
-    // Add animation classes
-    if (leftPanel) leftPanel.classList.add('animate-slide-left');
-    if (rightPanel) rightPanel.classList.add('animate-slide-right');
+    // Hide the panel contents (text and login form) smoothly
+    if (leftPanelContent) leftPanelContent.style.opacity = '0';
+    if (rightPanelContent) rightPanelContent.style.opacity = '0';
 
-    // Wait for animation to finish (800ms matches CSS)
+    // Create transparent overlay without blue background
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 z-[100] flex items-center justify-center pointer-events-none';
+
+    // Add transparent rounded logo using Animate.css
+    const delayClass = fast ? '' : 'animate__delay-1s';
+    const durationStyle = fast ? 'animation-duration: 0.8s;' : 'animation-duration: 2s;';
+
+    overlay.innerHTML = `
+        <img src="${getBasePath()}frontend/images/logo/doleiligan.png" class="w-64 h-64 md:w-96 md:h-96 object-contain bg-white/20 backdrop-blur-sm shadow-2xl rounded-full p-4 animate__animated animate__rotateOut ${delayClass}" style="${durationStyle}" alt="DOLE Logo">
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Timing constants based on mode
+    const rotationWait = fast ? 0 : 1000;
+    const slideWait = fast ? 600 : 1500;
+
+    // Wait for logo to rotate, then open panels
     setTimeout(() => {
-        window.location.href = `${getBasePath()}frontend/dashboard/`;
-    }, 800);
+        if (leftPanel) leftPanel.classList.add('animate-slide-left');
+        if (rightPanel) rightPanel.classList.add('animate-slide-right');
+
+        // Wait to let the panels slide and logo finish fading out, then redirect
+        setTimeout(() => {
+            window.location.href = `${getBasePath()}frontend/dashboard/`;
+        }, slideWait);
+    }, rotationWait);
 }
 
 export function initLogoutHandler() {

@@ -22,7 +22,8 @@
     <!-- Header -->
     <header class="relative z-10 flex items-center justify-between border-b-2 border-royal-blue pb-4 mb-8">
         <div class="flex items-center gap-5">
-            <img src="../../frontend/images/logo/doleiligan.png" class="h-24 w-auto drop-shadow-sm" alt="DOLE Logo">
+            <img src="../../frontend/images/logo/doleiligan.png"
+                class="h-24 w-auto drop-shadow-sm bg-white rounded-full p-1 object-contain" alt="DOLE Logo">
             <div>
                 <h1 class="text-3xl font-black text-royal-blue uppercase tracking-tighter leading-none mb-1">Department
                     of Labor and Employment</h1>
@@ -49,12 +50,12 @@
 
     <!-- Footer -->
     <footer class="fixed bottom-0 left-0 w-full text-center border-t border-gray-800 pt-3 pb-4 bg-white z-20">
-      <p class="text-[10px] text-gray-900 font-bold uppercase tracking-wider flex items-center justify-center gap-1">
-        &copy; <span class="auto-year"></span> System 
-        <span class="opacity-28">Developed by</span>
-        <span class="text-royal-blue font-black opacity-23">Mark Jordan Ugtong</span>
-        <span class="mx-1 text-gray-400">|</span>
-        Exclusive Property of DOLE Iligan City
-      </p>
+        <p class="text-[10px] text-gray-900 font-bold uppercase tracking-wider flex items-center justify-center gap-1">
+            &copy; <span class="auto-year"></span> System
+            <span class="opacity-28">Developed by</span>
+            <span class="text-royal-blue font-black opacity-23">Mark Jordan Ugtong</span>
+            <span class="mx-1 text-gray-400">|</span>
+            Exclusive Property of DOLE Iligan City
+        </p>
     </footer>
 </div>

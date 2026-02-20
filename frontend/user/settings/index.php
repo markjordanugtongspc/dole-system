@@ -61,7 +61,8 @@ require_once __DIR__ . '/../../../config/vite.php';
                         </svg>
                     </button>
                     <div class="flex ms-2 md:me-24 items-center select-none">
-                        <img src="../../../frontend/images/logo/doleiligan.png" class="h-10 me-3" alt="DOLE Logo" />
+                        <img src="../../../frontend/images/logo/doleiligan.png"
+                            class="h-10 me-3 bg-white rounded-full p-0.5 object-contain" alt="DOLE Logo" />
                         <div class="flex flex-col">
                             <span class="text-lg font-black text-gray-800 tracking-tight font-outfit">Account
                                 Settings</span>

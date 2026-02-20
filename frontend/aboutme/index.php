@@ -30,7 +30,8 @@ require_once '../../config/db.php'; // Loads .env and provides env() helper
                             </svg>
                         </button>
                         <div class="flex ms-2 md:me-24 items-center select-none">
-                            <img src="../../frontend/images/logo/doleiligan.png" class="h-8 me-3" alt="DOLE Logo" />
+                            <img src="../../frontend/images/logo/doleiligan.png"
+                                class="h-8 me-3 bg-white rounded-full p-0.5 object-contain" alt="DOLE Logo" />
                             <div class="flex flex-col">
                                 <span
                                     class="text-sm font-black text-royal-blue uppercase tracking-tight leading-tight">DOLE

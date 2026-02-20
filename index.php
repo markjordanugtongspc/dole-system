@@ -18,7 +18,7 @@ require_once __DIR__ . '/config/db.php';
                 var match = document.cookie.match(/(?:^|; )color-theme=([^;]*)/);
                 theme = match ? decodeURIComponent(match[1]) : null;
             }
-            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            if (theme === 'dark') {
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');
@@ -38,12 +38,13 @@ require_once __DIR__ . '/config/db.php';
 
 
     <!-- LEFT SIDE - Brand Panel -->
-    <div id="left-panel" class="hidden lg:flex lg:w-1/2 bg-royal-blue items-center justify-center p-12">
-        <div class="text-center max-w-md">
+    <div id="left-panel"
+        class="hidden lg:flex lg:w-1/2 bg-royal-blue dark:bg-slate-900 transition-colors duration-300 items-center justify-center p-12">
+        <div id="left-panel-content" class="text-center max-w-md transition-opacity duration-300">
             <!-- Logo -->
-            <div class="mb-10">
+            <div id="left-panel-logo" class="mb-10 transition-opacity duration-300">
                 <div
-                    class="w-56 h-56 mx-auto bg-white dark:bg-royal-blue/20 rounded-full shadow-2xl flex items-center justify-center p-6 border-4 border-white/10 dark:border-white/5 overflow-hidden transition-all duration-500">
+                    class="w-56 h-56 mx-auto bg-white dark:bg-white rounded-full shadow-2xl flex items-center justify-center p-6 border-4 border-white/10 dark:border-white/5 overflow-hidden transition-all duration-500">
                     <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo"
                         class="w-full h-full object-contain rounded-full drop-shadow-2xl">
                 </div>
@@ -60,17 +61,18 @@ require_once __DIR__ . '/config/db.php';
     <!-- RIGHT SIDE - Login Form -->
     <div id="right-panel"
         class="flex w-full lg:w-1/2 items-center justify-center bg-white dark:bg-slate-900 px-6 py-12 transition-colors duration-300">
-        <div class="w-full max-w-md">
+        <div id="right-panel-content" class="w-full max-w-md transition-opacity duration-300">
 
             <!-- Mobile Logo (shows only on mobile) -->
             <div class="lg:hidden text-center mb-8">
                 <div
-                    class="w-24 h-24 mx-auto bg-white dark:bg-royal-blue/20 rounded-full shadow-lg flex items-center justify-center mb-4 p-2 border-2 border-white/10 dark:border-white/5 overflow-hidden">
+                    class="w-24 h-24 mx-auto bg-white dark:bg-white rounded-full shadow-lg flex items-center justify-center mb-4 p-2 border-2 border-white/10 dark:border-white/5 overflow-hidden">
                     <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo"
                         class="w-full h-full object-contain rounded-full">
                 </div>
                 <h2 class="text-2xl font-bold text-royal-blue dark:text-blue-400 transition-colors">DOLE System</h2>
-                <p class="text-xs text-gray-500 dark:text-slate-400 font-semibold transition-colors">Republic of the Philippines</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400 font-semibold transition-colors">Republic of the
+                    Philippines</p>
             </div>
 
             <!-- Login Form Card -->
@@ -84,7 +86,8 @@ require_once __DIR__ . '/config/db.php';
                 <form id="loginForm" class="space-y-6">
                     <!-- Username Field -->
                     <div>
-                        <label for="username" class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2 transition-colors">
+                        <label for="username"
+                            class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2 transition-colors">
                             Username
                         </label>
                         <input type="text" id="username" name="username" required autocomplete="username"
@@ -94,7 +97,8 @@ require_once __DIR__ . '/config/db.php';
 
                     <!-- Password Field -->
                     <div>
-                        <label for="password" class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2 transition-colors">
+                        <label for="password"
+                            class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2 transition-colors">
                             Password
                         </label>
                         <div class="relative">
@@ -126,7 +130,8 @@ require_once __DIR__ . '/config/db.php';
                         <div class="flex items-center">
                             <input type="checkbox" id="rememberMe" name="rememberMe"
                                 class="w-4 h-4 rounded border-gray-300 text-royal-blue focus:ring-blue-100 cursor-pointer" />
-                            <label for="rememberMe" class="ml-2 text-sm text-gray-700 dark:text-slate-400 cursor-pointer transition-colors">
+                            <label for="rememberMe"
+                                class="ml-2 text-sm text-gray-700 dark:text-slate-400 cursor-pointer transition-colors">
                                 Remember me
                             </label>
                         </div>

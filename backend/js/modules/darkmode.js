@@ -26,8 +26,8 @@ function getCookie(name) {
 function resolveTheme() {
     const stored = localStorage.getItem(THEME_KEY) || getCookie(THEME_KEY);
     if (stored === 'dark' || stored === 'light') return stored;
-    // Fallback: respect OS/browser preference
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    // Fallback: default to light instead of OS preference to maintain consistency
+    return 'light';
 }
 
 // ─── Apply Theme ──────────────────────────────────────────────────────────────

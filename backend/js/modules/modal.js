@@ -35,33 +35,31 @@ export function showAuthError(message = 'Incorrect Username or Password') {
     });
 }
 
-/**
- * Show modern success modal for authentication
- */
-export function showLoginSuccess() {
+export function showLoginSuccess(fast = false) {
     return Swal.fire({
         html: `
             <div class="p-6">
-                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                    <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
+                <div class="mx-auto flex flex-col items-center justify-center">
+                    <div class="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mb-4 border-[3px] border-green-200">
+                        <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-black text-gray-900 mb-1">Welcome Back!</h3>
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Authentication successful</p>
                 </div>
-                <h3 class="text-xl font-black text-gray-900 mb-2">Welcome Back!</h3>
-                <p class="text-sm text-gray-600 font-medium">Authentication successful.</p>
-                <p class="text-xs text-gray-500 mt-3">Redirecting to dashboard...</p>
             </div>
         `,
-        timer: 3000,
+        timer: fast ? 800 : 3000,
         timerProgressBar: true,
         showConfirmButton: false,
         showCloseButton: false,
-        width: '400px',
+        width: '350px',
         padding: '0',
         customClass: {
             container: 'font-montserrat',
-            popup: 'rounded-2xl shadow-2xl overflow-hidden',
-            timerProgressBar: 'bg-green-600 h-1.5'
+            popup: 'rounded-[1.5rem] shadow-2xl overflow-hidden border border-gray-100',
+            timerProgressBar: 'bg-green-500 h-1.5'
         },
         backdrop: 'rgba(0, 0, 0, 0.4)'
     });

@@ -65,7 +65,8 @@ require_once __DIR__ . '/../../config/vite.php';
                         </svg>
                     </button>
                     <div class="flex ms-2 md:me-24 items-center select-none">
-                        <img src="../../frontend/images/logo/doleiligan.png" class="h-8 me-3" alt="DOLE Logo" />
+                        <img src="../../frontend/images/logo/doleiligan.png"
+                            class="h-8 me-3 bg-white rounded-full p-0.5 object-contain" alt="DOLE Logo" />
                         <div class="flex flex-col">
                             <span class="text-sm font-black text-royal-blue uppercase tracking-tight leading-tight">DOLE
                                 LDNPFO</span>
@@ -580,8 +581,8 @@ require_once __DIR__ . '/../../config/vite.php';
                                     Statistical Compliance Notice</h4>
                                 <p class="text-[11px] text-slate-500 font-medium leading-relaxed">
                                     This dashboard visualizes aggregated statistical patterns only. PII is
-                                    strictly excluded in compliance with <span
-                                        class="font-bold text-royal-blue">RA 10173 (Data Privacy Act of 2012)</span>.
+                                    strictly excluded in compliance with <span class="font-bold text-royal-blue">RA
+                                        10173 (Data Privacy Act of 2012)</span>.
                                 </p>
                             </div>
                         </div>
@@ -590,7 +591,8 @@ require_once __DIR__ . '/../../config/vite.php';
                     <div class="flex flex-col items-center md:items-end justify-center shrink-0">
                         <div
                             class="flex items-center gap-3 mb-2 opacity-40 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-500">
-                            <img src="../../frontend/images/logo/doleiligan.png" class="h-7" alt="DOLE">
+                            <img src="../../frontend/images/logo/doleiligan.png"
+                                class="h-7 bg-white rounded-full p-0.5 object-contain" alt="DOLE">
                             <div class="w-px h-5 bg-slate-300"></div>
                             <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">GIP
                                 Monitoring</span>

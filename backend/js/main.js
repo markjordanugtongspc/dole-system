@@ -3,6 +3,7 @@
  * Handles authentication and app initialization
  */
 import '../css/main.css';
+import 'animate.css';
 import 'flowbite';
 import { initFlowbite } from 'flowbite';
 import { initLoginHandler, initLogoutHandler, initSmartLoader } from './modules/auth.js';

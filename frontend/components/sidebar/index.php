@@ -12,10 +12,10 @@
             $baseUrl = rtrim($baseUrl, '/');
 
             $current_uri = $_SERVER['REQUEST_URI'];
-            $is_dashboard = (strpos($current_uri, '/frontend/dashboard/') !== false);
-            $is_ldn = (strpos($current_uri, '/frontend/LDN/') !== false);
-            $is_export = (strpos($current_uri, '/frontend/export/') !== false);
-            $is_settings = (strpos($current_uri, '/frontend/user/settings/') !== false);
+            $is_dashboard = (stripos($current_uri, '/frontend/dashboard') !== false);
+            $is_export = (stripos($current_uri, '/frontend/export') !== false);
+            $is_settings = (stripos($current_uri, '/frontend/user/settings') !== false);
+            $is_ldn = (stripos($current_uri, '/frontend/LDN') !== false);
             ?>
             <li>
                 <a href="<?php echo $baseUrl; ?>/frontend/dashboard/" title="Analytics Dashboard"
@@ -42,7 +42,7 @@
                 </a>
             </li>
 
-            <!-- Integrated Monitoring & Data Items -->
+            <!-- Integrated Monitoring & Data Items
             <li>
                 <a href="#"
                     class="flex items-center px-4 py-3 text-white/80 rounded-lg hover:bg-white/10 hover:text-white group transition-all duration-200 hover:scale-105 cursor-pointer border-b-2 border-transparent">
@@ -52,7 +52,7 @@
                     </svg>
                     <span class="ms-3 whitespace-nowrap">LDN - SPES</span>
                 </a>
-            </li>
+            </li> -->
 
             <li class="pt-2">
                 <a href="<?php echo $baseUrl; ?>/frontend/export/"
@@ -67,7 +67,7 @@
                 </a>
             </li>
 
-            <li>
+            <!-- <li>
                 <a href="#"
                     class="flex items-center px-4 py-3 text-white/80 rounded-lg hover:bg-white/10 hover:text-white group transition-all duration-200 hover:scale-105 cursor-pointer border-b-2 border-transparent">
                     <svg class="w-5 h-5 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,10 +76,10 @@
                     </svg>
                     <span class="ms-3 whitespace-nowrap">Filter Settings</span>
                 </a>
-            </li>
+            </li> -->
 
             <?php
-            $is_aboutme = (strpos($current_uri, '/frontend/aboutme/') !== false || strpos($current_uri, '/frontend/aboutme/index.php') !== false || substr($current_uri, -17) === '/frontend/aboutme');
+            $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
             ?>
 
             <!-- <li>

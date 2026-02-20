@@ -75,7 +75,8 @@ require_once __DIR__ . '/../../config/vite.php';
                         </svg>
                     </button>
                     <a href="#" class="flex ms-2 md:me-24 cursor-pointer items-center">
-                        <img src="../../frontend/images/logo/doleiligan.png" class="h-8 me-3" alt="DOLE Logo" />
+                        <img src="../../frontend/images/logo/doleiligan.png"
+                            class="h-8 me-3 bg-white rounded-full p-0.5 object-contain" alt="DOLE Logo" />
                         <div class="flex flex-col">
                             <span class="text-sm font-black text-royal-blue uppercase tracking-tight leading-tight">DOLE
                                 LDNPFO</span>
