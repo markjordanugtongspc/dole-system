@@ -21,8 +21,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Load database connection
 require_once __DIR__ . '/../config/db.php';
 
+session_start();
+$current_user_id = $_SESSION['user_id'] ?? null;
+$current_username = null;
+
 try {
     $pdo = getDbConnection();
+
+    // DB connection is established, session is started.
+    // We already have $current_user_id.
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Database connection failed']);
@@ -39,6 +46,21 @@ if ($method === 'GET') {
     $showArchived = isset($_GET['archived']) && $_GET['archived'] === 'true';
 
     try {
+        if (isset($_GET['next_id'])) {
+            $stmt = $pdo->query("SELECT gip_id FROM beneficiaries ORDER BY gip_id DESC LIMIT 1");
+            $lastId = $stmt->fetchColumn();
+            $nextId = 'ROX-RD-ESIG-2025-0001';
+
+            if ($lastId && preg_match('/ROX-RD-ESIG-(\d{4})-(\d{4})/', $lastId, $matches)) {
+                $year = $matches[1];
+                $num = intval($matches[2]) + 1;
+                $nextId = sprintf('ROX-RD-ESIG-%s-%04d', $year, $num);
+            }
+
+            echo json_encode(['success' => true, 'nextId' => $nextId]);
+            exit();
+        }
+
         if ($id) {
             // Get single beneficiary
             $stmt = $pdo->prepare("
@@ -61,6 +83,10 @@ if ($method === 'GET') {
                     b.replacement_notes as replacement,
                     s.status_name as remarks,
                     al.absorption_datetime as absorbDate,
+                    al.where as absorb_where,
+                    al.position as absorb_position,
+                    al.agency as absorb_agency,
+                    u.username as absorb_by,
                     b.is_archived as isArchived,
                     b.created_at as createdAt,
                     b.updated_at as updatedAt
@@ -69,6 +95,7 @@ if ($method === 'GET') {
                 LEFT JOIN offices o ON b.office_id = o.office_id
                 LEFT JOIN status_types s ON b.status_id = s.status_id
                 LEFT JOIN absorption_logs al ON b.absorption_log_id = al.log_id
+                LEFT JOIN users u ON al.logged_by = u.user_id
                 WHERE b.gip_id = :id
             ");
             $stmt->execute(['id' => $id]);
@@ -111,12 +138,19 @@ if ($method === 'GET') {
                     b.designation,
                     b.replacement_notes as replacement,
                     s.status_name as remarks,
+                    al.absorption_datetime as absorbDate,
+                    al.where as absorb_where,
+                    al.position as absorb_position,
+                    al.agency as absorb_agency,
+                    u.username as absorb_by,
                     b.is_archived as isArchived,
                     b.created_at as createdAt
                 FROM beneficiaries b
                 LEFT JOIN genders g ON b.gender_id = g.gender_id
                 LEFT JOIN offices o ON b.office_id = o.office_id
                 LEFT JOIN status_types s ON b.status_id = s.status_id
+                LEFT JOIN absorption_logs al ON b.absorption_log_id = al.log_id
+                LEFT JOIN users u ON al.logged_by = u.user_id
                 WHERE $whereClause
                 ORDER BY b.is_archived ASC, b.created_at DESC
             ");
@@ -175,11 +209,18 @@ if ($method === 'GET') {
         // Handle absorption log if status is ABSORBED
         $absorptionLogId = null;
         if (!empty($data['remarks']) && $data['remarks'] === 'ABSORBED') {
+            $absorbDate = !empty($data['absorbDate']) ? date('Y-m-d H:i:s', strtotime($data['absorbDate'])) : date('Y-m-d H:i:s');
             $stmt = $pdo->prepare("
-                INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, notes)
-                VALUES (NULL, NOW(), 'Auto-generated on beneficiary creation')
+                INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, `where`, `position`, `agency`, logged_by)
+                VALUES (NULL, :absorbDate, :where, :position, :agency, :logged_by)
             ");
-            $stmt->execute();
+            $stmt->execute([
+                'absorbDate' => $absorbDate,
+                'where' => $data['absorb_where'] ?? null,
+                'position' => $data['absorb_position'] ?? null,
+                'agency' => $data['absorb_agency'] ?? null,
+                'logged_by' => $current_user_id
+            ]);
             $absorptionLogId = $pdo->lastInsertId();
         }
 
@@ -288,17 +329,44 @@ if ($method === 'GET') {
             $stmt->execute(['id' => $data['id']]);
             $existingLogId = $stmt->fetchColumn();
 
+            $absorbDate = !empty($data['absorbDate']) ? date('Y-m-d H:i:s', strtotime($data['absorbDate'])) : date('Y-m-d H:i:s');
+
             if (!$existingLogId) {
                 $stmt = $pdo->prepare("SELECT beneficiary_id FROM beneficiaries WHERE gip_id = :id");
                 $stmt->execute(['id' => $data['id']]);
                 $beneficiaryId = $stmt->fetchColumn();
 
                 $stmt = $pdo->prepare("
-                    INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, notes)
-                    VALUES (:bid, NOW(), 'Status updated to ABSORBED')
+                    INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, `where`, `position`, `agency`, logged_by)
+                    VALUES (:bid, :absorbDate, :where, :position, :agency, :logged_by)
                 ");
-                $stmt->execute(['bid' => $beneficiaryId]);
+                $stmt->execute([
+                    'bid' => $beneficiaryId,
+                    'absorbDate' => $absorbDate,
+                    'where' => $data['absorb_where'] ?? null,
+                    'position' => $data['absorb_position'] ?? null,
+                    'agency' => $data['absorb_agency'] ?? null,
+                    'logged_by' => $current_user_id
+                ]);
                 $absorptionLogId = $pdo->lastInsertId();
+            } else {
+                // Update existing absorption log
+                $stmt = $pdo->prepare("
+                    UPDATE absorption_logs SET 
+                        `where` = :where, 
+                        `position` = :position, 
+                        `agency` = :agency,
+                        logged_by = :logged_by
+                    WHERE log_id = :log_id
+                ");
+                $stmt->execute([
+                    'where' => $data['absorb_where'] ?? null,
+                    'position' => $data['absorb_position'] ?? null,
+                    'agency' => $data['absorb_agency'] ?? null,
+                    'logged_by' => $current_user_id,
+                    'log_id' => $existingLogId
+                ]);
+                $absorptionLogId = $existingLogId; // Ensure we don't lose the reference
             }
         }
 

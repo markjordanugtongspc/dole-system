@@ -492,22 +492,22 @@ export function showExportConfigModal(callback) {
 }
 
 const COMMON_COURSES = [
-    "BS Information Technology",
-    "BS Computer Science",
-    "BS Criminology",
-    "BS Business Administration",
-    "BS Accountancy",
-    "BS Civil Engineering",
-    "BS Electrical Engineering",
-    "BS Mechanical Engineering",
-    "BS Nursing",
-    "BS Hospitality Management",
-    "Bachelor of Secondary Education",
-    "Bachelor of Elementary Education",
-    "BS Psychology",
-    "BS Biology",
-    "Senior High School Graduate",
-    "High School Graduate"
+    { name: "BS Information Technology", icon: `<svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>` },
+    { name: "BS Computer Science", icon: `<svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>` },
+    { name: "BS Criminology", icon: `<svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>` },
+    { name: "BS Business Administration", icon: `<svg class="w-3.5 h-3.5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>` },
+    { name: "BS Accountancy", icon: `<svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>` },
+    { name: "BS Civil Engineering", icon: `<svg class="w-3.5 h-3.5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>` },
+    { name: "BS Electrical Engineering", icon: `<svg class="w-3.5 h-3.5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>` },
+    { name: "BS Mechanical Engineering", icon: `<svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>` },
+    { name: "BS Nursing", icon: `<svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>` },
+    { name: "BS Hospitality Management", icon: `<svg class="w-3.5 h-3.5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>` },
+    { name: "Bachelor of Secondary Education", icon: `<svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>` },
+    { name: "Bachelor of Elementary Education", icon: `<svg class="w-3.5 h-3.5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>` },
+    { name: "BS Psychology", icon: `<svg class="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>` },
+    { name: "BS Biology", icon: `<svg class="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>` },
+    { name: "Senior High School Graduate", icon: `<svg class="w-3.5 h-3.5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>` },
+    { name: "High School Graduate", icon: `<svg class="w-3.5 h-3.5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>` }
 ];
 
 const COMMON_NATURE_OF_WORK = [
@@ -765,21 +765,46 @@ function showBeneficiaryModal(data) {
 
                         <div id="modal-log-section" class="pt-2">
                              ${data.remarks === 'ABSORBED' ? `
-                                <label class="text-[9px] text-green-600 font-black uppercase tracking-widest block mb-2">Absorption Record</label>
-                                <div class="bg-green-50 border border-green-100 rounded-lg p-3 flex items-center justify-between shadow-sm">
-                                    <div>
-                                        <span class="text-[8px] text-green-600 block uppercase font-bold tracking-tight mb-0.5">Logged Date/Time</span>
-                                        <span class="text-[11px] font-black text-green-700 uppercase">${data.absorbDate || new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: '2-digit', year: 'numeric' })}</span>
-                                    </div>
-                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                <div class="bg-green-50/50 border border-green-100 rounded-xl p-3 shadow-sm pt-2">
+                                    <p class="text-[9px] text-green-600 font-black uppercase tracking-widest block mb-1.5 pb-1 border-b border-green-100"><span class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> Absorption Record</span></p>
+                                    
+                                    <div class="space-y-3 md:space-y-0 grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                                        <div class="bg-white border border-green-100 rounded-lg p-2.5 flex items-center justify-between col-span-1 md:col-span-2">
+                                            <div>
+                                                <span class="text-[8px] text-green-500 block uppercase font-bold tracking-tight mb-0.5">Logged Date/Time</span>
+                                                <span class="text-[10px] font-black text-green-700 uppercase">${data.absorbDate || new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: '2-digit', year: 'numeric' })}</span>
+                                            </div>
+                                            <div class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                            </div>
+                                        </div>
+
+                                        <div class="bg-white border border-green-100 rounded-lg p-2.5">
+                                            <span class="text-[8px] text-green-500 block uppercase font-bold tracking-tight mb-0.5">Where</span>
+                                            <span class="text-[10px] font-black text-green-700 uppercase break-words">${data.absorb_where || 'N/A'}</span>
+                                        </div>
+
+                                        <div class="bg-white border border-green-100 rounded-lg p-2.5">
+                                            <span class="text-[8px] text-green-500 block uppercase font-bold tracking-tight mb-0.5">Position</span>
+                                            <span class="text-[10px] font-black text-green-700 uppercase break-words">${data.absorb_position || 'N/A'}</span>
+                                        </div>
+
+                                        <div class="bg-white border border-green-100 rounded-lg p-2.5">
+                                            <span class="text-[8px] text-green-500 block uppercase font-bold tracking-tight mb-0.5">Agency</span>
+                                            <span class="text-[10px] font-black text-green-700 uppercase break-words">${data.absorb_agency || 'N/A'}</span>
+                                        </div>
+
+                                        <div class="bg-white border border-green-100 rounded-lg p-2.5">
+                                            <span class="text-[8px] text-green-500 block uppercase font-bold tracking-tight mb-0.5">Logged By</span>
+                                            <span class="text-[10px] font-black text-green-700 uppercase break-words">${data.absorb_by || 'N/A'}</span>
+                                        </div>
                                     </div>
                                 </div>
                              ` : ''}
                         </div>
                     </div>
 
-                    <div id="modal-page-1" class="hidden transition-opacity duration-300 h-full overflow-hidden">
+                    <div id="modal-page-1" class="hidden transition-opacity duration-300 h-full flex flex-col">
                          <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm h-full flex flex-col">
                             <div class="mb-4 border-b border-gray-50 pb-2 flex items-center justify-between">
                                 <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black flex items-center gap-2">
@@ -1636,7 +1661,8 @@ function showAddDataModal(data = null) {
                                     <div id="course-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
                                         ${COMMON_COURSES.map(course => `
                                             <div class="course-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
-                                                ${course}
+                                                ${course.icon}
+                                                <span class="option-text">${course.name}</span>
                                             </div>
                                         `).join('')}
                                     </div>
@@ -1673,26 +1699,32 @@ function showAddDataModal(data = null) {
                     <div class="space-y-3.5">
                          <div class="group">
                             <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">ID Number</label>
-                            <div class="flex items-center">
-                                <div class="${t.idBadgeBg} rounded-l-lg px-3 py-2 text-[10px] font-black text-white font-mono shadow-sm">ROX-RD-ESIG-2025-</div>
-                                <input type="text" name="id_number_suffix" id="id-number-input" 
-                                    value="${data?.id ? data.id.split('-').pop() : ''}" 
-                                    class="flex-1 ${t.bgInput} border ${t.borderInput} border-l-0 rounded-r-lg px-3 py-2 text-[11px] font-black ${t.idText} font-mono outline-none focus:ring-4 ${t.focusBlue} transition-all" 
-                                    placeholder="0001">
-                                <input type="hidden" name="id" id="full-id-input" value="${data?.id || ''}">
-                            </div>
+                            <input type="text" name="gip_id" id="full-id-input" 
+                                value="${data?.id || ''}" 
+                                class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[11px] font-black ${t.idText} font-mono outline-none focus:ring-4 ${t.focusBlue} transition-all uppercase" 
+                                placeholder="ROX-RD-ESIG-2025-0001">
+                            <input type="hidden" name="id" value="${data?.id || ''}">
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Assigned Office</label>
-                                <select name="office" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm cursor-pointer appearance-none">
-                                    <option value="DOLE" ${data?.office?.includes('DOLE') ? 'selected' : ''}>DOLE Field Office</option>
-                                    <option value="LGU" ${data?.office?.includes('LGU') ? 'selected' : ''}>LGU</option>
-                                    <option value="DEPED" ${data?.office?.includes('DEPED') ? 'selected' : ''}>DEPED</option>
-                                    <option value="DICT" ${data?.office?.includes('DICT') ? 'selected' : ''}>DICT</option>
-                                    <option value="PCA" ${data?.office?.includes('PCA') ? 'selected' : ''}>PCA</option>
-                                </select>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Assigned Office <span class="text-red-500">*</span></label>
+                                <div class="relative" id="office-container">
+                                    <input type="text" name="office" id="office-input" autocomplete="off"
+                                        value="${data?.office || ''}" required 
+                                        class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
+                                        placeholder="e.g. DOLE Field Office">
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                    </div>
+                                    <div id="office-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
+                                        ${['DOLE Field Office', 'LGU', 'DEPED', 'DICT', 'PCA'].map(office => `
+                                            <div class="office-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
+                                                ${office}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
                             </div>
                             <div class="group">
                                 <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Series Number</label>
@@ -1718,7 +1750,7 @@ function showAddDataModal(data = null) {
                                         <div class="work-option px-3 py-2.5 text-[10px] font-black ${t.textWorkOpt} ${t.workHover} rounded-lg cursor-pointer transition-all flex items-center justify-between group/opt active:scale-[0.98]">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-1.5 h-1.5 rounded-full ${t.workDot} transition-colors"></div>
-                                                ${work}
+                                                <span class="option-text">${work}</span>
                                             </div>
                                             <svg class="w-3 h-3 opacity-0 group-hover/opt:opacity-100 transition-opacity ${t.workArrow}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                                         </div>
@@ -1739,9 +1771,9 @@ function showAddDataModal(data = null) {
                                     ${(() => {
             const statusConfigs = {
                 'ONGOING': 'peer-checked:bg-green-400 peer-checked:text-white peer-checked:border-green-400',
-                'EXPIRED': 'peer-checked:bg-philippine-red peer-checked:text-white peer-checked:border-philippine-red',
-                'RESIGNED': 'peer-checked:bg-neutral-800 peer-checked:text-white peer-checked:border-neutral-800',
-                'ABSORBED': 'peer-checked:bg-royal-blue peer-checked:text-white peer-checked:border-royal-blue'
+                'EXPIRED': 'peer-checked:bg-red-400 peer-checked:text-white peer-checked:border-red-400',
+                'RESIGNED': 'peer-checked:bg-[#ce1126] peer-checked:text-white peer-checked:border-[#ce1126]',
+                'ABSORBED': 'peer-checked:bg-[#2e7d32] peer-checked:text-white peer-checked:border-[#2e7d32]'
             };
             return ['ONGOING', 'EXPIRED', 'RESIGNED', 'ABSORBED'].map(s => `
                                             <label class="cursor-pointer relative min-w-[80px]">
@@ -1839,29 +1871,29 @@ function showAddDataModal(data = null) {
             }
 
             // ID Auto-increment Logic
-            const idNumInput = popup.querySelector('#id-number-input');
             const fullIdInput = popup.querySelector('#full-id-input');
             const ID_PREFIX = "ROX-RD-ESIG-2025-";
 
-            if (idNumInput && fullIdInput) {
-                // If adding new record, auto-fill the next ID
+            if (fullIdInput) {
+                // If adding new record, fetch the correct next ID from the database
                 if (!isEdit) {
-                    const existingIds = Array.from(document.querySelectorAll('th[scope="row"]')).map(th => th.textContent.trim());
-                    let maxNum = 0;
-                    existingIds.forEach(id => {
-                        if (id.startsWith(ID_PREFIX)) {
-                            const num = parseInt(id.replace(ID_PREFIX, ''));
-                            if (!isNaN(num) && num > maxNum) maxNum = num;
-                        }
-                    });
-                    const nextNum = (maxNum + 1).toString().padStart(4, '0');
-                    idNumInput.value = nextNum;
-                    fullIdInput.value = ID_PREFIX + nextNum;
-                }
+                    // Set a placeholder while waiting
+                    fullIdInput.classList.add('animate-pulse');
+                    fullIdInput.placeholder = "Loading next ID...";
 
-                idNumInput.addEventListener('input', (e) => {
-                    fullIdInput.value = ID_PREFIX + e.target.value;
-                });
+                    fetch(`${getBasePath()}api/beneficiaries.php?next_id`)
+                        .then(res => res.json())
+                        .then(data => {
+                            fullIdInput.classList.remove('animate-pulse');
+                            if (data.success && data.nextId) {
+                                fullIdInput.value = data.nextId;
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Failed to fetch next ID:", err);
+                            fullIdInput.classList.remove('animate-pulse');
+                        });
+                }
             }
 
             // Remarks and End Date Logic
@@ -1883,12 +1915,12 @@ function showAddDataModal(data = null) {
             };
 
             if (startDateInput && endDateInput && remarksRadios.length > 0) {
-                // Auto-set End Date based on Start Date (e.g., 6 months later)
+                // Auto-set End Date based on Start Date (e.g., 1 month later)
                 startDateInput.addEventListener('change', (e) => {
                     if (e.target.value) {
                         if (!endDateInput.value) {
                             const start = new Date(e.target.value);
-                            start.setMonth(start.getMonth() + 6); // Default 6 months for GIP
+                            start.setMonth(start.getMonth() + 1); // Default 1 month for GIP Contract
                             endDateInput.value = start.toISOString().split('T')[0];
                         }
                         updateRemarks();
@@ -1950,14 +1982,35 @@ function showAddDataModal(data = null) {
                             hour12: true
                         });
                         extensionContainer.innerHTML = `
-                            <p class="text-[9px] uppercase font-black ${dk ? 'text-green-500' : 'text-green-600'} border-b ${dk ? 'border-slate-800' : 'border-green-100'} pb-0.5">Absorption Log</p>
-                            <div class="${dk ? 'bg-green-900/10 border-green-900/30' : 'bg-green-50/50 border-green-100'} rounded-lg p-3 border flex items-center justify-between mt-2">
-                                <div>
-                                    <label class="text-[9px] ${dk ? 'text-green-500' : 'text-green-600'} font-bold uppercase block mb-0.5">Absorption Date & Time</label>
-                                    <p class="text-[11px] font-black ${dk ? 'text-green-400' : 'text-green-700'} uppercase">${date}</p>
-                                    <input type="hidden" name="absorbDate" value="${date}">
+                            <div class="mt-4 pt-4 border-t ${dk ? 'border-slate-800' : 'border-gray-100'}">
+                                <p class="text-[9px] uppercase font-black ${dk ? 'text-green-500' : 'text-[#2e7d32]'} border-b ${dk ? 'border-slate-800' : 'border-green-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> Absorption Details</p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                    <div class="${dk ? 'bg-green-900/10 border-green-900/30' : 'bg-[#e8f5e9]/50 border-[#c8e6c9]'} rounded-lg p-2.5 flex items-center justify-between border">
+                                        <div>
+                                            <label class="text-[8px] ${dk ? 'text-green-500' : 'text-[#2e7d32]'} font-bold uppercase block mb-0.5">Absorption Date</label>
+                                            <p class="text-[10px] font-black ${dk ? 'text-green-400' : 'text-[#1b5e20]'} uppercase">${date}</p>
+                                            <input type="hidden" name="absorbDate" value="${date}">
+                                        </div>
+                                        <svg class="w-4 h-4 ${dk ? 'text-green-400' : 'text-[#2e7d32]'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </div>
+                                    
+                                    <div class="group">
+                                        <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400'} font-black uppercase block mb-1">Where?</label>
+                                        <input type="text" name="absorb_where" value="${data?.absorb_where || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="Where to absorb?">
+                                    </div>
                                 </div>
-                                <svg class="w-5 h-5 ${dk ? 'text-green-400' : 'text-green-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div class="group">
+                                        <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400'} font-black uppercase block mb-1">Position</label>
+                                        <input type="text" name="absorb_position" value="${data?.absorb_position || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="What kind of position?">
+                                    </div>
+                                    <div class="group">
+                                        <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400'} font-black uppercase block mb-1">Agency</label>
+                                        <input type="text" name="absorb_agency" value="${data?.absorb_agency || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="On what agency?">
+                                    </div>
+                                </div>
                             </div>
                         `;
                     } else {
@@ -2002,11 +2055,10 @@ function showAddDataModal(data = null) {
                 updateAbsorptionLog();
             }
 
-            // Custom Course Suggestion Logic
-            // Setup Course Suggestions
+            // Setup Suggestions
             setupSuggestions('education-input', 'course-suggestions', 'course-option');
-            // Setup Nature of Work Suggestions
             setupSuggestions('designation-input', 'work-suggestions', 'work-option');
+            setupSuggestions('office-input', 'office-suggestions', 'office-option');
 
             function setupSuggestions(inputId, containerId, optionClass) {
                 const input = popup.querySelector(`#${inputId}`);
@@ -2027,7 +2079,8 @@ function showAddDataModal(data = null) {
                     const options = container.querySelectorAll(`.${optionClass}`);
                     let hasVisible = false;
                     options.forEach(opt => {
-                        const txt = opt.innerText.toLowerCase();
+                        const txtElem = opt.querySelector('.option-text');
+                        const txt = (txtElem ? txtElem.innerText : opt.innerText).toLowerCase();
                         if (txt.includes(filter)) {
                             opt.style.display = 'block';
                             hasVisible = true;
@@ -2042,7 +2095,8 @@ function showAddDataModal(data = null) {
 
                 container.querySelectorAll(`.${optionClass}`).forEach(opt => {
                     opt.addEventListener('click', () => {
-                        input.value = opt.innerText.trim();
+                        const txtElem = opt.querySelector('.option-text');
+                        input.value = txtElem ? txtElem.innerText.trim() : opt.innerText.trim();
                         container.classList.add('hidden');
                         // Trigger change event for auto-save
                         input.dispatchEvent(new Event('change'));
@@ -2068,11 +2122,6 @@ function showAddDataModal(data = null) {
                                 field.value = value;
                             }
                         });
-                        // Specific check specifically for ID suffix input which might be separate from hidden ID
-                        if (parsedDraft.id_number_suffix) {
-                            const idInput = popup.querySelector('#id-number-input');
-                            if (idInput) idInput.value = parsedDraft.id_number_suffix;
-                        }
                     } catch (e) {
                         console.error('Error loading draft', e);
                     }
@@ -2089,9 +2138,6 @@ function showAddDataModal(data = null) {
                     const formData = new FormData(form);
                     const obj = {};
                     formData.forEach((value, key) => obj[key] = value);
-                    // Manually add the ID number suffix input since it might not be in FormData if name is reused/complex
-                    const idNumInput = popup.querySelector('#id-number-input');
-                    if (idNumInput) obj['id_number_suffix'] = idNumInput.value;
 
                     localStorage.setItem(draftKey, JSON.stringify(obj));
                 }
@@ -2152,26 +2198,22 @@ function showAddDataModal(data = null) {
                     });
 
                     // Prepare ID logic
-                    const idSuffix = popup.querySelector('#id-number-input')?.value;
-                    const fullIdFromSuffix = (idSuffix && idSuffix.trim()) ? `ROX-RD-ESIG-2025-${idSuffix.padStart(4, '0')}` : null;
+                    const gipIdInput = popup.querySelector('#full-id-input')?.value;
 
                     if (isEdit) {
                         // In edit mode, 'id' is for identifying the record to update
                         beneficiaryData.id = data?.id; // Original ID
-                        if (fullIdFromSuffix) {
-                            beneficiaryData.gip_id = fullIdFromSuffix; // Potential new GIP ID
+                        if (gipIdInput) {
+                            beneficiaryData.gip_id = gipIdInput; // Potential new GIP ID
                         }
                     } else {
                         // In add mode, 'id' determines PUT vs POST in ldngip.js
-                        // We set it to null to force POST even if fullIdFromSuffix exists
+                        // We set it to null to force POST
                         beneficiaryData.id = null;
-                        if (fullIdFromSuffix) {
-                            beneficiaryData.gip_id = fullIdFromSuffix; // Preferred ID
+                        if (gipIdInput) {
+                            beneficiaryData.gip_id = gipIdInput; // Preferred ID
                         }
                     }
-
-                    // Remove the suffix field as API doesn't expect it
-                    delete beneficiaryData.id_number_suffix;
 
                     // Call the simulation function from LDNgip.js
                     if (window.addBeneficiaryData) {

@@ -21,6 +21,7 @@ async function loadBeneficiaries() {
 
         if (data.success) {
             beneficiaries = data.beneficiaries || [];
+            syncExpiredStatusesLocally(beneficiaries);
             renderTable();
         } else {
             console.error('Failed to load beneficiaries:', data.error);
@@ -32,6 +33,28 @@ async function loadBeneficiaries() {
         beneficiaries = [];
         renderTable();
     }
+}
+
+function syncExpiredStatusesLocally(dataArray) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    dataArray.forEach(b => {
+        if (b.remarks === 'ONGOING' && b.endDate) {
+            const end = new Date(b.endDate);
+            end.setHours(0, 0, 0, 0);
+            if (end < today) {
+                b.remarks = 'EXPIRED';
+                // Trigger an async background sync to update exactly this record
+                const updatePayload = { ...b };
+                fetch(`${getBasePath()}api/beneficiaries.php`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatePayload)
+                }).catch(e => console.error("Auto sync failed", e));
+            }
+        }
+    });
 }
 
 export function initLDNPage() {
@@ -55,6 +78,7 @@ function initAutoRefresh() {
 
         if (result.success && result.data.beneficiaries) {
             const newData = result.data.beneficiaries;
+            syncExpiredStatusesLocally(newData);
             const newChecksum = generateChecksum(newData);
 
             // Only update if data actually changed
@@ -159,9 +183,9 @@ function getStatusClass(status) {
     if (!status) return 'bg-gray-100 text-gray-600 border-gray-200';
     const s = status.toUpperCase();
     if (s === 'ONGOING') return 'bg-green-100 text-green-700 border-green-200';
-    if (s === 'EXPIRED') return 'bg-red-100 text-red-700 border-red-200';
-    if (s === 'RESIGNED') return 'bg-neutral-800 text-white border-neutral-900';
-    if (s === 'ABSORBED') return 'bg-green-600 text-white border-green-700';
+    if (s === 'EXPIRED') return 'bg-red-400 text-white border-red-400';
+    if (s === 'RESIGNED') return 'bg-[#ce1126] text-white border-[#ce1126]';
+    if (s === 'ABSORBED') return 'bg-[#2e7d32] text-white border-[#2e7d32]';
     return 'bg-gray-100 text-gray-600 border-gray-200';
 }
 
