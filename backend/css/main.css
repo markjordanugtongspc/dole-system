@@ -241,7 +241,8 @@ body {
 @media print {
     @page {
         size: landscape;
-        margin: 0;
+        margin: 8mm 10mm 55mm 10mm;
+        /* Increased bottom margin for safer buffer */
     }
 
     body {
@@ -252,6 +253,29 @@ body {
 
     .no-print {
         display: none !important;
+    }
+
+    /* Report Generator Specific Styles */
+    #print-area {
+        display: block !important;
+        zoom: 100%;
+        padding-bottom: 25px !important;
+        /* Forces content to stop before margin zone */
+    }
+
+    #print-area header {
+        margin-top: -5px !important;
+        /* Reclaims wasted vertical space */
+    }
+
+    #print-area footer {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: white !important;
+        border-top: 1px solid #e2e8f0;
+        z-index: 50;
     }
 }
 

@@ -13,7 +13,9 @@ let currentFilters = {
     search: '',
     sort: 'name',
     section: 'ALL', // ALL, ACTIVE, ARCHIVED
-    columns: ['id', 'name', 'office', 'position', 'status']
+    columns: ['id', 'name', 'office', 'position', 'status'],
+    preparedBy: localStorage.getItem('ldn_export_prepared') || '',
+    approvedBy: localStorage.getItem('ldn_export_approved') || ''
 };
 
 export async function initExportPage() {
@@ -62,6 +64,8 @@ window.handleFilterUpdate = function (filters) {
     if (filters.columns) {
         activeColumns = filters.columns;
     }
+    if (filters.preparedBy !== undefined) currentFilters.preparedBy = filters.preparedBy;
+    if (filters.approvedBy !== undefined) currentFilters.approvedBy = filters.approvedBy;
 
     saveConfig();
 
@@ -202,8 +206,24 @@ window.exportToExcel = function () {
                     return `<td class="cell">${val}</td>`;
                 }).join('')}</tr>`;
             });
-            return html;
         })()}
+                <tr><td colspan="${columns.length}"></td></tr>
+                <tr><td colspan="${columns.length}"></td></tr>
+                <tr>
+                    <td colspan="2" style="font-weight: bold; font-size: 11px;">Prepared by:</td>
+                    <td colspan="${Math.max(1, columns.length - 4)}"></td>
+                    <td colspan="2" style="font-weight: bold; font-size: 11px;">Approved by:</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="font-weight: bold; font-size: 12px; text-transform: uppercase;">${currentFilters.preparedBy || ''}</td>
+                    <td colspan="${Math.max(1, columns.length - 4)}"></td>
+                    <td colspan="2" style="font-weight: bold; font-size: 12px; text-transform: uppercase;">${currentFilters.approvedBy || ''}</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="font-size: 10px;">Printed Name &amp; Signature</td>
+                    <td colspan="${Math.max(1, columns.length - 4)}"></td>
+                    <td colspan="2" style="font-size: 10px;">Printed Name &amp; Signature</td>
+                </tr>
             </table>
         </body>
         </html>
@@ -359,6 +379,12 @@ function renderPrintTable(data) {
     }).join('')}
         </tr>
     `;
+
+    const prepEl = document.getElementById('print-prepared-by');
+    const appEl = document.getElementById('print-approved-by');
+
+    if (prepEl) prepEl.textContent = currentFilters.preparedBy;
+    if (appEl) appEl.textContent = currentFilters.approvedBy;
 
     // Grouping logic for print
     const sortedData = [...data].sort((a, b) => {

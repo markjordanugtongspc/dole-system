@@ -305,7 +305,9 @@ export function showExportConfigModal(callback) {
         search: '',
         sort: 'name',
         section: 'ALL',
-        columns: ['id', 'name', 'office', 'position', 'startdate', 'enddate', 'status']
+        columns: ['id', 'name', 'office', 'position', 'startdate', 'enddate', 'status'],
+        preparedBy: localStorage.getItem('ldn_export_prepared') || '',
+        approvedBy: localStorage.getItem('ldn_export_approved') || ''
     };
 
     const modalHtml = `
@@ -402,6 +404,17 @@ export function showExportConfigModal(callback) {
                             </div>
                         </div>
                     </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100/50">
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Prepared By (Signature)</label>
+                            <input type="text" id="export-prepared" value="${currentFilters.preparedBy}" placeholder="Mary Joy Q. Nuñez" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all uppercase">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Approved By (Signature)</label>
+                            <input type="text" id="export-approved" value="${currentFilters.approvedBy}" placeholder="Noel B. Orias" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all uppercase">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100 mt-4">
@@ -460,6 +473,11 @@ export function showExportConfigModal(callback) {
 
                 const statusRadio = form.querySelector('input[name="export-status"]:checked');
                 const sectionRadio = form.querySelector('input[name="export-section"]:checked');
+                const prepared = form.querySelector('#export-prepared').value.trim();
+                const approved = form.querySelector('#export-approved').value.trim();
+
+                localStorage.setItem('ldn_export_prepared', prepared);
+                localStorage.setItem('ldn_export_approved', approved);
 
                 const filters = {
                     office: form.querySelector('#export-office').value,
@@ -467,25 +485,29 @@ export function showExportConfigModal(callback) {
                     search: form.querySelector('#export-search').value.trim().toLowerCase(),
                     sort: form.querySelector('#export-sort').value,
                     section: sectionRadio ? sectionRadio.value : 'ALL',
+                    preparedBy: prepared,
+                    approvedBy: approved,
                     columns: selectedColumns
                 };
 
                 callback(filters);
                 Swal.close();
 
-                // Show tiny success feedback
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Generator pattern updated',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    customClass: {
-                        popup: 'rounded-xl shadow-lg border border-emerald-100'
-                    }
-                });
+                // Show tiny success feedback safely after modal destruction
+                setTimeout(() => {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Generator pattern updated',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'rounded-xl shadow-lg border border-emerald-100'
+                        }
+                    });
+                }, 150);
             });
         }
     });
