@@ -30,7 +30,8 @@
                     of Labor and Employment</h1>
                 <h2 class="text-sm font-bold text-gray-600 uppercase tracking-[0.2em]">Lanao del Norte Provincial Field
                     Office</h2>
-                <p class="text-xs text-gray-500 font-medium mt-1">0048 Purok 3, Tibanga, Iligan City, Lanao del Norte
+                <p class="text-xs text-gray-500 font-medium mt-1">OREDC Building, Badelles St. Extension, Barangay
+                    Ubaldo Laya, Iligan City
                 </p>
             </div>
         </div>
