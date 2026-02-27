@@ -20,24 +20,25 @@
             alt="DOLE Watermark">
     </div>
 
-    <!-- Original Header Restored -->
-    <header class="relative z-10 flex items-center justify-between border-b-2 border-royal-blue pb-4 mb-4 pt-4 px-2">
-        <div class="flex items-center gap-5">
+    <!-- Compact Header -->
+    <header class="relative z-10 flex items-center justify-between border-b-2 border-royal-blue pb-3 mb-4 pt-2 px-4">
+        <div class="flex items-center gap-4">
             <img src="../../frontend/images/logo/doleiligan.png"
-                class="h-24 w-auto drop-shadow-sm bg-white rounded-full p-1 object-contain" alt="DOLE Logo">
+                class="h-20 w-auto drop-shadow-sm bg-white rounded-full p-1 object-contain" alt="DOLE Logo">
             <div>
-                <h1 class="text-3xl font-black text-royal-blue uppercase tracking-tighter leading-none mb-1">Department
+                <h1 class="text-2xl font-black text-royal-blue uppercase tracking-tighter leading-none mb-1">Department
                     of Labor and Employment</h1>
-                <h2 class="text-sm font-bold text-gray-600 uppercase tracking-[0.2em]">Lanao del Norte Provincial Field
+                <h2 class="text-[11px] font-bold text-gray-600 uppercase tracking-[0.2em]">Lanao del Norte Provincial
+                    Field
                     Office</h2>
-                <p class="text-xs text-gray-500 font-medium mt-1">OREDC Building, Badelles St. Extension, Barangay
+                <p class="text-[10px] text-gray-500 font-medium mt-0.5">OREDC Building, Badelles St. Extension, Barangay
                     Ubaldo Laya, Iligan City
                 </p>
             </div>
         </div>
         <div class="text-right">
-            <h3 class="text-xl font-black text-philippine-red uppercase tracking-tight">GIP Monitoring Report</h3>
-            <div class="mt-2 text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full inline-block">
+            <h3 class="text-lg font-black text-philippine-red uppercase tracking-tight">GIP Monitoring Report</h3>
+            <div class="mt-1 text-[10px] font-semibold text-gray-500 bg-gray-100 px-3 py-0.5 rounded-full inline-block">
                 Generated: <span class="text-gray-800">
                     <?php echo date('F d, Y h:i A'); ?>
                 </span>
@@ -47,26 +48,27 @@
 
 
     <!-- Main Content Injection -->
-    <main class="relative z-10 w-full text-sm leading-normal">
+    <main class="relative z-10 w-full text-sm leading-normal px-4">
         <?php echo $content ?? '<!-- No Content Loaded -->'; ?>
     </main>
 
     <!-- Footer Signatures -->
-    <div class="relative z-10 mt-6 flex items-start justify-between w-full px-12" style="page-break-inside: avoid;">
-        <div class="flex flex-col w-[300px]">
-            <p class="mb-3 text-sm font-semibold text-black italic">Prepared by:</p>
+    <div class="relative z-10 mt-8 mb-12 flex items-start justify-between w-full px-12 footer-signatures"
+        style="page-break-inside: avoid;">
+        <div class="flex flex-col w-[280px]">
+            <p class="mb-4 text-xs font-semibold text-black italic">Prepared by:</p>
             <div class="text-center border-b border-black pb-1 px-4 w-full">
-                <strong id="print-prepared-by" class="uppercase text-sm block min-h-[1.5rem]"></strong>
+                <strong id="print-prepared-by" class="uppercase text-xs block min-h-[1.2rem]"></strong>
             </div>
-            <p class="text-[10px] text-center mt-1 text-black font-medium opacity-80">Printed Name & Signature</p>
+            <p class="text-[9px] text-center mt-1 text-black font-medium opacity-80">Printed Name & Signature</p>
         </div>
 
-        <div class="flex flex-col w-[300px]">
-            <p class="mb-3 text-sm font-semibold text-black italic">Approved by:</p>
+        <div class="flex flex-col w-[280px]">
+            <p class="mb-4 text-xs font-semibold text-black italic">Approved by:</p>
             <div class="text-center border-b border-black pb-1 px-4 w-full">
-                <strong id="print-approved-by" class="uppercase text-sm block min-h-[1.5rem]"></strong>
+                <strong id="print-approved-by" class="uppercase text-xs block min-h-[1.2rem]"></strong>
             </div>
-            <p class="text-[10px] text-center mt-1 text-black font-medium opacity-80">Printed Name & Signature</p>
+            <p class="text-[9px] text-center mt-1 text-black font-medium opacity-80">Printed Name & Signature</p>
         </div>
     </div>
 

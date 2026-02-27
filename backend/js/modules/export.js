@@ -271,9 +271,9 @@ function generateTableRow(row, columns, isPrint = false) {
         if (c === 'status') val = row.remarks || 'N/A';
 
         if (isPrint) {
-            let classes = "px-2 py-2 border-r border-gray-200 text-center";
+            let classes = "px-3 py-2 border border-gray-200 text-center";
             if (c === 'id') classes += " font-mono font-bold";
-            if (c === 'name') classes += " font-bold text-black uppercase leading-tight text-left";
+            if (c === 'name') classes += " font-bold text-black uppercase leading-tight text-left px-4";
             if (c === 'status') {
                 const colors = { 'ABSORBED': 'text-golden-yellow', 'RESIGNED': 'text-slate-500', 'EXPIRED': 'text-philippine-red', 'ONGOING': 'text-green-600' };
                 classes += ` text-center font-bold uppercase ${colors[val] || 'text-gray-500'}`;
