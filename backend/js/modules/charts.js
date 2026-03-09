@@ -132,7 +132,14 @@ export async function initCharts() {
         dataLabels: { enabled: false },
         legend: { show: false },
         stroke: { colors: [theme.cardBg], width: 4 },
-        theme: { mode: isDark() ? 'dark' : 'light' }
+        theme: { mode: isDark() ? 'dark' : 'light' },
+        responsive: [{
+            breakpoint: 640,
+            options: {
+                chart: { height: 260 },
+                plotOptions: { pie: { donut: { size: '70%', labels: { value: { fontSize: '18px' } } } } }
+            }
+        }]
     };
 
     renderChart("gender-chart", genderOptions);
@@ -155,7 +162,14 @@ export async function initCharts() {
         },
         colors: [COLORS.royalBlue(), COLORS.goldenYellow, COLORS.philippineRed, COLORS.mutedSlate()],
         labels: ['Col. Grad', 'Col. Lvl', 'HS Grad', 'Snr High'],
-        theme: { mode: isDark() ? 'dark' : 'light' }
+        theme: { mode: isDark() ? 'dark' : 'light' },
+        responsive: [{
+            breakpoint: 640,
+            options: {
+                chart: { height: 260 },
+                plotOptions: { radialBar: { hollow: { size: '20%' }, dataLabels: { value: { fontSize: '14px' } } } }
+            }
+        }]
     };
 
     renderChart("education-chart", educationOptions);
@@ -174,8 +188,20 @@ export async function initCharts() {
             axisTicks: { show: false }
         },
         yaxis: { labels: { show: true, style: { fontWeight: 700, colors: theme.text, fontSize: '10px' } } },
-        grid: { borderColor: theme.grid, strokeDashArray: 4, padding: { left: 0, right: 0 } },
-        theme: { mode: isDark() ? 'dark' : 'light' }
+        grid: { 
+            borderColor: theme.grid, 
+            strokeDashArray: 4, 
+            padding: { left: -15, right: 0 } 
+        },
+        theme: { mode: isDark() ? 'dark' : 'light' },
+        responsive: [{
+            breakpoint: 640,
+            options: {
+                chart: { height: 160 },
+                xaxis: { labels: { style: { fontSize: '8px' } } },
+                yaxis: { labels: { style: { fontSize: '9px' } } }
+            }
+        }]
     };
 
     renderChart("job-roles-chart", jobRolesOptions);
@@ -183,7 +209,13 @@ export async function initCharts() {
     // --- 5. AGE DEMOGRAPHICS ---
     const ageOptions = {
         series: [{ name: "Beneficiaries", data: Object.values(stats.ages), color: COLORS.royalBlue() }],
-        chart: { type: 'area', height: 200, toolbar: { show: false }, fontFamily: "Montserrat, sans-serif", background: theme.cardBg },
+        chart: { 
+            type: 'area', 
+            height: 220, 
+            toolbar: { show: false }, 
+            fontFamily: "Montserrat, sans-serif", 
+            background: theme.cardBg 
+        },
         stroke: { curve: 'smooth', width: 3 },
         fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.1 } },
         xaxis: {
@@ -192,8 +224,18 @@ export async function initCharts() {
             axisBorder: { show: false }
         },
         yaxis: { labels: { style: { fontWeight: 600, colors: theme.muted, fontSize: '10px' } } },
-        grid: { borderColor: theme.grid, strokeDashArray: 6 },
-        theme: { mode: isDark() ? 'dark' : 'light' }
+        grid: { 
+            borderColor: theme.grid, 
+            strokeDashArray: 6,
+            padding: { left: -15, right: 0 }
+        },
+        theme: { mode: isDark() ? 'dark' : 'light' },
+        responsive: [{
+            breakpoint: 640,
+            options: {
+                chart: { height: 160 }
+            }
+        }]
     };
 
     renderChart("age-chart", ageOptions);
