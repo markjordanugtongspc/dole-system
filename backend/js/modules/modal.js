@@ -668,7 +668,7 @@ function showBeneficiaryModal(data) {
     };
 
     const modalContent = () => `
-        <div class="text-left font-montserrat user-select-none relative pt-2">
+        <div class="text-left font-montserrat user-select-none relative pt-0 lg:pt-2 w-full">
             <!-- Header with ID and Status -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b border-gray-100">
                 <div>
@@ -727,13 +727,15 @@ function showBeneficiaryModal(data) {
                         </div>
                     </div>
 
-                    <div class="bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="bg-white p-3.5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm w-full">
                         <label class="text-[9px] text-gray-400 font-black uppercase tracking-widest block mb-1">Educational Attainment</label>
                         <div class="flex items-center gap-3">
-                             <div class="w-8 h-8 rounded-lg bg-golden-yellow/10 flex items-center justify-center text-golden-yellow border border-golden-yellow/20 shadow-sm">
+                             <div class="w-8 h-8 rounded-lg bg-golden-yellow/10 flex items-center justify-center text-golden-yellow border border-golden-yellow/20 shadow-sm shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                              </div>
-                             <p class="text-sm font-black text-heading">${data.education || 'N/A'}</p>
+                             <div class="flex-1 min-w-0">
+                                <p class="text-[11px] lg:text-sm font-black text-heading whitespace-nowrap tracking-tight truncate">${data.education || 'N/A'}</p>
+                             </div>
                         </div>
                     </div>
 
@@ -741,43 +743,43 @@ function showBeneficiaryModal(data) {
                 </div>
 
                 <!-- RIGHT GRID: Work Details & Docs (Paginated) -->
-                <div class="space-y-3 pl-0 lg:pl-6 relative h-[410px]">
-                    <!-- Pagination Toggles -->
+                <div class="flex flex-col gap-3 pl-0 lg:pl-10 relative min-h-[300px] max-h-[60vh] lg:h-[410px] w-full">
+                    <!-- Pagination Toggles (Desktop SVG Arrows only) -->
                     <button id="modal-prev-btn" 
-                        class="absolute top-37 -left-6 w-10 h-10 rounded-full transition-all duration-300 cursor-pointer flex items-center justify-center group text-royal-blue hover:scale-110 active:scale-95 hidden" 
+                        class="hidden lg:flex desktop-hidden absolute top-[180px] -left-0 w-10 h-10 transition-all duration-300 cursor-pointer items-center justify-center group text-royal-blue hover:scale-110 active:scale-95 z-50 bg-transparent border-none shadow-none" 
                         title="Back">
-                        <svg class="w-6 h-6 transform translate-y-[1px] group-hover:-translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                        <svg class="w-7 h-7 transform translate-y-[1px] group-hover:-translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
                         </svg>
                     </button>
 
                     <button id="modal-next-btn" 
-                        class="absolute top-36 -right-10 w-10 h-10 rounded-full transition-all duration-300 cursor-pointer flex items-center justify-center group text-royal-blue hover:scale-110 active:scale-95" 
-                        title="Next: Required Docs">
-                        <svg class="w-6 h-6 transform translate-y-[1px] group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+                        class="hidden lg:flex absolute top-[180px] -right-10 w-10 h-10 transition-all duration-300 cursor-pointer items-center justify-center group text-royal-blue hover:scale-110 active:scale-95 z-50 bg-transparent border-none shadow-none" 
+                        title="Next">
+                        <svg class="w-7 h-7 transform translate-y-[1px] group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
                         </svg>
                     </button>
                     
-                    <div id="modal-page-0" class="transition-opacity duration-300 space-y-3 h-full overflow-y-auto custom-scrollbar pr-1">
-                        <div class="bg-gray-50/50 rounded-xl p-3.5 border border-gray-100 shadow-sm">
-                             <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black mb-3">Work Registry</p>
+                    <div id="modal-page-0" class="transition-opacity duration-300 flex-1 flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-1">
+                        <div class="bg-gray-50/50 rounded-xl p-3.5 border border-gray-100 dark:border-slate-800 shadow-sm w-full">
+                             <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black mb-2.5 whitespace-nowrap">Work Registry</p>
                              <div class="flex items-center gap-3">
-                                <div class="p-2 bg-blue-50 rounded-lg border border-blue-100">
+                                <div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
                                     <svg class="w-5 h-5 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 </div>
-                                <div>
-                                    <label class="text-[9px] text-gray-400 font-black block mb-0.5 uppercase tracking-widest">Series Number</label>
-                                    <span class="text-base font-black text-royal-blue font-mono">
+                                <div class="flex-1">
+                                    <label class="text-[9px] text-gray-400 font-black block mb-0.5 uppercase tracking-widest">Series No.</label>
+                                    <span class="text-base font-black text-royal-blue font-mono whitespace-nowrap">
                                         ${data.seriesNo || '2025-00-000'}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                         <div class="bg-white border border-gray-100 p-3.5 rounded-xl shadow-sm">
+                         <div class="bg-white border border-gray-100 dark:border-slate-800 p-3.5 rounded-xl shadow-sm">
                             <label class="text-[9px] text-gray-400 font-black block mb-1 uppercase tracking-widest">Designation / Role</label>
-                            <p class="text-sm font-black text-heading">${data.designation}</p>
+                            <p class="text-sm font-black text-heading break-words whitespace-normal leading-snug">${data.designation}</p>
                         </div>
                         
                          <div class="bg-gray-50/30 p-3.5 rounded-xl border border-dashed border-gray-200">
@@ -826,9 +828,9 @@ function showBeneficiaryModal(data) {
                         </div>
                     </div>
 
-                    <div id="modal-page-1" class="hidden transition-opacity duration-300 h-full flex flex-col">
-                         <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm h-full flex flex-col">
-                            <div class="mb-4 border-b border-gray-50 pb-2 flex items-center justify-between">
+                    <div id="modal-page-1" class="hidden transition-opacity duration-300 flex-1 flex flex-col min-h-0">
+                         <div class="bg-white dark:bg-slate-900 rounded-xl p-3.5 border border-gray-100 dark:border-slate-800 shadow-sm flex-1 flex flex-col min-h-0 overflow-hidden">
+                            <div class="mb-2 border-b border-gray-50 dark:border-slate-800 pb-2 flex items-center justify-between shrink-0">
                                 <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black flex items-center gap-2">
                                     <svg class="w-4 h-4 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     Required Documents
@@ -837,7 +839,7 @@ function showBeneficiaryModal(data) {
                                     <svg class="w-4 h-4 transition-transform group-hover/toggle:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 </button>
                             </div>
-                            <ul id="docs-list-static" class="space-y-4 flex-1 pt-2 pl-2">
+                            <ul id="docs-list-static" class="space-y-4 flex-1 pt-2 pl-2 overflow-y-auto custom-scrollbar pr-2 pb-2">
                                 ${displayDocs.map((doc, i) => {
         const docId = doc.id || `static-${i}`;
         const targetId = `docs-${docId}`;
@@ -859,7 +861,7 @@ function showBeneficiaryModal(data) {
                                             <span class="doc-name-display text-[11px] font-black text-gray-700 truncate block cursor-text hover:text-royal-blue transition-colors" title="${doc.name}">${doc.name}</span>
                                             <input type="text" value="${doc.name}" class="doc-name-edit hidden w-full bg-white border border-royal-blue/30 rounded px-1.5 py-0.5 text-[11px] font-black text-royal-blue outline-none ring-2 ring-royal-blue/10">
                                         </div>
-                                        <div class="doc-view-mode-container shrink-0 flex items-center">
+                                        <div class="doc-view-mode-container ml-auto shrink-0 flex items-center self-end sm:self-center">
                                             <span id="doc-text-badge-${targetId}" class="text-[8px] ${config.textClass} font-black uppercase px-2 py-0.5 rounded border tracking-tighter shadow-sm">${doc.status}</span>
                                         </div>
                                         <div class="doc-edit-mode-container hidden flex items-center gap-1.5 shrink-0">
@@ -880,7 +882,7 @@ function showBeneficiaryModal(data) {
                         </div>
                     </div>
 
-                    <div id="modal-page-2" class="hidden h-full flex flex-col gap-3">
+                    <div id="modal-page-2" class="hidden flex-1 flex flex-col min-h-0 gap-3">
                         <!-- Accomplishment Report Section -->
                         <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm flex-1 flex flex-col min-h-0 overflow-hidden">
                             <div class="mb-3 border-b border-gray-50 pb-2 flex items-center justify-between">
@@ -945,7 +947,18 @@ function showBeneficiaryModal(data) {
                             </div>
                         </div>
                     </div>
+                </div>
 
+                <!-- RESPONSIVE MOBILE NAVIGATION (Below content) -->
+                <div class="lg:hidden shrink-0 grid grid-cols-2 gap-3 pt-4 mt-auto border-t border-gray-100 dark:border-slate-800 -mx-4 sm:-mx-6 -mb-4 sm:-mb-6 p-4 sm:p-6 bg-gray-50/50 dark:bg-slate-900/50 rounded-b-[1.5rem]">
+                    <button id="modal-prev-btn-mob" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-red-500 text-white text-[10px] font-black transition-all active:scale-95 hidden uppercase tracking-widest whitespace-nowrap shadow-lg shadow-red-200 dark:shadow-none border border-red-600">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+                        PREVIOUS
+                    </button>
+                    <button id="modal-next-btn-mob" class="col-start-2 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-royal-blue text-white text-[10px] font-black transition-all active:scale-95 shadow-lg shadow-royal-blue/20 uppercase tracking-widest whitespace-nowrap border border-royal-blue/10">
+                        NEXT
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -953,10 +966,10 @@ function showBeneficiaryModal(data) {
 
     Swal.fire({
         html: modalContent(),
-        width: '850px',
+        width: window.innerWidth < 1024 ? '96vw' : '850px',
         showConfirmButton: false,
         showCloseButton: true,
-        padding: '2rem',
+        padding: window.innerWidth < 1024 ? '0.75rem' : '2rem',
         customClass: {
             container: 'font-montserrat',
             popup: 'rounded-[1.5rem] ldn-modal-popup shadow-2xl',
@@ -1012,18 +1025,28 @@ function showBeneficiaryModal(data) {
                         stroke-width: 3 !important;
                     }
                     .custom-scrollbar::-webkit-scrollbar {
-                        width: 4px;
+                        width: 5px;
                     }
                     .custom-scrollbar::-webkit-scrollbar-track {
-                        background: #f8fafc;
+                        background: rgba(248, 250, 252, 0.4);
                         border-radius: 10px;
                     }
                     .custom-scrollbar::-webkit-scrollbar-thumb {
-                        background: #cbd5e1;
+                        background: rgba(203, 213, 225, 0.5);
                         border-radius: 10px;
                     }
                     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                        background: #94a3b8;
+                        background: rgba(148, 163, 184, 0.7);
+                    }
+                    .desktop-hidden { display: none !important; }
+                    html.dark .custom-scrollbar::-webkit-scrollbar-track {
+                        background: rgba(30, 41, 59, 0.2) !important;
+                    }
+                    html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+                        background: rgba(148, 163, 184, 0.5) !important;
+                    }
+                    html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                        background: rgba(148, 163, 184, 0.8) !important;
                     }
                     @keyframes toast-in {
                         from { transform: translateX(100%); opacity: 0; }
@@ -1056,15 +1079,32 @@ function showBeneficiaryModal(data) {
 
             if (nextBtn) {
                 const prevBtn = popup.querySelector('#modal-prev-btn');
+                const nextBtnMob = popup.querySelector('#modal-next-btn-mob');
+                const prevBtnMob = popup.querySelector('#modal-prev-btn-mob');
+
                 const pages = [page0, page1, page2];
                 const pageTitles = ["Basic Information", "Required Docs", "Submission Logs"];
 
                 const updateNavigation = () => {
                     pages.forEach((p, i) => p.classList.toggle('hidden', i !== rightGridPage));
 
-                    // Update Visibility
-                    if (prevBtn) prevBtn.classList.toggle('hidden', rightGridPage === 0);
-                    if (nextBtn) nextBtn.classList.toggle('hidden', rightGridPage === 2);
+                    // Update Visibility (Desktop)
+                    if (prevBtn) prevBtn.classList.toggle('desktop-hidden', rightGridPage === 0);
+                    if (nextBtn) nextBtn.classList.toggle('desktop-hidden', rightGridPage === 2);
+
+                    // Update Visibility (Mobile)
+                    if (prevBtnMob) prevBtnMob.classList.toggle('hidden', rightGridPage === 0);
+                    if (nextBtnMob) nextBtnMob.classList.toggle('hidden', rightGridPage === 2);
+
+                    // Special: If we're on page 0, the next button should span 2 columns on mobile if we want, 
+                    // or just stay at the right as requested.
+                    if (nextBtnMob) {
+                        if (rightGridPage === 0) {
+                            nextBtnMob.classList.add('col-span-1', 'col-start-2');
+                        } else {
+                            nextBtnMob.classList.remove('col-span-1', 'col-start-2');
+                        }
+                    }
 
                     // Update Tooltips
                     if (nextBtn && rightGridPage < 2) {
@@ -1073,33 +1113,27 @@ function showBeneficiaryModal(data) {
                     if (prevBtn && rightGridPage > 0) {
                         prevBtn.setAttribute("title", "Back: " + pageTitles[rightGridPage - 1]);
                     }
-
-                    // Special Positioning for Page 2 (Submission Logs)
-                    const btns = [prevBtn, nextBtn].filter(Boolean);
-                    btns.forEach(btn => {
-                        if (rightGridPage === 2) {
-                            btn.style.top = '185px';
-                        } else {
-                            btn.style.top = ''; // Reset to top-36 from CSS
-                        }
-                    });
                 };
 
-                nextBtn.addEventListener('click', () => {
+                const handleNext = () => {
                     if (rightGridPage < 2) {
                         rightGridPage++;
                         updateNavigation();
                     }
-                });
+                };
 
-                if (prevBtn) {
-                    prevBtn.addEventListener('click', () => {
-                        if (rightGridPage > 0) {
-                            rightGridPage--;
-                            updateNavigation();
-                        }
-                    });
-                }
+                const handlePrev = () => {
+                    if (rightGridPage > 0) {
+                        rightGridPage--;
+                        updateNavigation();
+                    }
+                };
+
+                nextBtn.addEventListener('click', handleNext);
+                if (nextBtnMob) nextBtnMob.addEventListener('click', handleNext);
+
+                if (prevBtn) prevBtn.addEventListener('click', handlePrev);
+                if (prevBtnMob) prevBtnMob.addEventListener('click', handlePrev);
             }
 
             // Documentation Edit Mode Toggle (Primary + Tables)
@@ -1612,7 +1646,7 @@ function showAddDataModal(data = null) {
     };
 
     const formContent = `
-        <div class="text-left font-montserrat user-select-none relative">
+        <div class="text-left font-montserrat user-select-none relative p-0 w-full">
             <!-- Modal Header -->
             <div class="mb-4 pb-3 border-b ${t.borderBase} flex items-center justify-between">
                 <div>
@@ -1628,7 +1662,7 @@ function showAddDataModal(data = null) {
 
             <form id="add-beneficiary-form" class="grid grid-cols-1 lg:grid-cols-2 gap-5" data-is-edit="${isEdit}">
                 <!-- LEFT COLUMN: Personal Info Card -->
-                <div class="${t.bgCard} rounded-xl p-4 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
+                <div class="${t.bgCard} rounded-xl p-3 sm:p-4 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
                     <div class="flex items-center gap-2 mb-1">
                         <div class="w-1 h-5 ${t.dotGreen} rounded-full"></div>
                         <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest">Personal & Educational Information</p>
@@ -1712,7 +1746,7 @@ function showAddDataModal(data = null) {
                 </div>
 
                 <!-- RIGHT COLUMN: Work Details Card -->
-                <div class="${t.bgCard} rounded-xl p-4 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
+                <div class="${t.bgCard} rounded-xl p-3 sm:p-4 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
                     <div class="flex items-center gap-2 mb-1">
                         <div class="w-1 h-5 ${t.dotBlue} rounded-full"></div>
                         <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest">Work & Administrative Data</p>
@@ -1828,17 +1862,17 @@ function showAddDataModal(data = null) {
             </form>
 
             <!-- Action Bar -->
-            <div class="mt-6 flex justify-end items-center gap-3 -mx-8 -mb-8 p-4 rounded-b-2xl ${t.bgActionBar} border-t ${t.actionBarBorder}">
-                <button type="submit" form="add-beneficiary-form"
-                    class="group flex items-center gap-2.5 px-6 py-3 ${t.bgSaveBtn} text-white font-black rounded-xl transition-all duration-300 shadow-lg ${t.saveShadow} cursor-pointer text-[12px] transform active:scale-[0.98]">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-                    <span>${isEdit ? 'UPDATE RECORD' : 'SAVE RECORD'}</span>
-                </button>
-
+            <div class="mt-6 grid grid-cols-2 lg:flex lg:justify-end items-center gap-3 -mx-3 sm:-mx-8 -mb-3 sm:-mb-8 p-3 sm:p-6 rounded-b-[1.5rem] ${t.bgActionBar} border-t ${t.actionBarBorder}">
                 <button type="button" id="cancel-modal-btn"
-                    class="group flex items-center gap-2.5 px-6 py-3 ${t.bgCancelBtn} ${t.textCancel} font-bold rounded-xl hover:bg-[#ce1126] hover:text-white transition-all duration-300 shadow-sm border ${t.cancelBorder} hover:border-[#ce1126] cursor-pointer text-[12px] active:scale-[0.98]">
+                    class="group flex items-center justify-center gap-2.5 px-4 lg:px-6 py-3 lg:py-3.5 ${t.bgCancelBtn} ${t.textCancel} font-black rounded-xl hover:bg-[#ce1126] hover:text-white transition-all duration-300 shadow-sm border ${t.cancelBorder} hover:border-[#ce1126] cursor-pointer text-[10px] lg:text-[12px] active:scale-[0.98] uppercase tracking-wider whitespace-nowrap order-1 lg:order-2">
                     <svg class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
                     <span>CANCEL</span>
+                </button>
+
+                <button type="submit" form="add-beneficiary-form"
+                    class="group flex items-center justify-center gap-2.5 px-4 lg:px-6 py-3 lg:py-3.5 ${t.bgSaveBtn} text-white font-black rounded-xl transition-all duration-300 shadow-lg ${t.saveShadow} cursor-pointer text-[10px] lg:text-[12px] transform active:scale-[0.98] uppercase tracking-wider whitespace-nowrap order-2 lg:order-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                    <span>${isEdit ? 'UPDATE RECORD' : 'SAVE RECORD'}</span>
                 </button>
             </div>
         </div>
@@ -1846,10 +1880,10 @@ function showAddDataModal(data = null) {
 
     Swal.fire({
         html: formContent,
-        width: '1000px',
+        width: window.innerWidth < 1024 ? '96vw' : '1000px',
         showConfirmButton: false,
         showCloseButton: false,
-        padding: '2rem',
+        padding: window.innerWidth < 1024 ? '0.75rem' : '2rem',
         customClass: {
             container: 'font-montserrat',
             popup: 'rounded-2xl ldn-modal-popup'

@@ -70,10 +70,10 @@ require_once __DIR__ . '/../../config/vite.php';
                     <p class="text-sm text-body font-medium">Generate reports and print beneficiary data.</p>
                 </div>
 
-                <div class="flex gap-3">
+                <div class="grid grid-cols-1 sm:flex gap-2 sm:gap-3 w-full md:w-auto">
                     <button onclick="window.showExportConfigModal(handleFilterUpdate)"
-                        class="flex items-center px-5 py-2.5 bg-white text-royal-blue border border-royal-blue/20 rounded-xl shadow-sm hover:bg-blue-50 transition-all text-xs font-black uppercase tracking-wider cursor-pointer">
-                        <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="flex justify-center items-center px-4 py-3 sm:px-5 sm:py-2.5 bg-white text-royal-blue border border-royal-blue/20 rounded-xl shadow-sm hover:bg-blue-50 transition-all text-[10px] sm:text-xs font-black uppercase tracking-wider cursor-pointer h-full">
+                        <svg class="w-4 h-4 me-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
                             </path>
@@ -81,8 +81,8 @@ require_once __DIR__ . '/../../config/vite.php';
                         Configure Report
                     </button>
                     <button onclick="window.exportToExcel()"
-                        class="flex items-center px-5 py-2.5 bg-emerald-600 text-white rounded-xl shadow-lg hover:bg-emerald-700 hover:-translate-y-0.5 active:scale-95 transition-all text-xs font-black uppercase tracking-wider cursor-pointer border-none">
-                        <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="flex justify-center items-center px-4 py-3 sm:px-5 sm:py-2.5 bg-emerald-600 text-white rounded-xl shadow-lg hover:bg-emerald-700 hover:-translate-y-0.5 active:scale-95 transition-all text-[10px] sm:text-xs font-black uppercase tracking-wider cursor-pointer border-none h-full">
+                        <svg class="w-4 h-4 me-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                             </path>
@@ -90,8 +90,8 @@ require_once __DIR__ . '/../../config/vite.php';
                         Export to Excel
                     </button>
                     <button onclick="window.print()"
-                        class="flex items-center px-5 py-2.5 bg-royal-blue text-white rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 transition-all text-xs font-black uppercase tracking-wider cursor-pointer">
-                        <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="flex justify-center items-center px-4 py-3 sm:px-5 sm:py-2.5 bg-royal-blue text-white rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 transition-all text-[10px] sm:text-xs font-black uppercase tracking-wider cursor-pointer h-full">
+                        <svg class="w-4 h-4 me-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
                             </path>
@@ -101,8 +101,19 @@ require_once __DIR__ . '/../../config/vite.php';
                 </div>
             </div>
 
-            <!-- Preview Card -->
-            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mb-8">
+            <!-- Mobile Preview Unavailable State -->
+            <div class="md:hidden bg-white border border-gray-100 rounded-2xl shadow-sm mb-8 p-8 flex flex-col items-center justify-center text-center">
+                <div class="bg-gray-50 p-4 rounded-full mb-3">
+                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-1">Preview Unavailable</h3>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider max-w-[200px]">Table Preview is not compatible on this device's screen size.</p>
+            </div>
+
+            <!-- Desktop Live Preview Card -->
+            <div class="hidden md:block bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mb-8">
                 <div class="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                     <h3 class="text-xs font-black uppercase tracking-widest text-gray-500">Live Preview</h3>
                     <div

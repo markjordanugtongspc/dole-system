@@ -104,14 +104,17 @@ require_once __DIR__ . '/../../config/vite.php';
 
     <?php include __DIR__ . '/../components/sidebar/index.php'; ?>
 
-    <div class="p-4 sm:ml-64 mt-14">
-        <div class="p-6 min-h-screen">
+    <div class="p-2 sm:p-4 sm:ml-64 mt-14">
+        <div class="px-2.5 py-5 sm:p-6 min-h-screen">
 
             <!-- Page Header with Toggle & Add Button -->
-            <div class="mb-6 flex items-center justify-between">
-                <div class="flex items-center gap-2 transition-all duration-200" id="ldn-header-container">
-                    <h1 class="text-3xl font-black text-heading mb-2" id="ldn-header-text">Lanao Del Norte - GIP</h1>
-                    <div id="ldn-header-icon" class="mb-1 text-royal-blue">
+            <div class="mb-6 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 transition-all duration-200 cursor-pointer select-none" id="ldn-header-container">
+                    <h1 class="text-xl sm:text-3xl font-black text-heading mb-0 sm:mb-2 leading-tight" id="ldn-header-text">
+                        <span class="sm:hidden">LDN - GIP</span>
+                        <span class="hidden sm:inline">Lanao Del Norte - GIP</span>
+                    </h1>
+                    <div id="ldn-header-icon" class="mb-1 text-royal-blue hidden sm:block">
                         <!-- Clickable SVG Icon -->
                         <svg class="w-6 h-6 hover:text-royal-blue/80 cursor-pointer" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
@@ -122,11 +125,11 @@ require_once __DIR__ . '/../../config/vite.php';
                 </div>
 
                 <button type="button" onclick="showAddDataModal()"
-                    class="flex items-center gap-2 px-5 py-2.5 bg-[#e8f5e9] text-[#2e7d32] font-black rounded-xl hover:bg-[#2e7d32] hover:text-white transition-all duration-300 shadow-sm border border-[#c8e6c9] hover:scale-105 active:scale-95 cursor-pointer">
+                    class="flex items-center gap-2 px-3 py-2 sm:px-5 sm:py-2.5 bg-[#e8f5e9] text-[#2e7d32] font-black rounded-xl hover:bg-[#2e7d32] hover:text-white transition-all duration-300 shadow-sm border border-[#c8e6c9] hover:scale-105 active:scale-95 cursor-pointer shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span class="text-sm">ADD DATA</span>
+                    <span class="text-[10px] sm:text-sm uppercase">Add Data</span>
                 </button>
             </div>
 
@@ -135,8 +138,8 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <!-- Modern Search Bar -->
                 <div
-                    class="p-5 bg-white border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div class="relative w-full sm:max-w-md group">
+                    class="p-3 sm:p-5 bg-white border-b border-gray-100 flex items-center justify-between gap-2.5">
+                    <div class="relative flex-1 sm:max-w-md group">
                         <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none">
                             <svg class="w-5 h-5 text-gray-400 group-focus-within:text-royal-blue transition-colors duration-300"
                                 aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -145,20 +148,20 @@ require_once __DIR__ . '/../../config/vite.php';
                             </svg>
                         </div>
                         <input type="text" id="table-search"
-                            class="block w-full ps-12 pe-4 py-3 text-sm font-medium text-heading bg-gray-50/50 border border-gray-200 rounded-full focus:bg-white focus:border-royal-blue/30 focus:ring-4 focus:ring-royal-blue/10 focus:shadow-lg transition-all duration-300 ease-out placeholder:text-gray-400"
-                            placeholder="Search by Name, ID, Office, or Status...">
+                            class="block w-full ps-11 sm:ps-12 pe-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-heading bg-gray-50/50 border border-gray-200 rounded-full focus:bg-white focus:border-royal-blue/30 focus:ring-4 focus:ring-royal-blue/10 focus:shadow-lg transition-all duration-300 ease-out placeholder:text-gray-400"
+                            placeholder="Search beneficiaries...">
 
                         <!-- Optional Keyboard Shortcut Hint -->
-                        <div class="absolute inset-y-0 end-0 flex items-center pe-4 pointer-events-none">
+                        <div class="absolute inset-y-0 end-0 flex items-center pe-4 pointer-events-none hidden sm:flex">
                             <span
                                 class="text-xs text-gray-400 border border-gray-200 rounded px-1.5 py-0.5 group-focus-within:border-royal-blue/30 group-focus-within:text-royal-blue transition-colors duration-300">/</span>
                         </div>
                     </div>
 
                     <!-- Filter / Sort Actions -->
-                    <div class="relative">
+                    <div class="relative shrink-0">
                         <button id="sort-dropdown-button" data-dropdown-toggle="sort-dropdown"
-                            class="flex items-center justify-center p-2.5 text-gray-500 rounded-full hover:bg-orange-50 hover:text-orange-600 transition-all duration-300 border border-transparent hover:border-orange-100 group shadow-sm">
+                            class="flex items-center justify-center p-2.5 text-gray-500 rounded-full hover:bg-orange-50 hover:text-orange-600 transition-all duration-300 border border-default hover:border-orange-100 group shadow-sm">
                             <svg class="w-5 h-5 transition-transform group-hover:rotate-180" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

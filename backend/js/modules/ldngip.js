@@ -122,13 +122,13 @@ export function renderTable(dataToRender = beneficiaries) {
     tbody.innerHTML = dataToRender.map(data => `
         <tr class="bg-blue-50 border-b border-blue-100 hover:bg-blue-100 transition-colors group cursor-pointer"
             onclick='viewBeneficiary(${JSON.stringify(data)})'>
-            <th scope="row" class="px-4 py-3 font-medium text-heading whitespace-nowrap font-mono text-xs">
+            <th scope="row" class="px-4 py-3 font-medium text-heading whitespace-nowrap font-mono text-xs text-center">
                 ${data.id}
             </th>
-            <td class="px-4 py-3 font-bold text-royal-blue">
+            <td class="px-4 py-3 font-bold text-royal-blue text-center">
                 ${data.name}
             </td>
-            <td class="px-4 py-3">
+            <td class="px-4 py-3 text-center">
                 <span class="${getOfficeClass(data.office)} text-xs font-bold px-2.5 py-0.5 rounded">
                     ${data.office}
                 </span>
@@ -139,7 +139,7 @@ export function renderTable(dataToRender = beneficiaries) {
             <td class="px-4 py-3 whitespace-nowrap text-center">
                 <span class="text-[11px] font-black text-philippine-red uppercase tracking-tight">${data.endDateFormatted || data.endDate || 'N/A'}</span>
             </td>
-            <td class="px-4 py-3">
+            <td class="px-4 py-3 text-center">
                 <span class="${getStatusClass(data.remarks)} text-xs font-bold px-2.5 py-0.5 rounded uppercase border">
                     ${data.remarks}
                 </span>
@@ -335,15 +335,21 @@ function initLDNHeader() {
 
     if (headerContainer && headerText && headerIcon) {
         headerContainer.addEventListener('click', () => {
+            // Skip toggle if on mobile (icon is hidden and text is auto-shortened via CSS)
+            if (window.innerWidth < 640) return;
+
             const currentText = headerText.innerText.trim();
             const longText = "Lanao Del Norte - GIP";
             const shortText = "LDN - GIP";
 
-            if (currentText === longText) {
-                headerText.innerText = shortText;
+            // If we have spans (from the recent HTML update), target the text content properly
+            const isShort = headerText.querySelector('.sm\\:hidden')?.offsetParent !== null;
+            
+            if (currentText.includes(longText)) {
+                headerText.innerHTML = shortText;
                 headerIcon.classList.add('rotate-180');
             } else {
-                headerText.innerText = longText;
+                headerText.innerHTML = longText;
                 headerIcon.classList.remove('rotate-180');
             }
         });
