@@ -277,7 +277,7 @@ body {
         width: 100% !important;
     }
 
-    #print-area th, 
+    #print-area th,
     #print-area td {
         word-break: break-word !important;
     }
@@ -293,8 +293,14 @@ body {
     }
 
     /* Avoid page breaks inside table rows and signature block */
-    tr { page-break-inside: avoid !important; page-break-after: auto !important; }
-    .footer-signatures { page-break-inside: avoid !important; }
+    tr {
+        page-break-inside: avoid !important;
+        page-break-after: auto !important;
+    }
+
+    .footer-signatures {
+        page-break-inside: avoid !important;
+    }
 }
 
 /* ================================================
@@ -453,25 +459,6 @@ select:focus {
 .dark .border-gray-200,
 .dark .border-slate-200 {
     border-color: #334155 !important;
-}
-
-.dark .text-gray-500,
-.dark .text-slate-500 {
-    color: #94a3b8 !important;
-}
-
-.dark .text-gray-700,
-.dark .text-gray-800,
-.dark .text-gray-900 {
-    color: #e2e8f0 !important;
-}
-
-.dark .text-gray-600 {
-    color: #cbd5e1 !important;
-}
-
-.dark .text-gray-400 {
-    color: #64748b !important;
 }
 
 /* ── Dashboard Chart Cards ── */

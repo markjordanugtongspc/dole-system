@@ -318,7 +318,7 @@ export function showExportConfigModal(callback) {
                 </div>
                 <div>
                     <h2 class="text-xl font-black text-heading leading-tight italic">Report Generator</h2>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Configure your data output</p>
+                    <p class="text-[10px] font-bold text-gray-400 dark:!text-white uppercase tracking-widest">Configure your data output</p>
                 </div>
             </div>
 
@@ -327,7 +327,7 @@ export function showExportConfigModal(callback) {
                 <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="w-1.5 h-4 bg-royal-blue rounded-full"></span>
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Global Filters</label>
+                        <label class="text-[10px] font-black text-gray-400 dark:!text-white uppercase tracking-widest leading-none">Global Filters</label>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -336,7 +336,7 @@ export function showExportConfigModal(callback) {
                             <div class="relative group">
                                 <input type="text" id="export-search" value="${currentFilters.search}" placeholder="Name or ID..." 
                                     class="w-full bg-white border border-gray-200 rounded-xl px-9 py-2.5 text-xs font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
-                                <svg class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                <svg class="w-3.5 h-3.5 text-gray-400 dark:!text-white absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             </div>
                         </div>
 
@@ -350,7 +350,7 @@ export function showExportConfigModal(callback) {
                                     <option value="DICT" ${currentFilters.office === 'DICT' ? 'selected' : ''}>DICT</option>
                                     <option value="DEPED" ${currentFilters.office === 'DEPED' ? 'selected' : ''}>DEPED</option>
                                 </select>
-                                <svg class="w-3.5 h-3.5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                <svg class="w-3.5 h-3.5 text-gray-400 dark:!text-white absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
                         </div>
 
@@ -363,7 +363,7 @@ export function showExportConfigModal(callback) {
                                     <option value="id" ${currentFilters.sort === 'id' ? 'selected' : ''}>ID NUMBER</option>
                                     <option value="office" ${currentFilters.sort === 'office' ? 'selected' : ''}>OFFICE NAME</option>
                                 </select>
-                                <svg class="w-3.5 h-3.5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                <svg class="w-3.5 h-3.5 text-gray-400 dark:!text-white absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
                         </div>
                     </div>
@@ -378,7 +378,7 @@ export function showExportConfigModal(callback) {
         return `
                                         <label class="cursor-pointer">
                                             <input type="radio" name="export-status" value="${s}" ${currentFilters.status === s ? 'checked' : ''} class="hidden peer">
-                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 dark:!text-white uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
                                         </label>
                                     `;
     }).join('')}
@@ -420,7 +420,7 @@ export function showExportConfigModal(callback) {
                 <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100 mt-4">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="w-1.5 h-4 bg-golden-yellow rounded-full"></span>
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Output Column Selection</label>
+                        <label class="text-[10px] font-black text-gray-400 dark:!text-white uppercase tracking-widest leading-none">Output Column Selection</label>
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -626,7 +626,7 @@ function showBeneficiaryModal(data) {
                 <td class="p-2.5 text-center">
                     <!-- Column 2: Date Submitted (AR) or Day (DTR) -->
                     <div class="doc-view-mode-container">
-                        <span id="submit-date-${targetId}" class="submission-date-text text-[9px] font-bold text-gray-400 uppercase tracking-tighter">${type === 'dtr' ? dtrDay : displayDate}</span>
+                        <span id="submit-date-${targetId}" class="submission-date-text text-[9px] font-bold text-gray-400 dark:!text-white uppercase tracking-tighter">${type === 'dtr' ? dtrDay : displayDate}</span>
                     </div>
                     <div class="doc-edit-mode-container hidden">
                         ${type === 'dtr' ? `
@@ -686,7 +686,7 @@ function showBeneficiaryModal(data) {
                     <span class="${getOfficeColor(data.office)} text-[10px] font-bold px-3 py-1 rounded-full border border-current shadow-sm">
                         ${data.office}
                     </span>
-                    <p class="text-[9px] text-gray-400 font-bold mt-1 uppercase tracking-widest">Assigned Office</p>
+                    <p class="text-[9px] text-gray-400 dark:!text-white font-bold mt-1 uppercase tracking-widest">Assigned Office</p>
                 </div>
             </div>
 
@@ -695,40 +695,40 @@ function showBeneficiaryModal(data) {
                 <!-- LEFT GRID: Basic Information -->
                 <div class="space-y-3 pr-0 lg:pr-6">
                     <div class="bg-gray-50/50 rounded-xl p-3.5 border border-gray-100 shadow-sm">
-                        <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black mb-2.5 border-b border-gray-100 pb-1.5">Personal Profile</p>
+                        <p class="text-[9px] uppercase tracking-widest text-gray-400 dark:!text-white font-black mb-2.5 border-b border-gray-100 pb-1.5">Personal Profile</p>
                         
                         <div class="space-y-3">
                              <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="text-[9px] text-gray-400 font-black uppercase tracking-widest block mb-1">Contact No.</label>
+                                    <label class="text-[9px] text-gray-400 dark:!text-white font-black uppercase tracking-widest block mb-1">Contact No.</label>
                                     <p class="text-sm font-black text-heading font-mono">${data.contact || 'N/A'}</p>
                                 </div>
                                 <div class="">
-                                    <label class="text-[9px] text-gray-400 font-black uppercase tracking-widest block mb-1">Address</label>
+                                    <label class="text-[9px] text-gray-400 dark:!text-white font-black uppercase tracking-widest block mb-1">Address</label>
                                     <p class="text-sm font-black text-heading break-words whitespace-normal leading-snug" title="${data.address}">${data.address || 'N/A'}</p>
                                 </div>
                             </div>
 
                              <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="text-[9px] text-gray-400 font-black uppercase tracking-widest block mb-1">Birthday</label>
+                                    <label class="text-[9px] text-gray-400 dark:!text-white font-black uppercase tracking-widest block mb-1">Birthday</label>
                                     <p class="text-sm font-black text-heading uppercase">${data.birthday || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label class="text-[9px] text-gray-400 font-black uppercase tracking-widest block mb-1">Age</label>
+                                    <label class="text-[9px] text-gray-400 dark:!text-white font-black uppercase tracking-widest block mb-1">Age</label>
                                     <p class="text-sm font-black text-heading">${data.age || calculateAge(data.birthday) || 'N/A'}</p>
                                 </div>
                             </div>
 
                              <div>
-                                <label class="text-[9px] text-gray-400 font-black uppercase tracking-widest block mb-1">Gender</label>
+                                <label class="text-[9px] text-gray-400 dark:!text-white font-black uppercase tracking-widest block mb-1">Gender</label>
                                 <p class="text-sm font-black text-heading uppercase">${data.gender || 'N/A'}</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-white p-3.5 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm w-full">
-                        <label class="text-[9px] text-gray-400 font-black uppercase tracking-widest block mb-1">Educational Attainment</label>
+                        <label class="text-[9px] text-gray-400 dark:!text-white font-black uppercase tracking-widest block mb-1">Educational Attainment</label>
                         <div class="flex items-center gap-3">
                              <div class="w-8 h-8 rounded-lg bg-golden-yellow/10 flex items-center justify-center text-golden-yellow border border-golden-yellow/20 shadow-sm shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
@@ -763,13 +763,13 @@ function showBeneficiaryModal(data) {
                     
                     <div id="modal-page-0" class="transition-opacity duration-300 flex-1 flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-1">
                         <div class="bg-gray-50/50 rounded-xl p-3.5 border border-gray-100 dark:border-slate-800 shadow-sm w-full">
-                             <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black mb-2.5 whitespace-nowrap">Work Registry</p>
+                             <p class="text-[9px] uppercase tracking-widest text-gray-400 dark:!text-white font-black mb-2.5 whitespace-nowrap">Work Registry</p>
                              <div class="flex items-center gap-3">
                                 <div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
                                     <svg class="w-5 h-5 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 </div>
                                 <div class="flex-1">
-                                    <label class="text-[9px] text-gray-400 font-black block mb-0.5 uppercase tracking-widest">Series No.</label>
+                                    <label class="text-[9px] text-gray-400 dark:!text-white font-black block mb-0.5 uppercase tracking-widest">Series No.</label>
                                     <span class="text-base font-black text-royal-blue font-mono whitespace-nowrap">
                                         ${data.seriesNo || '2025-00-000'}
                                     </span>
@@ -778,12 +778,12 @@ function showBeneficiaryModal(data) {
                         </div>
 
                          <div class="bg-white border border-gray-100 dark:border-slate-800 p-3.5 rounded-xl shadow-sm">
-                            <label class="text-[9px] text-gray-400 font-black block mb-1 uppercase tracking-widest">Designation / Role</label>
+                            <label class="text-[9px] text-gray-400 dark:!text-white font-black block mb-1 uppercase tracking-widest">Designation / Role</label>
                             <p class="text-sm font-black text-heading break-words whitespace-normal leading-snug">${data.designation}</p>
                         </div>
                         
                          <div class="bg-gray-50/30 p-3.5 rounded-xl border border-dashed border-gray-200">
-                            <label class="text-[9px] text-gray-400 font-black block mb-1 uppercase tracking-widest">Replacement History</label>
+                            <label class="text-[9px] text-gray-400 dark:!text-white font-black block mb-1 uppercase tracking-widest">Replacement History</label>
                              <p class="text-xs text-gray-500 font-medium italic">${data.replacement || 'None found.'}</p>
                         </div>
 
@@ -831,11 +831,11 @@ function showBeneficiaryModal(data) {
                     <div id="modal-page-1" class="hidden transition-opacity duration-300 flex-1 flex flex-col min-h-0">
                          <div class="bg-white dark:bg-slate-900 rounded-xl p-3.5 border border-gray-100 dark:border-slate-800 shadow-sm flex-1 flex flex-col min-h-0 overflow-hidden">
                             <div class="mb-2 border-b border-gray-50 dark:border-slate-800 pb-2 flex items-center justify-between shrink-0">
-                                <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black flex items-center gap-2">
+                                <p class="text-[9px] uppercase tracking-widest text-gray-400 dark:!text-white font-black flex items-center gap-2">
                                     <svg class="w-4 h-4 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     Required Documents
                                 </p>
-                                <button type="button" id="toggle-docs-edit" class="toggle-docs-edit p-1.5 rounded-lg text-gray-400 hover:bg-royal-blue/10 hover:text-royal-blue transition-all cursor-pointer group/toggle" title="Manage Documentation Status">
+                                <button type="button" id="toggle-docs-edit" class="toggle-docs-edit p-1.5 rounded-lg text-gray-400 dark:!text-white hover:bg-royal-blue/10 hover:text-royal-blue transition-all cursor-pointer group/toggle" title="Manage Documentation Status">
                                     <svg class="w-4 h-4 transition-transform group-hover/toggle:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 </button>
                             </div>
@@ -886,7 +886,7 @@ function showBeneficiaryModal(data) {
                         <!-- Accomplishment Report Section -->
                         <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm flex-1 flex flex-col min-h-0 overflow-hidden">
                             <div class="mb-3 border-b border-gray-50 pb-2 flex items-center justify-between">
-                                <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black flex items-center gap-2">
+                                <p class="text-[9px] uppercase tracking-widest text-gray-400 dark:!text-white font-black flex items-center gap-2">
                                     <svg class="w-4 h-4 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                                     Accomplishment Report
                                 </p>
@@ -894,7 +894,7 @@ function showBeneficiaryModal(data) {
                                     <button type="button" data-type="ar" class="add-log-btn p-1.5 rounded-lg text-green-500 hover:bg-green-50 transition-all cursor-pointer group/add" title="Add Report Log">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                                     </button>
-                                    <button type="button" class="toggle-logs-edit p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-all cursor-pointer" title="Manage Logs">
+                                    <button type="button" class="toggle-logs-edit p-1.5 rounded-lg text-gray-400 dark:!text-white hover:bg-gray-50 transition-all cursor-pointer" title="Manage Logs">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                     </button>
                                 </div>
@@ -903,9 +903,9 @@ function showBeneficiaryModal(data) {
                                 <table class="w-full text-left">
                                     <thead class="sticky top-0 bg-white z-10 border-b border-gray-100">
                                         <tr class="bg-gray-50/50">
-                                            <th class="p-2 text-[8px] font-black uppercase text-gray-400 tracking-widest">Period</th>
-                                            <th class="p-2 text-[8px] font-black uppercase text-gray-400 tracking-widest text-center">Date Submitted</th>
-                                            <th class="p-2 text-[8px] font-black uppercase text-gray-400 tracking-widest text-right">Status</th>
+                                            <th class="p-2 text-[8px] font-black uppercase text-gray-400 dark:!text-white tracking-widest">Period</th>
+                                            <th class="p-2 text-[8px] font-black uppercase text-gray-400 dark:!text-white tracking-widest text-center">Date Submitted</th>
+                                            <th class="p-2 text-[8px] font-black uppercase text-gray-400 dark:!text-white tracking-widest text-right">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody id="ar-logs-body">
@@ -918,7 +918,7 @@ function showBeneficiaryModal(data) {
                         <!-- Daily Time Record Section -->
                         <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm flex-1 flex flex-col min-h-0 overflow-hidden">
                             <div class="mb-3 border-b border-gray-50 pb-2 flex items-center justify-between">
-                                <p class="text-[9px] uppercase tracking-widest text-gray-400 font-black flex items-center gap-2">
+                                <p class="text-[9px] uppercase tracking-widest text-gray-400 dark:!text-white font-black flex items-center gap-2">
                                     <svg class="w-4 h-4 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     Daily Time Record
                                 </p>
@@ -926,7 +926,7 @@ function showBeneficiaryModal(data) {
                                     <button type="button" data-type="dtr" class="add-log-btn p-1.5 rounded-lg text-green-500 hover:bg-green-50 transition-all cursor-pointer group/add" title="Add DTR Log">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                                     </button>
-                                    <button type="button" class="toggle-logs-edit p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-all cursor-pointer" title="Manage Logs">
+                                    <button type="button" class="toggle-logs-edit p-1.5 rounded-lg text-gray-400 dark:!text-white hover:bg-gray-50 transition-all cursor-pointer" title="Manage Logs">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                     </button>
                                 </div>
@@ -935,9 +935,9 @@ function showBeneficiaryModal(data) {
                                 <table class="w-full text-left">
                                     <thead class="sticky top-0 bg-white z-10 border-b border-gray-100">
                                         <tr class="bg-gray-50/50">
-                                            <th class="p-2 text-[8px] font-black uppercase text-gray-400 tracking-widest">Date</th>
-                                            <th class="p-2 text-[8px] font-black uppercase text-gray-400 tracking-widest text-center">Day</th>
-                                            <th class="p-2 text-[8px] font-black uppercase text-gray-400 tracking-widest text-right">Status</th>
+                                            <th class="p-2 text-[8px] font-black uppercase text-gray-400 dark:!text-white tracking-widest">Date</th>
+                                            <th class="p-2 text-[8px] font-black uppercase text-gray-400 dark:!text-white tracking-widest text-center">Day</th>
+                                            <th class="p-2 text-[8px] font-black uppercase text-gray-400 dark:!text-white tracking-widest text-right">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody id="dtr-logs-body">
@@ -1146,7 +1146,7 @@ function showBeneficiaryModal(data) {
 
                     if (isEditing) {
                         btn.classList.remove('bg-royal-blue', 'text-white', 'shadow-md');
-                        btn.classList.add('text-gray-400');
+                        btn.classList.add('text-gray-400 dark:!text-white');
                         btn.setAttribute('title', 'Manage Documentation Status');
                         btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>`;
                         section.querySelectorAll('.doc-name-edit').forEach(el => el.classList.add('hidden'));
@@ -1161,7 +1161,7 @@ function showBeneficiaryModal(data) {
                         }
                     } else {
                         btn.classList.add('bg-royal-blue', 'text-white', 'shadow-md');
-                        btn.classList.remove('text-gray-400');
+                        btn.classList.remove('text-gray-400 dark:!text-white');
                         btn.setAttribute('title', 'Save Changes');
                         btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
                     }
@@ -1601,8 +1601,8 @@ function showAddDataModal(data = null) {
         bgCancelBtn: dk ? 'bg-red-900/20' : 'bg-[#fef2f2]',
         // Text colors
         textHeading: dk ? 'text-green-500' : 'text-[#2e7d32]',
-        textSubtitle: dk ? 'text-slate-500' : 'text-gray-400',
-        textLabel: dk ? 'text-slate-500' : 'text-gray-400',
+        textSubtitle: dk ? 'text-slate-500' : 'text-gray-400 dark:!text-white',
+        textLabel: dk ? 'text-slate-500' : 'text-gray-400 dark:!text-white',
         textSectionTitle: dk ? 'text-slate-400' : 'text-gray-500',
         textInput: dk ? 'text-white' : 'text-slate-900',
         textAge: dk ? 'text-green-400' : 'text-[#2e7d32]',
@@ -1636,7 +1636,7 @@ function showAddDataModal(data = null) {
         workDot: dk ? 'bg-slate-700 group-hover/opt:bg-blue-500' : 'bg-gray-200 group-hover/opt:bg-royal-blue',
         workArrow: dk ? 'text-blue-400' : 'text-royal-blue',
         // Icon colors
-        iconColor: dk ? 'text-slate-500' : 'text-gray-400',
+        iconColor: dk ? 'text-slate-500' : 'text-gray-400 dark:!text-white',
         // Cancel border
         cancelBorder: dk ? 'border-red-900/30' : 'border-[#fee2e2]',
         // Save shadow
@@ -1665,47 +1665,47 @@ function showAddDataModal(data = null) {
                 <div class="${t.bgCard} rounded-xl p-3 sm:p-4 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
                     <div class="flex items-center gap-2 mb-1">
                         <div class="w-1 h-5 ${t.dotGreen} rounded-full"></div>
-                        <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest">Personal & Educational Information</p>
+                        <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest dark:!text-white">Personal & Educational Information</p>
                     </div>
                     
                     <div class="space-y-3.5">
                         <div class="group">
-                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
-                            <input type="text" name="name" value="${data?.name || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="e.g. Dela Cruz, Juan M.">
+                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" value="${data?.name || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} dark:!text-white" placeholder="e.g. Dela Cruz, Juan M.">
                         </div>
                         
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Contact No. <span class="text-red-500">*</span></label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Contact No. <span class="text-red-500">*</span></label>
                                 <input type="text" name="contact" value="${data?.contact || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} font-mono" placeholder="09XX-XXX-XXXX">
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Address</label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Address</label>
                                 <input type="text" name="address" value="${data?.address || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="Barangay, City">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Birthday</label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Birthday</label>
                                 <input type="date" name="birthday" value="${data?.birthday || ''}" id="birthday-input" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm uppercase">
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Age</label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Age</label>
                                 <input type="text" name="age" value="${data?.age || ''}" id="age-display" readonly class="w-full ${t.bgAgeInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-black ${t.textAge} cursor-not-allowed outline-none font-mono" placeholder="Auto">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Gender</label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Gender</label>
                                 <select name="gender" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm cursor-pointer appearance-none">
                                     <option value="Male" ${data?.gender === 'Male' ? 'selected' : ''}>Male</option>
                                     <option value="Female" ${data?.gender === 'Female' ? 'selected' : ''}>Female</option>
                                 </select>
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen}">Education</label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Education</label>
                                 <div class="relative" id="education-container">
                                     <input type="text" name="education" id="education-input" autocomplete="off"
                                         value="${data?.education || ''}" 
@@ -1834,7 +1834,7 @@ function showAddDataModal(data = null) {
             return ['ONGOING', 'EXPIRED', 'RESIGNED', 'ABSORBED'].map(s => `
                                             <label class="cursor-pointer relative min-w-[80px]">
                                                 <input type="radio" name="remarks" value="${s}" ${data?.remarks === s ? 'checked' : ''} class="hidden peer remarks-radio">
-                                                <span class="px-3 py-1.5 rounded-lg border border-transparent text-[10px] font-black text-gray-400 uppercase tracking-widest ${statusConfigs[s] || ''} transition-all block text-center cursor-pointer shadow-sm">
+                                                <span class="px-3 py-1.5 rounded-lg border border-transparent text-[10px] font-black text-gray-400 dark:!text-white uppercase tracking-widest ${statusConfigs[s] || ''} transition-all block text-center cursor-pointer shadow-sm">
                                                     ${s}
                                                 </span>
                                             </label>
@@ -2052,18 +2052,18 @@ function showAddDataModal(data = null) {
                                     </div>
                                     
                                     <div class="group">
-                                        <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400'} font-black uppercase block mb-1">Where?</label>
+                                        <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:!text-white'} font-black uppercase block mb-1">Where?</label>
                                         <input type="text" name="absorb_where" value="${data?.absorb_where || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="Where to absorb?">
                                     </div>
                                 </div>
                                 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <div class="group">
-                                        <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400'} font-black uppercase block mb-1">Position</label>
+                                        <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:!text-white'} font-black uppercase block mb-1">Position</label>
                                         <input type="text" name="absorb_position" value="${data?.absorb_position || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="What kind of position?">
                                     </div>
                                     <div class="group">
-                                        <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400'} font-black uppercase block mb-1">Agency</label>
+                                        <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:!text-white'} font-black uppercase block mb-1">Agency</label>
                                         <input type="text" name="absorb_agency" value="${data?.absorb_agency || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="On what agency?">
                                     </div>
                                 </div>

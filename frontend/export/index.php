@@ -72,7 +72,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <div class="grid grid-cols-1 sm:flex gap-2 sm:gap-3 w-full md:w-auto">
                     <button onclick="window.showExportConfigModal(handleFilterUpdate)"
-                        class="flex justify-center items-center px-4 py-3 sm:px-5 sm:py-2.5 bg-white text-royal-blue border border-royal-blue/20 rounded-xl shadow-sm hover:bg-blue-50 transition-all text-[10px] sm:text-xs font-black uppercase tracking-wider cursor-pointer h-full">
+                        class="flex justify-center items-center px-4 py-3 sm:px-5 sm:py-2.5 bg-white text-royal-blue border border-royal-blue/20 rounded-xl shadow-sm hover:bg-blue-50 transition-all text-[10px] sm:text-xs font-black uppercase tracking-wider cursor-pointer h-full dark:bg-blue-900 dark:text-white dark:hover:bg-blue-500 dark:hover:text-white dark:border-blue-700">
                         <svg class="w-4 h-4 me-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
@@ -102,20 +102,23 @@ require_once __DIR__ . '/../../config/vite.php';
             </div>
 
             <!-- Mobile Preview Unavailable State -->
-            <div class="md:hidden bg-white border border-gray-100 rounded-2xl shadow-sm mb-8 p-8 flex flex-col items-center justify-center text-center">
+            <div
+                class="md:hidden bg-white border border-gray-100 rounded-2xl shadow-sm mb-8 p-8 flex flex-col items-center justify-center text-center">
                 <div class="bg-gray-50 p-4 rounded-full mb-3">
                     <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                     </svg>
                 </div>
                 <h3 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-1">Preview Unavailable</h3>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider max-w-[200px]">Table Preview is not compatible on this device's screen size.</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider max-w-[200px]">Table Preview is
+                    not compatible on this device's screen size.</p>
             </div>
 
             <!-- Desktop Live Preview Card -->
             <div class="hidden md:block bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mb-8">
-                <div class="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-gray-500">Live Preview</h3>
+                <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-white">Live Preview</h3>
                     <div
                         class="text-[10px] font-bold text-gray-400 bg-white px-3 py-1 rounded-full border border-gray-100 italic">
                         Displaying <span id="record-count" class="text-royal-blue font-black">0</span> records</div>
