@@ -1,6 +1,7 @@
 import { getBasePath } from './auth.js';
 import { isDarkMode } from './darkmode.js';
 import Swal from 'sweetalert2';
+import { BulkApp } from './bulk_tool.js';
 
 /**
  * Show modern error modal for authentication
@@ -1560,12 +1561,12 @@ function showBeneficiaryModal(data) {
 /**
  * Show Add Data Modal Form
  */
-function showAddDataModal(data = null) {
-    const isEdit = !!data;
+export function showAddDataModal(data = null) {
+    const isEdit = !!data && !data._isBulk;
     const headerIcon = isEdit ?
         'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' :
         'M12 4v16m8-8H4';
-    const headerTitle = isEdit ? 'Edit Beneficiary' : 'New Beneficiary';
+    const headerTitle = isEdit ? 'Edit Beneficiary' : (data?._isBulk ? `Bulk Adding (${data._bulkCurrent} of ${data._bulkTotal})` : 'New Beneficiary');
 
     // ── Theme-aware class resolver ──────────────────────────────────────────
     // Check theme ONCE at render-time. Light mode = your original "old code" classes.
@@ -1640,7 +1641,7 @@ function showAddDataModal(data = null) {
     const formContent = `
         <div class="text-left font-montserrat user-select-none relative p-0 max-w-full overflow-x-hidden">
             <!-- Modal Header -->
-            <div class="mb-4 pb-3 border-b ${t.borderBase} flex items-center justify-between">
+            <div class="mb-4 pb-3 border-b ${t.borderBase} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h3 class="text-xl font-black ${t.textHeading} flex items-center gap-2.5">
                         <div class="p-2 ${t.iconBg} rounded-lg ${t.iconText} border ${t.iconBorder} shadow-sm">
@@ -1650,6 +1651,12 @@ function showAddDataModal(data = null) {
                     </h3>
                     <p class="text-[10px] ${t.textSubtitle} font-bold mt-1 uppercase tracking-widest pl-11">Enter the details of the GIP beneficiary below.</p>
                 </div>
+                ${!isEdit && !data?._isBulk ? `
+                <button type="button" id="bulk-add-btn" class="group flex items-center justify-center gap-2 px-3 py-2 ${t.bgCard} border ${t.borderCard} rounded-lg hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-300 w-full sm:w-auto sm:mr-4 focus:ring-4 focus:ring-blue-500/20 active:scale-95 cursor-pointer shadow-sm">
+                    <svg class="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">Bulk Add</span>
+                </button>
+                ` : ''}
             </div>
 
             <form id="add-beneficiary-form" class="grid grid-cols-1 lg:grid-cols-2 gap-5" data-is-edit="${isEdit}">
@@ -1663,7 +1670,11 @@ function showAddDataModal(data = null) {
                     <div class="space-y-3.5">
                         <div class="group">
                             <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
-                            <input type="text" name="name" value="${data?.name || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} dark:text-white!" placeholder="e.g. Dela Cruz, Juan M.">
+                            <input type="text" name="name" id="name-input-field" value="${data?.name || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} dark:text-white!" placeholder="e.g. Dela Cruz, Juan M.">
+                            <div id="duplicate-warning" class="hidden mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                <span>Beneficiary already exist</span>
+                            </div>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-3">
@@ -1886,10 +1897,22 @@ function showAddDataModal(data = null) {
             if (cancelBtn) {
                 cancelBtn.addEventListener('click', () => {
                     // Wipe draft ONLY on explicit CANCEL for Add mode
-                    if (!isEdit) {
+                    if (!isEdit && !data?._isBulk) {
                         localStorage.removeItem('add_beneficiary_draft');
                     }
                     Swal.close();
+                    if (data?._isBulk) {
+                        BulkApp.onCancel();
+                    }
+                });
+            }
+
+            // Bulk Add Event Listener
+            const bulkBtn = popup.querySelector('#bulk-add-btn');
+            if (bulkBtn) {
+                bulkBtn.addEventListener('click', () => {
+                    Swal.close();
+                    BulkApp.init();
                 });
             }
 
@@ -1906,6 +1929,69 @@ function showAddDataModal(data = null) {
                 // Initial calculation for Edit mode if birthday is set and no age is already there
                 if (bdayInput.value && !data?.age) {
                     ageDisplay.value = calculateAge(bdayInput.value);
+                }
+            }
+
+            // Duplicate Name Check with UI Feedback
+            const nameField = popup.querySelector('#name-input-field');
+            const dupWarning = popup.querySelector('#duplicate-warning');
+            
+            if (nameField && dupWarning) {
+                let dupTimer;
+                nameField.addEventListener('input', (e) => {
+                    const name = e.target.value.trim();
+                    clearTimeout(dupTimer);
+                    
+                    if (name.length < 3) {
+                        dupWarning.classList.add('hidden');
+                        return;
+                    }
+
+                    dupTimer = setTimeout(async () => {
+                        try {
+                            const response = await fetch(`${getBasePath()}api/check_duplicate.php`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ name })
+                            });
+                            const res = await response.json();
+                            
+                            if (res.success && res.exists) {
+                                dupWarning.classList.remove('hidden');
+                                if (isDarkMode()) {
+                                    dupWarning.className = 'mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse text-red-400';
+                                } else {
+                                    dupWarning.className = 'mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse text-red-600';
+                                }
+                            } else {
+                                dupWarning.classList.add('hidden');
+                            }
+                        } catch (err) {
+                            console.error('Duplicate check error:', err);
+                        }
+                    }, 500);
+                });
+                
+                if (data?.name) {
+                    // Trigger check for Pre-filled data
+                    dupWarning.classList.add('hidden');
+                    // We call it manually to not wait for 500ms
+                    (async () => {
+                        const res = await fetch(`${getBasePath()}api/check_duplicate.php`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: data.name })
+                        });
+                        const result = await res.json();
+                        if (result.success && result.exists) {
+                            dupWarning.classList.remove('hidden');
+                             if (isDarkMode()) {
+                                dupWarning.className = 'mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse text-red-400';
+                            } else {
+                                dupWarning.className = 'mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse text-red-600';
+                            }
+                        }
+                    })();
                 }
             }
 
@@ -2262,6 +2348,9 @@ function showAddDataModal(data = null) {
                                         timer: 3000,
                                         timerProgressBar: true
                                     });
+                                    if (!isEdit && data?._isBulk) {
+                                        BulkApp.onSaveSuccess();
+                                    }
                                 }, 100);
                             } else {
                                 Swal.fire({

@@ -84,6 +84,17 @@ function initAutoRefresh() {
     if (!ldnTable) return;
 
     pollingManager.start('beneficiaries', async () => {
+        // PREVENT CONFLICT: If bulk add is active OR was recently used (30s grace period)
+        // This stops sync/toasts from closing your modals during delicate sessions
+        const isBulkInUse = window.BulkApp && (
+            window.BulkApp.isActive || 
+            (Date.now() - (window.BulkApp.lastInteractionTime || 0) < 30000)
+        );
+
+        if (isBulkInUse) {
+            return;
+        }
+
         const result = await apiGet('api/beneficiaries.php');
 
         if (result.success && result.data.beneficiaries) {
