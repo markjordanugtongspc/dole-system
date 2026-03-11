@@ -47,17 +47,38 @@ if ($method === 'GET') {
 
     try {
         if (isset($_GET['next_id'])) {
-            $stmt = $pdo->query("SELECT gip_id FROM beneficiaries ORDER BY gip_id DESC LIMIT 1");
+            $year = $_GET['year'] ?? date('Y');
+            $stmt = $pdo->prepare("SELECT gip_id FROM beneficiaries WHERE gip_id LIKE :year_prefix ORDER BY gip_id DESC LIMIT 1");
+            $stmt->execute(['year_prefix' => "%-$year-%"]);
             $lastId = $stmt->fetchColumn();
-            $nextId = 'ROX-RD-ESIG-2025-0001';
+            $nextId = sprintf('ROX-RD-ESIG-%s-0001', $year);
 
             if ($lastId && preg_match('/ROX-RD-ESIG-(\d{4})-(\d{4})/', $lastId, $matches)) {
-                $year = $matches[1];
+                $y = $matches[1];
                 $num = intval($matches[2]) + 1;
-                $nextId = sprintf('ROX-RD-ESIG-%s-%04d', $year, $num);
+                $nextId = sprintf('ROX-RD-ESIG-%s-%04d', $y, $num);
             }
 
             echo json_encode(['success' => true, 'nextId' => $nextId]);
+            exit();
+        }
+
+        if (isset($_GET['next_series_no'])) {
+            $year = $_GET['year'] ?? date('Y');
+            $stmt = $pdo->prepare("SELECT series_number FROM beneficiaries WHERE series_number LIKE :year_prefix ORDER BY series_number DESC LIMIT 1");
+            $stmt->execute(['year_prefix' => $year . '-%']);
+            $lastSeries = $stmt->fetchColumn();
+            
+            $nextSeries = $year . '-00-001';
+
+            if ($lastSeries && preg_match('/(\d{4})-(\d{2})-(\d{3})/', $lastSeries, $matches)) {
+                $y = $matches[1];
+                $mid = $matches[2];
+                $num = intval($matches[3]) + 1;
+                $nextSeries = sprintf('%s-%s-%03d', $y, $mid, $num);
+            }
+
+            echo json_encode(['success' => true, 'nextSeries' => $nextSeries]);
             exit();
         }
 
@@ -70,7 +91,7 @@ if ($method === 'GET') {
                     b.contact_number as contact,
                     b.address,
                     b.birthday,
-                    TIMESTAMPDIFF(YEAR, b.birthday, CURDATE()) as age,
+                    COALESCE(b.age, TIMESTAMPDIFF(YEAR, b.birthday, CURDATE())) as age,
                     g.gender_name as gender,
                     b.education,
                     b.start_date as startDate,
@@ -78,7 +99,7 @@ if ($method === 'GET') {
                     DATE_FORMAT(b.start_date, '%b %d, %Y') as startDateFormatted,
                     DATE_FORMAT(b.end_date, '%b %d, %Y') as endDateFormatted,
                     b.series_number as seriesNo,
-                    o.office_name as office,
+                    COALESCE(o.office_name, b.office_name) as office,
                     b.designation,
                     b.replacement_notes as replacement,
                     s.status_name as remarks,
@@ -126,7 +147,7 @@ if ($method === 'GET') {
                     b.contact_number as contact,
                     b.address,
                     b.birthday,
-                    TIMESTAMPDIFF(YEAR, b.birthday, CURDATE()) as age,
+                    COALESCE(b.age, TIMESTAMPDIFF(YEAR, b.birthday, CURDATE())) as age,
                     g.gender_name as gender,
                     b.education,
                     b.start_date as startDate,
@@ -134,7 +155,7 @@ if ($method === 'GET') {
                     DATE_FORMAT(b.start_date, '%b %d, %Y') as startDateFormatted,
                     DATE_FORMAT(b.end_date, '%b %d, %Y') as endDateFormatted,
                     b.series_number as seriesNo,
-                    o.office_name as office,
+                    COALESCE(o.office_name, b.office_name) as office,
                     b.designation,
                     b.replacement_notes as replacement,
                     s.status_name as remarks,
@@ -152,7 +173,7 @@ if ($method === 'GET') {
                 LEFT JOIN absorption_logs al ON b.absorption_log_id = al.log_id
                 LEFT JOIN users u ON al.logged_by = u.user_id
                 WHERE $whereClause
-                ORDER BY b.is_archived ASC, b.created_at DESC
+                ORDER BY b.full_name ASC, b.created_at ASC
             ");
             $stmt->execute();
             $beneficiaries = $stmt->fetchAll();
@@ -186,7 +207,7 @@ if ($method === 'GET') {
         if (!empty($data['gender'])) {
             $stmt = $pdo->prepare("SELECT gender_id FROM genders WHERE gender_name = :gender");
             $stmt->execute(['gender' => $data['gender']]);
-            $genderId = $stmt->fetchColumn();
+            $genderId = $stmt->fetchColumn() ?: null;
         }
 
         $officeId = null;
@@ -196,14 +217,14 @@ if ($method === 'GET') {
                 'office_name' => '%' . $data['office'] . '%',
                 'office_code' => $data['office']
             ]);
-            $officeId = $stmt->fetchColumn();
+            $officeId = $stmt->fetchColumn() ?: null;
         }
 
         $statusId = null;
         if (!empty($data['remarks'])) {
             $stmt = $pdo->prepare("SELECT status_id FROM status_types WHERE status_name = :status");
             $stmt->execute(['status' => $data['remarks']]);
-            $statusId = $stmt->fetchColumn();
+            $statusId = $stmt->fetchColumn() ?: null;
         }
 
         // Handle absorption log if status is ABSORBED
@@ -242,13 +263,13 @@ if ($method === 'GET') {
         // Insert beneficiary
         $stmt = $pdo->prepare("
             INSERT INTO beneficiaries (
-                gip_id, full_name, contact_number, address, birthday,
+                gip_id, full_name, contact_number, address, birthday, age,
                 gender_id, education, start_date, end_date, series_number,
-                office_id, designation, replacement_notes, status_id, absorption_log_id
+                office_id, office_name, designation, replacement_notes, status_id, absorption_log_id
             ) VALUES (
-                :gip_id, :name, :contact, :address, :birthday,
+                :gip_id, :name, :contact, :address, :birthday, :age,
                 :gender_id, :education, :start_date, :end_date, :series_no,
-                :office_id, :designation, :replacement, :status_id, :absorption_log_id
+                :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id
             )
         ");
 
@@ -257,13 +278,15 @@ if ($method === 'GET') {
             'name' => $data['name'],
             'contact' => $data['contact'] ?? null,
             'address' => $data['address'] ?? null,
-            'birthday' => $data['birthday'] ?? null,
+            'birthday' => !empty($data['birthday']) ? $data['birthday'] : null,
+            'age' => !empty($data['age']) ? intval($data['age']) : null,
             'gender_id' => $genderId,
             'education' => $data['education'] ?? null,
             'start_date' => $data['startDate'],
             'end_date' => $data['endDate'],
             'series_no' => $data['seriesNo'] ?? null,
             'office_id' => $officeId,
+            'office_name' => $data['office'] ?? null,
             'designation' => $data['designation'],
             'replacement' => $data['replacement'] ?? null,
             'status_id' => $statusId,
@@ -301,7 +324,7 @@ if ($method === 'GET') {
         if (!empty($data['gender'])) {
             $stmt = $pdo->prepare("SELECT gender_id FROM genders WHERE gender_name = :gender");
             $stmt->execute(['gender' => $data['gender']]);
-            $genderId = $stmt->fetchColumn();
+            $genderId = $stmt->fetchColumn() ?: null;
         }
 
         $officeId = null;
@@ -311,14 +334,14 @@ if ($method === 'GET') {
                 'office_name' => '%' . $data['office'] . '%',
                 'office_code' => $data['office']
             ]);
-            $officeId = $stmt->fetchColumn();
+            $officeId = $stmt->fetchColumn() ?: null;
         }
 
         $statusId = null;
         if (!empty($data['remarks'])) {
             $stmt = $pdo->prepare("SELECT status_id FROM status_types WHERE status_name = :status");
             $stmt->execute(['status' => $data['remarks']]);
-            $statusId = $stmt->fetchColumn();
+            $statusId = $stmt->fetchColumn() ?: null;
         }
 
         // Handle absorption log if status changed to ABSORBED
@@ -378,12 +401,14 @@ if ($method === 'GET') {
                 contact_number = :contact,
                 address = :address,
                 birthday = :birthday,
+                age = :age,
                 gender_id = :gender_id,
                 education = :education,
                 start_date = :start_date,
                 end_date = :end_date,
                 series_number = :series_no,
                 office_id = :office_id,
+                office_name = :office_name,
                 designation = :designation,
                 replacement_notes = :replacement,
                 status_id = :status_id,
@@ -397,13 +422,15 @@ if ($method === 'GET') {
             'name' => $data['name'],
             'contact' => $data['contact'] ?? null,
             'address' => $data['address'] ?? null,
-            'birthday' => $data['birthday'] ?? null,
+            'birthday' => !empty($data['birthday']) ? $data['birthday'] : null,
+            'age' => !empty($data['age']) ? intval($data['age']) : null,
             'gender_id' => $genderId,
             'education' => $data['education'] ?? null,
             'start_date' => $data['startDate'],
             'end_date' => $data['endDate'],
             'series_no' => $data['seriesNo'] ?? null,
             'office_id' => $officeId,
+            'office_name' => $data['office'] ?? null,
             'designation' => $data['designation'],
             'replacement' => $data['replacement'] ?? null,
             'status_id' => $statusId,

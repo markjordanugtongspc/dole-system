@@ -11,6 +11,9 @@ import Swal from 'sweetalert2';
 // Beneficiaries data loaded from database
 let beneficiaries = [];
 let lastDataChecksum = null; // For detecting data changes
+let currentPage = 1;
+const itemsPerPage = 10;
+let filteredDataGlobal = null; // Store current filtered state for pagination
 /**
  * Load beneficiaries from backend API
  */
@@ -22,7 +25,14 @@ async function loadBeneficiaries() {
         if (data.success) {
             beneficiaries = data.beneficiaries || [];
             syncExpiredStatusesLocally(beneficiaries);
-            renderTable();
+            
+            // Re-apply saved sort preference if exists
+            const savedSort = localStorage.getItem('ldn_sort_preference');
+            if (savedSort) {
+                sortData(savedSort, false); // false to avoid redundant localStorage.setItem
+            } else {
+                renderTable();
+            }
         } else {
             console.error('Failed to load beneficiaries:', data.error);
             beneficiaries = [];
@@ -103,6 +113,9 @@ export function renderTable(dataToRender = beneficiaries) {
     const tbody = document.getElementById('beneficiary-table-body');
     if (!tbody) return;
 
+    // Update global reference for pagination
+    filteredDataGlobal = dataToRender;
+
     if (dataToRender.length === 0) {
         tbody.innerHTML = `
             <tr>
@@ -116,10 +129,24 @@ export function renderTable(dataToRender = beneficiaries) {
                 </td>
             </tr>
         `;
+        const paginationContainer = document.getElementById('pagination-controls');
+        if (paginationContainer) paginationContainer.innerHTML = '';
         return;
     }
 
-    tbody.innerHTML = dataToRender.map(data => `
+    // Pagination Calculation
+    const totalItems = dataToRender.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    
+    // Ensure currentPage is within bounds
+    if (currentPage > totalPages) currentPage = totalPages || 1;
+    if (currentPage < 1) currentPage = 1;
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pagedData = dataToRender.slice(startIndex, endIndex);
+
+    tbody.innerHTML = pagedData.map(data => `
         <tr class="bg-blue-50 border-b border-blue-100 hover:bg-blue-100 transition-colors group cursor-pointer"
             onclick='viewBeneficiary(${JSON.stringify(data)})'>
             <th scope="row" class="px-4 py-3 font-medium text-heading whitespace-nowrap font-mono text-xs text-center">
@@ -129,19 +156,21 @@ export function renderTable(dataToRender = beneficiaries) {
                 ${data.name}
             </td>
             <td class="px-4 py-3 text-center">
-                <span class="${getOfficeClass(data.office)} text-xs font-bold px-2.5 py-0.5 rounded">
-                    ${data.office}
-                </span>
+                <div class="flex justify-center">
+                    <span class="${getOfficeClass(data.office)} text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded whitespace-nowrap">
+                        ${data.office || 'N/A'}
+                    </span>
+                </div>
             </td>
             <td class="px-4 py-3 whitespace-nowrap text-center">
-                <span class="text-[11px] font-black text-royal-blue uppercase tracking-tight">${data.startDateFormatted || data.startDate || 'N/A'}</span>
+                <span class="${(data.startDateFormatted || data.startDate) ? 'text-[11px] font-black text-royal-blue uppercase tracking-tight' : 'text-[10px] font-bold text-gray-300 italic'}">${data.startDateFormatted || data.startDate || 'N/A'}</span>
             </td>
             <td class="px-4 py-3 whitespace-nowrap text-center">
-                <span class="text-[11px] font-black text-philippine-red uppercase tracking-tight">${data.endDateFormatted || data.endDate || 'N/A'}</span>
+                <span class="${(data.endDateFormatted || data.endDate) ? 'text-[11px] font-black text-philippine-red uppercase tracking-tight' : 'text-[10px] font-bold text-gray-300 italic'}">${data.endDateFormatted || data.endDate || 'N/A'}</span>
             </td>
             <td class="px-4 py-3 text-center">
                 <span class="${getStatusClass(data.remarks)} text-xs font-bold px-2.5 py-0.5 rounded uppercase border">
-                    ${data.remarks}
+                    ${data.remarks || 'N/A'}
                 </span>
             </td>
             <td class="px-4 py-3 flex gap-2">
@@ -167,16 +196,89 @@ export function renderTable(dataToRender = beneficiaries) {
         </tr>
     `).join('');
 
+    renderPagination(totalItems, totalPages);
+    
     // Re-initialize Flowbite components after DOM update
     reinitFlowbite();
 }
 
+function renderPagination(totalItems, totalPages) {
+    const container = document.getElementById('pagination-controls');
+    if (!container) return;
+
+    if (totalItems <= itemsPerPage) {
+        container.innerHTML = `
+            <span class="text-xs font-bold text-gray-500">Showing all ${totalItems} results</span>
+            <div class="flex items-center gap-1"></div>
+        `;
+        return;
+    }
+
+    const startIdx = (currentPage - 1) * itemsPerPage + 1;
+    const endIdx = Math.min(currentPage * itemsPerPage, totalItems);
+
+    container.innerHTML = `
+        <span class="text-xs font-bold text-gray-500 px-2 py-1">
+            Showing <span class="text-royal-blue">${startIdx}-${endIdx}</span> of <span class="text-royal-blue">${totalItems}</span>
+        </span>
+        <div class="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-100">
+            <!-- Previous Button -->
+            <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
+                class="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:text-royal-blue hover:border-royal-blue/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            
+            ${generatePageNumbers(currentPage, totalPages)}
+
+            <!-- Next Button -->
+            <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
+                class="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:text-royal-blue hover:border-royal-blue/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+    `;
+}
+
+function generatePageNumbers(current, total) {
+    let html = '';
+    const maxVisible = 3;
+    
+    let start = Math.max(1, current - 1);
+    let end = Math.min(total, start + maxVisible - 1);
+    
+    if (end - start + 1 < maxVisible) {
+        start = Math.max(1, end - maxVisible + 1);
+    }
+
+    if (start > 1) html += `<span class="px-2 text-gray-400">...</span>`;
+
+    for (let i = start; i <= end; i++) {
+        html += `
+            <button onclick="changePage(${i})" 
+                class="min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-black transition-all cursor-pointer
+                ${i === current ? 'bg-royal-blue text-white shadow-md shadow-royal-blue/20' : 'bg-white text-gray-600 hover:bg-royal-blue/10 hover:text-royal-blue border border-gray-100'}">
+                ${i}
+            </button>
+        `;
+    }
+
+    if (end < total) html += `<span class="px-2 text-gray-400">...</span>`;
+
+    return html;
+}
+
+window.changePage = (page) => {
+    currentPage = page;
+    renderTable(filteredDataGlobal || beneficiaries);
+};
+
 function getOfficeClass(office) {
-    if (office.includes('DOLE')) return 'bg-blue-100 text-blue-700 border border-blue-200';
-    if (office.includes('DepEd')) return 'bg-orange-100 text-orange-700 border border-orange-200';
-    if (office.includes('LGU')) return 'bg-purple-100 text-purple-700 border border-purple-200';
-    if (office.includes('DICT')) return 'bg-cyan-100 text-cyan-700 border border-cyan-200';
-    return 'bg-gray-100 text-gray-700 border border-gray-200';
+    if (!office) return 'bg-gray-100 text-gray-700 border border-gray-200 dark:!text-white';
+    if (office.includes('DOLE')) return 'bg-blue-100 text-blue-700 border border-blue-200 dark:!text-white';
+    if (office.includes('DepEd')) return 'bg-orange-100 text-orange-700 border border-orange-200 dark:!text-white';
+    if (office.includes('LGU')) return 'bg-purple-100 text-purple-700 border border-purple-200 dark:!text-white';
+    if (office.includes('DICT')) return 'bg-cyan-100 text-cyan-700 border border-cyan-200 dark:!text-white';
+    return 'bg-gray-100 text-gray-700 border border-gray-200 dark:!text-white';
 }
 
 function getStatusClass(status) {
@@ -189,31 +291,51 @@ function getStatusClass(status) {
     return 'bg-gray-100 text-gray-600 border-gray-200';
 }
 
-export function sortData(criteria) {
+export function sortData(criteria, saveToStorage = true) {
+    if (saveToStorage) {
+        localStorage.setItem('ldn_sort_preference', criteria);
+    }
+
     switch (criteria) {
         case 'name_asc':
-            beneficiaries.sort((a, b) => a.name.localeCompare(b.name));
+            beneficiaries.sort((a, b) => {
+                const nameRes = a.name.localeCompare(b.name);
+                if (nameRes !== 0) return nameRes;
+                return new Date(a.createdAt) - new Date(b.createdAt);
+            });
             break;
         case 'name_desc':
-            beneficiaries.sort((a, b) => b.name.localeCompare(a.name));
+            beneficiaries.sort((a, b) => {
+                const nameRes = b.name.localeCompare(a.name);
+                if (nameRes !== 0) return nameRes;
+                return new Date(a.createdAt) - new Date(b.createdAt);
+            });
             break;
         case 'office':
-            beneficiaries.sort((a, b) => a.office.localeCompare(b.office));
+            beneficiaries.sort((a, b) => (a.office || '').localeCompare(b.office || ''));
             break;
         case 'remarks':
-            beneficiaries.sort((a, b) => a.remarks.localeCompare(b.remarks));
+            beneficiaries.sort((a, b) => (a.remarks || '').localeCompare(b.remarks || ''));
             break;
         case 'education':
-            beneficiaries.sort((a, b) => a.education.localeCompare(b.education));
+            beneficiaries.sort((a, b) => (a.education || '').localeCompare(b.education || ''));
             break;
         case 'work':
-            beneficiaries.sort((a, b) => a.designation.localeCompare(b.designation));
+            beneficiaries.sort((a, b) => (a.designation || '').localeCompare(b.designation || ''));
             break;
         case 'address':
-            beneficiaries.sort((a, b) => a.address.localeCompare(b.address));
+            beneficiaries.sort((a, b) => (a.address || '').localeCompare(b.address || ''));
             break;
     }
+    
+    currentPage = 1;
     renderTable();
+
+    // Auto-hide the dropdown menu
+    const dropdown = document.getElementById('sort-dropdown');
+    if (dropdown && !dropdown.classList.contains('hidden')) {
+        dropdown.classList.add('hidden');
+    }
 }
 
 export async function addBeneficiary(data) {
@@ -367,20 +489,22 @@ function initSearch() {
         const query = e.target.value.toLowerCase().trim();
 
         if (query === "") {
+            currentPage = 1;
             renderTable(beneficiaries);
             return;
         }
 
         const filtered = beneficiaries.filter(b =>
-            b.name.toLowerCase().includes(query) ||
-            b.id.toLowerCase().includes(query) ||
-            b.office.toLowerCase().includes(query) ||
-            b.remarks.toLowerCase().includes(query) ||
-            b.designation.toLowerCase().includes(query) ||
-            b.address.toLowerCase().includes(query) ||
-            b.education.toLowerCase().includes(query)
+            (b.name?.toLowerCase().includes(query) || false) ||
+            (b.id?.toLowerCase().includes(query) || false) ||
+            (b.office?.toLowerCase().includes(query) || false) ||
+            (b.remarks?.toLowerCase().includes(query) || false) ||
+            (b.designation?.toLowerCase().includes(query) || false) ||
+            (b.address?.toLowerCase().includes(query) || false) ||
+            (b.education?.toLowerCase().includes(query) || false)
         );
 
+        currentPage = 1;
         renderTable(filtered);
     });
 

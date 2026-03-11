@@ -149,8 +149,8 @@ require_once __DIR__ . '/../../config/vite.php';
                 </button>
             </div>
 
-            <!-- Main Content Table -->
-            <div class="relative overflow-x-auto bg-white shadow-xs rounded-base border border-default">
+            <!-- Main Content Container -->
+            <div class="relative bg-white shadow-xs rounded-base border border-default">
 
                 <!-- Modern Search Bar -->
                 <div
@@ -186,70 +186,77 @@ require_once __DIR__ . '/../../config/vite.php';
                         </button>
                         <!-- Sort Dropdown Menu -->
                         <div id="sort-dropdown"
-                            class="z-10 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
+                            class="z-50 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
                             <div class="px-4 py-3 bg-orange-50/50 rounded-t-xl">
                                 <span class="block text-[10px] font-black text-orange-600 uppercase tracking-wider">Sort
                                     Beneficiaries</span>
                             </div>
                             <ul class="py-2 text-xs font-bold text-gray-700" aria-labelledby="sort-dropdown-button">
                                 <li><button onclick="sortData('name_asc')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors">Name
+                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Name
                                         (A-Z)</button></li>
                                 <li><button onclick="sortData('name_desc')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors">Name
+                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Name
                                         (Z-A)</button></li>
                                 <li><button onclick="sortData('office')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors">Office
+                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Office
                                         / Assignment</button></li>
                                 <li><button onclick="sortData('remarks')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors">Remarks
+                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Remarks
                                         Status</button></li>
                                 <li><button onclick="sortData('education')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors">Educational
+                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Educational
                                         Attainment</button></li>
                                 <li><button onclick="sortData('work')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors">Nature
+                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Nature
                                         of Work</button></li>
                                 <li><button onclick="sortData('address')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors">Address
+                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Address
                                         / Residency</button></li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
-                <table class="w-full text-sm text-left rtl:text-right text-body">
-                    <!-- Primary Color Header -->
-                    <thead class="text-sm text-white bg-royal-blue border-b border-royal-blue/20">
-                        <tr>
-                            <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
-                                ID NO.
-                            </th>
-                            <th scope="col" class="px-4 py-2.5 font-medium text-center"
-                                title="Last Name, First Name, Middle Initial">
-                                NAME
-                            </th>
-                            <th scope="col" class="px-4 py-2.5 font-medium text-center">
-                                OFFICE / PLACE OF ASSIGNMENT
-                            </th>
-                            <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
-                                START DATE
-                            </th>
-                            <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
-                                END DATE
-                            </th>
-                            <th scope="col" class="px-4 py-2.5 font-medium text-center">
-                                REMARKS
-                            </th>
-                            <th scope="col" class="px-4 py-2.5 font-medium text-center">
-                                Action
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="beneficiary-table-body">
-                        <!-- Dynamic content injected by LDNgip.js -->
-                    </tbody>
-                </table>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left rtl:text-right text-body">
+                        <!-- Primary Color Header -->
+                        <thead class="text-sm text-white bg-royal-blue border-b border-royal-blue/20">
+                            <tr>
+                                <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
+                                    ID NO.
+                                </th>
+                                <th scope="col" class="px-4 py-2.5 font-medium text-center"
+                                    title="Last Name, First Name, Middle Initial">
+                                    NAME
+                                </th>
+                                <th scope="col" class="px-4 py-2.5 font-medium text-center">
+                                    OFFICE / PLACE OF ASSIGNMENT
+                                </th>
+                                <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
+                                    START DATE
+                                </th>
+                                <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
+                                    END DATE
+                                </th>
+                                <th scope="col" class="px-4 py-2.5 font-medium text-center">
+                                    REMARKS
+                                </th>
+                                <th scope="col" class="px-4 py-2.5 font-medium text-center">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="beneficiary-table-body">
+                            <!-- Dynamic content injected by LDNgip.js -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Modern Pagination Footer -->
+                <div id="pagination-controls" class="px-4 py-3 bg-white border-t border-gray-100 flex items-center justify-between font-montserrat">
+                    <!-- Pagination will be injected by LDNgip.js -->
+                </div>
             </div>
 
         </div>

@@ -529,7 +529,8 @@ const COMMON_COURSES = [
     { name: "BS Psychology", icon: `<svg class="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>` },
     { name: "BS Biology", icon: `<svg class="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>` },
     { name: "Senior High School Graduate", icon: `<svg class="w-3.5 h-3.5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>` },
-    { name: "High School Graduate", icon: `<svg class="w-3.5 h-3.5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>` }
+    { name: "High School Graduate", icon: `<svg class="w-3.5 h-3.5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>` },
+    { name: "College Graduate", icon: `<svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>` }
 ];
 
 const COMMON_NATURE_OF_WORK = [
@@ -701,22 +702,22 @@ function showBeneficiaryModal(data) {
                              <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="text-[9px] text-gray-400 dark:!text-white font-black uppercase tracking-widest block mb-1">Contact No.</label>
-                                    <p class="text-sm font-black text-heading font-mono">${data.contact || 'N/A'}</p>
+                                    <p class="${data.contact ? 'text-sm font-black text-heading font-mono' : 'text-xs font-bold text-gray-300 italic'}">${data.contact || 'NOT PROVIDED'}</p>
                                 </div>
                                 <div class="">
                                     <label class="text-[9px] text-gray-400 dark:!text-white font-black uppercase tracking-widest block mb-1">Address</label>
-                                    <p class="text-sm font-black text-heading break-words whitespace-normal leading-snug" title="${data.address}">${data.address || 'N/A'}</p>
+                                    <p class="text-xs font-bold text-heading break-words whitespace-normal leading-snug" title="${data.address}">${data.address || 'N/A'}</p>
                                 </div>
                             </div>
 
                              <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="text-[9px] text-gray-400 dark:!text-white font-black uppercase tracking-widest block mb-1">Birthday</label>
-                                    <p class="text-sm font-black text-heading uppercase">${data.birthday || 'N/A'}</p>
+                                    <p class="${data.birthday ? 'text-sm font-black text-heading uppercase' : 'text-xs font-bold text-gray-300 italic'}">${data.birthday || 'N/A'}</p>
                                 </div>
                                 <div>
                                     <label class="text-[9px] text-gray-400 dark:!text-white font-black uppercase tracking-widest block mb-1">Age</label>
-                                    <p class="text-sm font-black text-heading">${data.age || calculateAge(data.birthday) || 'N/A'}</p>
+                                    <p class="${(data.age || calculateAge(data.birthday)) ? 'text-sm font-black text-heading' : 'text-xs font-bold text-gray-300 italic'}">${data.age || calculateAge(data.birthday) || 'N/A'}</p>
                                 </div>
                             </div>
 
@@ -1550,17 +1551,8 @@ function showBeneficiaryModal(data) {
             bindDynamicInputs();
         },
         willClose: () => {
-            // Clear draft if the modal is closed without a successful save
-            // This assumes successful save explicitly clears it.
-            // If the modal is closed by clicking the close button or outside,
-            // and it's a new entry, we clear the draft.
-            const form = document.querySelector('#add-beneficiary-form');
-            const draftKey = 'add_beneficiary_draft';
-            const isEdit = form?.dataset.isEdit === 'true'; // Assuming you add data-is-edit to form
-
-            if (!isEdit) {
-                localStorage.removeItem(draftKey);
-            }
+            // No longer clearing draft automatically on close
+            // We now clear it only on explicit SAVE (partially) or CANCEL
         }
     });
 }
@@ -1619,7 +1611,7 @@ function showAddDataModal(data = null) {
         gfGreen: dk ? 'group-focus-within:text-green-500' : 'group-focus-within:text-[#2e7d32]',
         gfBlue: dk ? 'group-focus-within:text-blue-500' : 'group-focus-within:text-royal-blue',
         // Header icon
-        iconBg: dk ? 'bg-green-900/20' : 'bg-[#e8f5e9]',
+        iconBg: dk ? 'bg-green-900/20' : 'bg-white',
         iconText: dk ? 'text-green-400' : 'text-[#2e7d32]',
         iconBorder: dk ? 'border-green-800/30' : 'border-[#c8e6c9]',
         // Section dots
@@ -1646,7 +1638,7 @@ function showAddDataModal(data = null) {
     };
 
     const formContent = `
-        <div class="text-left font-montserrat user-select-none relative p-0 w-full">
+        <div class="text-left font-montserrat user-select-none relative p-0 max-w-full overflow-x-hidden">
             <!-- Modal Header -->
             <div class="mb-4 pb-3 border-b ${t.borderBase} flex items-center justify-between">
                 <div>
@@ -1665,47 +1657,47 @@ function showAddDataModal(data = null) {
                 <div class="${t.bgCard} rounded-xl p-3 sm:p-4 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
                     <div class="flex items-center gap-2 mb-1">
                         <div class="w-1 h-5 ${t.dotGreen} rounded-full"></div>
-                        <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest dark:!text-white">Personal & Educational Information</p>
+                        <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest dark:text-white!">Personal & Educational Information</p>
                     </div>
                     
                     <div class="space-y-3.5">
                         <div class="group">
-                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
-                            <input type="text" name="name" value="${data?.name || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} dark:!text-white" placeholder="e.g. Dela Cruz, Juan M.">
+                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" value="${data?.name || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} dark:text-white!" placeholder="e.g. Dela Cruz, Juan M.">
                         </div>
                         
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Contact No. <span class="text-red-500">*</span></label>
-                                <input type="text" name="contact" value="${data?.contact || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} font-mono" placeholder="09XX-XXX-XXXX">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Contact No.</label>
+                                <input type="text" name="contact" value="${data?.contact || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} font-mono" placeholder="09XX-XXX-XXXX">
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Address</label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Address</label>
                                 <input type="text" name="address" value="${data?.address || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="Barangay, City">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Birthday</label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Birthday</label>
                                 <input type="date" name="birthday" value="${data?.birthday || ''}" id="birthday-input" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm uppercase">
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Age</label>
-                                <input type="text" name="age" value="${data?.age || ''}" id="age-display" readonly class="w-full ${t.bgAgeInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-black ${t.textAge} cursor-not-allowed outline-none font-mono" placeholder="Auto">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Age</label>
+                                <input type="text" name="age" value="${data?.age || ''}" id="age-display" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-black ${t.textAge} outline-none font-mono focus:ring-4 ${t.focusGreen}" placeholder="Auto">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Gender</label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Gender</label>
                                 <select name="gender" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm cursor-pointer appearance-none">
                                     <option value="Male" ${data?.gender === 'Male' ? 'selected' : ''}>Male</option>
                                     <option value="Female" ${data?.gender === 'Female' ? 'selected' : ''}>Female</option>
                                 </select>
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:!text-white">Education</label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Education</label>
                                 <div class="relative" id="education-container">
                                     <input type="text" name="education" id="education-input" autocomplete="off"
                                         value="${data?.education || ''}" 
@@ -1784,7 +1776,7 @@ function showAddDataModal(data = null) {
                             </div>
                             <div class="group">
                                 <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Series Number</label>
-                                <input type="text" name="seriesNo" value="${data?.seriesNo || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-black ${dk ? 'text-white' : 'text-royal-blue'} font-mono focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm" placeholder="2025-00-000">
+                                <input type="text" name="seriesNo" id="series-no-input" value="${data?.seriesNo || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-black ${dk ? 'text-white' : 'text-royal-blue'} font-mono focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm" placeholder="2025-00-000">
                             </div>
                         </div>
 
@@ -1834,7 +1826,7 @@ function showAddDataModal(data = null) {
             return ['ONGOING', 'EXPIRED', 'RESIGNED', 'ABSORBED'].map(s => `
                                             <label class="cursor-pointer relative min-w-[80px]">
                                                 <input type="radio" name="remarks" value="${s}" ${data?.remarks === s ? 'checked' : ''} class="hidden peer remarks-radio">
-                                                <span class="px-3 py-1.5 rounded-lg border border-transparent text-[10px] font-black text-gray-400 dark:!text-white uppercase tracking-widest ${statusConfigs[s] || ''} transition-all block text-center cursor-pointer shadow-sm">
+                                                <span class="px-3 py-1.5 rounded-lg border border-transparent text-[10px] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${statusConfigs[s] || ''} transition-all block text-center cursor-pointer shadow-sm">
                                                     ${s}
                                                 </span>
                                             </label>
@@ -1862,7 +1854,7 @@ function showAddDataModal(data = null) {
             </form>
 
             <!-- Action Bar -->
-            <div class="mt-6 grid grid-cols-2 lg:flex lg:justify-end items-center gap-3 -mx-3 sm:-mx-8 -mb-3 sm:-mb-8 p-3 sm:p-6 rounded-b-[1.5rem] ${t.bgActionBar} border-t ${t.actionBarBorder}">
+            <div class="mt-6 flex flex-wrap lg:justify-end items-center gap-3 pt-6 rounded-b-[1.5rem] ${t.bgActionBar} border-t ${t.actionBarBorder}">
                 <button type="button" id="cancel-modal-btn"
                     class="group flex items-center justify-center gap-2.5 px-4 lg:px-6 py-3 lg:py-3.5 ${t.bgCancelBtn} ${t.textCancel} font-black rounded-xl hover:bg-[#ce1126] hover:text-white transition-all duration-300 shadow-sm border ${t.cancelBorder} hover:border-[#ce1126] cursor-pointer text-[10px] lg:text-[12px] active:scale-[0.98] uppercase tracking-wider whitespace-nowrap order-1 lg:order-2">
                     <svg class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -1892,70 +1884,68 @@ function showAddDataModal(data = null) {
             // Cancel button functionality
             const cancelBtn = popup.querySelector('#cancel-modal-btn');
             if (cancelBtn) {
-                cancelBtn.addEventListener('click', () => Swal.close());
+                cancelBtn.addEventListener('click', () => {
+                    // Wipe draft ONLY on explicit CANCEL for Add mode
+                    if (!isEdit) {
+                        localStorage.removeItem('add_beneficiary_draft');
+                    }
+                    Swal.close();
+                });
             }
 
-            // Ensure no internal scrolling and visible overflow for suggestions
-            if (!document.getElementById('ldn-modal-common-styles')) {
-                const style = document.createElement('style');
-                style.id = 'ldn-modal-common-styles';
-                style.innerHTML = `
-                    .ldn-modal-popup {
-                        overflow: visible !important;
-                        max-height: none !important;
-                    }
-                    .swal2-html-container {
-                        overflow: visible !important;
-                        margin: 0 !important;
-                        padding: 0 !important;
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-
-            // Auto-age calculation
             const bdayInput = popup.querySelector('#birthday-input');
             const ageDisplay = popup.querySelector('#age-display');
 
             if (bdayInput && ageDisplay) {
                 bdayInput.addEventListener('change', (e) => {
-                    ageDisplay.value = calculateAge(e.target.value);
+                    if (e.target.value) {
+                        ageDisplay.value = calculateAge(e.target.value);
+                    }
                 });
 
-                // Initial calculation for Edit mode
-                if (bdayInput.value) ageDisplay.value = calculateAge(bdayInput.value);
+                // Initial calculation for Edit mode if birthday is set and no age is already there
+                if (bdayInput.value && !data?.age) {
+                    ageDisplay.value = calculateAge(bdayInput.value);
+                }
             }
 
-            // ID Auto-increment Logic
+            // Identifiers Sync Logic (GIP ID & Series Number)
             const fullIdInput = popup.querySelector('#full-id-input');
-            const ID_PREFIX = "ROX-RD-ESIG-2025-";
+            const seriesNoInput = popup.querySelector('#series-no-input');
+            const startDateInput = popup.querySelector('input[name="startDate"]');
+            const endDateInput = popup.querySelector('input[name="endDate"]');
+            const remarksRadios = popup.querySelectorAll('input[name="remarks"]');
+            const extensionContainer = popup.querySelector('#extension-log-container');
 
-            if (fullIdInput) {
-                // If adding new record, fetch the correct next ID from the database
-                if (!isEdit) {
-                    // Set a placeholder while waiting
+            const fetchNextIdentifiers = (year) => {
+                if (isEdit) return; 
+
+                if (fullIdInput) {
                     fullIdInput.classList.add('animate-pulse');
-                    fullIdInput.placeholder = "Loading next ID...";
-
-                    fetch(`${getBasePath()}api/beneficiaries.php?next_id`)
+                    fullIdInput.placeholder = "Loading...";
+                    fetch(`${getBasePath()}api/beneficiaries.php?next_id&year=${year}`)
                         .then(res => res.json())
                         .then(data => {
                             fullIdInput.classList.remove('animate-pulse');
                             if (data.success && data.nextId) {
                                 fullIdInput.value = data.nextId;
                             }
-                        })
-                        .catch(err => {
-                            console.error("Failed to fetch next ID:", err);
-                            fullIdInput.classList.remove('animate-pulse');
                         });
                 }
-            }
 
-            // Remarks and End Date Logic
-            const startDateInput = popup.querySelector('input[name="startDate"]');
-            const endDateInput = popup.querySelector('input[name="endDate"]');
-            const remarksRadios = popup.querySelectorAll('input[name="remarks"]');
+                if (seriesNoInput) {
+                    seriesNoInput.classList.add('animate-pulse');
+                    seriesNoInput.placeholder = "Loading...";
+                    fetch(`${getBasePath()}api/beneficiaries.php?next_series_no&year=${year}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            seriesNoInput.classList.remove('animate-pulse');
+                            if (data.success && data.nextSeries) {
+                                seriesNoInput.value = data.nextSeries;
+                            }
+                        });
+                }
+            };
 
             const getSelectedRemarks = () => {
                 const checked = popup.querySelector('input[name="remarks"]:checked');
@@ -1966,150 +1956,116 @@ function showAddDataModal(data = null) {
                 const radio = popup.querySelector(`input[name="remarks"][value="${val}"]`);
                 if (radio) {
                     radio.checked = true;
-                    radio.dispatchEvent(new Event('change', { bubbles: true }));
+                    // Trigger manual change if needed for absorption log
+                    updateAbsorptionLog();
                 }
             };
 
-            if (startDateInput && endDateInput && remarksRadios.length > 0) {
-                // Auto-set End Date based on Start Date (e.g., 1 month later)
+            const updateRemarks = () => {
+                if (endDateInput && endDateInput.value) {
+                    const endArr = endDateInput.value.split('-');
+                    const end = new Date(endArr[0], endArr[1]-1, endArr[2]);
+                    const now = new Date();
+                    now.setHours(0, 0, 0, 0);
+
+                    let newStatus = 'ONGOING';
+                    if (end < now) {
+                        newStatus = 'EXPIRED';
+                    }
+                    setSelectedRemarks(newStatus);
+                }
+            };
+
+            const updateAbsorptionLog = () => {
+                if (!extensionContainer) return;
+                const status = getSelectedRemarks();
+                if (status === 'ABSORBED') {
+                    const dateStr = data?.absorbDate || new Date().toLocaleString('en-US', {
+                        timeZone: 'Asia/Manila',
+                        month: 'short', day: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', hour12: true
+                    });
+                    extensionContainer.innerHTML = `
+                        <div class="mt-4 pt-4 border-t ${dk ? 'border-slate-800' : 'border-gray-100'}">
+                            <p class="text-[9px] uppercase font-black ${dk ? 'text-green-500' : 'text-[#2e7d32]'} border-b ${dk ? 'border-slate-800' : 'border-green-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> Absorption Details</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                <div class="${dk ? 'bg-green-900/10 border-green-900/30' : 'bg-[#e8f5e9]/50 border-[#c8e6c9]'} rounded-lg p-2.5 flex items-center justify-between border">
+                                    <div>
+                                        <label class="text-[8px] ${dk ? 'text-green-500' : 'text-[#2e7d32]'} font-bold uppercase block mb-0.5">Absorption Date</label>
+                                        <p class="text-[10px] font-black ${dk ? 'text-green-400' : 'text-[#1b5e20]'} uppercase">${dateStr}</p>
+                                        <input type="hidden" name="absorbDate" value="${dateStr}">
+                                    </div>
+                                    <svg class="w-4 h-4 ${dk ? 'text-green-400' : 'text-[#2e7d32]'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                </div>
+                                <div class="group">
+                                    <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Where?</label>
+                                    <input type="text" name="absorb_where" value="${data?.absorb_where || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="Where to absorb?">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="group">
+                                    <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Position</label>
+                                    <input type="text" name="absorb_position" value="${data?.absorb_position || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="What kind of position?">
+                                </div>
+                                <div class="group">
+                                    <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Agency</label>
+                                    <input type="text" name="absorb_agency" value="${data?.absorb_agency || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="On what agency?">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    extensionContainer.innerHTML = '';
+                }
+            };
+
+            if (startDateInput) {
                 startDateInput.addEventListener('change', (e) => {
-                    if (e.target.value) {
-                        if (!endDateInput.value) {
-                            const start = new Date(e.target.value);
-                            start.setMonth(start.getMonth() + 1); // Default 1 month for GIP Contract
+                    const dateVal = e.target.value;
+                    if (dateVal) {
+                        const selectedYear = new Date(dateVal).getFullYear();
+                        fetchNextIdentifiers(selectedYear);
+
+                        if (endDateInput && !endDateInput.value) {
+                            const start = new Date(dateVal);
+                            start.setMonth(start.getMonth() + 1);
                             endDateInput.value = start.toISOString().split('T')[0];
                         }
                         updateRemarks();
                     }
                 });
 
-                // Auto-uppercase for all text inputs as per senior request
-                const textInputs = popup.querySelectorAll('input[type="text"], textarea');
-                textInputs.forEach(input => {
-                    // Skip GIP ID suffix input to keep it numeric mostly
-                    if (input.id === 'id-number-input' || input.id === 'full-id-input') return;
-
-                    input.addEventListener('input', () => {
-                        const start = input.selectionStart;
-                        const end = input.selectionEnd;
-                        input.value = input.value.toUpperCase();
-                        input.setSelectionRange(start, end);
-                    });
-                });
-
-                const updateRemarks = () => {
-                    if (endDateInput.value) {
-                        const start = startDateInput.value ? new Date(startDateInput.value) : null;
-                        const end = new Date(endDateInput.value);
-                        const now = new Date();
-
-                        // Reset hours for pure date comparison
-                        if (start) start.setHours(0, 0, 0, 0);
-                        end.setHours(0, 0, 0, 0);
-                        now.setHours(0, 0, 0, 0);
-
-                        let newStatus = 'ONGOING';
-                        if (end < now) {
-                            newStatus = 'EXPIRED';
-                        } else if (start && start <= now) {
-                            newStatus = 'ONGOING';
-                        } else if (start && start > now) {
-                            newStatus = 'ONGOING';
-                        }
-
-                        setSelectedRemarks(newStatus);
-                    }
-                };
-
-                endDateInput.addEventListener('change', updateRemarks);
-
-                // Absorption Content Helper
-                const extensionContainer = popup.querySelector('#extension-log-container');
-                const updateAbsorptionLog = () => {
-                    const status = getSelectedRemarks();
-                    if (status === 'ABSORBED') {
-                        const date = data?.absorbDate || new Date().toLocaleString('en-US', {
-                            timeZone: 'Asia/Manila',
-                            month: 'short',
-                            day: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true
-                        });
-                        extensionContainer.innerHTML = `
-                            <div class="mt-4 pt-4 border-t ${dk ? 'border-slate-800' : 'border-gray-100'}">
-                                <p class="text-[9px] uppercase font-black ${dk ? 'text-green-500' : 'text-[#2e7d32]'} border-b ${dk ? 'border-slate-800' : 'border-green-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> Absorption Details</p>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                    <div class="${dk ? 'bg-green-900/10 border-green-900/30' : 'bg-[#e8f5e9]/50 border-[#c8e6c9]'} rounded-lg p-2.5 flex items-center justify-between border">
-                                        <div>
-                                            <label class="text-[8px] ${dk ? 'text-green-500' : 'text-[#2e7d32]'} font-bold uppercase block mb-0.5">Absorption Date</label>
-                                            <p class="text-[10px] font-black ${dk ? 'text-green-400' : 'text-[#1b5e20]'} uppercase">${date}</p>
-                                            <input type="hidden" name="absorbDate" value="${date}">
-                                        </div>
-                                        <svg class="w-4 h-4 ${dk ? 'text-green-400' : 'text-[#2e7d32]'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    </div>
-                                    
-                                    <div class="group">
-                                        <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:!text-white'} font-black uppercase block mb-1">Where?</label>
-                                        <input type="text" name="absorb_where" value="${data?.absorb_where || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="Where to absorb?">
-                                    </div>
-                                </div>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <div class="group">
-                                        <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:!text-white'} font-black uppercase block mb-1">Position</label>
-                                        <input type="text" name="absorb_position" value="${data?.absorb_position || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="What kind of position?">
-                                    </div>
-                                    <div class="group">
-                                        <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:!text-white'} font-black uppercase block mb-1">Agency</label>
-                                        <input type="text" name="absorb_agency" value="${data?.absorb_agency || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="On what agency?">
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        extensionContainer.innerHTML = '';
-                    }
-                };
-
-                // Listen for manual radio changes
-                remarksRadios.forEach(r => r.addEventListener('change', updateAbsorptionLog));
-
-                // Resign Button Logic
-                const resignBtn = popup.querySelector('#resign-btn');
-                const absorbBtn = popup.querySelector('#absorb-btn');
-
-                if (resignBtn) {
-                    resignBtn.addEventListener('click', () => {
-                        const current = getSelectedRemarks();
-                        if (current === 'RESIGNED') {
-                            updateRemarks();
-                        } else {
-                            setSelectedRemarks('RESIGNED');
-                        }
-                    });
+                if (!isEdit) {
+                    const baseYear = startDateInput.value ? new Date(startDateInput.value).getFullYear() : new Date().getFullYear();
+                    fetchNextIdentifiers(baseYear);
                 }
-
-                if (absorbBtn) {
-                    absorbBtn.addEventListener('click', () => {
-                        const current = getSelectedRemarks();
-                        if (current === 'ABSORBED') {
-                            updateRemarks();
-                        } else {
-                            setSelectedRemarks('ABSORBED');
-                        }
-                    });
-                }
-
-                // Initial check
-                const initialRemarks = getSelectedRemarks();
-                if (initialRemarks !== 'RESIGNED' && initialRemarks !== 'ABSORBED') {
-                    updateRemarks();
-                }
-                updateAbsorptionLog();
             }
+
+            if (endDateInput) {
+                endDateInput.addEventListener('change', updateRemarks);
+            }
+
+            remarksRadios.forEach(r => r.addEventListener('change', updateAbsorptionLog));
+
+            // Resign & Absorb Buttons
+            const resignBtn = popup.querySelector('#resign-btn');
+            const absorbBtn = popup.querySelector('#absorb-btn');
+            if (resignBtn) resignBtn.addEventListener('click', () => setSelectedRemarks('RESIGNED'));
+            if (absorbBtn) absorbBtn.addEventListener('click', () => setSelectedRemarks('ABSORBED'));
+
+            // Text Auto-Uppercase
+            popup.querySelectorAll('input[type="text"], textarea').forEach(input => {
+                if (['id-number-input', 'full-id-input'].includes(input.id)) return;
+                input.addEventListener('input', () => {
+                    const start = input.selectionStart, end = input.selectionEnd;
+                    input.value = input.value.toUpperCase();
+                    input.setSelectionRange(start, end);
+                });
+            });
+
+            // Initial UI state
+            updateRemarks();
+            updateAbsorptionLog();
 
             // Setup Suggestions
             setupSuggestions('education-input', 'course-suggestions', 'course-option');
@@ -2215,7 +2171,7 @@ function showAddDataModal(data = null) {
 
                     // Helper to mark field as error
                     const markError = (name) => {
-                        const el = form.querySelector(`[name = "${name}"]`);
+                        const el = form.querySelector(`[name="${name}"]`);
                         if (el) {
                             el.classList.add('ring-2', 'ring-red-500', '!border-red-500');
                         }
@@ -2234,8 +2190,8 @@ function showAddDataModal(data = null) {
                         markError('name');
                     }
 
-                    // Contact validation (required + numbers only)
-                    if (!contact || contact.trim() === "" || /[^0-9]/.test(contact.replace(/[\s\-\+\(\)]/g, ''))) {
+                    // Contact validation (optional + numbers only if provided)
+                    if (contact && contact.trim() !== "" && /[^0-9]/.test(contact.replace(/[\s\-\+\(\)]/g, ''))) {
                         markError('contact');
                     }
 
@@ -2277,6 +2233,20 @@ function showAddDataModal(data = null) {
                             const success = await window.addBeneficiaryData(beneficiaryData);
 
                             if (success) {
+                                // Clear draft EXCEPT for Office and Nature of Work for convenience
+                                if (!isEdit) {
+                                    const draftKey = 'add_beneficiary_draft';
+                                    const currentOffice = form.querySelector('[name="office"]')?.value || '';
+                                    const currentWork = form.querySelector('[name="designation"]')?.value || '';
+                                    const currentEducation = form.querySelector('[name="education"]')?.value || '';
+                                    
+                                    localStorage.setItem(draftKey, JSON.stringify({
+                                        office: currentOffice,
+                                        designation: currentWork,
+                                        education: currentEducation
+                                    }));
+                                }
+
                                 // 1. Close the main input modal first
                                 Swal.close();
 
