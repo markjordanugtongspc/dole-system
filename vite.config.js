@@ -47,9 +47,9 @@ export default defineConfig({
         origin: process.env.VITE_ORIGIN || undefined,
 
         hmr: {
-            // Setting host to true allows the HMR connection to automatically use 
-            // the IP/Host from which the page was loaded.
-            host: true,
+            // Setting host to 'localhost' prevents the 'ws://true' connection error
+            // while still allowing the dev server to function locally.
+            host: 'localhost',
             clientPort: 5173,
         },
         watch: {
