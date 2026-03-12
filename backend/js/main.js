@@ -6,7 +6,7 @@ import '../css/main.css';
 import 'animate.css';
 import 'flowbite';
 import { initFlowbite } from 'flowbite';
-import { initLoginHandler, initLogoutHandler, initSmartLoader } from './modules/auth.js';
+import { initLoginHandler, initLogoutHandler, initSmartLoader, initMobileSplash } from './modules/auth.js';
 import { initCharts } from './modules/charts.js';
 import { initLDNPage } from './modules/ldngip.js';
 import { initModalHandler, updateUIProfile } from './modules/modal.js';
@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize modules
     initLoginHandler();
     initLogoutHandler();
+    initMobileSplash();
     initCharts();
     initLDNPage();
     initModalHandler();

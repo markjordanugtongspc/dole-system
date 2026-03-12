@@ -113,29 +113,29 @@ require_once __DIR__ . '/config/db.php';
             </svg>
         </div>
 
-        <!-- SPLASH CONTENT (Scrollable/Expandable) -->
-        <div class="relative z-10 flex flex-col h-full overflow-y-auto px-4 md:px-8 py-4">
-            <!-- Headers (Left-aligned, Brand color, Enhanced visibility) -->
-            <div class="pt-8 mb-2 text-left w-full pl-4">
+        <!-- SPLASH CONTENT (Scrollable/Expandable & Fixed Overlap) -->
+        <div class="relative z-10 flex flex-col h-full overflow-y-auto px-4 md:px-8 py-8">
+            <!-- Headers (Left-aligned, Enhanced Visibility) -->
+            <div class="pt-8 mb-4 text-left w-full pl-4">
                 <h1 class="text-3xl sm:text-2xl font-black text-royal-blue dark:text-blue-400 leading-tight uppercase tracking-tight whitespace-nowrap">DOLE-GIP</h1>
                 <p class="text-[11px] sm:text-[10px] font-bold text-slate-700 dark:text-slate-300 mt-1 uppercase tracking-widest whitespace-nowrap">Republic of the Philippines</p>
-                <p class="text-[9px] sm:text-[8px] font-bold text-slate-800 dark:text-slate-200 mt-0.5 uppercase tracking-widest opacity-100 whitespace-nowrap bg-white/40 dark:bg-black/20 backdrop-blur-sm px-1 inline-block rounded">Department of Labor and Employment</p>
+                <p class="text-[9px] sm:text-[8px] font-black text-white bg-royal-blue/90 dark:bg-blue-600/90 px-2 py-1 inline-block rounded uppercase tracking-widest shadow-sm mt-1.5 backdrop-blur-md">Department of Labor and Employment</p>
             </div>
 
-            <!-- Middle Center Logo (No circle outline) -->
+            <!-- Logo Container (Middle Center, No circle outline) -->
             <div class="grow flex items-center justify-center relative my-12">
-                <div class="relative w-48 h-48 sm:w-40 sm:h-40 flex items-center justify-center z-10">
+                <div class="relative w-64 h-64 sm:w-56 sm:h-56 flex items-center justify-center z-10">
                     <div class="absolute inset-0 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
-                    <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-32 h-32 sm:w-28 sm:h-28 object-contain opacity-25">
+                    <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-48 h-48 sm:w-40 sm:h-40 object-contain opacity-35 drop-shadow-2xl">
                 </div>
             </div>
 
-            <!-- Action Buttons (Moved higher up from bottom) -->
-            <div class="flex flex-col gap-2 mb-40 sm:mb-32 relative z-20 w-full max-w-xs mx-auto">
-                <button id="show-login-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3.5 rounded-xl shadow-lg transition-all text-[11px] sm:text-[10px] uppercase tracking-[0.2em] active:scale-[0.98]">
+            <!-- Action Buttons (Positioned higher, fully visible) -->
+            <div class="flex flex-col gap-4 mb-48 sm:mb-40 relative z-20 w-full max-w-xs mx-auto">
+                <button id="show-login-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 rounded-xl shadow-lg transition-all text-xs uppercase tracking-[0.2em] active:scale-[0.97]">
                     Login
                 </button>
-                <button id="forgot-password-splash-btn" class="w-full text-red-500 hover:bg-red-500/10 font-bold py-3.5 rounded-xl transition-all text-[11px] sm:text-[10px] uppercase tracking-[0.15em] border border-red-500/20 active:scale-[0.98]">
+                <button id="forgot-password-splash-btn" class="w-full text-red-500 hover:bg-red-500/5 font-bold py-3.5 rounded-xl transition-all text-xs uppercase tracking-[0.15em] border border-red-500/10 active:scale-[0.97]">
                     Forgot Password
                 </button>
             </div>
@@ -158,80 +158,64 @@ require_once __DIR__ . '/config/db.php';
         </div>
     </div>
 
-    <!-- RIGHT PANEL - Login Area -->
-    <div id="right-panel" class="flex w-full lg:w-1/2 items-center justify-center bg-white dark:bg-slate-900 px-6 py-12 transition-colors duration-300">
-        <div id="right-panel-content" class="w-full max-w-md">
-            <!-- Mobile Logo -->
-            <div class="lg:hidden text-center mb-8">
-                <div class="w-20 h-20 mx-auto bg-white rounded-full shadow-lg flex items-center justify-center mb-4 p-2 border-2 border-slate-100 overflow-hidden">
-                    <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-full h-full object-contain rounded-full">
+        <!-- Back Button for Mobile (Light Red in light mode) -->
+        <button id="back-to-splash" class="lg:hidden absolute top-6 left-3 text-red-400 hover:text-red-500 dark:text-red-500 transition-colors p-2 z-50">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 9-3 3m0 0 3 3m-3-3h7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+        </button>
+
+        <div id="right-panel-content" class="w-full max-w-md lg:max-w-md mx-auto">
+            <!-- Mobile Logo Section (Branding text commented out) -->
+            <div class="lg:hidden text-center mb-6">
+                <div class="w-32 h-32 mx-auto mb-4 relative aspect-square rounded-full border border-blue-500/10">
+                    <div class="absolute inset-0 bg-royal-blue/5 rounded-full blur-2xl animate-pulse"></div>
+                    <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-full h-full object-contain relative z-10 rounded-full">
                 </div>
-                <h2 class="text-xl font-bold text-royal-blue dark:text-blue-400">DOLE System</h2>
-                <p class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">Republic of the Philippines</p>
+                <!--
+                <h2 class="text-3xl font-black text-royal-blue dark:text-blue-400 uppercase tracking-tight">DOLE System</h2>
+                <p class="text-xs text-gray-500 font-bold uppercase tracking-[0.2em] mt-2">Republic of the Philippines</p>
+                <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-widest mt-1">Department of Labor and Employment</p>
+                -->
             </div>
 
-            <!-- Login Card -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-200 dark:border-slate-700 p-8 transition-all duration-300">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">Welcome Back</h2>
-                    <p class="text-sm text-gray-600 dark:text-slate-400">Sign in to your account</p>
+            <!-- Login Form (Container removed for mobile as per ref) -->
+            <div class="lg:bg-white lg:dark:bg-slate-800 lg:rounded-2xl lg:shadow-xl lg:border lg:border-gray-200 lg:dark:border-slate-700 lg:p-10 transition-all duration-300">
+                <div class="mb-10 text-center lg:text-left">
+                    <h2 class="text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">Welcome Back!</h2>
+                    <p class="text-base text-gray-600 dark:text-slate-400 font-medium">Sign in to access your administrative tools and services.</p>
                 </div>
-                <form id="loginForm" class="space-y-5">
-                    <div>
-                        <label for="username" class="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">Username</label>
-                        <input type="text" id="username" name="username" required class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-2 focus:ring-blue-100 transition-all outline-none text-sm font-medium" placeholder="Enter your username" />
+                <form id="loginForm" class="space-y-6">
+                    <div class="w-full">
+                        <label for="username" class="block text-xs font-black text-gray-700 dark:text-slate-300 mb-2 uppercase tracking-[0.1em]">Email address or Username*</label>
+                        <input type="text" id="username" name="username" required class="w-full px-5 py-4 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-blue-100/50 transition-all outline-none text-base font-semibold shadow-sm" placeholder="Enter your username" />
                     </div>
-                    <div>
-                        <label for="password" class="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">Password</label>
+                    <div class="w-full">
+                        <div class="flex justify-between items-center mb-2">
+                            <label for="password" class="block text-xs font-black text-gray-700 dark:text-slate-300 uppercase tracking-[0.1em]">Password*</label>
+                        </div>
                         <div class="relative">
-                            <input type="password" id="password" name="password" required class="w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-2 focus:ring-blue-100 transition-all outline-none text-sm font-medium" placeholder="Enter your password" />
-                            <button type="button" id="togglePassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400">
-                                <svg class="eye-open w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                <svg class="eye-closed w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                            <input type="password" id="password" name="password" required class="w-full px-5 py-4 pr-14 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-blue-100/50 transition-all outline-none text-base font-semibold shadow-sm" placeholder="Enter your password" />
+                            <button type="button" id="togglePassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-royal-blue dark:text-slate-500 transition-colors">
+                                <svg class="eye-open w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                <svg class="eye-closed w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
                             </button>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between pt-2 px-1">
                         <div class="flex items-center">
-                            <input type="checkbox" id="rememberMe" name="rememberMe" class="w-4 h-4 rounded border-gray-300 text-royal-blue focus:ring-blue-100 cursor-pointer" />
-                            <label for="rememberMe" class="ml-2 text-sm text-gray-700 dark:text-slate-400 cursor-pointer">Remember me</label>
+                            <input type="checkbox" id="rememberMe" name="rememberMe" class="w-5 h-5 rounded border-gray-300 text-royal-blue focus:ring-blue-100 cursor-pointer" />
+                            <label for="rememberMe" class="ml-3 text-sm font-bold text-gray-700 dark:text-slate-400 cursor-pointer">Remember me</label>
                         </div>
-                        <a href="#" class="text-sm font-semibold text-royal-blue hover:text-blue-700 transition-colors">Forgot password?</a>
+                        <a href="#" id="forgot-password-link" class="text-sm font-black text-royal-blue hover:text-blue-700 transition-colors uppercase tracking-tight">Forgot password?</a>
                     </div>
-                    <button type="submit" class="w-full bg-royal-blue text-white font-bold py-3.5 rounded-lg hover:bg-blue-800 transition-all shadow-lg active:scale-[0.98]">Login</button>
+                    <button type="submit" class="w-full bg-royal-blue text-white font-black py-4 rounded-xl hover:bg-blue-800 transition-all shadow-xl active:scale-[0.98] uppercase tracking-[0.1em] text-sm mt-4">Sign in</button>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPTS -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const splash = document.getElementById('mobile-splash');
-            const showBtn = document.getElementById('show-login-btn');
-            const forgotBtn = document.getElementById('forgot-password-splash-btn');
-
-            const removeSplash = () => {
-                if (splash) {
-                    splash.style.transform = 'translateY(-100%)';
-                    // Listen for the end of the transition to literally remove it from DOM
-                    splash.addEventListener('transitionend', () => {
-                        splash.remove();
-                        // Also restore scrolling to body if it was blocked
-                        document.body.style.overflow = '';
-                    }, { once: true });
-                }
-            };
-
-            if (showBtn) {
-                showBtn.addEventListener('click', removeSplash);
-            }
-
-            if (forgotBtn) {
-                forgotBtn.addEventListener('click', removeSplash);
-            }
-        });
-    </script>
+    <!-- SCRIPTS MOVED TO MAIN.JS -->
 </body>
 
 </html>

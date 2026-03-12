@@ -219,3 +219,38 @@ export function initLogoutHandler() {
         });
     }
 }
+
+/**
+ * Initialize Mobile Splash Drawer Transitions
+ */
+export function initMobileSplash() {
+    const splash = document.getElementById('mobile-splash');
+    const showBtn = document.getElementById('show-login-btn');
+    const forgotBtn = document.getElementById('forgot-password-splash-btn');
+    const backBtn = document.getElementById('back-to-splash');
+
+    const hideSplash = () => {
+        if (splash) {
+            splash.style.transform = 'translateY(-100%)';
+            // Wait for transition to finish then hide completely to prevent top-overlap
+            setTimeout(() => {
+                splash.style.visibility = 'hidden';
+                splash.style.pointerEvents = 'none';
+                splash.style.zIndex = '-1';
+            }, 700);
+        }
+    };
+
+    const showSplash = () => {
+        if (splash) {
+            splash.style.zIndex = '9999';
+            splash.style.pointerEvents = 'auto';
+            splash.style.visibility = 'visible';
+            splash.style.transform = 'translateY(0)';
+        }
+    };
+
+    if (showBtn) showBtn.addEventListener('click', hideSplash);
+    if (forgotBtn) forgotBtn.addEventListener('click', hideSplash);
+    if (backBtn) backBtn.addEventListener('click', showSplash);
+}
