@@ -47,9 +47,8 @@ export default defineConfig({
         origin: process.env.VITE_ORIGIN || undefined,
 
         hmr: {
-            // Setting host to 'localhost' prevents the 'ws://true' connection error
-            // while still allowing the dev server to function locally.
-            host: 'localhost',
+            // Removing the hardcoded 'host: localhost' so that external devices (like your phone)
+            // can connect to the HMR WebSocket using the network IP (192.168.x.x)
             clientPort: 5173,
         },
         watch: {

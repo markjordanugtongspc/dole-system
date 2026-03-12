@@ -133,3 +133,37 @@ function env($key, $default = null)
 
 // Set timezone from environment
 date_default_timezone_set(env('APP_TIMEZONE', 'Asia/Manila'));
+
+/**
+ * Handle CORS and dynamic origin validation
+ */
+function handleCors()
+{
+    $allowedOrigins = explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost,http://127.0.0.1'));
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+    // If no origin (same-site or direct), or if origin is in our allowed list
+    $isAllowed = empty($origin) || in_array($origin, $allowedOrigins);
+
+    // Dynamic pattern check: allow any local network IP (192.168.x.x or 10.x.x.x) if in development
+    if (!$isAllowed && env('APP_ENV') === 'development') {
+        if (preg_match('/^http:\/\/(192\.168\.\d+\.\d+|127\.0\.0\.1|localhost|10\.\d+\.\d+\.\d+)(:\d+)?$/', $origin)) {
+            $isAllowed = true;
+        }
+    }
+
+    if ($isAllowed && !empty($origin)) {
+        header("Access-Control-Allow-Origin: $origin");
+    } else {
+        header("Access-Control-Allow-Origin: " . ($allowedOrigins[0] ?? '*'));
+    }
+
+    header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+    header('Access-Control-Allow-Credentials: true');
+
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        http_response_code(200);
+        exit();
+    }
+}
