@@ -10,7 +10,7 @@
     class="relative inline-flex items-center text-sm font-medium text-center text-gray-700 hover:text-gray-900 focus:outline-none transition-colors cursor-pointer"
     type="button">
     <span id="notificationBellIcon">
-        <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
             fill="none" viewBox="0 0 24 24">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 5.365V3m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175 0 .593 0 1.292-.538 1.292H5.538C5 18 5 17.301 5 16.708c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.365ZM8.733 18c.094.852.306 1.54.944 2.112a3.48 3.48 0 0 0 4.646 0c.638-.572 1.236-1.26 1.33-2.112h-6.92Z" />
@@ -60,16 +60,13 @@
     </div>
 
     <!-- Footer -->
-    <a href="<?php echo $baseUrl ?? ''; ?>/frontend/notifications/"
-        class="block py-2.5 text-sm font-medium text-center text-gray-700 rounded-b-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-        <div class="inline-flex items-center gap-1.5">
-            <svg class="w-4 h-4 text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-                height="24" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-width="2"
-                    d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z" />
-                <path stroke="currentColor" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+    <button onclick="clearNotificationView()"
+        class="block w-full py-2.5 text-xs font-bold uppercase tracking-widest text-center text-slate-500 hover:text-royal-blue rounded-b-xl bg-slate-50 hover:bg-slate-100 transition-all duration-300 cursor-pointer">
+        <div class="inline-flex items-center gap-1.5 leading-none">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
-            View all notifications
+            Clear Notifications View
         </div>
-    </a>
+    </button>
 </div>

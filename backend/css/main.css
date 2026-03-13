@@ -228,11 +228,11 @@ body {
 }
 
 .animate-slide-left {
-    animation: slide-left 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: slide-left 0.8s cubic-bezier(0.85, 0, 0.15, 1) forwards;
 }
 
 .animate-slide-right {
-    animation: slide-right 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: slide-right 0.8s cubic-bezier(0.85, 0, 0.15, 1) forwards;
 }
 
 /* ================================================

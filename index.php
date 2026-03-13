@@ -85,6 +85,86 @@ require_once __DIR__ . '/config/db.php';
         .local-animate-bot-0 { animation: bot-pathAnim-0 12s linear infinite; }
         .local-animate-bot-1 { animation: bot-pathAnim-1 9s linear infinite; }
         .local-animate-bot-2 { animation: bot-pathAnim-2 7s linear infinite; }
+
+        .local-animate-bot-0 { animation: bot-pathAnim-0 12s linear infinite; }
+
+        /* Login Page Mobile Background Waves - Bottom Right */
+        @keyframes login-bot-pathAnim-0 {
+            0%, 100% { d: path("M 0,500 L 0,375 C 75.964,390.814 151.928,406.628 221,401 C 290.071,395.371 352.251,368.301 445,337 C 537.748,305.698 661.066,270.166 756,233 C 850.933,195.833 917.482,157.032 992,140 C 1066.517,122.967 1149.005,127.705 1225,108 C 1300.994,88.294 1370.497,44.147 1440,0 L 1440,500 L 0,500 Z"); }
+            25% { d: path("M 0,500 L 0,375 C 85.623,366.921 171.246,358.843 260,346 C 348.753,333.156 440.638,315.547 510,287 C 579.361,258.452 626.2,218.966 706,192 C 785.8,165.033 898.561,150.585 983,128 C 1067.438,105.414 1123.553,74.689 1195,52 C 1266.446,29.310 1353.223,14.655 1440,0 L 1440,500 L 0,500 Z"); }
+            50% { d: path("M 0,500 L 0,375 C 77.794,403.552 155.589,432.105 228,411 C 300.410,389.894 367.435,319.132 440,285 C 512.564,250.867 590.666,253.366 687,242 C 783.333,230.633 897.897,205.401 979,176 C 1060.102,146.598 1107.743,113.028 1179,83 C 1250.256,52.971 1345.128,26.485 1440,0 L 1440,500 L 0,500 Z"); }
+            75% { d: path("M 0,500 L 0,375 C 88.887,363.834 177.774,352.669 263,345 C 348.225,337.330 429.789,333.157 498,306 C 566.210,278.842 621.066,228.699 703,195 C 784.933,161.300 893.943,144.042 988,129 C 1082.056,113.957 1161.158,101.130 1234,80 C 1306.841,58.869 1373.420,29.434 1440,0 L 1440,500 L 0,500 Z"); }
+        }
+        @keyframes login-bot-pathAnim-1 {
+            0%, 100% { d: path("M 0,500 L 0,475 C 91.917,490.362 183.835,505.725 256,489 C 328.164,472.274 380.574,423.460 447,391 C 513.425,358.539 593.866,342.433 683,315 C 772.133,287.566 869.958,248.806 965,231 C 1060.041,213.193 1152.297,216.341 1231,198 C 1309.702,179.658 1374.851,139.829 1440,100 L 1440,500 L 0,500 Z"); }
+            25% { d: path("M 0,500 L 0,475 C 92.453,461.860 184.907,448.720 260,441 C 335.092,433.279 392.823,430.978 479,414 C 565.176,397.021 679.800,365.366 761,331 C 842.199,296.633 889.976,259.555 956,234 C 1022.023,208.444 1106.292,194.412 1190,174 C 1273.707,153.587 1356.853,126.793 1440,100 L 1440,500 L 0,500 Z"); }
+            50% { d: path("M 0,500 L 0,475 C 72.676,494.544 145.353,514.089 223,507 C 300.646,499.910 383.261,466.185 478,425 C 572.738,383.814 679.6,335.166 762,297 C 844.4,258.833 902.338,231.147 971,218 C 1039.661,204.852 1119.046,206.243 1199,189 C 1278.953,171.756 1359.476,135.878 1440,100 L 1440,500 L 0,500 Z"); }
+            75% { d: path("M 0,500 L 0,475 C 82.487,479.093 164.974,483.187 251,479 C 337.025,474.812 426.589,462.344 515,430 C 603.410,397.655 690.666,345.433 755,307 C 819.333,268.566 860.743,243.921 926,224 C 991.256,204.078 1080.358,188.879 1170,169 C 1259.641,149.120 1349.820,124.560 1440,100 L 1440,500 L 0,500 Z"); }
+        }
+        @keyframes login-bot-pathAnim-2 {
+            0%, 100% { d: path("M 0,500 L 0,575 C 79.002,570.867 158.005,566.735 248,554 C 337.994,541.264 438.982,519.924 515,501 C 591.017,482.075 642.066,465.566 711,442 C 779.933,418.433 866.751,387.808 950,352 C 1033.248,316.191 1112.928,275.197 1194,249 C 1275.071,222.802 1357.535,211.401 1440,200 L 1440,500 L 0,500 Z"); }
+            25% { d: path("M 0,500 L 0,575 C 92.135,578.296 184.271,581.592 250,574 C 315.728,566.407 355.048,547.926 443,522 C 530.951,496.073 667.533,462.7 759,428 C 850.466,393.3 896.817,357.273 953,327 C 1009.182,296.726 1075.194,272.207 1158,252 C 1240.805,231.792 1340.402,215.896 1440,200 L 1440,500 L 0,500 Z"); }
+            50% { d: path("M 0,500 L 0,575 C 63.143,577.821 126.287,580.643 207,572 C 287.712,563.356 385.994,543.247 467,521 C 548.005,498.752 611.733,474.366 693,452 C 774.266,429.633 873.071,409.285 951,381 C 1028.928,352.714 1085.979,316.489 1164,285 C 1242.020,253.510 1341.010,226.755 1440,200 L 1440,500 L 0,500 Z"); }
+            75% { d: path("M 0,500 L 0,575 C 65.815,587.793 131.630,600.587 224,595 C 316.369,589.412 435.292,565.444 509,535 C 582.707,504.555 611.2,467.633 681,429 C 750.8,390.366 861.907,350.021 959,318 C 1056.092,285.978 1139.169,262.279 1217,244 C 1294.830,225.720 1367.415,212.860 1440,200 L 1440,500 L 0,500 Z"); }
+        }
+        @keyframes login-bot-pathAnim-3 {
+            0%, 100% { d: path("M 0,500 L 0,675 C 86.884,684.170 173.769,693.341 252,684 C 330.230,674.658 399.807,646.806 468,622 C 536.192,597.193 603,575.433 685,548 C 767,520.566 864.192,487.460 961,464 C 1057.807,440.539 1154.230,426.725 1234,401 C 1313.769,375.274 1376.884,337.637 1440,300 L 1440,500 L 0,500 Z"); }
+            25% { d: path("M 0,500 L 0,675 C 81.946,682.332 163.892,689.664 232,667 C 300.107,644.335 354.376,591.675 449,569 C 543.623,546.324 678.6,553.633 758,533 C 837.4,512.366 861.223,463.791 926,426 C 990.776,388.208 1096.507,361.202 1189,342 C 1281.492,322.797 1360.746,311.398 1440,300 L 1440,500 L 0,500 Z"); }
+            50% { d: path("M 0,500 L 0,675 C 107.797,675.478 215.594,675.956 282,670 C 348.405,664.043 373.417,651.652 448,633 C 522.582,614.347 646.733,589.433 735,548 C 823.266,506.566 875.648,448.614 941,421 C 1006.351,393.385 1084.671,396.110 1170,381 C 1255.328,365.889 1347.664,332.944 1440,300 L 1440,500 L 0,500 Z"); }
+            75% { d: path("M 0,500 L 0,675 C 64.889,687.467 129.779,699.935 203,691 C 276.220,682.064 357.771,651.724 449,627 C 540.228,602.275 641.133,583.166 728,557 C 814.866,530.833 887.694,497.608 958,464 C 1028.305,430.391 1096.087,396.397 1176,369 C 1255.912,341.602 1347.956,320.801 1440,300 L 1440,500 L 0,500 Z"); }
+        }
+
+        /* Login Page Mobile Background Waves - Top Left */
+        @keyframes login-top-pathAnim-0 {
+            0%, 100% { d: path("M 0,500 L 0,375 C 70.02,359.76 140.041,344.52 216,337 C 291.958,329.479 373.856,329.678 471,309 C 568.143,288.321 680.533,246.766 752,220 C 823.466,193.233 854.01,181.255 932,152 C 1009.989,122.744 1135.425,76.212 1228,48 C 1320.574,19.787 1380.287,9.893 1440,0 L 1440,500 L 0,500 Z"); }
+            25% { d: path("M 0,500 L 0,375 C 63.607,382.916 127.215,390.833 200,383 C 272.784,375.166 354.746,351.583 452,324 C 549.253,296.416 661.8,264.833 749,236 C 836.2,207.166 898.053,181.083 965,147 C 1031.946,112.916 1103.984,70.833 1184,45 C 1264.015,19.166 1352.007,9.583 1440,0 L 1440,500 L 0,500 Z"); }
+            50% { d: path("M 0,500 L 0,375 C 98.5,391.334 197,407.669 264,385 C 331,362.33 366.5,300.657 443,276 C 519.5,251.342 637,263.7 736,244 C 835,224.3 915.5,172.542 987,145 C 1058.5,117.457 1121,114.13 1195,94 C 1269,73.869 1354.5,36.934 1440,0 L 1440,500 L 0,500 Z"); }
+            75% { d: path("M 0,500 L 0,375 C 64.287,366.055 128.574,357.11 221,341 C 313.425,324.889 433.989,301.614 522,287 C 610.01,272.385 665.466,266.433 739,249 C 812.533,231.566 904.143,202.652 992,164 C 1079.856,125.347 1163.958,76.956 1238,48 C 1312.041,19.043 1376.02,9.521 1440,0 L 1440,500 L 0,500 Z"); }
+        }
+        @keyframes login-top-pathAnim-1 {
+            0%, 100% { d: path("M 0,500 L 0,475 C 63.215,463.926 126.430,452.853 208,449 C 289.569,445.146 389.492,448.511 468,433 C 546.507,417.488 603.599,383.1 683,350 C 762.4,316.9 864.107,285.088 954,250 C 1043.892,214.911 1121.969,176.546 1201,151 C 1280.03,125.453 1360.015,112.726 1440,100 L 1440,500 L 0,500 Z"); }
+            25% { d: path("M 0,500 L 0,475 C 86.138,478.244 172.276,481.489 257,477 C 341.723,472.510 425.030,460.285 495,435 C 564.969,409.714 621.6,371.366 691,333 C 760.4,294.633 842.569,256.247 929,223 C 1015.43,189.752 1106.123,161.643 1192,142 C 1277.876,122.356 1358.938,111.178 1440,100 L 1440,500 L 0,500 Z"); }
+            50% { d: path("M 0,500 L 0,475 C 92.469,499.052 184.938,523.105 271,505 C 357.061,486.894 436.715,426.632 515,393 C 593.284,359.367 670.199,352.366 742,331 C 813.8,309.633 880.484,273.901 960,247 C 1039.515,220.098 1131.861,202.028 1214,179 C 1296.138,155.971 1368.069,127.985 1440,100 L 1440,500 L 0,500 Z"); }
+            75% { d: path("M 0,500 L 0,475 C 66.174,467.806 132.348,460.612 203,442 C 273.651,423.387 348.779,393.355 447,378 C 545.22,362.644 666.533,361.966 753,351 C 839.466,340.033 891.087,318.778 964,277 C 1036.912,235.221 1131.117,172.92 1214,140 C 1296.882,107.079 1368.441,103.539 1440,100 L 1440,500 L 0,500 Z"); }
+        }
+        @keyframes login-top-pathAnim-2 {
+            0%, 100% { d: path("M 0,500 L 0,575 C 89.787,578.665 179.574,582.330 258,575 C 336.425,567.669 403.489,549.342 489,523 C 574.510,496.657 678.466,462.300 758,432 C 837.533,401.7 892.643,375.457 964,345 C 1035.356,314.542 1122.958,279.869 1205,255 C 1287.041,230.130 1363.520,215.065 1440,200 L 1440,500 L 0,500 Z"); }
+            25% { d: path("M 0,500 L 0,575 C 71.984,601.455 143.969,627.910 226,606 C 308.030,584.089 400.107,513.814 490,474 C 579.892,434.185 667.6,424.833 736,413 C 804.4,401.166 853.492,386.852 935,370 C 1016.507,353.147 1130.43,333.756 1220,305 C 1309.569,276.243 1374.784,238.121 1440,200 L 1440,500 L 0,500 Z"); }
+            50% { d: path("M 0,500 L 0,575 C 67.369,592.914 134.738,610.828 214,594 C 293.261,577.171 384.415,525.601 472,492 C 559.584,458.398 643.599,442.766 717,424 C 790.4,405.233 853.184,383.332 939,353 C 1024.815,322.667 1133.661,283.905 1221,257 C 1308.338,230.094 1374.169,215.047 1440,200 L 1440,500 L 0,500 Z"); }
+            75% { d: path("M 0,500 L 0,575 C 65.815,587.793 131.63,600.587 224,595 C 316.369,589.412 435.292,565.444 509,535 C 582.707,504.555 611.2,467.633 681,429 C 750.8,390.366 861.907,350.021 959,318 C 1056.092,285.978 1139.169,262.279 1217,244 C 1294.83,225.720 1367.415,212.860 1440,200 L 1440,500 L 0,500 Z"); }
+        }
+        @keyframes login-top-pathAnim-3 {
+            0%, 100% { d: path("M 0,500 L 0,675 C 73.841,702.514 147.682,730.028 224,712 C 300.317,693.971 379.112,630.401 464,592 C 548.887,553.598 639.866,540.366 734,515 C 828.133,489.633 925.42,452.132 996,420 C 1066.579,387.867 1110.451,361.105 1180,342 C 1249.548,322.894 1344.774,311.447 1440,300 L 1440,500 L 0,500 Z"); }
+            25% { d: path("M 0,500 L 0,675 C 67.974,660.042 135.948,645.084 212,643 C 288.051,640.915 372.179,651.703 454,633 C 535.820,614.296 615.333,566.099 695,523 C 774.666,479.9 854.487,441.896 948,425 C 1041.512,408.103 1148.717,412.315 1233,395 C 1317.282,377.684 1378.641,338.842 1440,300 L 1440,500 L 0,500 Z"); }
+            50% { d: path("M 0,500 L 0,675 C 73.117,686.434 146.235,697.869 236,678 C 325.764,658.130 432.174,606.957 524,570 C 615.825,533.042 693.066,510.3 759,503 C 824.933,495.7 879.558,503.842 957,483 C 1034.441,462.157 1134.697,412.330 1219,377 C 1303.302,341.669 1371.651,320.834 1440,300 L 1440,500 L 0,500 Z"); }
+            75% { d: path("M 0,500 L 0,675 C 72.715,706.191 145.43,737.382 225,712 C 304.569,686.617 390.992,604.662 465,566 C 539.007,527.337 600.6,531.966 693,519 C 785.4,506.033 908.607,475.470 997,451 C 1085.392,426.529 1138.969,408.151 1207,384 C 1275.03,359.848 1357.515,329.924 1440,300 L 1440,500 L 0,500 Z"); }
+        }
+
+        .login-bot-path-0 { animation: login-bot-pathAnim-0 4s linear infinite; }
+        .login-bot-path-1 { animation: login-bot-pathAnim-1 4s linear infinite; }
+        .login-bot-path-3 { animation: login-bot-pathAnim-3 4s linear infinite; }
+
+        .login-top-path-0 { animation: login-top-pathAnim-0 4s linear infinite; }
+        .login-top-path-1 { animation: login-top-pathAnim-1 4s linear infinite; }
+        .login-top-path-2 { animation: login-top-pathAnim-2 4s linear infinite; }
+        .login-top-path-3 { animation: login-top-pathAnim-3 4s linear infinite; }
+
+        /* Left Panel Brand Waves */
+        @keyframes left-panel-pathAnim-0 {
+            0%, 100% { d: path("M 0,700 L 0,175 C 83.658,154.923 167.317,134.846 230,117 C 292.682,99.153 334.390,83.538 398,106 C 461.609,128.461 547.121,188.999 622,191 C 696.878,193.000 761.121,136.464 830,111 C 898.878,85.535 972.390,91.144 1043,101 C 1113.609,110.855 1181.317,124.958 1247,138 C 1312.682,151.041 1376.341,163.020 1440,175 L 1440,700 L 0,700 Z"); }
+            25% { d: path("M 0,700 L 0,175 C 53.069,143.541 106.138,112.082 185,99 C 263.861,85.917 368.516,91.210 436,125 C 503.483,158.789 533.795,221.076 605,259 C 676.204,296.923 788.302,310.484 855,258 C 921.697,205.515 942.995,86.984 999,88 C 1055.004,89.015 1145.715,209.575 1225,244 C 1304.284,278.424 1372.142,226.712 1440,175 L 1440,700 L 0,700 Z"); }
+            50% { d: path("M 0,700 L 0,175 C 82.971,207.535 165.942,240.071 240,222 C 314.057,203.928 379.199,135.248 431,104 C 482.800,72.751 521.258,78.933 596,101 C 670.741,123.066 781.765,161.017 859,152 C 936.234,142.982 979.678,86.995 1030,108 C 1080.321,129.004 1137.520,227.001 1207,251 C 1276.479,274.998 1358.239,224.999 1440,175 L 1440,700 L 0,700 Z"); }
+            75% { d: path("M 0,700 L 0,175 C 83.094,139.551 166.188,104.103 230,96 C 293.811,87.896 338.338,107.138 395,144 C 451.661,180.861 520.456,235.344 604,250 C 687.543,264.655 785.836,239.485 846,224 C 906.163,208.514 928.197,202.715 999,216 C 1069.802,229.284 1189.372,261.652 1271,258 C 1352.627,254.347 1396.313,214.673 1440,175 L 1440,700 L 0,700 Z"); }
+        }
+        @keyframes left-panel-pathAnim-1 {
+            0%, 100% { d: path("M 0,700 L 0,408 C 87.735,443.436 175.470,478.873 232,453 C 288.529,427.126 313.851,339.943 380,338 C 446.148,336.056 553.122,419.352 630,459 C 706.877,498.647 753.657,494.647 806,467 C 858.342,439.352 916.245,388.056 992,374 C 1067.754,359.943 1161.358,383.126 1239,395 C 1316.641,406.873 1378.320,407.436 1440,408 L 1440,700 L 0,700 Z"); }
+            25% { d: path("M 0,700 L 0,408 C 63.279,441.978 126.559,475.956 207,472 C 287.440,468.043 385.040,426.153 444,397 C 502.959,367.846 523.279,351.428 579,377 C 634.720,402.571 725.842,470.132 813,486 C 900.157,501.867 983.350,466.041 1047,449 C 1110.649,431.958 1154.757,433.702 1217,430 C 1279.242,426.297 1359.621,417.148 1440,408 L 1440,700 L 0,700 Z"); }
+            50% { d: path("M 0,700 L 0,408 C 76.449,409.224 152.898,410.448 211,427 C 269.101,443.551 308.854,475.429 386,461 C 463.145,446.570 577.682,385.832 653,385 C 728.317,384.167 764.414,443.240 828,437 C 891.585,430.759 982.657,359.204 1053,328 C 1123.342,296.795 1172.954,305.941 1234,326 C 1295.045,346.058 1367.522,377.029 1440,408 L 1440,700 L 0,700 Z"); }
+            75% { d: path("M 0,700 L 0,408 C 63.218,377.010 126.436,346.021 202,358 C 277.563,369.978 365.473,424.925 435,427 C 504.526,429.074 555.671,378.276 612,359 C 668.328,339.723 729.840,351.967 804,355 C 878.159,358.032 964.965,351.855 1032,365 C 1099.034,378.144 1146.295,410.612 1211,421 C 1275.704,431.387 1357.852,419.693 1440,408 L 1440,700 L 0,700 Z"); }
+        }
+
+        .left-panel-path-0 { animation: left-panel-pathAnim-0 4s linear infinite; }
+        .left-panel-path-1 { animation: left-panel-pathAnim-1 4s linear infinite; }
     </style>
     <div id="mobile-splash" class="lg:hidden fixed inset-0 bg-white dark:bg-slate-900 flex flex-col transition-transform duration-700 ease-[cubic-bezier(0.85,0,0.15,1)]" style="z-index: 9999;">
 
@@ -122,11 +202,16 @@ require_once __DIR__ . '/config/db.php';
                 <p class="text-[9px] sm:text-[8px] font-black text-white bg-royal-blue/90 dark:bg-blue-600/90 px-2 py-1 inline-block rounded uppercase tracking-widest shadow-sm mt-1.5 backdrop-blur-md">Department of Labor and Employment</p>
             </div>
 
-            <!-- Logo Container (Middle Center, No circle outline) -->
+            <!-- Logo Container (Middle Center, Circle Trimmed) -->
             <div class="grow flex items-center justify-center relative my-12">
-                <div class="relative w-64 h-64 sm:w-56 sm:h-56 flex items-center justify-center z-10">
-                    <div class="absolute inset-0 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
-                    <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-48 h-48 sm:w-40 sm:h-40 object-contain opacity-35 drop-shadow-2xl">
+                <div class="relative w-64 h-64 sm:w-56 sm:h-56 flex items-center justify-center rounded-full">
+                    <!-- Glow background (behind logo) -->
+                    <div class="absolute inset-0 bg-blue-500/20 blur-3xl animate-pulse rounded-full z-0"></div>
+                    
+                    <!-- Logo (in front) -->
+                    <img src="frontend/images/logo/doleiligan.png" 
+                        alt="DOLE Logo" 
+                        class="w-48 h-48 sm:w-40 sm:h-40 object-contain drop-shadow-2xl brightness-110 rounded-full z-10">
                 </div>
             </div>
 
@@ -145,19 +230,52 @@ require_once __DIR__ . '/config/db.php';
     <!-- DESKTOP DESIGN (Untouched) -->
     
     <!-- LEFT PANEL - Brand Panel (Desktop) -->
-    <div id="left-panel" class="hidden lg:flex lg:w-1/2 bg-royal-blue dark:bg-slate-900 transition-colors duration-300 items-center justify-center p-12">
-        <div id="left-panel-content" class="text-center max-w-md">
+    <div id="left-panel" class="hidden lg:flex lg:w-1/2 bg-royal-blue dark:bg-slate-900 transition-colors duration-300 items-center justify-center p-12 relative overflow-hidden">
+        
+        <!-- Animated Background Waves (Positioned at the very top) -->
+        <div class="absolute top-0 left-0 w-full leading-none z-0 opacity-50 scale-110 -translate-y-1/4">
+            <svg viewBox="0 0 1440 690" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                <path d="M 0,700 L 0,175 C 83.658,154.923 167.317,134.846 230,117 C 292.682,99.153 334.390,83.538 398,106 C 461.609,128.461 547.121,188.999 622,191 C 696.878,193.000 761.121,136.464 830,111 C 898.878,85.535 972.390,91.144 1043,101 C 1113.609,110.855 1181.317,124.958 1247,138 C 1312.682,151.041 1376.341,163.020 1440,175 L 1440,700 L 0,700 Z" stroke="none" stroke-width="0" fill="#66ccff" fill-opacity="0.3" class="left-panel-path-0" transform="rotate(-180 720 350)"></path>
+                <path d="M 0,700 L 0,408 C 87.735,443.436 175.470,478.873 232,453 C 288.529,427.126 313.851,339.943 380,338 C 446.148,336.056 553.122,419.352 630,459 C 706.877,498.647 753.657,494.647 806,467 C 858.342,439.352 916.245,388.056 992,374 C 1067.754,359.943 1161.358,383.126 1239,395 C 1316.641,406.873 1378.320,407.436 1440,408 L 1440,700 L 0,700 Z" stroke="none" stroke-width="0" fill="#66ccff" fill-opacity="0.6" class="left-panel-path-1" transform="rotate(-180 720 350)"></path>
+            </svg>
+        </div>
+
+        <div id="left-panel-content" class="text-center max-w-md relative z-10">
             <div id="left-panel-logo" class="mb-10">
                 <div class="w-56 h-56 mx-auto bg-white rounded-full shadow-2xl flex items-center justify-center p-6 border-4 border-white/10 overflow-hidden">
                     <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-full h-full object-contain rounded-full drop-shadow-2xl">
                 </div>
             </div>
-            <h1 class="text-4xl font-bold text-white mb-4 tracking-tight">DOLE System</h1>
+            <h1 class="text-4xl font-bold text-white mb-4 tracking-tight">DOLE GIP Monitoring System</h1>
             <p class="text-lg text-white/90 font-medium tracking-wide">Department of Labor and Employment</p>
             <p class="text-xs text-golden-yellow mt-4 font-bold uppercase tracking-[0.2em]">Republic of the Philippines</p>
         </div>
     </div>
 
+    <!-- Right Content Centering Wrapper -->
+    <div id="right-panel" class="flex-1 flex flex-col items-center justify-center p-6 lg:p-12 relative min-h-screen transition-all duration-500">
+        
+        <!-- Login Background Waves (Mobile & Desktop) -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+            <!-- Top Left Side Wave -->
+            <div class="absolute top-0 left-0 w-full opacity-60 scale-125 -translate-x-1/4 -translate-y-1/4">
+                <svg viewBox="0 0 1440 490" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto rotate-180">
+                    <path d="M 0,500 L 0,375 C 70.02,359.76 140.041,344.52 216,337 C 291.958,329.479 373.856,329.678 471,309 C 568.143,288.321 680.533,246.766 752,220 C 823.466,193.233 854.01,181.255 932,152 C 1009.989,122.744 1135.425,76.212 1228,48 C 1320.574,19.787 1380.287,9.893 1440,0 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.265" class="login-top-path-0"></path>
+                    <path d="M 0,500 L 0,475 C 63.215,463.926 126.430,452.853 208,449 C 289.569,445.146 389.492,448.511 468,433 C 546.507,417.488 603.599,383.1 683,350 C 762.4,316.9 864.107,285.088 954,250 C 1043.892,214.911 1121.969,176.546 1201,151 C 1280.03,125.453 1360.015,112.726 1440,100 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.4" class="login-top-path-1"></path>
+                    <path d="M 0,500 L 0,575 C 89.787,578.665 179.574,582.330 258,575 C 336.425,567.669 403.489,549.342 489,523 C 574.510,496.657 678.466,462.300 758,432 C 837.533,401.7 892.643,375.457 964,345 C 1035.356,314.542 1122.958,279.869 1205,255 C 1287.041,230.130 1363.520,215.065 1440,200 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.53" class="login-top-path-2"></path>
+                    <path d="M 0,500 L 0,675 C 73.841,702.514 147.682,730.028 224,712 C 300.317,693.971 379.112,630.401 464,592 C 548.887,553.598 639.866,540.366 734,515 C 828.133,489.633 925.42,452.132 996,420 C 1066.579,387.867 1110.451,361.105 1180,342 C 1249.548,322.894 1344.774,311.447 1440,300 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="1" class="login-top-path-3"></path>
+                </svg>
+            </div>
+            <!-- Bottom Right Side Wave -->
+            <div class="absolute bottom-0 right-0 w-full opacity-60 scale-125 translate-x-1/4 translate-y-1/4">
+                <svg viewBox="0 0 1440 490" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                    <path d="M 0,500 L 0,375 C 75.964,390.814 151.928,406.628 221,401 C 290.071,395.371 352.251,368.301 445,337 C 537.748,305.698 661.066,270.166 756,233 C 850.933,195.833 917.482,157.032 992,140 C 1066.517,122.967 1149.005,127.705 1225,108 C 1300.994,88.294 1370.497,44.147 1440,0 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.265" class="login-bot-path-0"></path>
+                    <path d="M 0,500 L 0,475 C 91.917,490.362 183.835,505.725 256,489 C 328.164,472.274 380.574,423.460 447,391 C 513.425,358.539 593.866,342.433 683,315 C 772.133,287.566 869.958,248.806 965,231 C 1060.041,213.193 1152.297,216.341 1231,198 C 1309.702,179.658 1374.851,139.829 1440,100 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.4" class="login-bot-path-1"></path>
+                    <path d="M 0,500 L 0,575 C 79.002,570.867 158.005,566.735 248,554 C 337.994,541.264 438.982,519.924 515,501 C 591.017,482.075 642.066,465.566 711,442 C 779.933,418.433 866.751,387.808 950,352 C 1033.248,316.191 1112.928,275.197 1194,249 C 1275.071,222.802 1357.535,211.401 1440,200 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.53" class="login-bot-path-2"></path>
+                    <path d="M 0,500 L 0,675 C 86.884,684.170 173.769,693.341 252,684 C 330.230,674.658 399.807,646.806 468,622 C 536.192,597.193 603,575.433 685,548 C 767,520.566 864.192,487.460 961,464 C 1057.807,440.539 1154.230,426.725 1234,401 C 1313.769,375.274 1376.884,337.637 1440,300 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="1" class="login-bot-path-3"></path>
+                </svg>
+            </div>
+        </div>
         <!-- Back Button for Mobile (Light Red in light mode) -->
         <button id="back-to-splash" class="lg:hidden absolute top-6 left-3 text-red-400 hover:text-red-500 dark:text-red-500 transition-colors p-2 z-50">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
@@ -165,12 +283,12 @@ require_once __DIR__ . '/config/db.php';
             </svg>
         </button>
 
-        <div id="right-panel-content" class="w-full max-w-md lg:max-w-md mx-auto">
-            <!-- Mobile Logo Section (Branding text commented out) -->
-            <div class="lg:hidden text-center mb-6">
-                <div class="w-32 h-32 mx-auto mb-4 relative aspect-square rounded-full border border-blue-500/10">
+        <div id="right-panel-content" class="w-full max-w-md lg:max-w-3xl mx-auto pt-0 relative z-10">
+            <!-- Mobile Logo Section (Moved down for mobile view) -->
+            <div class="lg:hidden text-center mb-8 mt-4">
+                <div class="w-32 h-32 mx-auto mb-4 relative aspect-square rounded-full border border-blue-500/10 bg-white/5 backdrop-blur-sm shadow-inner">
                     <div class="absolute inset-0 bg-royal-blue/5 rounded-full blur-2xl animate-pulse"></div>
-                    <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-full h-full object-contain relative z-10 rounded-full">
+                    <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-full h-full object-contain relative z-10 rounded-full [clip-path:circle(50%)] shadow-lg">
                 </div>
                 <!--
                 <h2 class="text-3xl font-black text-royal-blue dark:text-blue-400 uppercase tracking-tight">DOLE System</h2>
@@ -179,39 +297,75 @@ require_once __DIR__ . '/config/db.php';
                 -->
             </div>
 
-            <!-- Login Form (Container removed for mobile as per ref) -->
-            <div class="lg:bg-white lg:dark:bg-slate-800 lg:rounded-2xl lg:shadow-xl lg:border lg:border-gray-200 lg:dark:border-slate-700 lg:p-10 transition-all duration-300">
-                <div class="mb-10 text-center lg:text-left">
-                    <h2 class="text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">Welcome Back!</h2>
-                    <p class="text-base text-gray-600 dark:text-slate-400 font-medium">Sign in to access your administrative tools and services.</p>
+            <!-- Login Form (Desktop: Extra Wide & Premium Layout) -->
+            <div class="">
+                <div class="mb-12 text-center lg:text-left">
+                    <h2 class="text-4xl lg:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">
+                        Welcome Back!
+                    </h2>
+                    <p class="text-base lg:text-xl text-gray-600 dark:text-slate-400 font-medium max-w-xl">
+                        Sign in to access your administrative tools and services.
+                    </p>
                 </div>
-                <form id="loginForm" class="space-y-6">
-                    <div class="w-full">
-                        <label for="username" class="block text-xs font-black text-gray-700 dark:text-slate-300 mb-2 uppercase tracking-[0.1em]">Email address or Username*</label>
-                        <input type="text" id="username" name="username" required class="w-full px-5 py-4 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-blue-100/50 transition-all outline-none text-base font-semibold shadow-sm" placeholder="Enter your username" />
-                    </div>
-                    <div class="w-full">
-                        <div class="flex justify-between items-center mb-2">
-                            <label for="password" class="block text-xs font-black text-gray-700 dark:text-slate-300 uppercase tracking-[0.1em]">Password*</label>
-                        </div>
-                        <div class="relative">
-                            <input type="password" id="password" name="password" required class="w-full px-5 py-4 pr-14 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-blue-100/50 transition-all outline-none text-base font-semibold shadow-sm" placeholder="Enter your password" />
-                            <button type="button" id="togglePassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-royal-blue dark:text-slate-500 transition-colors">
-                                <svg class="eye-open w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                <svg class="eye-closed w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between pt-2 px-1">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="rememberMe" name="rememberMe" class="w-5 h-5 rounded border-gray-300 text-royal-blue focus:ring-blue-100 cursor-pointer" />
-                            <label for="rememberMe" class="ml-3 text-sm font-bold text-gray-700 dark:text-slate-400 cursor-pointer">Remember me</label>
-                        </div>
-                        <a href="#" id="forgot-password-link" class="text-sm font-black text-royal-blue hover:text-blue-700 transition-colors uppercase tracking-tight">Forgot password?</a>
-                    </div>
-                    <button type="submit" class="w-full bg-royal-blue text-white font-black py-4 rounded-xl hover:bg-blue-800 transition-all shadow-xl active:scale-[0.98] uppercase tracking-[0.1em] text-sm mt-4">Sign in</button>
-                </form>
+
+    <!-- Form with responsive horizontal padding to reduce input width on mobile -->
+    <form id="loginForm" class="space-y-8 px-10 lg:px-0">
+        <div class="w-full">
+            <label for="username" class="block text-xs font-black text-gray-700 dark:text-slate-300 mb-2 uppercase tracking-[0.15em]">
+                Username*
+            </label>
+            <input type="text" id="username" name="username" required
+                class="w-full px-6 py-5 rounded-2xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-blue-200/50 transition-all outline-none text-lg font-semibold shadow-md"
+                placeholder="Enter your username" />
+        </div>
+
+        <div class="w-full">
+            <div class="flex justify-between items-center mb-2">
+                <label for="password" class="block text-xs font-black text-gray-700 dark:text-slate-300 uppercase tracking-[0.15em]">
+                    Password*
+                </label>
             </div>
+            <div class="relative">
+                <input type="password" id="password" name="password" required
+                    class="w-full px-6 py-5 pr-16 rounded-2xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-blue-200/50 transition-all outline-none text-lg font-semibold shadow-md"
+                    placeholder="Enter your password" />
+                <button type="button" id="togglePassword"
+                    class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-royal-blue dark:text-slate-500 transition-colors">
+                    <!-- Eye icons -->
+                    <svg class="eye-open w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <svg class="eye-closed w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-6 px-1">
+            <div class="flex items-center">
+                <input type="checkbox" id="rememberMe" name="rememberMe"
+                    class="w-6 h-6 lg:w-5 lg:h-5 rounded-md border-gray-300 text-royal-blue focus:ring-blue-200 cursor-pointer" />
+                <label for="rememberMe"
+                    class="ml-3 text-sm lg:text-base font-bold text-gray-700 dark:text-slate-400 cursor-pointer">
+                    Remember me
+                </label>
+            </div>
+            <a href="#" id="forgot-password-link"
+                class="text-sm lg:text-base font-black text-royal-blue hover:text-blue-700 transition-colors uppercase tracking-tight">
+                Forgot password?
+            </a>
+        </div>
+
+        <button type="submit"
+            class="w-full lg:w-full bg-royal-blue text-white font-black py-3 lg:py-6 rounded-2xl hover:bg-blue-800 transition-all shadow-lg active:scale-[0.98] uppercase tracking-[0.2em] text-sm lg:text-lg mt-8 relative z-30 cursor-pointer">
+            Sign in
+        </button>
+    </form>
+</div>
         </div>
     </div>
 

@@ -71,7 +71,7 @@ try {
 
         $stmt = $pdo->prepare("
             SELECT * FROM notifications 
-            WHERE user_id = ? 
+            WHERE user_id = ? AND is_read != 3
             ORDER BY created_at DESC 
             LIMIT ? OFFSET ?
         ");
@@ -136,7 +136,7 @@ try {
             exit;
         }
 
-        // Mark all as read
+        // Mark all as read (Set to 1)
         if ($action === 'mark_all_read') {
             $stmt = $pdo->prepare("
                 UPDATE notifications 
@@ -146,6 +146,19 @@ try {
             $stmt->execute([$user_id]);
 
             echo json_encode(['success' => true, 'message' => 'All notifications marked as read']);
+            exit;
+        }
+
+        // Clear all (Set to 3 - HIDDEN)
+        if ($action === 'clear_all') {
+            $stmt = $pdo->prepare("
+                UPDATE notifications 
+                SET is_read = 3, read_at = NOW() 
+                WHERE user_id = ? AND is_read != 3
+            ");
+            $stmt->execute([$user_id]);
+
+            echo json_encode(['success' => true, 'message' => 'All notifications cleared']);
             exit;
         }
 

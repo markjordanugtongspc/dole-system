@@ -5,18 +5,18 @@
         class="h-full px-4 py-4 overflow-y-auto bg-royal-blue border-e border-royal-blue/20 pt-20 flex flex-col justify-between">
         <ul class="space-y-3 font-medium">
             <?php
-            // Calculate base URL (same logic as vite.php for consistency)
-            $projectRoot = str_replace('\\', '/', dirname(dirname(dirname(__DIR__))));
-            $docRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
-            $baseUrl = str_ireplace($docRoot, '', $projectRoot);
-            $baseUrl = rtrim($baseUrl, '/');
+// Calculate base URL (same logic as vite.php for consistency)
+$projectRoot = str_replace('\\', '/', dirname(dirname(dirname(__DIR__))));
+$docRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
+$baseUrl = str_ireplace($docRoot, '', $projectRoot);
+$baseUrl = rtrim($baseUrl, '/');
 
-            $current_uri = $_SERVER['REQUEST_URI'];
-            $is_dashboard = (stripos($current_uri, '/frontend/dashboard') !== false);
-            $is_export = (stripos($current_uri, '/frontend/export') !== false);
-            $is_settings = (stripos($current_uri, '/frontend/user/settings') !== false);
-            $is_ldn = (stripos($current_uri, '/frontend/LDN') !== false);
-            ?>
+$current_uri = $_SERVER['REQUEST_URI'];
+$is_dashboard = (stripos($current_uri, '/frontend/dashboard') !== false);
+$is_export = (stripos($current_uri, '/frontend/export') !== false);
+$is_settings = (stripos($current_uri, '/frontend/user/settings') !== false);
+$is_ldn = (stripos($current_uri, '/frontend/LDN') !== false);
+?>
             <li>
                 <a href="<?php echo $baseUrl; ?>/frontend/dashboard/" title="Analytics Dashboard"
                     class="flex items-center px-4 py-3 rounded-lg group cursor-pointer transition-all duration-200 border-b-2 <?php echo $is_dashboard ? 'text-white font-black bg-white/20 border-white' : 'text-white/80 hover:bg-white/10 hover:text-white border-transparent hover:scale-105'; ?>">
@@ -79,8 +79,8 @@
             </li> -->
 
             <?php
-            $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
-            ?>
+$is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
+?>
 
             <!-- <li>
                 <a href="#"

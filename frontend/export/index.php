@@ -158,9 +158,9 @@ require_once __DIR__ . '/../../config/vite.php';
 
     <!-- Print Template Injection -->
     <?php
-    // We define the table structure for the print view here, JS will populate the body
-    ob_start();
-    ?>
+// We define the table structure for the print view here, JS will populate the body
+ob_start();
+?>
     <table class="w-full text-xs text-left border-collapse">
         <thead class="text-white bg-royal-blue font-bold uppercase tracking-wider text-[10px]">
             <tr class="text-center">
@@ -179,9 +179,9 @@ require_once __DIR__ . '/../../config/vite.php';
         </tbody>
     </table>
     <?php
-    $content = ob_get_clean();
-    include __DIR__ . '/../components/printTemplate.php';
-    ?>
+$content = ob_get_clean();
+include __DIR__ . '/../components/printTemplate.php';
+?>
 
     <!-- Logic is now handled by backend/js/modules/export.js via main.js bundle -->
 </body>

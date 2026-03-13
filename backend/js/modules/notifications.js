@@ -168,30 +168,33 @@ function showErrorState(container) {
     `;
 }
 
-/**
- * Render notifications
- */
 function renderNotifications(notifications) {
     const notificationList = document.getElementById('notificationList');
+    if (!notificationList) return;
 
-    // Filter to only show unread notifications in the dropdown as requested
-    const unreadNotifications = notifications.filter(n => n.is_read === 0);
+    // PRESERVE SCROLL POSITION
+    const currentScroll = notificationList.scrollTop;
 
-    if (unreadNotifications.length === 0) {
+    if (notifications.length === 0) {
         notificationList.innerHTML = `
-            <div class="flex flex-col items-center justify-center py-12 px-4">
-                <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex flex-col items-center justify-center py-12 px-4 text-center">
+                <svg class="w-16 h-16 text-slate-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
-                <p class="text-gray-500 text-sm font-medium">Clear for now!</p>
-                <p class="text-gray-400 text-xs mt-1">You have no unread notifications.</p>
+                <p class="text-slate-400 text-sm font-bold uppercase tracking-widest">Inbox Empty</p>
+                <p class="text-slate-300 text-[10px] mt-1 italic">No recent activity detected</p>
             </div>
         `;
         return;
     }
 
-    const html = unreadNotifications.map(notif => renderNotificationItem(notif)).join('');
+    const html = notifications.map(notif => renderNotificationItem(notif)).join('');
     notificationList.innerHTML = html;
+
+    // RESTORE SCROLL POSITION after microtask
+    requestAnimationFrame(() => {
+        notificationList.scrollTop = currentScroll;
+    });
 }
 
 /**
@@ -203,19 +206,19 @@ function renderNotificationItem(notification) {
     const isUnread = notification.is_read === 0;
 
     return `
-        <a href="#" 
-           class="flex px-4 py-3 hover:bg-neutral-secondary-medium transition-colors cursor-pointer ${isUnread ? 'bg-emerald-50/30' : ''}" 
+        <a href="javascript:void(0)" 
+           class="flex px-4 py-3 hover:bg-neutral-secondary-medium transition-all duration-300 cursor-pointer border-b border-slate-100 dark:border-slate-700/50 ${isUnread ? 'bg-emerald-50/30 dark:bg-emerald-500/10 border-l-4 border-emerald-500 shadow-md ring-1 ring-emerald-500/10 z-10' : 'opacity-60 grayscale-[0.2] border-l-4 border-transparent'}" 
            data-notification-id="${notification.id}"
            onclick="markAsRead(${notification.id}); return false;">
-            <div class="shrink-0">
-                <div class="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-black text-sm shadow-lg">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <div class="shrink-0 relative">
+                <div class="w-11 h-11 rounded-full ${isUnread ? 'bg-gradient-to-br from-royal-blue to-blue-700' : 'bg-slate-200 dark:bg-slate-700'} flex items-center justify-center text-white font-black text-sm shadow-sm transition-all duration-500">
+                    <svg class="w-6 h-6 ${!isUnread ? 'text-slate-400 dark:text-slate-500' : ''}" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                     </svg>
                 </div>
                 ${isUnread ? `
-                <div class="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-emerald-500 border-2 border-white rounded-full">
-                    <span class="w-2 h-2 bg-white rounded-full"></span>
+                <div class="notification-marker absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full shadow-sm z-10 transition-opacity duration-300">
+                    <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                 </div>
                 ` : ''}
             </div>
@@ -323,13 +326,13 @@ function updateBadgeCount(count) {
     if (bellIcon) {
         if (count > 0) {
             bellIcon.innerHTML = `
-                <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M17.133 12.632v-1.8a5.406 5.406 0 0 0-4.154-5.262.955.955 0 0 0 .021-.106V3.1a1 1 0 0 0-2 0v2.364a.955.955 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C6.867 15.018 5 15.614 5 16.807 5 17.4 5 18 5.538 18h12.924C19 18 19 17.4 19 16.807c0-1.193-1.867-1.789-1.867-4.175ZM8.823 19a3.453 3.453 0 0 0 6.354 0H8.823Z"/>
                 </svg>
             `;
         } else {
             bellIcon.innerHTML = `
-                <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5.365V3m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175 0 .593 0 1.292-.538 1.292H5.538C5 18 5 17.301 5 16.708c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.365ZM8.733 18c.094.852.306 1.54.944 2.112a3.48 3.48 0 0 0 4.646 0c.638-.572 1.236-1.26 1.33-2.112h-6.92Z"/>
                 </svg>
             `;
@@ -348,14 +351,6 @@ window.markAllAsRead = async function () {
 
     // 1. Immediate UI Feedback
     updateBadgeCount(0); // Clear badge instantly
-    notificationList.innerHTML = `
-        <div class="flex flex-col items-center justify-center py-12 px-4 transition-opacity duration-300">
-            <svg class="w-16 h-16 text-emerald-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            <p class="text-gray-500 text-sm font-bold animate-pulse">Marking everything as read...</p>
-        </div>
-    `;
 
     try {
         const response = await fetch(`${basePath}api/notifications.php`, {
@@ -367,26 +362,56 @@ window.markAllAsRead = async function () {
         const result = await response.json();
 
         if (result.success) {
-            // 2. Indicator / Toast Feedback
-            const { default: Swal } = await import('sweetalert2');
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                icon: 'success',
-                title: 'Inbox Cleared',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            });
-
-            // Reload to show empty state
+            // Force badge to 0 immediately upon server success
+            updateBadgeCount(0);
             loadNotifications();
         }
     } catch (error) {
         console.error('Error marking all as read:', error);
-        loadNotifications(); // Rollback/Refresh on error
+        updateBadgeCount(0); // Fallback to 0 if we assume it should be cleared
+        loadNotifications();
     }
 };
+
+/**
+ * Clear the current notification view (Client-side hide)
+ */
+window.clearNotificationView = async function () {
+    const basePath = getBasePath();
+    const list = document.getElementById('notificationList');
+    if (!list) return;
+
+    // 1. Immediate UI Feedback
+    updateBadgeCount(0);
+
+    list.style.opacity = '0';
+    setTimeout(() => {
+        list.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-12 px-4 transition-all duration-500">
+                <svg class="w-16 h-16 text-slate-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <p class="text-slate-400 text-sm font-bold uppercase tracking-widest">Inbox Cleared</p>
+                <p class="text-slate-300 text-[10px] mt-1 italic">Notifications have been archived</p>
+            </div>
+        `;
+        list.style.opacity = '1';
+    }, 300);
+
+    try {
+        const response = await fetch(`${basePath}api/notifications.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'clear_all' })
+        });
+        const result = await response.json();
+        if (result.success) {
+            // No need to reload, we already showed the cleared state
+        }
+    } catch (error) {
+        console.error('Error clearing notifications:', error);
+    }
+}
 
 /**
  * Mark single notification as read
@@ -395,13 +420,20 @@ window.markAsRead = async function (notificationId) {
     const basePath = getBasePath();
     const item = document.querySelector(`[data-notification-id="${notificationId}"]`);
 
-    // 1. Instant UI Feedback
+    // 1. Instant UI Feedback (Hide green dot and fade the row)
     if (item) {
-        item.style.opacity = '0'; // Fade out
-        item.style.height = '0'; // Collapse
-        item.style.padding = '0';
-        item.style.overflow = 'hidden';
-        item.style.transition = 'all 0.3s ease';
+        const marker = item.querySelector('.notification-marker');
+        if (marker) marker.style.display = 'none';
+        item.classList.remove('bg-emerald-50/20', 'dark:bg-emerald-500/5', 'border-l-4', 'border-emerald-500', 'shadow-xs');
+        item.classList.add('opacity-60', 'grayscale-[0.2]', 'border-l-4', 'border-transparent');
+
+        const avatar = item.querySelector('.rounded-full');
+        if (avatar) {
+            avatar.classList.remove('bg-gradient-to-br', 'from-royal-blue', 'to-blue-700');
+            avatar.classList.add('bg-slate-200', 'dark:bg-slate-700');
+            const svg = avatar.querySelector('svg');
+            if (svg) svg.classList.add('text-slate-400', 'dark:text-slate-500');
+        }
     }
 
     // Decrement badge locally for instant feel
@@ -416,11 +448,10 @@ window.markAsRead = async function (notificationId) {
             body: JSON.stringify({ action: 'mark_read', notification_id: notificationId })
         });
 
-        // Sync with server state
-        loadNotifications();
+        // We don't call loadNotifications() here to avoid scroll jumping.
+        // The local unreadCount and UI items are already updated instantly.
     } catch (error) {
         console.error('Error marking notification as read:', error);
-        loadNotifications(); // Rollback/Refresh on error
     }
 };
 
