@@ -136,24 +136,46 @@ if ($method === 'GET') {
 /**
  * POST: Create new log entry
  */ elseif ($method === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
+    // Try to get data from multiple sources (JSON body, POST body, or GET parameters)
+    $inputData = json_decode(file_get_contents('php://input'), true) ?? [];
+    $data = array_merge($_POST, $inputData);
+    
+    // Explicitly check for type in GET if not in body
+    $type = $data['type'] ?? $_GET['type'] ?? null;
+    $gipId = $data['gip_id'] ?? $_GET['gip_id'] ?? null;
+    $action = $data['action'] ?? $_GET['action'] ?? null;
 
-    $type = $data['type'] ?? null;
-    $gipId = $data['gip_id'] ?? null;
-
-    if (!$type || ($type !== 'ar' && $type !== 'dtr' && $type !== 'docs')) {
+    if (!$type || !in_array($type, ['ar', 'dtr', 'docs'])) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'Type must be "ar", "dtr", or "docs"']);
+        echo json_encode(['success' => false, 'error' => 'Type must be "ar", "dtr", or "docs"', 'received_type' => $type]);
         exit();
     }
 
-    if (!$gipId) {
+    if (!$gipId && $action !== 'delete') {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'gip_id is required']);
         exit();
     }
 
     try {
+        // Handle POST-based deletion if specified
+        if ($action === 'delete') {
+            $logId = $data['log_id'] ?? $_GET['log_id'] ?? $_GET['id'] ?? null;
+            if (!$logId) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'error' => 'ID is required for deletion']);
+                exit();
+            }
+            if ($type === 'ar') {
+                $stmt = $pdo->prepare("DELETE FROM accomplishment_reports WHERE ar_id = :id");
+            } else {
+                $stmt = $pdo->prepare("DELETE FROM daily_time_records WHERE dtr_id = :id");
+            }
+            $stmt->execute(['id' => $logId]);
+            echo json_encode(['success' => true, 'message' => 'Log deleted successfully']);
+            exit();
+        }
+
         // Get beneficiary_id from gip_id
         $stmt = $pdo->prepare("SELECT beneficiary_id FROM beneficiaries WHERE gip_id = :gip_id");
         $stmt->execute(['gip_id' => $gipId]);
@@ -216,7 +238,8 @@ if ($method === 'GET') {
             echo json_encode(['success' => true, 'message' => 'DTR log created successfully', 'id' => $logId]);
         } else { // docs
             // Create or Update Document status
-            $docName = !empty($data['document_name']) ? strtoupper($data['document_name']) : null;
+            $docName = $data['document_name'] ?? $data['doc_name'] ?? null;
+            $docName = !empty($docName) ? strtoupper($docName) : null;
             $status = strtoupper($data['status'] ?? 'PENDING');
 
             if (!$docName) {
@@ -262,29 +285,53 @@ if ($method === 'GET') {
     $type = $data['type'] ?? null;
     $logId = $data['id'] ?? null;
     $status = $data['status'] ?? null;
+    $period = $data['period'] ?? null;
+    $recordDate = $data['record_date'] ?? null;
 
-    if (!$type || !$logId || !$status) {
+    if (!$type || !$logId) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'Type, ID, and status are required']);
-        exit();
-    }
-
-    if (!in_array($status, ['VERIFIED', 'PENDING', 'DECLINED'])) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'Invalid status']);
+        echo json_encode(['success' => false, 'error' => 'Type and ID are required']);
         exit();
     }
 
     try {
         if ($type === 'ar') {
-            $stmt = $pdo->prepare("UPDATE accomplishment_reports SET status = :status WHERE ar_id = :id");
+            $updateFields = [];
+            $params = ['id' => $logId];
+            if ($status) { $updateFields[] = "status = :status"; $params['status'] = $status; }
+            if ($period) { $updateFields[] = "period = :period"; $params['period'] = $period; }
+            
+            if (empty($updateFields)) {
+                echo json_encode(['success' => true, 'message' => 'No changes provided']);
+                exit();
+            }
+            $stmt = $pdo->prepare("UPDATE accomplishment_reports SET " . implode(', ', $updateFields) . " WHERE ar_id = :id");
+            $stmt->execute($params);
         } elseif ($type === 'dtr') {
-            $stmt = $pdo->prepare("UPDATE daily_time_records SET status = :status WHERE dtr_id = :id");
+            $updateFields = [];
+            $params = ['id' => $logId];
+            if ($status) { $updateFields[] = "status = :status"; $params['status'] = $status; }
+            if ($recordDate) { 
+                $updateFields[] = "record_date = :record_date"; 
+                $updateFields[] = "weekday = :weekday";
+                $params['record_date'] = $recordDate; 
+                $params['weekday'] = strtoupper(date('l', strtotime($recordDate)));
+            }
+            
+            if (empty($updateFields)) {
+                echo json_encode(['success' => true, 'message' => 'No changes provided']);
+                exit();
+            }
+            $stmt = $pdo->prepare("UPDATE daily_time_records SET " . implode(', ', $updateFields) . " WHERE dtr_id = :id");
+            $stmt->execute($params);
         } else { // docs
+            if (!$status) {
+                echo json_encode(['success' => true, 'message' => 'No changes provided']);
+                exit();
+            }
             $stmt = $pdo->prepare("UPDATE beneficiary_documents SET status = :status WHERE doc_id = :id");
+            $stmt->execute(['status' => $status, 'id' => $logId]);
         }
-
-        $stmt->execute(['status' => $status, 'id' => $logId]);
 
         if ($stmt->rowCount() > 0) {
             echo json_encode(['success' => true, 'message' => 'Log status updated successfully']);
