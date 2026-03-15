@@ -10,6 +10,22 @@ require_once __DIR__ . '/../../config/vite.php';
     <title>Export Data - DOLE GIP Monitoring</title>
 
     <?php vite('backend/js/main.js'); ?>
+
+    <!-- Dark Mode FOUC Prevention -->
+    <script>
+        (function () {
+            var theme = localStorage.getItem('color-theme');
+            if (!theme) {
+                var match = document.cookie.match(/(?:^|; )color-theme=([^;]*)/);
+                theme = match ? decodeURIComponent(match[1]) : null;
+            }
+            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
 </head>
 
 <body class="bg-neutral-primary-soft antialiased print:bg-white">

@@ -66,7 +66,10 @@ export default defineConfig({
         manifest: true,
         cssCodeSplit: false,
         rollupOptions: {
-            input: './backend/js/main.js',
+            input: [
+                './backend/js/main.js',
+                './backend/js/modules/settings.js'
+            ],
             output: {
                 assetFileNames: (assetInfo) => {
                     if (assetInfo.name.endsWith('.css')) {
