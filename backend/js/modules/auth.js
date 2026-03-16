@@ -151,8 +151,7 @@ export function initLoginHandler() {
 
                     // Hide the drawer if it's open (Mobile)
                     const drawer = document.getElementById('drawer-login');
-                    if (drawer && typeof window.initFlowbite === 'function') {
-                        // We use the Flowbite data attribute to close
+                    if (drawer) {
                         const closeBtn = drawer.querySelector('[data-drawer-hide]');
                         if (closeBtn) closeBtn.click();
                     }
@@ -161,9 +160,28 @@ export function initLoginHandler() {
                     await showLoginSuccess(hasLoggedInBefore);
                     playOpeningAnimation(hasLoggedInBefore);
                 } else {
-                    showAuthError();
-                    passwordInput.value = '';
-                    passwordInput.focus();
+                    // AUTO HIDE FORM BOTTOM DRAWER ON WRONG PASSWORD
+                    const drawer = document.getElementById('drawer-login');
+                    if (drawer) {
+                        // Use class manipulation for the rebound effect
+                        drawer.classList.add('translate-y-full');
+                        
+                        // Wait for drawer to hide before showing error
+                        setTimeout(() => {
+                            showAuthError();
+                            
+                            // Re-open after error shows to let user logs again
+                            setTimeout(() => {
+                                drawer.classList.remove('translate-y-full');
+                                passwordInput.value = '';
+                                passwordInput.focus();
+                            }, 600);
+                        }, 400);
+                    } else {
+                        showAuthError();
+                        passwordInput.value = '';
+                        passwordInput.focus();
+                    }
                 }
             } catch (error) {
                 console.error('Login Error:', error);
@@ -269,7 +287,13 @@ export function initMobileSplash() {
 
                 // On first hide (Login click), also ask for notifications if not yet asked
                 if (Notification.permission === 'default') requestNotifications();
-            }, 700);
+
+                // DELAYED DRAWER OPENING: Wait until splash is gone
+                const drawer = document.getElementById('drawer-login');
+                if (drawer) {
+                    drawer.classList.remove('translate-y-full');
+                }
+            }, 800);
         }
     };
 
@@ -294,7 +318,17 @@ export function initMobileSplash() {
         });
     });
 
-    if (backBtn) backBtn.addEventListener('click', showSplash);
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            // Auto hide LOGIN DRAWER if open
+            const drawer = document.getElementById('drawer-login');
+            if (drawer) {
+                const closeBtn = drawer.querySelector('[data-drawer-hide]');
+                if (closeBtn) closeBtn.click();
+            }
+            showSplash();
+        });
+    }
 
     // --- Drawer Event Listeners for Background Movement ---
     // Note: We use MutationObserver or simple interval as fallback if Flowbite events aren't firing globally

@@ -217,9 +217,6 @@ require_once __DIR__ . '/config/db.php';
             <!-- Action Buttons (Positioned higher, fully visible) -->
             <div class="flex flex-col gap-3 mb-12 relative z-20 w-full max-w-[280px] mx-auto">
                 <button id="show-login-btn" 
-                    data-drawer-target="drawer-login" 
-                    data-drawer-show="drawer-login" 
-                    data-drawer-placement="bottom"
                     class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 rounded-xl shadow-lg transition-all text-[11px] uppercase tracking-[0.2em] active:scale-[0.97]">
                     Login
                 </button>
@@ -302,7 +299,7 @@ require_once __DIR__ . '/config/db.php';
 
             <!-- Curved Text SVG (Visible when drawer open) -->
             <svg id="curved-welcome" 
-                class="absolute -top-px-[12] left-20 right-20 w-[calc(100%+240px)] h-[calc(100%+200px)] opacity-100 scale-90 transition-all duration-700 ease-in-out pointer-events-none z-20" 
+                class="absolute !-top-28 !-left-24 w-[calc(100%+240px)] h-[calc(100%+200px)] opacity-0 scale-50 transition-all duration-700 ease-in-out pointer-events-none z-20" 
                 viewBox="0 0 500 300">
                 <!-- Curvier path moved toward the top -->
                 <path id="curve" d="M73.2,121.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97" fill="transparent" />

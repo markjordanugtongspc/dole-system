@@ -55,19 +55,19 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
     });
 
     const drawerHtml = `
-<div class="border-b border-default pb-3 mb-4 flex flex-col relative w-full pt-3 font-montserrat user-select-none">
+<div class="border-b border-default pb-4 mb-5 flex flex-col relative w-full pt-4 font-montserrat user-select-none">
     <div class="flex justify-between items-start pe-12">
-        <h3 class="text-lg sm:text-2xl font-black text-royal-blue leading-tight mb-0.5 tracking-tight break-words pr-2 line-clamp-2">${data.name}</h3>
+        <h3 class="text-xl sm:text-2xl font-black text-royal-blue leading-tight mb-1.5 tracking-tight break-words pr-2">${data.name}</h3>
         <button type="button" id="close-drawer-btn" class="text-body bg-transparent hover:text-heading hover:bg-neutral-tertiary rounded-base w-9 h-9 absolute top-2 right-2 flex items-center justify-center cursor-pointer transition-colors z-50">
            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
            <span class="sr-only">Close drawer</span>
         </button>
     </div>
 
-    <div class="grid grid-cols-2 gap-3 mt-4 w-full">
+    <div class="grid grid-cols-2 gap-4 mt-6 w-full">
         <div class="flex flex-col gap-1 text-left">
             <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ID No.</span>
-            <span class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 text-[10px] sm:text-[10px] font-black px-2 py-1.5 rounded border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm border-l-4 border-l-gray-400 truncate">${data.id}</span>
+            <span class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 text-[10px] sm:text-[11px] font-black px-2.5 py-1.5 rounded border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm border-l-4 border-l-gray-400 truncate">${data.id}</span>
         </div>
         <div class="flex flex-col gap-1 text-left overflow-hidden">
             <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1 flex items-center">
@@ -83,14 +83,14 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
     </div>
 
     <!-- Mobile Only Assigned Office Row (Rectangle Style) -->
-    <div class="flex flex-col gap-1 text-left mt-3 sm:hidden">
+    <div class="flex flex-col gap-1 text-left mt-4 sm:hidden">
         <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ASSIGNED OFFICE</span>
         <span class="${getOfficeClass(data.office)} text-[10px] font-black px-2.5 py-2 rounded border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm border-l-4 border-l-indigo-500 w-full truncate" title="${data.office}">${data.office}</span>
     </div>
 </div>
 
-<h4 class="text-xs font-bold text-heading mt-4 mb-3 pb-2 border-b border-default uppercase tracking-widest hidden lg:block">Personal Profile</h4>
-<div class="flex flex-col gap-3 text-sm mt-2 px-1">
+<h4 class="text-sm font-bold text-heading mt-6 mb-4 pb-2 border-b border-default whitespace-nowrap hidden lg:block">Personal Profile</h4>
+<div class="flex flex-col gap-4 text-sm mt-3 px-1">
     <div class="flex justify-between items-center group">
         <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Contact No.</span>
         <span class="${data.contact ? 'font-black text-heading font-mono' : 'font-bold text-gray-300 italic'} truncate text-right">${data.contact || 'NOT PROVIDED'}</span>
@@ -111,43 +111,43 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Gender</span>
         <span class="font-black text-heading uppercase text-right">${data.gender || 'N/A'}</span>
     </div>
-    <div class="flex justify-between items-center group pt-2 mt-0.5 border-t border-gray-50 dark:border-slate-800/60">
+    <div class="flex justify-between items-center group pt-3 mt-1 border-t border-gray-50 dark:border-slate-800/60">
         <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Education</span>
-        <div class="flex items-center gap-1.5 max-w-[65%] justify-end shrink-0 min-w-0">
-            <div class="w-5 h-5 rounded bg-golden-yellow/10 flex items-center justify-center text-golden-yellow border border-golden-yellow/20 shrink-0">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+        <div class="flex items-center gap-2 max-w-[60%] justify-end shrink-0 min-w-0">
+            <div class="w-6 h-6 rounded bg-golden-yellow/10 flex items-center justify-center text-golden-yellow border border-golden-yellow/20 shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
             </div>
-            <span class="text-[11px] sm:text-sm font-black text-heading whitespace-nowrap tracking-tight truncate" title="${data.education}">${data.education || 'N/A'}</span>
+            <span class="text-[11px] lg:text-sm font-black text-heading whitespace-nowrap tracking-tight truncate" title="${data.education}">${data.education || 'N/A'}</span>
         </div>
     </div>
 </div>
 
 <!-- Container for right grid from modal -->
-<div class="mt-6 pt-4 border-t border-default relative">
+<div class="mt-8 pt-6 border-t border-default relative">
     <!-- Pages Container -->
-    <div id="drawer-page-0" class="flex-1 flex flex-col gap-3">
+    <div id="drawer-page-0" class="flex-1 flex flex-col gap-4">
         
-        <div class="bg-gray-50/50 dark:bg-slate-800/50 rounded-xl p-3 border border-gray-100 dark:border-slate-700 shadow-sm w-full">
-            <p class="text-[9px] uppercase tracking-widest text-gray-400 dark:text-white font-black mb-2">Work Registry</p>
+        <div class="bg-gray-50/50 dark:bg-slate-800/50 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm w-full">
+            <p class="text-[9px] uppercase tracking-widest text-gray-400 dark:text-white font-black mb-3">Work Registry</p>
             <div class="flex items-center gap-3">
-                <div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800 shrink-0">
+                <div class="p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800 shrink-0">
                     <svg class="w-5 h-5 text-royal-blue dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <label class="text-[9px] text-gray-400 dark:text-gray-300 font-bold block mb-0.5 uppercase tracking-widest truncate">Series No.</label>
+                    <label class="text-[9px] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest truncate">Series No.</label>
                     <span class="text-sm sm:text-base font-black text-royal-blue dark:text-blue-400 font-mono whitespace-nowrap leading-none tracking-tight">${data.seriesNo || '2025-00-000'}</span>
                 </div>
             </div>
         </div>
 
-         <div class="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-3 sm:p-4 rounded-xl shadow-sm">
+         <div class="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-4 rounded-xl shadow-sm">
             <label class="text-[9px] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest">Designation / Role</label>
-            <p class="text-xs sm:text-sm font-black text-heading break-words whitespace-normal leading-snug">${data.designation}</p>
+            <p class="text-sm font-black text-heading break-words whitespace-normal leading-snug">${data.designation}</p>
         </div>
         
-         <div class="bg-gray-50/30 dark:bg-slate-800/30 p-3 sm:p-4 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
+         <div class="bg-gray-50/30 dark:bg-slate-800/30 p-4 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
             <label class="text-[9px] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest">Replacement History</label>
-             <p class="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium italic">${data.replacement || 'None found.'}</p>
+             <p class="text-xs text-gray-500 dark:text-gray-400 font-medium italic">${data.replacement || 'None found.'}</p>
         </div>
     </div>
     
@@ -198,20 +198,20 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         </div>
     </div>
     
-    <div id="drawer-page-2" class="hidden flex-1 flex flex-col gap-4 sm:gap-6">
+    <div id="drawer-page-2" class="hidden flex-1 flex flex-col gap-6">
          <div class="flex justify-between items-center border-b-2 border-brand pb-2">
-            <h4 class="text-xs sm:text-sm font-bold text-heading uppercase tracking-widest">Submission Logs</h4>
-            <div class="flex gap-1.5 sm:gap-2">
-                <button type="button" id="add-dtr-log-btn" class="bg-blue-50 dark:bg-blue-900/40 text-royal-blue dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-600 dark:hover:text-white text-[9px] sm:text-[10px] font-black tracking-widest uppercase px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap">
+            <h4 class="text-sm font-bold text-heading uppercase tracking-widest">Submission Logs</h4>
+            <div class="flex gap-2">
+                <button type="button" id="add-dtr-log-btn" class="bg-blue-50 dark:bg-blue-900/40 text-royal-blue dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-600 dark:hover:text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap">
                     + DTR
                 </button>
-                <button type="button" id="add-ar-log-btn" class="bg-orange-50 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300 border border-orange-200 dark:border-orange-800 hover:bg-orange-500 hover:text-white text-[9px] sm:text-[10px] font-black tracking-widest uppercase px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap">
+                <button type="button" id="add-ar-log-btn" class="bg-orange-50 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300 border border-orange-200 dark:border-orange-800 hover:bg-orange-500 hover:text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap">
                     + AR
                 </button>
             </div>
          </div>
 
-         <div class="flex flex-col gap-4 sm:gap-5">
+         <div class="flex flex-col gap-5">
             <div>
                 <h5 class="text-xs font-bold text-gray-500 uppercase tracking-widest pl-1 mb-3 flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -252,15 +252,14 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
     <!-- Navigation Below (Same as modal logic but styled for drawer) -->
     <!-- Grid columns structure for responsive desktop and mobile -->
-    <div class="grid grid-cols-2 gap-3 pt-3 mt-3 border-t border-gray-100 dark:border-slate-800 relative z-10 w-full mb-1">
-        <button id="drawer-prev-btn" class="flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 rounded-xl bg-neutral-secondary-medium text-heading text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm border border-default-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-tertiary cursor-pointer">
+    <div class="grid grid-cols-2 gap-3 pt-6 mt-6 border-t border-gray-100 dark:border-slate-800 relative z-10 w-full mb-4">
+        <button id="drawer-prev-btn" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-neutral-secondary-medium text-heading text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm border border-default-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-tertiary">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
             PREVIOUS
         </button>
-        <button id="drawer-next-btn" class="flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 rounded-xl bg-brand text-white text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm shadow-brand/50 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-strong cursor-pointer">
+        <button id="drawer-next-btn" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-brand text-white text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm shadow-brand-medium/50 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-strong">
             NEXT
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
-        </button>
     </div>
 </div>
 
@@ -296,8 +295,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
     
     drawerContainer = document.createElement('div');
     drawerContainer.id = 'beneficiary-drawer-container';
-    // Mobile: Bottom drawer (translate-y); Desktop: Right drawer (translate-x)
-    drawerContainer.className = 'fixed bottom-0 left-0 right-0 lg:top-0 lg:right-0 z-[10001] h-[85vh] lg:h-screen p-3 sm:p-5 overflow-y-auto transition-transform duration-500 ease-in-out translate-y-full lg:translate-y-0 lg:translate-x-full bg-neutral-primary-soft dark:bg-slate-900 w-full lg:w-[600px] shadow-2xl rounded-t-[2.5rem] lg:rounded-t-none border-t lg:border-t-0 lg:border-l border-default-medium dark:border-slate-800';
+    drawerContainer.className = 'fixed top-0 right-0 z-[100] h-screen p-4 sm:p-6 overflow-y-auto transition-transform duration-500 ease-in-out translate-x-full bg-neutral-primary-soft dark:bg-slate-900 w-full sm:w-[550px] lg:w-[650px] shadow-2xl';
     drawerContainer.setAttribute('tabindex', '-1');
     drawerContainer.setAttribute('data-drawer-backdrop', 'true');
     drawerContainer.innerHTML = drawerHtml;
@@ -305,14 +303,13 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
     document.body.appendChild(drawerContainer);
 
     import('flowbite').then(({ Drawer }) => {
-        const isMobile = window.innerWidth < 1024;
         const options = {
-            placement: isMobile ? 'bottom' : 'right',
+            placement: 'right',
             backdrop: true,
             bodyScrolling: false,
             edge: false,
             edgeOffset: '',
-            backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-[10000]',
+            backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-50',
             onHide: () => {
                 setTimeout(() => {
                     if (drawerContainer && drawerContainer.parentNode) {

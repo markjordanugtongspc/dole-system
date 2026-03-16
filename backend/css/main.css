@@ -1,72 +1,56 @@
+/* Google Fonts - Montserrat */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
+/* Enforce class-based Dark Mode mapping for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
+    /* Brand Colors (V4 requires --color-* for specific utility generation) */
     --color-royal-blue: #0038A8;
     --color-brand: #0038A8;
     --color-brand-strong: #002d86;
     --color-philippine-red: #CE1126;
     --color-golden-yellow: #FCD116;
+
+    /* Theme Tokens mapped to dynamic variables */
+    --color-neutral-primary-soft: var(--bg-soft);
+    --color-neutral-primary-medium: var(--bg-medium);
+    --color-neutral-secondary-soft: var(--border-light);
+    --color-neutral-tertiary-medium: var(--bg-soft);
+
+    --color-text-heading: var(--text-heading-color);
+    --color-text-body: var(--text-body-color);
 }
 
-/* Neutral Color Palette for Dashboard */
+/* Base Variable Definitions (Dynamic Themes) */
 :root {
     --bg-soft: #f8fafc;
+    --bg-medium: #ffffff;
     --border-light: #e2e8f0;
-    --text-heading: #0f172a;
-    --text-body: #475569;
+    --text-heading-color: #0f172a;
+    --text-body-color: #475569;
 }
 
 .dark {
     --bg-soft: #1e293b;
+    --bg-medium: #1e293b;
     --border-light: #334155;
-    --text-heading: #ffffff;
-    --text-body: #94a3b8;
+    --text-heading-color: #ffffff;
+    --text-body-color: #94a3b8;
 }
 
 @layer utilities {
-    .bg-neutral-primary-soft {
-        background-color: var(--bg-soft);
-    }
-
-    .bg-neutral-primary-medium {
-        background-color: #ffffff;
-    }
-
-    .bg-neutral-secondary-soft {
-        background-color: var(--border-light);
-    }
-
-    .bg-neutral-tertiary-medium {
-        background-color: var(--bg-soft);
-    }
-
-    .border-default {
-        border-color: var(--border-light);
-    }
-
-    .border-default-medium {
-        border-color: #e2e8f0;
-    }
-
     .text-heading {
-        color: var(--text-heading);
+        color: var(--text-heading-color);
     }
 
     .text-body {
-        color: var(--text-body);
+        color: var(--text-body-color);
     }
 
     .text-fg-brand {
-        color: var(--royal-blue);
-    }
-
-    .bg-brand {
-        background-color: var(--royal-blue);
-    }
-
-    .hover\:bg-brand-strong:hover {
-        background-color: #002d86;
+        color: var(--color-royal-blue);
     }
 
     .rounded-base {
@@ -76,7 +60,7 @@
 
 body {
     font-family: 'Montserrat', 'Gotham', 'Century Gothic', sans-serif;
-    color: var(--text-body);
+    color: var(--text-body-color);
     background-color: var(--bg-soft);
 }
 
@@ -92,7 +76,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #0038A8 0%, #0052CC 100%);
+    background: linear-gradient(135deg, var(--color-royal-blue) 0%, #0052CC 100%);
     display: flex;
     align-items: center;
     justify-content: center;
