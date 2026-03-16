@@ -54,27 +54,31 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Initialize password visibility toggle
+ * Initialize password visibility toggle for all forms
  */
 function initPasswordToggle() {
-    const toggleBtn = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('password');
+    const toggleBtns = document.querySelectorAll('.togglePassword');
 
-    if (toggleBtn && passwordInput) {
-        toggleBtn.addEventListener('click', () => {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
+    toggleBtns.forEach(btn => {
+        // Find the input in the same form/container
+        const passwordInput = btn.closest('.relative').querySelector('input');
 
-            // Toggle eye icon
-            const eyeOpen = toggleBtn.querySelector('.eye-open');
-            const eyeClosed = toggleBtn.querySelector('.eye-closed');
+        if (btn && passwordInput) {
+            btn.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
 
-            if (eyeOpen && eyeClosed) {
-                eyeOpen.classList.toggle('hidden');
-                eyeClosed.classList.toggle('hidden');
-            }
-        });
-    }
+                // Toggle eye icon
+                const eyeOpen = btn.querySelector('.eye-open');
+                const eyeClosed = btn.querySelector('.eye-closed');
+
+                if (eyeOpen && eyeClosed) {
+                    eyeOpen.classList.toggle('hidden');
+                    eyeClosed.classList.toggle('hidden');
+                }
+            });
+        }
+    });
 }
 
 /**
