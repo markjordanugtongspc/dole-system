@@ -57,7 +57,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
     const drawerHtml = `
 <div class="border-b border-default pb-3 mb-4 flex flex-col relative w-full pt-3 font-montserrat user-select-none">
     <div class="flex justify-between items-start pe-12">
-        <h3 class="text-xl sm:text-2xl font-black text-royal-blue leading-tight mb-1 tracking-tight break-words pr-2">${data.name}</h3>
+        <h3 class="text-lg sm:text-2xl font-black text-royal-blue leading-tight mb-0.5 tracking-tight break-words pr-2 line-clamp-2">${data.name}</h3>
         <button type="button" id="close-drawer-btn" class="text-body bg-transparent hover:text-heading hover:bg-neutral-tertiary rounded-base w-9 h-9 absolute top-2 right-2 flex items-center justify-center cursor-pointer transition-colors z-50">
            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
            <span class="sr-only">Close drawer</span>
@@ -252,15 +252,16 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
     <!-- Navigation Below (Same as modal logic but styled for drawer) -->
     <!-- Grid columns structure for responsive desktop and mobile -->
-    <div class="grid grid-cols-2 gap-3 pt-4 mt-4 border-t border-gray-100 dark:border-slate-800 relative z-10 w-full mb-2">
-        <button id="drawer-prev-btn" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-neutral-secondary-medium text-heading text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm border border-default-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-tertiary cursor-pointer">
+    <div class="grid grid-cols-2 gap-3 pt-3 mt-3 border-t border-gray-100 dark:border-slate-800 relative z-10 w-full mb-1">
+        <button id="drawer-prev-btn" class="flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 rounded-xl bg-neutral-secondary-medium text-heading text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm border border-default-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-tertiary cursor-pointer">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
             PREVIOUS
         </button>
-        <button id="drawer-next-btn" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-brand text-white text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm shadow-brand/50 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-strong cursor-pointer">
+        <button id="drawer-next-btn" class="flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 rounded-xl bg-brand text-white text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm shadow-brand/50 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-strong cursor-pointer">
             NEXT
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
         </button>
+    </div>
 </div>
 
 <style>
@@ -295,7 +296,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
     
     drawerContainer = document.createElement('div');
     drawerContainer.id = 'beneficiary-drawer-container';
-    drawerContainer.className = 'fixed top-0 right-0 z-[100] h-screen p-3 sm:p-5 overflow-y-auto transition-transform duration-500 ease-in-out translate-x-full bg-neutral-primary-soft dark:bg-slate-900 w-full sm:w-[500px] lg:w-[600px] shadow-2xl';
+    // Mobile: Bottom drawer (translate-y); Desktop: Right drawer (translate-x)
+    drawerContainer.className = 'fixed bottom-0 left-0 right-0 lg:top-0 lg:right-0 z-[10001] h-[85vh] lg:h-screen p-3 sm:p-5 overflow-y-auto transition-transform duration-500 ease-in-out translate-y-full lg:translate-y-0 lg:translate-x-full bg-neutral-primary-soft dark:bg-slate-900 w-full lg:w-[600px] shadow-2xl rounded-t-[2.5rem] lg:rounded-t-none border-t lg:border-t-0 lg:border-l border-default-medium dark:border-slate-800';
     drawerContainer.setAttribute('tabindex', '-1');
     drawerContainer.setAttribute('data-drawer-backdrop', 'true');
     drawerContainer.innerHTML = drawerHtml;
@@ -303,13 +305,14 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
     document.body.appendChild(drawerContainer);
 
     import('flowbite').then(({ Drawer }) => {
+        const isMobile = window.innerWidth < 1024;
         const options = {
-            placement: 'right',
+            placement: isMobile ? 'bottom' : 'right',
             backdrop: true,
             bodyScrolling: false,
             edge: false,
             edgeOffset: '',
-            backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-50',
+            backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-[10000]',
             onHide: () => {
                 setTimeout(() => {
                     if (drawerContainer && drawerContainer.parentNode) {

@@ -294,37 +294,40 @@ require_once __DIR__ . '/config/db.php';
             data-drawer-target="drawer-login" 
             data-drawer-show="drawer-login" 
             data-drawer-placement="bottom"
-            class="lg:hidden flex flex-col items-center justify-center text-center w-full px-6 transition-transform duration-500 ease-out relative z-10 cursor-pointer">
+            class="lg:hidden flex flex-col items-center justify-start text-center w-full px-6 pt-24 transition-transform duration-500 ease-out relative z-10 cursor-pointer">
             
             <!-- Logo Container -->
-<div id="mobile-logo-container" 
-     class="w-56 h-56 mx-auto mb-12 relative flex items-center justify-center transition-all duration-500">
+            <div id="mobile-logo-container" 
+                class="w-56 h-56 mx-auto mb-12 relative flex items-center justify-center transition-all duration-500 bg-white dark:bg-slate-800 rounded-full">
 
-<!-- Curved Text SVG (Visible when drawer open) -->
-<svg id="curved-welcome" 
-     class="absolute -top-10 -left-16 -right-16 w-[calc(100%+200px)] h-[calc(100%+200px)] opacity-100 scale-75 transition-all duration-700 ease-in-out pointer-events-none z-20" 
-     viewBox="0 0 500 300">
-    <!-- Tilted slightly right and lowered -->
-    <path id="curve" d="M 40, 270 A 185,130 0 0,1 455, 220" fill="transparent" />
-    <text fill="#000080" class="dark:fill-blue-500" style="font-size: 52px; font-weight: 1000; text-transform: uppercase; letter-spacing: -0.01em;">
-        <textPath xlink:href="#curve" startOffset="55%" text-anchor="middle">
-            Welcome Back!
-        </textPath>
-    </text>
-</svg>
+            <!-- Curved Text SVG (Visible when drawer open) -->
+            <svg id="curved-welcome" 
+                class="absolute -top-px-[12] left-20 right-20 w-[calc(100%+240px)] h-[calc(100%+200px)] opacity-100 scale-90 transition-all duration-700 ease-in-out pointer-events-none z-20" 
+                viewBox="0 0 500 300">
+                <!-- Curvier path moved toward the top -->
+                <path id="curve" d="M73.2,121.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97" fill="transparent" />
+                <text 
+                    fill="#000080" 
+                    class="dark:fill-blue-500 [text-shadow:_3px_7px_0px_#3b82f6]" 
+                    style="font-size: 34px; font-weight: 1000; text-transform: uppercase; letter-spacing: -0.01em;">
+                    <textPath xlink:href="#curve" startOffset="50%" text-anchor="middle">
+                        Welcome Back!
+                    </textPath>
+                </text>
+            </svg>
 
-    <!-- Circular Logo -->
-    <img src="frontend/images/logo/doleiligan.png" 
-         alt="DOLE Logo" 
-         class="w-48 h-48 object-contain relative z-10 drop-shadow-2xl transition-all duration-500 rounded-full">
-</div>
+                <!-- Circular Logo -->
+                <img src="frontend/images/logo/doleiligan.png" 
+                    alt="DOLE Logo" 
+                    class="w-48 h-48 object-contain relative z-10 drop-shadow-[0_20px_50px_rgba(0,56,168,0.4)] transition-all duration-500 rounded-full">
+            </div>
 
             <!-- Welcome Text (moved outside logo container) -->
-            <div id="mobile-welcome-text" class="transition-all duration-500 -mt-8">
-                <h2 class="text-3xl font-black text-royal-blue dark:text-blue-400 uppercase tracking-tight mb-8 !text-nowrap">
+            <div id="mobile-welcome-text" class="transition-all duration-500 -mt-4 sm:-mt-8">
+                <h2 class="text-2xl sm:text-xl font-black text-royal-blue dark:text-blue-400 uppercase tracking-tight mb-2 sm:mb-4 !text-nowrap">
                     Welcome Back!
                 </h2>
-                <p class="text-[18px] text-gray-400 dark:text-slate-500 font-black uppercase tracking-[0.3em] !text-nowrap">
+                <p class="text-[10px] sm:text-[12px] text-gray-400 dark:text-slate-500 font-black uppercase tracking-widest !text-nowrap">
                     Department of Labor and Employment
                 </p>
             </div>

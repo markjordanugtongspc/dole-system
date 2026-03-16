@@ -308,7 +308,7 @@ export function initMobileSplash() {
                     const isHidden = drawer.classList.contains('translate-y-full');
                     if (!isHidden) {
                         // Drawer is OPEN -> Move background UP & Curve Text
-                        if (bgContent) bgContent.style.transform = 'translateY(-20%)';
+                        if (bgContent) bgContent.style.transform = 'translateY(-35%)';
                         
                         // Hide conventional text
                         if (welcomeText) {
