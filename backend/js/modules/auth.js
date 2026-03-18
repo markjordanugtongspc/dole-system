@@ -89,32 +89,34 @@ const SimpleCrypto = {
 
 /**
  * Initialize Login Handler with "Opening" Animation
+ * Supports both Desktop and Mobile (Drawer) forms
  */
 export function initLoginHandler() {
-    const loginForm = document.getElementById('loginForm');
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
-    const rememberMeCheckbox = document.getElementById('rememberMe');
+    const loginForms = document.querySelectorAll('.login-form-shared');
 
-    // Restore "Remember Me" credentials if they exist
-    if (usernameInput && passwordInput && rememberMeCheckbox) {
-        const storedUser = localStorage.getItem('secure_user');
-        const storedPass = localStorage.getItem('secure_pass');
+    loginForms.forEach(form => {
+        const usernameInput = form.querySelector('input[name="username"]');
+        const passwordInput = form.querySelector('input[name="password"]');
+        const rememberMeCheckbox = form.querySelector('input[name="rememberMe"]');
 
-        if (storedUser && storedPass) {
-            const decryptedUser = SimpleCrypto.decrypt(storedUser);
-            const decryptedPass = SimpleCrypto.decrypt(storedPass);
+        // Restore "Remember Me" credentials if they exist
+        if (usernameInput && passwordInput && rememberMeCheckbox) {
+            const storedUser = localStorage.getItem('secure_user');
+            const storedPass = localStorage.getItem('secure_pass');
 
-            if (decryptedUser && decryptedPass) {
-                usernameInput.value = decryptedUser;
-                passwordInput.value = decryptedPass;
-                rememberMeCheckbox.checked = true;
+            if (storedUser && storedPass) {
+                const decryptedUser = SimpleCrypto.decrypt(storedUser);
+                const decryptedPass = SimpleCrypto.decrypt(storedPass);
+
+                if (decryptedUser && decryptedPass) {
+                    usernameInput.value = decryptedUser;
+                    passwordInput.value = decryptedPass;
+                    rememberMeCheckbox.checked = true;
+                }
             }
         }
-    }
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             try {
@@ -147,13 +149,42 @@ export function initLoginHandler() {
                     localStorage.setItem('hasLoggedInBefore', 'true');
                     localStorage.setItem('user', JSON.stringify(result.user));
 
+                    // Hide the drawer if it's open (Mobile)
+                    const drawer = document.getElementById('drawer-login');
+                    if (drawer) {
+                        // Forcibly hide by adding the translate class
+                        drawer.classList.add('translate-y-full');
+                        
+                        const closeBtn = drawer.querySelector('[data-drawer-hide]');
+                        if (closeBtn) closeBtn.click();
+                    }
+
                     // Show Success Modal then Trigger Opening Animation
                     await showLoginSuccess(hasLoggedInBefore);
                     playOpeningAnimation(hasLoggedInBefore);
                 } else {
-                    showAuthError();
-                    passwordInput.value = '';
-                    passwordInput.focus();
+                    // AUTO HIDE FORM BOTTOM DRAWER ON WRONG PASSWORD
+                    const drawer = document.getElementById('drawer-login');
+                    if (drawer) {
+                        // Use class manipulation for the rebound effect
+                        drawer.classList.add('translate-y-full');
+                        
+                        // Wait for drawer to hide before showing error
+                        setTimeout(() => {
+                            showAuthError();
+                            
+                            // Re-open after error shows to let user logs again
+                            setTimeout(() => {
+                                drawer.classList.remove('translate-y-full');
+                                passwordInput.value = '';
+                                passwordInput.focus();
+                            }, 600);
+                        }, 400);
+                    } else {
+                        showAuthError();
+                        passwordInput.value = '';
+                        passwordInput.focus();
+                    }
                 }
             } catch (error) {
                 console.error('Login Error:', error);
@@ -164,7 +195,7 @@ export function initLoginHandler() {
                 });
             }
         });
-    }
+    });
 }
 
 /**
@@ -226,18 +257,46 @@ export function initLogoutHandler() {
 export function initMobileSplash() {
     const splash = document.getElementById('mobile-splash');
     const showBtn = document.getElementById('show-login-btn');
-    const forgotBtn = document.getElementById('forgot-password-splash-btn');
     const backBtn = document.getElementById('back-to-splash');
+    const bgContent = document.getElementById('mobile-bg-content');
+    const welcomeText = document.getElementById('mobile-welcome-text');
+    const reopenBtn = document.getElementById('reopen-login-drawer');
+    const notifyBtn = document.getElementById('request-notifications-btn');
+
+    // Handle Notification Permissions immediately on first splash interaction or load
+    const requestNotifications = async () => {
+        if ('Notification' in window) {
+            const permission = await Notification.requestPermission();
+            console.log('Notification permission:', permission);
+            if (permission === 'granted') {
+                if (notifyBtn) notifyBtn.classList.add('hidden');
+            }
+        }
+    };
+
+    if (Notification.permission === 'default' && notifyBtn) {
+        notifyBtn.classList.remove('hidden');
+        notifyBtn.addEventListener('click', requestNotifications);
+    }
 
     const hideSplash = () => {
         if (splash) {
             splash.style.transform = 'translateY(-100%)';
-            // Wait for transition to finish then hide completely to prevent top-overlap
+            // Wait for transition to finish then hide completely
             setTimeout(() => {
                 splash.style.visibility = 'hidden';
                 splash.style.pointerEvents = 'none';
                 splash.style.zIndex = '-1';
-            }, 700);
+
+                // On first hide (Login click), also ask for notifications if not yet asked
+                if (Notification.permission === 'default') requestNotifications();
+
+                // DELAYED DRAWER OPENING: Wait until splash is gone
+                const drawer = document.getElementById('drawer-login');
+                if (drawer) {
+                    drawer.classList.remove('translate-y-full');
+                }
+            }, 800);
         }
     };
 
@@ -251,6 +310,103 @@ export function initMobileSplash() {
     };
 
     if (showBtn) showBtn.addEventListener('click', hideSplash);
-    if (forgotBtn) forgotBtn.addEventListener('click', hideSplash);
-    if (backBtn) backBtn.addEventListener('click', showSplash);
+
+    // If the user clicked Forgot Password link
+    const forgotLinks = document.querySelectorAll('.forgot-password-link');
+    forgotLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (e.target.closest('#mobile-splash')) {
+                hideSplash();
+            }
+        });
+    });
+
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            // Auto hide LOGIN DRAWER if open
+            const drawer = document.getElementById('drawer-login');
+            if (drawer) {
+                // Forcefully slide the drawer down off-screen
+                drawer.classList.add('translate-y-full');
+                
+                // Fallback: If Flowbite's close button happens to exist, click it
+                const closeBtn = drawer.querySelector('[data-drawer-hide]');
+                if (closeBtn) closeBtn.click();
+            }
+            // Animate splash in
+            showSplash();
+        });
+    }
+
+    // --- Drawer Event Listeners for Background Movement ---
+    // Note: We use MutationObserver or simple interval as fallback if Flowbite events aren't firing globally
+    const drawer = document.getElementById('drawer-login');
+    const curvedWelcome = document.getElementById('curved-welcome');
+    const peoplesBg = document.getElementById('peoples-bg');
+
+    if (drawer) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    const isHidden = drawer.classList.contains('translate-y-full');
+                    if (!isHidden) {
+                        // Drawer is OPEN -> Move background UP & Curve Text
+                        if (bgContent) bgContent.style.transform = 'translateY(-35%)';
+                        
+                        // Hide conventional text
+                        if (welcomeText) {
+                            welcomeText.style.opacity = '0';
+                            welcomeText.style.transform = 'translateY(20px) scale(0.9)';
+                        }
+                        
+                        // Show curved text around circle
+                        if (curvedWelcome) {
+                            curvedWelcome.style.opacity = '1';
+                            curvedWelcome.style.transform = 'scale(1)';
+                        }
+
+                        if (reopenBtn) {
+                            reopenBtn.style.opacity = '0';
+                            reopenBtn.style.transform = 'scale(0)';
+                        }
+
+                        // Show Peoples Background
+                        if (peoplesBg) {
+                            peoplesBg.classList.remove('opacity-0', 'scale-0');
+                            peoplesBg.classList.add('opacity-40', 'scale-[1.6]');
+                        }
+                    } else {
+                        // Drawer is CLOSED -> Reset to original design
+                        if (bgContent) bgContent.style.transform = 'translateY(0)';
+                        
+                        // Show conventional text
+                        if (welcomeText) {
+                            welcomeText.style.opacity = '1';
+                            welcomeText.style.transform = 'translateY(0) scale(1)';
+                        }
+                        
+                        // Hide curved text
+                        if (curvedWelcome) {
+                            curvedWelcome.style.opacity = '0';
+                            curvedWelcome.style.transform = 'scale(0.5)';
+                        }
+
+                        // Reveal the "Sign In Now" button if splash is gone
+                        if (reopenBtn && splash && splash.style.visibility === 'hidden') {
+                            reopenBtn.style.opacity = '1';
+                            reopenBtn.style.transform = 'scale(1)';
+                        }
+
+                        // Hide Peoples Background
+                        if (peoplesBg) {
+                            peoplesBg.classList.add('opacity-0', 'scale-0');
+                            peoplesBg.classList.remove('opacity-40', 'scale-[1.6]');
+                        }
+                    }
+                }
+            });
+        });
+
+        observer.observe(drawer, { attributes: true });
+    }
 }

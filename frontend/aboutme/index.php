@@ -11,6 +11,22 @@ require_once '../../config/db.php'; // Loads .env and provides env() helper
     <title>About Me | DOLE - GIP System</title>
     <!-- Vite Assets -->
     <?php vite('backend/js/main.js'); ?>
+
+    <!-- Dark Mode FOUC Prevention -->
+    <script>
+        (function () {
+            var theme = localStorage.getItem('color-theme');
+            if (!theme) {
+                var match = document.cookie.match(/(?:^|; )color-theme=([^;]*)/);
+                theme = match ? decodeURIComponent(match[1]) : null;
+            }
+            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
 </head>
 
 <body class="bg-slate-100 font-montserrat">

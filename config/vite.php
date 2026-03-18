@@ -65,12 +65,16 @@ function getBaseUrl()
 function vite($entry)
 {
     $baseUrl = getBaseUrl();
+    static $cssLoaded = false;
 
     if (isViteRunning()) {
         // Development mode
         $viteHost = getViteHost();
-        echo '    <link rel="modulepreload" href="' . $viteHost . '/@vite/client">' . PHP_EOL;
-        echo '    <script type="module" src="' . $viteHost . '/@vite/client"></script>' . PHP_EOL;
+        if (!$cssLoaded) {
+            echo '    <link rel="modulepreload" href="' . $viteHost . '/@vite/client">' . PHP_EOL;
+            echo '    <script type="module" src="' . $viteHost . '/@vite/client"></script>' . PHP_EOL;
+            $cssLoaded = true;
+        }
         echo '    <script type="module" src="' . $viteHost . '/' . ltrim($entry, './') . '"></script>' . PHP_EOL;
     } else {
         // Production mode - load from manifest
@@ -80,10 +84,19 @@ function vite($entry)
             $manifest = json_decode(file_get_contents($manifestPath), true);
             $entryKey = ltrim($entry, './');
 
+            // Load main CSS specifically generated due to cssCodeSplit: false
+            if (!$cssLoaded && isset($manifest['style.css'])) {
+                $cssFile = $manifest['style.css']['file'];
+                $href = $baseUrl . '/dist/' . $cssFile;
+                echo '    <link rel="preload" href="' . $href . '" as="style">' . PHP_EOL;
+                echo '    <link rel="stylesheet" href="' . $href . '">' . PHP_EOL;
+                $cssLoaded = true;
+            }
+
             if (isset($manifest[$entryKey])) {
                 $file = $manifest[$entryKey]['file'];
 
-                // Load CSS with Preload
+                // Load individual CSS files if any (fallback)
                 if (isset($manifest[$entryKey]['css'])) {
                     foreach ($manifest[$entryKey]['css'] as $cssFile) {
                         $href = $baseUrl . '/dist/' . $cssFile;

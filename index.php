@@ -167,7 +167,6 @@ require_once __DIR__ . '/config/db.php';
         .left-panel-path-1 { animation: left-panel-pathAnim-1 4s linear infinite; }
     </style>
     <div id="mobile-splash" class="lg:hidden fixed inset-0 bg-white dark:bg-slate-900 flex flex-col transition-transform duration-700 ease-[cubic-bezier(0.85,0,0.15,1)]" style="z-index: 9999;">
-
         
         <!-- TOP WAVE SVG (Inlined & Animated via inline style) -->
         <div class="absolute top-0 left-0 w-full leading-none z-0 opacity-80 scale-110">
@@ -194,33 +193,34 @@ require_once __DIR__ . '/config/db.php';
         </div>
 
         <!-- SPLASH CONTENT (Scrollable/Expandable & Fixed Overlap) -->
-        <div class="relative z-10 flex flex-col h-full overflow-y-auto px-4 md:px-8 py-8">
+        <div class="relative z-10 flex flex-col h-full overflow-y-auto px-4 md:px-8 py-4">
             <!-- Headers (Left-aligned, Enhanced Visibility) -->
-            <div class="pt-8 mb-4 text-left w-full pl-4">
-                <h1 class="text-3xl sm:text-2xl font-black text-royal-blue dark:text-blue-400 leading-tight uppercase tracking-tight whitespace-nowrap">DOLE-GIP</h1>
-                <p class="text-[11px] sm:text-[10px] font-bold text-slate-700 dark:text-slate-300 mt-1 uppercase tracking-widest whitespace-nowrap">Republic of the Philippines</p>
-                <p class="text-[9px] sm:text-[8px] font-black text-white bg-royal-blue/90 dark:bg-blue-600/90 px-2 py-1 inline-block rounded uppercase tracking-widest shadow-sm mt-1.5 backdrop-blur-md">Department of Labor and Employment</p>
+            <div class="pt-4 mb-2 text-left w-full pl-2">
+                <h1 class="text-2xl sm:text-2xl font-black text-royal-blue dark:text-blue-400 leading-tight uppercase tracking-tight whitespace-nowrap">DOLE-GIP</h1>
+                <p class="text-[10px] sm:text-[10px] font-bold text-slate-700 dark:text-slate-300 mt-0.5 uppercase tracking-widest whitespace-nowrap">Republic of the Philippines</p>
+                <p class="text-[8px] sm:text-[8px] font-black text-white bg-royal-blue/90 dark:bg-blue-600/90 px-2 py-0.5 inline-block rounded uppercase tracking-widest shadow-sm mt-1 backdrop-blur-md">Department of Labor and Employment</p>
             </div>
 
             <!-- Logo Container (Middle Center, Circle Trimmed) -->
-            <div class="grow flex items-center justify-center relative my-12">
-                <div class="relative w-64 h-64 sm:w-56 sm:h-56 flex items-center justify-center rounded-full">
+            <div class="flex items-center justify-center relative mt-auto mb-10">
+                <div class="relative w-48 h-48 flex items-center justify-center rounded-full">
                     <!-- Glow background (behind logo) -->
-                    <div class="absolute inset-0 bg-blue-500/20 blur-3xl animate-pulse rounded-full z-0"></div>
+                    <div class="absolute inset-0 bg-blue-500/20 blur-2xl animate-pulse rounded-full z-0"></div>
                     
                     <!-- Logo (in front) -->
                     <img src="frontend/images/logo/doleiligan.png" 
                         alt="DOLE Logo" 
-                        class="w-48 h-48 sm:w-40 sm:h-40 object-contain drop-shadow-2xl brightness-110 rounded-full z-10">
+                        class="w-36 h-36 object-contain drop-shadow-2xl brightness-110 rounded-full z-10">
                 </div>
             </div>
 
-            <!-- Action Buttons (Positioned higher, fully visible) -->
-            <div class="flex flex-col gap-4 mb-48 sm:mb-40 relative z-20 w-full max-w-xs mx-auto">
-                <button id="show-login-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 rounded-xl shadow-lg transition-all text-xs uppercase tracking-[0.2em] active:scale-[0.97]">
+            <!-- Action Buttons (Positioned firmly below logo) -->
+            <div class="flex flex-col gap-3 mb-auto relative z-20 w-full max-w-[280px] mx-auto">
+                <button id="show-login-btn" 
+                    class="w-full  bg-royal-blue text-white hover:bg-royal-blue/90 text-white font-black py-4 rounded-xl shadow-lg transition-all text-[11px] uppercase tracking-[0.2em] active:scale-[0.97]">
                     Login
                 </button>
-                <button id="forgot-password-splash-btn" class="w-full text-red-500 hover:bg-red-500/5 font-bold py-3.5 rounded-xl transition-all text-xs uppercase tracking-[0.15em] border border-red-500/10 active:scale-[0.97]">
+                <button id="forgot-password-splash-btn" class="forgot-password-link w-full text-royal-blue hover:bg-red-500/5 font-bold py-3 rounded-xl transition-all text-[10px] uppercase tracking-[0.15em] border border-red-500/10 active:scale-[0.97]">
                     Forgot Password
                 </button>
             </div>
@@ -232,50 +232,53 @@ require_once __DIR__ . '/config/db.php';
     <!-- LEFT PANEL - Brand Panel (Desktop) -->
     <div id="left-panel" class="hidden lg:flex lg:w-1/2 bg-royal-blue dark:bg-slate-900 transition-colors duration-300 items-center justify-center p-12 relative overflow-hidden">
         
-        <!-- Animated Background Waves (Positioned at the very top) -->
-        <div class="absolute top-0 left-0 w-full leading-none z-0 opacity-50 scale-110 -translate-y-1/4">
-            <svg viewBox="0 0 1440 690" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
-                <path d="M 0,700 L 0,175 C 83.658,154.923 167.317,134.846 230,117 C 292.682,99.153 334.390,83.538 398,106 C 461.609,128.461 547.121,188.999 622,191 C 696.878,193.000 761.121,136.464 830,111 C 898.878,85.535 972.390,91.144 1043,101 C 1113.609,110.855 1181.317,124.958 1247,138 C 1312.682,151.041 1376.341,163.020 1440,175 L 1440,700 L 0,700 Z" stroke="none" stroke-width="0" fill="#66ccff" fill-opacity="0.3" class="left-panel-path-0" transform="rotate(-180 720 350)"></path>
-                <path d="M 0,700 L 0,408 C 87.735,443.436 175.470,478.873 232,453 C 288.529,427.126 313.851,339.943 380,338 C 446.148,336.056 553.122,419.352 630,459 C 706.877,498.647 753.657,494.647 806,467 C 858.342,439.352 916.245,388.056 992,374 C 1067.754,359.943 1161.358,383.126 1239,395 C 1316.641,406.873 1378.320,407.436 1440,408 L 1440,700 L 0,700 Z" stroke="none" stroke-width="0" fill="#66ccff" fill-opacity="0.6" class="left-panel-path-1" transform="rotate(-180 720 350)"></path>
-            </svg>
-        </div>
+<!-- Animated Background Waves (Positioned at the very top) -->
+<div class="absolute top-0 left-0 w-full leading-none z-0 opacity-50 scale-110 -translate-y-1/4">
+    <svg viewBox="0 0 1440 690" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+        <path d="M 0,700 L 0,175 C 83.658,154.923 167.317,134.846 230,117 C 292.682,99.153 334.390,83.538 398,106 C 461.609,128.461 547.121,188.999 622,191 C 696.878,193.000 761.121,136.464 830,111 C 898.878,85.535 972.390,91.144 1043,101 C 1113.609,110.855 1181.317,124.958 1247,138 C 1312.682,151.041 1376.341,163.020 1440,175 L 1440,700 L 0,700 Z" 
+              stroke="none" stroke-width="0" fill="#0099ff" fill-opacity="0.3" class="left-panel-path-0" transform="rotate(-180 720 350)"></path>
+        <path d="M 0,700 L 0,408 C 87.735,443.436 175.470,478.873 232,453 C 288.529,427.126 313.851,339.943 380,338 C 446.148,336.056 553.122,419.352 630,459 C 706.877,498.647 753.657,494.647 806,467 C 858.342,439.352 916.245,388.056 992,374 C 1067.754,359.943 1161.358,383.126 1239,395 C 1316.641,406.873 1378.320,407.436 1440,408 L 1440,700 L 0,700 Z" 
+              stroke="none" stroke-width="0" fill="#0099ff" fill-opacity="0.6" class="left-panel-path-1" transform="rotate(-180 720 350)"></path>
+    </svg>
+</div>
 
-        <div id="left-panel-content" class="text-center max-w-md relative z-10">
-            <div id="left-panel-logo" class="mb-10">
-                <div class="w-56 h-56 mx-auto bg-white rounded-full shadow-2xl flex items-center justify-center p-6 border-4 border-white/10 overflow-hidden">
-                    <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-full h-full object-contain rounded-full drop-shadow-2xl">
-                </div>
-            </div>
-            <h1 class="text-4xl font-bold text-white mb-4 tracking-tight">DOLE GIP Monitoring System</h1>
-            <p class="text-lg text-white/90 font-medium tracking-wide">Department of Labor and Employment</p>
-            <p class="text-xs text-golden-yellow mt-4 font-bold uppercase tracking-[0.2em]">Republic of the Philippines</p>
+<div id="left-panel-content" class="text-center max-w-md relative z-10">
+    <div id="left-panel-logo" class="mb-10">
+        <div class="w-56 h-56 mx-auto bg-white rounded-full shadow-2xl flex items-center justify-center p-6 border-4 border-white/10 overflow-hidden">
+            <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-full h-full object-contain rounded-full drop-shadow-2xl">
         </div>
     </div>
+    <h1 class="text-4xl font-bold text-white mb-4 tracking-tight">DOLE GIP Monitoring System</h1>
+    <p class="text-lg text-white/90 font-medium tracking-wide">Department of Labor and Employment</p>
+    <p class="text-xs text-golden-yellow mt-4 font-bold uppercase tracking-[0.2em]">Republic of the Philippines</p>
+</div>
+</div>
 
     <!-- Right Content Centering Wrapper -->
     <div id="right-panel" class="flex-1 flex flex-col items-center justify-center p-6 lg:p-12 relative min-h-screen transition-all duration-500">
-        
+
         <!-- Login Background Waves (Mobile & Desktop) -->
         <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
             <!-- Top Left Side Wave -->
-            <div class="absolute top-0 left-0 w-full opacity-60 scale-125 -translate-x-1/4 -translate-y-1/4">
+            <div class="absolute top-0 left-0 w-full opacity-30 lg:opacity-50 scale-150 -translate-x-1/4 -translate-y-1/4 pointer-events-none">
                 <svg viewBox="0 0 1440 490" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto rotate-180">
-                    <path d="M 0,500 L 0,375 C 70.02,359.76 140.041,344.52 216,337 C 291.958,329.479 373.856,329.678 471,309 C 568.143,288.321 680.533,246.766 752,220 C 823.466,193.233 854.01,181.255 932,152 C 1009.989,122.744 1135.425,76.212 1228,48 C 1320.574,19.787 1380.287,9.893 1440,0 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.265" class="login-top-path-0"></path>
-                    <path d="M 0,500 L 0,475 C 63.215,463.926 126.430,452.853 208,449 C 289.569,445.146 389.492,448.511 468,433 C 546.507,417.488 603.599,383.1 683,350 C 762.4,316.9 864.107,285.088 954,250 C 1043.892,214.911 1121.969,176.546 1201,151 C 1280.03,125.453 1360.015,112.726 1440,100 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.4" class="login-top-path-1"></path>
-                    <path d="M 0,500 L 0,575 C 89.787,578.665 179.574,582.330 258,575 C 336.425,567.669 403.489,549.342 489,523 C 574.510,496.657 678.466,462.300 758,432 C 837.533,401.7 892.643,375.457 964,345 C 1035.356,314.542 1122.958,279.869 1205,255 C 1287.041,230.130 1363.520,215.065 1440,200 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.53" class="login-top-path-2"></path>
-                    <path d="M 0,500 L 0,675 C 73.841,702.514 147.682,730.028 224,712 C 300.317,693.971 379.112,630.401 464,592 C 548.887,553.598 639.866,540.366 734,515 C 828.133,489.633 925.42,452.132 996,420 C 1066.579,387.867 1110.451,361.105 1180,342 C 1249.548,322.894 1344.774,311.447 1440,300 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="1" class="login-top-path-3"></path>
+                    <path d="M 0,500 L 0,375 C 70.02,359.76 140.041,344.52 216,337 C 291.958,329.479 373.856,329.678 471,309 C 568.143,288.321 680.533,246.766 752,220 C 823.466,193.233 854.01,181.255 932,152 C 1009.989,122.744 1135.425,76.212 1228,48 C 1320.574,19.787 1380.287,9.893 1440,0 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.1" class="login-top-path-0"></path>
+                    <path d="M 0,500 L 0,475 C 63.215,463.926 126.430,452.853 208,449 C 289.569,445.146 389.492,448.511 468,433 C 546.507,417.488 603.599,383.1 683,350 C 762.4,316.9 864.107,285.088 954,250 C 1043.892,214.911 1121.969,176.546 1201,151 C 1280.03,125.453 1360.015,112.726 1440,100 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.15" class="login-top-path-1"></path>
+                    <path d="M 0,500 L 0,575 C 89.787,578.665 179.574,582.330 258,575 C 336.425,567.669 403.489,549.342 489,523 C 574.510,496.657 678.466,462.300 758,432 C 837.533,401.7 892.643,375.457 964,345 C 1035.356,314.542 1122.958,279.869 1205,255 C 1287.041,230.130 1363.520,215.065 1440,200 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.2" class="login-top-path-2"></path>
+                    <path d="M 0,500 L 0,675 C 73.841,702.514 147.682,730.028 224,712 C 300.317,693.971 379.112,630.401 464,592 C 548.887,553.598 639.866,540.366 734,515 C 828.133,489.633 925.42,452.132 996,420 C 1066.579,387.867 1110.451,361.105 1180,342 C 1249.548,322.894 1344.774,311.447 1440,300 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.25" class="login-top-path-3"></path>
                 </svg>
             </div>
             <!-- Bottom Right Side Wave -->
-            <div class="absolute bottom-0 right-0 w-full opacity-60 scale-125 translate-x-1/4 translate-y-1/4">
+            <div class="absolute bottom-0 right-0 w-full opacity-30 lg:opacity-50 scale-150 translate-x-1/4 translate-y-1/4 pointer-events-none">
                 <svg viewBox="0 0 1440 490" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
-                    <path d="M 0,500 L 0,375 C 75.964,390.814 151.928,406.628 221,401 C 290.071,395.371 352.251,368.301 445,337 C 537.748,305.698 661.066,270.166 756,233 C 850.933,195.833 917.482,157.032 992,140 C 1066.517,122.967 1149.005,127.705 1225,108 C 1300.994,88.294 1370.497,44.147 1440,0 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.265" class="login-bot-path-0"></path>
-                    <path d="M 0,500 L 0,475 C 91.917,490.362 183.835,505.725 256,489 C 328.164,472.274 380.574,423.460 447,391 C 513.425,358.539 593.866,342.433 683,315 C 772.133,287.566 869.958,248.806 965,231 C 1060.041,213.193 1152.297,216.341 1231,198 C 1309.702,179.658 1374.851,139.829 1440,100 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.4" class="login-bot-path-1"></path>
-                    <path d="M 0,500 L 0,575 C 79.002,570.867 158.005,566.735 248,554 C 337.994,541.264 438.982,519.924 515,501 C 591.017,482.075 642.066,465.566 711,442 C 779.933,418.433 866.751,387.808 950,352 C 1033.248,316.191 1112.928,275.197 1194,249 C 1275.071,222.802 1357.535,211.401 1440,200 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.53" class="login-bot-path-2"></path>
-                    <path d="M 0,500 L 0,675 C 86.884,684.170 173.769,693.341 252,684 C 330.230,674.658 399.807,646.806 468,622 C 536.192,597.193 603,575.433 685,548 C 767,520.566 864.192,487.460 961,464 C 1057.807,440.539 1154.230,426.725 1234,401 C 1313.769,375.274 1376.884,337.637 1440,300 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="1" class="login-bot-path-3"></path>
+                    <path d="M 0,500 L 0,375 C 75.964,390.814 151.928,406.628 221,401 C 290.071,395.371 352.251,368.301 445,337 C 537.748,305.698 661.066,270.166 756,233 C 850.933,195.833 917.482,157.032 992,140 C 1066.517,122.967 1149.005,127.705 1225,108 C 1300.994,88.294 1370.497,44.147 1440,0 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.1" class="login-bot-path-0"></path>
+                    <path d="M 0,500 L 0,475 C 91.917,490.362 183.835,505.725 256,489 C 328.164,472.274 380.574,423.460 447,391 C 513.425,358.539 593.866,342.433 683,315 C 772.133,287.566 869.958,248.806 965,231 C 1060.041,213.193 1152.297,216.341 1231,198 C 1309.702,179.658 1374.851,139.829 1440,100 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.15" class="login-bot-path-1"></path>
+                    <path d="M 0,500 L 0,575 C 79.002,570.867 158.005,566.735 248,554 C 337.994,541.264 438.982,519.924 515,501 C 591.017,482.075 642.066,465.566 711,442 C 779.933,418.433 866.751,387.808 950,352 C 1033.248,316.191 1112.928,275.197 1194,249 C 1275.071,222.802 1357.535,211.401 1440,200 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.2" class="login-bot-path-2"></path>
+                    <path d="M 0,500 L 0,675 C 86.884,684.170 173.769,693.341 252,684 C 330.230,674.658 399.807,646.806 468,622 C 536.192,597.193 603,575.433 685,548 C 767,520.566 864.192,487.460 961,464 C 1057.807,440.539 1154.230,426.725 1234,401 C 1313.769,375.274 1376.884,337.637 1440,300 L 1440,500 L 0,500 Z" fill="#0099ff" fill-opacity="0.25" class="login-bot-path-3"></path>
                 </svg>
             </div>
         </div>
+
         <!-- Back Button for Mobile (Light Red in light mode) -->
         <button id="back-to-splash" class="lg:hidden absolute top-6 left-3 text-red-400 hover:text-red-500 dark:text-red-500 transition-colors p-2 z-50">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
@@ -283,90 +286,200 @@ require_once __DIR__ . '/config/db.php';
             </svg>
         </button>
 
-        <div id="right-panel-content" class="w-full max-w-md lg:max-w-3xl mx-auto pt-0 relative z-10">
-            <!-- Mobile Logo Section (Moved down for mobile view) -->
-            <div class="lg:hidden text-center mb-8 mt-4">
-                <div class="w-32 h-32 mx-auto mb-4 relative aspect-square rounded-full border border-blue-500/10 bg-white/5 backdrop-blur-sm shadow-inner">
-                    <div class="absolute inset-0 bg-royal-blue/5 rounded-full blur-2xl animate-pulse"></div>
-                    <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-full h-full object-contain relative z-10 rounded-full [clip-path:circle(50%)] shadow-lg">
-                </div>
-                <!--
-                <h2 class="text-3xl font-black text-royal-blue dark:text-blue-400 uppercase tracking-tight">DOLE System</h2>
-                <p class="text-xs text-gray-500 font-bold uppercase tracking-[0.2em] mt-2">Republic of the Philippines</p>
-                <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-widest mt-1">Department of Labor and Employment</p>
-                -->
+        <!-- MOBILE BACKGROUND CONTENT (Logo & Welcome) -->
+        <div id="mobile-bg-content" 
+            data-drawer-target="drawer-login" 
+            data-drawer-show="drawer-login" 
+            data-drawer-placement="bottom"
+            class="lg:hidden flex flex-col items-center justify-start text-center w-full px-6 pt-24 transition-transform duration-500 ease-out relative z-10 cursor-pointer">
+            
+            <!-- Logo Container -->
+            <div id="mobile-logo-container" 
+                class="w-56 h-56 mx-auto mb-12 relative flex items-center justify-center transition-all duration-500 bg-white dark:bg-slate-800 rounded-full">
+
+            <!-- Background People SVG (Visible when drawer open) -->
+            <!-- <img id="peoples-bg" 
+                src="frontend/images/svgs/peoples.svg" 
+                alt="Peoples Background" 
+                class="absolute inset-0 w-full h-full object-contain opacity-0 scale-0 transition-all duration-700 ease-out pointer-events-none z-0"> -->
+
+            <!-- Curved Text SVG (Visible when drawer open) -->
+            <svg id="curved-welcome" 
+                class="absolute -top-28! -left-24! w-[calc(100%+240px)] h-[calc(100%+200px)] opacity-0 scale-50 transition-all duration-700 ease-in-out pointer-events-none z-20 overflow-visible" 
+                viewBox="0 0 500 300">
+                <path id="curve" d="M 10,80 A 180,140 0 0,1 377,67" fill="transparent" />
+                <text 
+                    fill="#000080" 
+                    class="dark:fill-blue-500 [text-shadow:_3px_7px_0px_#3b82f6]" 
+                    style="font-size: 50px; font-weight: 1000; text-transform: uppercase; letter-spacing: -0.01em;">
+                    <textPath xlink:href="#curve" startOffset="50%" text-anchor="middle">
+                        Welcome Back!
+                    </textPath>
+                </text>
+            </svg>
+
+                <!-- Circular Logo -->
+                <img src="frontend/images/logo/doleiligan.png" 
+                    alt="DOLE Logo" 
+                    class="w-48 h-48 object-contain relative z-10 drop-shadow-[0_20px_50px_rgba(0,56,168,0.4)] transition-all duration-500 rounded-full">
             </div>
 
-            <!-- Login Form (Desktop: Extra Wide & Premium Layout) -->
-            <div class="">
-                <div class="mb-12 text-center lg:text-left">
+            <!-- Welcome Text (moved outside logo container) -->
+            <div id="mobile-welcome-text" class="transition-all duration-500 -mt-4 sm:-mt-8">
+                <h2 class="text-2xl sm:text-xl font-black text-royal-blue dark:text-blue-400 uppercase tracking-tight mb-2 sm:mb-4 !text-nowrap">
+                    Welcome Back!
+                </h2>
+                <p class="text-[10px] sm:text-[12px] text-gray-400 dark:text-slate-500 font-black uppercase tracking-widest !text-nowrap">
+                    Department of Labor and Employment
+                </p>
+            </div>
+        </div>
+
+            <!-- Re-open trigger shown when drawer is hidden -->
+            <button id="reopen-login-drawer" 
+                data-drawer-target="drawer-login" 
+                data-drawer-show="drawer-login" 
+                data-drawer-placement="bottom"
+                class="lg:hidden mt-12 scale-0 opacity-0 transition-all duration-500 bg-royal-blue text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl flex items-center gap-3 active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                </svg>
+                Sign In Now
+            </button>
+
+            <!-- Notification Request Button (Optional/Initial) -->
+            <button id="request-notifications-btn" class="lg:hidden mt-4 text-[10px] font-bold text-slate-400 hover:text-royal-blue uppercase tracking-widest transition-colors hidden">
+                Enable Notifications
+            </button>
+
+            <!-- DESKTOP FORM CONTENT (Now correctly nested inside right-panel) -->
+            <div id="right-panel-content" class="hidden lg:flex flex-col items-center justify-center w-full max-w-3xl mx-auto pt-0 relative z-10 transition-all duration-700">
+                <div class="mb-12 text-center">
                     <h2 class="text-4xl lg:text-6xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">
                         Welcome Back!
                     </h2>
-                    <p class="text-base lg:text-xl text-gray-600 dark:text-slate-400 font-medium max-w-xl">
+                    <p class="text-base lg:text-xl text-gray-600 dark:text-slate-400 font-medium max-w-xl mx-auto">
                         Sign in to access your administrative tools and services.
                     </p>
                 </div>
 
-    <!-- Form with responsive horizontal padding to reduce input width on mobile -->
-    <form id="loginForm" class="space-y-8 px-10 lg:px-0">
-        <div class="w-full">
-            <label for="username" class="block text-xs font-black text-gray-700 dark:text-slate-300 mb-2 uppercase tracking-[0.15em]">
-                Username*
-            </label>
-            <input type="text" id="username" name="username" required
-                class="w-full px-6 py-5 rounded-2xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-blue-200/50 transition-all outline-none text-lg font-semibold shadow-md"
-                placeholder="Enter your username" />
+                <!-- Form with responsive horizontal padding -->
+                <form id="loginForm" class="w-full space-y-8 lg:px-6 login-form-shared">
+                    <div class="w-full">
+                        <label for="username" class="block text-xs font-black text-gray-700 dark:text-slate-300 mb-2 uppercase tracking-[0.15em]">
+                            Username*
+                        </label>
+                        <input type="text" id="username" name="username" required
+                            class="w-full px-6 py-5 rounded-2xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 transition-all outline-none text-lg font-semibold shadow-md"
+                            placeholder="Enter your username" />
+                    </div>
+
+                    <div class="w-full">
+                        <div class="flex justify-between items-center mb-2">
+                            <label for="password" class="block text-xs font-black text-gray-700 dark:text-slate-300 uppercase tracking-[0.15em]">
+                                Password*
+                            </label>
+                        </div>
+                        <div class="relative">
+                            <input type="password" id="password" name="password" required
+                                class="w-full px-6 py-5 pr-16 rounded-2xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 transition-all outline-none text-lg font-semibold shadow-md"
+                                placeholder="Enter your password" />
+                            <button type="button" class="togglePassword absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-royal-blue dark:text-slate-500 transition-colors">
+                                <svg class="eye-open w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <svg class="eye-closed w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-6 px-1">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="rememberMe" name="rememberMe"
+                                class="w-5 h-5 rounded-md border-gray-300 text-royal-blue focus:ring-royal-blue/10 cursor-pointer" />
+                            <label for="rememberMe"
+                                class="ml-3 text-sm lg:text-base font-bold text-gray-700 dark:text-slate-400 cursor-pointer">
+                                Remember me
+                            </label>
+                        </div>
+                        <a href="#" class="forgot-password-link text-sm lg:text-base font-black text-royal-blue hover:text-blue-700 transition-colors uppercase tracking-tight">
+                            Forgot password?
+                        </a>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-royal-blue text-white font-black py-4 lg:py-6 rounded-2xl hover:bg-blue-800 transition-all shadow-lg active:scale-[0.98] uppercase tracking-[0.2em] text-sm lg:text-lg mt-8 relative z-30 cursor-pointer">
+                        Sign in
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE BOTTOM DRAWER FORM -->
+    <div id="drawer-login" class="fixed bottom-0 left-0 right-0 z-[10000] w-full p-6 pb-12 overflow-y-auto transition-transform translate-y-full bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 lg:hidden rounded-t-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.3)]" tabindex="-1" aria-labelledby="drawer-login-label">
+        <div class="w-16 h-1.5 bg-gray-300 dark:bg-slate-700 rounded-full mx-auto mb-8"></div>
+        
+        <div class="flex items-center justify-center mb-8">
+            <h5 id="drawer-login-label" class="inline-flex items-center text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
+                <svg class="w-6 h-6 me-3 text-royal-blue" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                </svg>
+                Secure Login
+            </h5>
         </div>
 
-        <div class="w-full">
-            <div class="flex justify-between items-center mb-2">
-                <label for="password" class="block text-xs font-black text-gray-700 dark:text-slate-300 uppercase tracking-[0.15em]">
-                    Password*
+        <form id="loginFormMobile" class="space-y-6 login-form-shared">
+            <div class="w-full">
+                <label for="username_mobile" class="block text-[10px] font-black text-gray-500 dark:text-slate-400 mb-2 uppercase tracking-[0.2em]">
+                    Username
                 </label>
+                <input type="text" id="username_mobile" name="username" required
+                    class="w-full px-5 py-4 rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-blue-500/10 transition-all outline-none text-base font-bold"
+                    placeholder="Enter your username" />
             </div>
-            <div class="relative">
-                <input type="password" id="password" name="password" required
-                    class="w-full px-6 py-5 pr-16 rounded-2xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-blue-200/50 transition-all outline-none text-lg font-semibold shadow-md"
-                    placeholder="Enter your password" />
-                <button type="button" id="togglePassword"
-                    class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-royal-blue dark:text-slate-500 transition-colors">
-                    <!-- Eye icons -->
-                    <svg class="eye-open w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <svg class="eye-closed w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                    </svg>
-                </button>
-            </div>
-        </div>
 
-        <div class="flex items-center justify-between pt-6 px-1">
-            <div class="flex items-center">
-                <input type="checkbox" id="rememberMe" name="rememberMe"
-                    class="w-6 h-6 lg:w-5 lg:h-5 rounded-md border-gray-300 text-royal-blue focus:ring-blue-200 cursor-pointer" />
-                <label for="rememberMe"
-                    class="ml-3 text-sm lg:text-base font-bold text-gray-700 dark:text-slate-400 cursor-pointer">
-                    Remember me
+            <div class="w-full">
+                <label for="password_mobile" class="block text-[10px] font-black text-gray-500 dark:text-slate-400 mb-2 uppercase tracking-[0.2em]">
+                    Password
                 </label>
+                <div class="relative">
+                    <input type="password" id="password_mobile" name="password" required
+                        class="w-full px-5 py-4 pr-14 rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-blue-500/10 transition-all outline-none text-base font-bold"
+                        placeholder="Enter your password" />
+                    <button type="button" class="togglePassword absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 transition-colors px-1">
+                        <svg class="eye-open w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <svg class="eye-closed w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <a href="#" id="forgot-password-link"
-                class="text-sm lg:text-base font-black text-royal-blue hover:text-blue-700 transition-colors uppercase tracking-tight">
-                Forgot password?
-            </a>
-        </div>
 
-        <button type="submit"
-            class="w-full lg:w-full bg-royal-blue text-white font-black py-3 lg:py-6 rounded-2xl hover:bg-blue-800 transition-all shadow-lg active:scale-[0.98] uppercase tracking-[0.2em] text-sm lg:text-lg mt-8 relative z-30 cursor-pointer">
-            Sign in
-        </button>
-    </form>
-</div>
-        </div>
+            <div class="flex items-center justify-between py-2">
+                <div class="flex items-center">
+                    <input type="checkbox" id="rememberMe_mobile" name="rememberMe"
+                        class="w-5 h-5 rounded-md border-gray-300 dark:border-slate-800 text-royal-blue focus:ring-blue-500/20 cursor-pointer" />
+                    <label for="rememberMe_mobile" class="ml-2.5 text-[13px] font-bold text-gray-600 dark:text-slate-400 cursor-pointer">
+                        Remember me
+                    </label>
+                </div>
+                <a href="#" class="forgot-password-link text-[13px] font-black text-royal-blue uppercase tracking-tight">
+                    Forgot?
+                </a>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-royal-blue text-white font-black py-5 rounded-2xl shadow-[0_10px_25px_-5px_rgba(0,56,168,0.4)] active:scale-[0.98] uppercase tracking-[0.2em] text-xs transition-all">
+                Sign in
+            </button>
+        </form>
     </div>
 
     <!-- SCRIPTS MOVED TO MAIN.JS -->
