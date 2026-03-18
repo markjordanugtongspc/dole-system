@@ -202,7 +202,7 @@ require_once __DIR__ . '/config/db.php';
             </div>
 
             <!-- Logo Container (Middle Center, Circle Trimmed) -->
-            <div class="grow flex items-center justify-center relative my-4">
+            <div class="flex items-center justify-center relative mt-auto mb-10">
                 <div class="relative w-48 h-48 flex items-center justify-center rounded-full">
                     <!-- Glow background (behind logo) -->
                     <div class="absolute inset-0 bg-blue-500/20 blur-2xl animate-pulse rounded-full z-0"></div>
@@ -214,13 +214,13 @@ require_once __DIR__ . '/config/db.php';
                 </div>
             </div>
 
-            <!-- Action Buttons (Positioned higher, fully visible) -->
-            <div class="flex flex-col gap-3 mb-12 relative z-20 w-full max-w-[280px] mx-auto">
+            <!-- Action Buttons (Positioned firmly below logo) -->
+            <div class="flex flex-col gap-3 mb-auto relative z-20 w-full max-w-[280px] mx-auto">
                 <button id="show-login-btn" 
-                    class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 rounded-xl shadow-lg transition-all text-[11px] uppercase tracking-[0.2em] active:scale-[0.97]">
+                    class="w-full  bg-royal-blue text-white hover:bg-royal-blue/90 text-white font-black py-4 rounded-xl shadow-lg transition-all text-[11px] uppercase tracking-[0.2em] active:scale-[0.97]">
                     Login
                 </button>
-                <button id="forgot-password-splash-btn" class="forgot-password-link w-full text-red-500 hover:bg-red-500/5 font-bold py-3 rounded-xl transition-all text-[10px] uppercase tracking-[0.15em] border border-red-500/10 active:scale-[0.97]">
+                <button id="forgot-password-splash-btn" class="forgot-password-link w-full text-royal-blue hover:bg-red-500/5 font-bold py-3 rounded-xl transition-all text-[10px] uppercase tracking-[0.15em] border border-red-500/10 active:scale-[0.97]">
                     Forgot Password
                 </button>
             </div>
@@ -297,16 +297,21 @@ require_once __DIR__ . '/config/db.php';
             <div id="mobile-logo-container" 
                 class="w-56 h-56 mx-auto mb-12 relative flex items-center justify-center transition-all duration-500 bg-white dark:bg-slate-800 rounded-full">
 
+            <!-- Background People SVG (Visible when drawer open) -->
+            <!-- <img id="peoples-bg" 
+                src="frontend/images/svgs/peoples.svg" 
+                alt="Peoples Background" 
+                class="absolute inset-0 w-full h-full object-contain opacity-0 scale-0 transition-all duration-700 ease-out pointer-events-none z-0"> -->
+
             <!-- Curved Text SVG (Visible when drawer open) -->
             <svg id="curved-welcome" 
-                class="absolute !-top-28 !-left-24 w-[calc(100%+240px)] h-[calc(100%+200px)] opacity-0 scale-50 transition-all duration-700 ease-in-out pointer-events-none z-20" 
+                class="absolute -top-28! -left-24! w-[calc(100%+240px)] h-[calc(100%+200px)] opacity-0 scale-50 transition-all duration-700 ease-in-out pointer-events-none z-20 overflow-visible" 
                 viewBox="0 0 500 300">
-                <!-- Curvier path moved toward the top -->
-                <path id="curve" d="M73.2,121.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97" fill="transparent" />
+                <path id="curve" d="M 10,80 A 180,140 0 0,1 377,67" fill="transparent" />
                 <text 
                     fill="#000080" 
                     class="dark:fill-blue-500 [text-shadow:_3px_7px_0px_#3b82f6]" 
-                    style="font-size: 34px; font-weight: 1000; text-transform: uppercase; letter-spacing: -0.01em;">
+                    style="font-size: 50px; font-weight: 1000; text-transform: uppercase; letter-spacing: -0.01em;">
                     <textPath xlink:href="#curve" startOffset="50%" text-anchor="middle">
                         Welcome Back!
                     </textPath>

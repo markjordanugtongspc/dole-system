@@ -152,6 +152,9 @@ export function initLoginHandler() {
                     // Hide the drawer if it's open (Mobile)
                     const drawer = document.getElementById('drawer-login');
                     if (drawer) {
+                        // Forcibly hide by adding the translate class
+                        drawer.classList.add('translate-y-full');
+                        
                         const closeBtn = drawer.querySelector('[data-drawer-hide]');
                         if (closeBtn) closeBtn.click();
                     }
@@ -323,9 +326,14 @@ export function initMobileSplash() {
             // Auto hide LOGIN DRAWER if open
             const drawer = document.getElementById('drawer-login');
             if (drawer) {
+                // Forcefully slide the drawer down off-screen
+                drawer.classList.add('translate-y-full');
+                
+                // Fallback: If Flowbite's close button happens to exist, click it
                 const closeBtn = drawer.querySelector('[data-drawer-hide]');
                 if (closeBtn) closeBtn.click();
             }
+            // Animate splash in
             showSplash();
         });
     }
@@ -334,6 +342,7 @@ export function initMobileSplash() {
     // Note: We use MutationObserver or simple interval as fallback if Flowbite events aren't firing globally
     const drawer = document.getElementById('drawer-login');
     const curvedWelcome = document.getElementById('curved-welcome');
+    const peoplesBg = document.getElementById('peoples-bg');
 
     if (drawer) {
         const observer = new MutationObserver((mutations) => {
@@ -360,6 +369,12 @@ export function initMobileSplash() {
                             reopenBtn.style.opacity = '0';
                             reopenBtn.style.transform = 'scale(0)';
                         }
+
+                        // Show Peoples Background
+                        if (peoplesBg) {
+                            peoplesBg.classList.remove('opacity-0', 'scale-0');
+                            peoplesBg.classList.add('opacity-40', 'scale-[1.6]');
+                        }
                     } else {
                         // Drawer is CLOSED -> Reset to original design
                         if (bgContent) bgContent.style.transform = 'translateY(0)';
@@ -380,6 +395,12 @@ export function initMobileSplash() {
                         if (reopenBtn && splash && splash.style.visibility === 'hidden') {
                             reopenBtn.style.opacity = '1';
                             reopenBtn.style.transform = 'scale(1)';
+                        }
+
+                        // Hide Peoples Background
+                        if (peoplesBg) {
+                            peoplesBg.classList.add('opacity-0', 'scale-0');
+                            peoplesBg.classList.remove('opacity-40', 'scale-[1.6]');
                         }
                     }
                 }
