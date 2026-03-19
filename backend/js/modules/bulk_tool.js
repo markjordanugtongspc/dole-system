@@ -199,7 +199,8 @@ export const BulkApp = {
             // index 9: End Date
 
             // Proceed only if there are enough columns up to the End Date (Index 9)
-            if (cols.length >= 10) {
+            // Relaxed check: As long as name exists, we proceed
+            if (cols.length >= 2) {
 
                 const age = cols[3];
                 // Strict validation: Skip row if Age is not a valid number (This ignores category headers like the first row)

@@ -108,12 +108,12 @@ export function showEditBeneficiaryDrawer(data) {
     <div class="flex flex-col gap-4 text-sm mt-4 px-1">
         <div class="grid grid-cols-2 gap-3 mb-2">
             <div class="flex flex-col gap-1">
-                <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest pl-1">Start Date <span class="text-red-500">*</span></span>
-                <input type="date" name="startDate" value="${data.startDate || ''}" required class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm">
+                <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest pl-1">Start Date</span>
+                <input type="date" name="startDate" value="${data.startDate || ''}" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm">
             </div>
             <div class="flex flex-col gap-1">
-                <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest pl-1">End Date <span class="text-red-500">*</span></span>
-                <input type="date" name="endDate" value="${data.endDate || ''}" required class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm">
+                <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest pl-1">End Date</span>
+                <input type="date" name="endDate" value="${data.endDate || ''}" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm">
             </div>
         </div>
         

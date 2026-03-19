@@ -199,8 +199,8 @@ if ($method === 'GET') {
  */ elseif ($method === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
 
-    // Validate required fields
-    $required = ['name', 'startDate', 'endDate', 'designation'];
+    // Validate required fields (ONLY name is now strictly required as per user's request)
+    $required = ['name'];
     foreach ($required as $field) {
         if (empty($data[$field])) {
             http_response_code(400);

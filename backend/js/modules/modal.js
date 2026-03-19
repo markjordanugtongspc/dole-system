@@ -745,12 +745,12 @@ export function showAddDataModal(data = null) {
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">Start Date <span class="text-red-500">*</span></label>
-                                <input type="date" name="startDate" value="${data?.startDate || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusYellow} outline-none transition-all shadow-sm uppercase">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">Start Date</label>
+                                <input type="date" name="startDate" value="${data?.startDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusYellow} outline-none transition-all shadow-sm uppercase">
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">End Date <span class="text-red-500">*</span></label>
-                                <input type="date" name="endDate" value="${data?.endDate || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusRed} outline-none transition-all shadow-sm uppercase">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">End Date</label>
+                                <input type="date" name="endDate" value="${data?.endDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusRed} outline-none transition-all shadow-sm uppercase">
                             </div>
                         </div>
                     </div>
@@ -775,10 +775,10 @@ export function showAddDataModal(data = null) {
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Assigned Office <span class="text-red-500">*</span></label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Assigned Office</label>
                                 <div class="relative" id="office-container">
                                     <input type="text" name="office" id="office-input" autocomplete="off"
-                                        value="${data?.office || ''}" required 
+                                        value="${data?.office || ''}" 
                                         class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
                                         placeholder="e.g. DOLE Field Office">
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">

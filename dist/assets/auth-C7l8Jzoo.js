@@ -37,7 +37,7 @@ import p from"./vendor-swal-BSk0fVSb.js";const G="color-theme",fe=3600*24*365;fu
             </div>
         `;p.fire({html:a,width:"600px",showConfirmButton:!1,showCloseButton:!0,customClass:{container:"font-montserrat",popup:"rounded-2xl ldn-modal-popup"},didOpen:s=>{const r=s.querySelector("#csv-upload"),t=s.querySelector('label[for="csv-upload"]');["dragenter","dragover","dragleave","drop"].forEach(n=>{t.addEventListener(n,i,!1)});function i(n){n.preventDefault(),n.stopPropagation()}["dragenter","dragover"].forEach(n=>{t.addEventListener(n,()=>{t.classList.add("border-blue-500","bg-blue-50/50"),e&&t.classList.add("dark:bg-slate-800/80")},!1)}),["dragleave","drop"].forEach(n=>{t.addEventListener(n,()=>{t.classList.remove("border-blue-500","bg-blue-50/50"),e&&t.classList.remove("dark:bg-slate-800/80")},!1)}),r.addEventListener("change",n=>{const c=n.target.files[0];if(c){const d=s.querySelector("#auto-save-toggle");this.isAutoSave=d?d.checked:!1,this.handleFile(c)}}),t.addEventListener("drop",n=>{const d=n.dataTransfer.files[0];if(d){const l=s.querySelector("#auto-save-toggle");this.isAutoSave=l?l.checked:!1,this.handleFile(d)}},!1)}})},handleFile(e){if(!e.name.toLowerCase().endsWith(".csv")&&!e.name.toLowerCase().endsWith(".txt")){p.fire("Invalid File","Please upload a valid .csv or .txt file.","error");return}const o=new FileReader;o.onload=a=>{const s=a.target.result;this.parseCSV(s)},o.readAsText(e)},parseCSV(e){let o=[],a="",s=!1;for(let r=0;r<e.length;r++){let t=e[r];t==='"'&&(s=!s),!s&&(t===`
 `||t==="\r")?(t==="\r"&&e[r+1]===`
-`&&r++,a.trim()!==""&&o.push(a),a=""):a+=t}a.trim()!==""&&o.push(a),this.queue=[];for(let r=0;r<o.length;r++){let t=o[r].trim();if(!t)continue;let i=[],n="",c=!1;for(let d=0;d<t.length;d++){let l=t[d];l==='"'?c=!c:l===","&&!c?(i.push(n.replace(/(^"|"$)/g,"").trim()),n=""):n+=l}if(i.push(n.replace(/(^"|"$)/g,"").trim()),i.length>=10){const d=i[3];if(!d||isNaN(parseInt(d)))continue;const l=i[1];if(!l||l.toLowerCase()==="name"||l.toLowerCase()==="full name")continue;const g=i[2];let b=i[4]?i[4].toUpperCase().trim():"",h="";(b==="F"||b.includes("FEMALE"))&&(h="Female"),(b==="M"||b.includes("MALE"))&&(h="Male");const x=i[5],$=i[6],D=i[7],I=this.formatDate(i[8]),N=this.formatDate(i[9]);this.queue.push({name:l,address:g,age:d,gender:h,education:x,startDate:I,endDate:N,office:$,designation:D})}}this.queue.length>0?(this.isActive=!0,this.currentIndex=0,p.close(),this.processNext()):p.fire("Error","No valid beneficiary data found. Please ensure your CSV formatting matches the requirements.","error")},showProgressModal(){T();const e=Math.round(this.currentIndex/this.queue.length*100),o=`
+`&&r++,a.trim()!==""&&o.push(a),a=""):a+=t}a.trim()!==""&&o.push(a),this.queue=[];for(let r=0;r<o.length;r++){let t=o[r].trim();if(!t)continue;let i=[],n="",c=!1;for(let d=0;d<t.length;d++){let l=t[d];l==='"'?c=!c:l===","&&!c?(i.push(n.replace(/(^"|"$)/g,"").trim()),n=""):n+=l}if(i.push(n.replace(/(^"|"$)/g,"").trim()),i.length>=2){const d=i[3];if(!d||isNaN(parseInt(d)))continue;const l=i[1];if(!l||l.toLowerCase()==="name"||l.toLowerCase()==="full name")continue;const g=i[2];let b=i[4]?i[4].toUpperCase().trim():"",h="";(b==="F"||b.includes("FEMALE"))&&(h="Female"),(b==="M"||b.includes("MALE"))&&(h="Male");const x=i[5],$=i[6],D=i[7],I=this.formatDate(i[8]),N=this.formatDate(i[9]);this.queue.push({name:l,address:g,age:d,gender:h,education:x,startDate:I,endDate:N,office:$,designation:D})}}this.queue.length>0?(this.isActive=!0,this.currentIndex=0,p.close(),this.processNext()):p.fire("Error","No valid beneficiary data found. Please ensure your CSV formatting matches the requirements.","error")},showProgressModal(){T();const e=Math.round(this.currentIndex/this.queue.length*100),o=`
             <div class="p-2 text-left font-montserrat">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-black text-blue-600 dark:text-blue-400 uppercase italic">Processing Data...</h3>
@@ -366,12 +366,12 @@ import p from"./vendor-swal-BSk0fVSb.js";const G="color-theme",fe=3600*24*365;fu
     <div class="flex flex-col gap-4 text-sm mt-4 px-1">
         <div class="grid grid-cols-2 gap-3 mb-2">
             <div class="flex flex-col gap-1">
-                <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest pl-1">Start Date <span class="text-red-500">*</span></span>
-                <input type="date" name="startDate" value="${e.startDate||""}" required class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm">
+                <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest pl-1">Start Date</span>
+                <input type="date" name="startDate" value="${e.startDate||""}" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm">
             </div>
             <div class="flex flex-col gap-1">
-                <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest pl-1">End Date <span class="text-red-500">*</span></span>
-                <input type="date" name="endDate" value="${e.endDate||""}" required class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm">
+                <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest pl-1">End Date</span>
+                <input type="date" name="endDate" value="${e.endDate||""}" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm">
             </div>
         </div>
         
@@ -711,12 +711,12 @@ import p from"./vendor-swal-BSk0fVSb.js";const G="color-theme",fe=3600*24*365;fu
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">Start Date <span class="text-red-500">*</span></label>
-                                <input type="date" name="startDate" value="${e?.startDate||""}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusYellow} outline-none transition-all shadow-sm uppercase">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">Start Date</label>
+                                <input type="date" name="startDate" value="${e?.startDate||""}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusYellow} outline-none transition-all shadow-sm uppercase">
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">End Date <span class="text-red-500">*</span></label>
-                                <input type="date" name="endDate" value="${e?.endDate||""}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusRed} outline-none transition-all shadow-sm uppercase">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">End Date</label>
+                                <input type="date" name="endDate" value="${e?.endDate||""}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusRed} outline-none transition-all shadow-sm uppercase">
                             </div>
                         </div>
                     </div>
@@ -741,10 +741,10 @@ import p from"./vendor-swal-BSk0fVSb.js";const G="color-theme",fe=3600*24*365;fu
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Assigned Office <span class="text-red-500">*</span></label>
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Assigned Office</label>
                                 <div class="relative" id="office-container">
                                     <input type="text" name="office" id="office-input" autocomplete="off"
-                                        value="${e?.office||""}" required 
+                                        value="${e?.office||""}" 
                                         class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
                                         placeholder="e.g. DOLE Field Office">
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
