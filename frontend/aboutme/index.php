@@ -73,7 +73,7 @@ require_once __DIR__ . '/../../config/db.php'; // Loads .env and provides env() 
         </nav>
 
         <!-- Sidebar -->
-        <?php include '../../frontend/components/sidebar/index.php'; ?>
+        <?php include __DIR__ . '/../components/sidebar/index.php'; ?>
 
         <!-- Main Content (Centered with Sidebar Offset) -->
         <main class="flex-1 relative overflow-y-auto focus:outline-none scroll-smooth sm:ml-64">
