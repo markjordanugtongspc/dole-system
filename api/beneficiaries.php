@@ -12,7 +12,8 @@ handleCors();
 header('Content-Type: application/json');
 
 session_start();
-$current_user_id = $_SESSION['user_id'] ?? null;
+// In serverless (Vercel), sessions don't persist. Accept user_id from multiple sources.
+$current_user_id = $_SESSION['user_id'] ?? $_SERVER['HTTP_X_USER_ID'] ?? $_GET['user_id'] ?? null;
 $current_username = null;
 
 try {

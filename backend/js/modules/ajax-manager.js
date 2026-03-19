@@ -17,9 +17,17 @@ export async function apiRequest(endpoint, options = {}) {
     const basePath = getBasePath();
     const url = `${basePath}${endpoint}`;
 
+    // Inject user_id header for Vercel serverless (no PHP sessions)
+    let userId = null;
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user && user.id) userId = user.id;
+    } catch (e) { /* ignore */ }
+
     const defaultOptions = {
         headers: {
             'Content-Type': 'application/json',
+            ...(userId ? { 'X-User-Id': userId } : {}),
             ...options.headers
         },
         ...options

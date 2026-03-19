@@ -1,6 +1,6 @@
 {
-  "_auth-fQYZ-80D.js": {
-    "file": "assets/auth-fQYZ-80D.js",
+  "_auth-PTnwH-jz.js": {
+    "file": "assets/auth-PTnwH-jz.js",
     "name": "auth",
     "imports": [
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
@@ -19,14 +19,14 @@
     "name": "vendor-charts"
   },
   "backend/js/main.js": {
-    "file": "assets/main-B64wjcsm.js",
+    "file": "assets/main-Dv-ZQSLN.js",
     "name": "main",
     "src": "backend/js/main.js",
     "isEntry": true,
     "imports": [
       "_vendor-DC5wud4b.js",
       "node_modules/flowbite/lib/esm/index.js",
-      "_auth-fQYZ-80D.js",
+      "_auth-PTnwH-jz.js",
       "_vendor-charts-BjInCqFR.js",
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
     ],
@@ -35,12 +35,12 @@
     ]
   },
   "backend/js/modules/settings.js": {
-    "file": "assets/settings-BlYOZ9TK.js",
+    "file": "assets/settings-DqhZW2Tc.js",
     "name": "settings",
     "src": "backend/js/modules/settings.js",
     "isEntry": true,
     "imports": [
-      "_auth-fQYZ-80D.js",
+      "_auth-PTnwH-jz.js",
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
     ]
   },

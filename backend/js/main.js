@@ -150,7 +150,14 @@ export function initAutoYear() {
  */
 async function loadUserProfile() {
     try {
-        const response = await fetch(`${getBasePath()}api/profile.php`);
+        // Pass user_id for Vercel serverless (no PHP sessions)
+        let userId = '';
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && user.id) userId = `?user_id=${user.id}`;
+        } catch (e) { /* ignore */ }
+
+        const response = await fetch(`${getBasePath()}api/profile.php${userId}`);
         const result = await response.json();
         if (result.success) {
             updateUIProfile(result.profile);

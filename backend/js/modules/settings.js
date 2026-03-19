@@ -19,8 +19,15 @@ async function initSettings() {
     const saveStatus = document.getElementById('save-status');
 
     // 1. Fetch Current Data
+    // Resolve user_id for Vercel serverless (no PHP sessions)
+    let userId = '';
     try {
-        const response = await fetch(`${basePath}api/profile.php`);
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user && user.id) userId = `?user_id=${user.id}`;
+    } catch (e) { /* ignore */ }
+
+    try {
+        const response = await fetch(`${basePath}api/profile.php${userId}`);
         const result = await response.json();
 
         if (result.success) {
@@ -81,6 +88,9 @@ async function initSettings() {
         // Add notifications state
         const notifEnabled = document.getElementById('pref-notifications').checked ? 1 : 0;
         formData.append('notifications_enabled', notifEnabled);
+
+        // Inject user_id for Vercel serverless
+        try { const u = JSON.parse(localStorage.getItem('user')); if (u && u.id) formData.append('user_id', u.id); } catch(e) {}
 
         try {
             const response = await fetch(`${basePath}api/profile.php`, {
@@ -146,15 +156,19 @@ async function initSettings() {
         }
 
         try {
-            const response = await fetch(`${basePath}api/profile.php`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
+            const pwParams = {
                     action: 'change_password',
                     current_password: currentPass,
                     new_password: newPass,
                     confirm_password: confirmPass
-                })
+                };
+                // Inject user_id for Vercel serverless
+                try { const u = JSON.parse(localStorage.getItem('user')); if (u && u.id) pwParams.user_id = u.id; } catch(e) {}
+
+                const response = await fetch(`${basePath}api/profile.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(pwParams)
             });
 
             const result = await response.json();

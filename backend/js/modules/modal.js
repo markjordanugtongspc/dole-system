@@ -115,7 +115,10 @@ export function initModalHandler() {
  */
 export async function showProfileModal() {
     try {
-        const response = await fetch(`${getBasePath()}api/profile.php`);
+        // Pass user_id for Vercel serverless (no PHP sessions)
+        let uid = '';
+        try { const u = JSON.parse(localStorage.getItem('user')); if (u && u.id) uid = `?user_id=${u.id}`; } catch(e) {}
+        const response = await fetch(`${getBasePath()}api/profile.php${uid}`);
         const result = await response.json();
 
         if (result.success) {
@@ -228,6 +231,8 @@ function renderProfileModal(profile) {
                 e.preventDefault();
 
                 const formData = new FormData(form);
+                // Inject user_id for Vercel serverless
+                try { const u = JSON.parse(localStorage.getItem('user')); if (u && u.id) formData.append('user_id', u.id); } catch(e) {}
 
                 try {
                     const saveResponse = await fetch(`${getBasePath()}api/profile.php`, {

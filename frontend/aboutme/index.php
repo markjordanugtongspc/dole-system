@@ -1,6 +1,6 @@
 <?php
-require_once '../../config/vite.php';
-require_once '../../config/db.php'; // Loads .env and provides env() helper
+require_once __DIR__ . '/../../config/vite.php';
+require_once __DIR__ . '/../../config/db.php'; // Loads .env and provides env() helper
 ?>
 <!DOCTYPE html>
 <html lang="en">
