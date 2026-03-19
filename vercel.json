@@ -3,12 +3,6 @@
     "functions": {
         "api/**/*.php": {
             "runtime": "vercel-php@0.7.2"
-        },
-        "index.php": {
-            "runtime": "vercel-php@0.7.2"
-        },
-        "frontend/**/*.php": {
-            "runtime": "vercel-php@0.7.2"
         }
     },
     "routes": [
@@ -29,12 +23,12 @@
             "dest": "/api/$1.php"
         },
         {
-            "src": "/dashboard/?",
-            "dest": "/frontend/dashboard/index.php"
+            "src": "/dashboard(.*)",
+            "dest": "/api/index.php"
         },
         {
             "src": "/(.*)",
-            "dest": "/index.php"
+            "dest": "/api/index.php"
         }
     ]
 }
