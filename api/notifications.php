@@ -18,7 +18,19 @@ require_once __DIR__ . '/../config/db.php';
 
 session_start();
 
+// In serverless (Vercel), sessions don't persist between requests.
+// Accept user_id from session (localhost), POST body, GET param, or X-User-Id header.
 $user_id = $_SESSION['user_id'] ?? null;
+
+if (!$user_id && isset($_POST['user_id'])) {
+    $user_id = $_POST['user_id'];
+}
+if (!$user_id && isset($_GET['user_id'])) {
+    $user_id = $_GET['user_id'];
+}
+if (!$user_id && isset($_SERVER['HTTP_X_USER_ID'])) {
+    $user_id = $_SERVER['HTTP_X_USER_ID'];
+}
 
 if (!$user_id) {
     echo json_encode(['success' => false, 'error' => 'Not authenticated']);

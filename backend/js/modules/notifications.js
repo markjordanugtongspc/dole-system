@@ -5,6 +5,7 @@
  */
 
 import { getBasePath } from './auth.js';
+import { apiRequest } from './ajax-manager.js';
 
 let notificationSound = null;
 let notificationPermission = 'default';
@@ -125,10 +126,10 @@ async function loadNotifications() {
     showLoadingState(notificationList);
 
     try {
-        const response = await fetch(`${basePath}api/notifications.php`);
-        const result = await response.json();
+        const response = await apiRequest('api/notifications.php');
+        const result = response.data;
 
-        if (result.success) {
+        if (response.success && result.success) {
             renderNotifications(result.notifications);
             updateBadgeCount(result.unread_count);
         } else {
@@ -353,15 +354,14 @@ window.markAllAsRead = async function () {
     updateBadgeCount(0); // Clear badge instantly
 
     try {
-        const response = await fetch(`${basePath}api/notifications.php`, {
+        const response = await apiRequest('api/notifications.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'mark_all_read' })
         });
 
-        const result = await response.json();
+        const result = response.data;
 
-        if (result.success) {
+        if (response.success && result.success) {
             // Force badge to 0 immediately upon server success
             updateBadgeCount(0);
             loadNotifications();
@@ -399,13 +399,12 @@ window.clearNotificationView = async function () {
     }, 300);
 
     try {
-        const response = await fetch(`${basePath}api/notifications.php`, {
+        const response = await apiRequest('api/notifications.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'clear_all' })
         });
-        const result = await response.json();
-        if (result.success) {
+        const result = response.data;
+        if (response.success && result.success) {
             // No need to reload, we already showed the cleared state
         }
     } catch (error) {
@@ -442,9 +441,8 @@ window.markAsRead = async function (notificationId) {
     }
 
     try {
-        await fetch(`${basePath}api/notifications.php`, {
+        await apiRequest('api/notifications.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'mark_read', notification_id: notificationId })
         });
 
@@ -473,18 +471,18 @@ async function checkForNewNotifications() {
     const dropdown = document.getElementById('notificationDropdown');
 
     try {
-        const response = await fetch(`${basePath}api/notifications.php?check_new=1`);
-        const result = await response.json();
+        const response = await apiRequest('api/notifications.php?check_new=1');
+        const result = response.data;
 
-        if (result.success) {
+        if (response.success && result.success) {
             // ALWAYS update the badge count to stay in sync with other devices
             updateBadgeCount(result.unread_count);
 
             // If the notification list is currently open/visible, refresh the content
             if (dropdown && !dropdown.classList.contains('hidden')) {
-                const listResponse = await fetch(`${basePath}api/notifications.php`);
-                const listData = await listResponse.json();
-                if (listData.success) {
+                const listResponse = await apiRequest('api/notifications.php');
+                const listData = listResponse.data;
+                if (listResponse.success && listData.success) {
                     renderNotifications(listData.notifications);
                 }
             }
@@ -550,9 +548,8 @@ export async function createNotification(message, type = 'info') {
     const basePath = getBasePath();
 
     try {
-        const response = await fetch(`${basePath}api/notifications.php`, {
+        const response = await apiRequest('api/notifications.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 action: 'create',
                 message: message,
@@ -560,9 +557,9 @@ export async function createNotification(message, type = 'info') {
             })
         });
 
-        const result = await response.json();
+        const result = response.data;
 
-        if (result.success) {
+        if (response.success && result.success) {
             // Trigger immediate check
             await checkForNewNotifications();
         }
