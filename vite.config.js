@@ -65,6 +65,7 @@ export default defineConfig({
         emptyOutDir: true,
         manifest: true,
         cssCodeSplit: false,
+        chunkSizeWarningLimit: 1600,
         rollupOptions: {
             input: [
                 './backend/js/main.js',
@@ -76,6 +77,14 @@ export default defineConfig({
                         return 'assets/[name]-[hash][extname]';
                     }
                     return 'assets/[name]-[hash][extname]';
+                },
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        if (id.includes('apexcharts')) return 'vendor-charts';
+                        if (id.includes('sweetalert2')) return 'vendor-swal';
+                        if (id.includes('flowbite')) return 'vendor-flowbite';
+                        return 'vendor';
+                    }
                 },
             },
         },
