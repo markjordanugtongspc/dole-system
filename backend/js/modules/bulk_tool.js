@@ -7,6 +7,7 @@ export const BulkApp = {
     queue: [],
     currentIndex: 0,
     isActive: false,
+    isAutoSave: false,
     lastInteractionTime: 0,
 
     init() {
@@ -53,6 +54,17 @@ export const BulkApp = {
                         <input id="csv-upload" type="file" class="hidden" accept=".csv, .txt" />
                     </label>
                 </div>
+                
+                <div class="flex items-center gap-3 px-2 py-3 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-800/30 mb-2">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="auto-save-toggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </label>
+                    <div>
+                        <span class="text-[11px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest block leading-tight">Auto-Save (Fast Mode)</span>
+                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Skip manual confirmations for every record</span>
+                    </div>
+                </div>
             </div>
         `;
 
@@ -92,20 +104,24 @@ export const BulkApp = {
                     }, false);
                 });
 
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const autoSaveToggle = popup.querySelector('#auto-save-toggle');
+                        this.isAutoSave = autoSaveToggle ? autoSaveToggle.checked : false;
+                        this.handleFile(file);
+                    }
+                });
+
                 label.addEventListener('drop', (e) => {
                     const dt = e.dataTransfer;
                     const file = dt.files[0];
                     if (file) {
+                        const autoSaveToggle = popup.querySelector('#auto-save-toggle');
+                        this.isAutoSave = autoSaveToggle ? autoSaveToggle.checked : false;
                         this.handleFile(file);
                     }
                 }, false);
-
-                fileInput.addEventListener('change', (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                        this.handleFile(file);
-                    }
-                });
             }
         });
     },
@@ -273,7 +289,25 @@ export const BulkApp = {
             data._bulkCurrent = this.currentIndex + 1;
             data._bulkTotal = this.queue.length;
 
-            showAddDataModal(data);
+            if (this.isAutoSave) {
+                // AUTO-SAVE MODE: Directly call the API without showing modal
+                if (window.addBeneficiaryData) {
+                    (async () => {
+                        const success = await window.addBeneficiaryData(data);
+                        if (success) {
+                            this.onSaveSuccess();
+                        } else {
+                            // If it fails, show the modal so user can fix issues
+                            showAddDataModal(data);
+                        }
+                    })();
+                } else {
+                    showAddDataModal(data);
+                }
+            } else {
+                // GUIDED MODE: Show the modal for manual review
+                showAddDataModal(data);
+            }
         } else {
             this.isActive = false;
             this.lastInteractionTime = Date.now();
@@ -289,11 +323,11 @@ export const BulkApp = {
     onSaveSuccess() {
         if (this.isActive) {
             this.currentIndex++;
-            // Wait for 3.5 seconds to let the Success toast finish (set to 3000ms in modal.js)
-            // This provides a smoother transition between records.
+            // If in AutoSave, reduce delay to 100ms. If Guided, keep 1500ms for review.
+            const delay = this.isAutoSave ? 100 : 1500; 
             setTimeout(() => {
                 this.processNext();
-            }, 3500); 
+            }, delay); 
         }
     },
 
