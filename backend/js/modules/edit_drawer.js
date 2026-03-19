@@ -1,5 +1,6 @@
 import { isDarkMode } from './darkmode.js';
 import { getBasePath } from './auth.js';
+import { apiRequest } from './ajax-manager.js';
 import Swal from 'sweetalert2';
 import { COMMON_COURSES, COMMON_NATURE_OF_WORK } from './modal.js';
 
@@ -49,13 +50,16 @@ export function showEditBeneficiaryDrawer(data) {
 
     <div class="flex flex-col gap-1 text-left mt-4 mb-4">
         <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ASSIGNED OFFICE</span>
-        <select name="office" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-[10px] sm:text-[11px] font-black px-2.5 py-2.5 rounded-lg border border-indigo-200 dark:border-indigo-800/60 uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full cursor-pointer">
-            <option value="DOLE Field Office" ${data.office === 'DOLE Field Office' ? 'selected' : ''}>DOLE Field Office</option>
-            <option value="LGU" ${data.office === 'LGU' ? 'selected' : ''}>LGU</option>
-            <option value="DEPED" ${data.office === 'DEPED' ? 'selected' : ''}>DEPED</option>
-            <option value="DICT" ${data.office === 'DICT' ? 'selected' : ''}>DICT</option>
-            <option value="PCA" ${data.office === 'PCA' ? 'selected' : ''}>PCA</option>
-        </select>
+        <input type="text" name="office" value="${data.office || ''}" list="edit-office-suggestions" 
+            class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-[10px] sm:text-[11px] font-black px-2.5 py-2.5 rounded-lg border border-indigo-200 dark:border-indigo-800/60 uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full placeholder-indigo-300 dark:placeholder-indigo-700"
+            placeholder="e.g. DOLE Field Office">
+        <datalist id="edit-office-suggestions">
+            <option value="DOLE Field Office">
+            <option value="LGU">
+            <option value="DEPED">
+            <option value="DICT">
+            <option value="PCA">
+        </datalist>
     </div>
 
     <h4 class="text-sm font-bold text-heading mt-6 mb-4 pb-2 border-b border-default whitespace-nowrap">Personal Profile</h4>
@@ -166,6 +170,23 @@ export function showEditBeneficiaryDrawer(data) {
             ta.style.height = ta.scrollHeight + 'px';
         }
     }, 10);
+    
+    // Fetch offices for suggestions from database
+    (async () => {
+        try {
+            const res = await apiRequest('api/beneficiaries.php?get_offices=1');
+            if (res.success && res.data.offices) {
+                const datalist = drawerContainer.querySelector('#edit-office-suggestions');
+                if (datalist) {
+                    const defaultOffices = ['DOLE Field Office', 'LGU', 'DEPED', 'DICT', 'PCA'];
+                    const allOffices = [...new Set([...defaultOffices, ...res.data.offices])];
+                    datalist.innerHTML = allOffices.map(o => `<option value="${o}">`).join('');
+                }
+            }
+        } catch (err) {
+            console.error('Error fetching office suggestions:', err);
+        }
+    })();
 
     import('flowbite').then(({ Drawer }) => {
         const drawer = new Drawer(drawerContainer, {

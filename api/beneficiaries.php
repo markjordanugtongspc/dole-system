@@ -37,6 +37,23 @@ if ($method === 'GET') {
     $showArchived = isset($_GET['archived']) && $_GET['archived'] === 'true';
 
     try {
+        if (isset($_GET['get_offices'])) {
+            // Get all unique office names from both the dedicated table and direct column
+            $stmt = $pdo->prepare("
+                SELECT DISTINCT office_name FROM (
+                    SELECT office_name FROM offices
+                    UNION
+                    SELECT office_name FROM beneficiaries WHERE office_name IS NOT NULL
+                ) as combined_offices
+                WHERE office_name != ''
+                ORDER BY office_name ASC
+            ");
+            $stmt->execute();
+            $offices = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            echo json_encode(['success' => true, 'offices' => $offices]);
+            exit();
+        }
+
         if (isset($_GET['next_id'])) {
             $year = $_GET['year'] ?? date('Y');
             $stmt = $pdo->prepare("SELECT gip_id FROM beneficiaries WHERE gip_id LIKE :year_prefix ORDER BY gip_id DESC LIMIT 1");
