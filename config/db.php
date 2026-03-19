@@ -42,12 +42,15 @@ function loadEnv($path)
     }
 }
 
-// Load .env file from config directory
+// Load .env file from config directory if it exists
 $envPath = __DIR__ . '/.env';
-try {
-    loadEnv($envPath);
-} catch (Exception $e) {
-    die("Environment Configuration Error: " . $e->getMessage());
+if (file_exists($envPath)) {
+    try {
+        loadEnv($envPath);
+    } catch (Exception $e) {
+        // Log error locally if .env is corrupted, but don't halt here
+        error_log("Environment Error: " . $e->getMessage());
+    }
 }
 
 // Database configuration from environment variables

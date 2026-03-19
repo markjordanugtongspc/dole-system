@@ -1,0 +1,40 @@
+{
+    "version": 2,
+    "functions": {
+        "api/*.php": {
+            "runtime": "vercel-php@0.7.0"
+        },
+        "index.php": {
+            "runtime": "vercel-php@0.7.0"
+        },
+        "frontend/**/*.php": {
+            "runtime": "vercel-php@0.7.0"
+        }
+    },
+    "routes": [
+        {
+            "src": "/dist/(.*)",
+            "dest": "/dist/$1"
+        },
+        {
+            "src": "/frontend/images/(.*)",
+            "dest": "/frontend/images/$1"
+        },
+        {
+            "src": "/api/(.*)",
+            "dest": "/api/$1.php"
+        },
+        {
+            "src": "/dashboard/?",
+            "dest": "/frontend/dashboard/index.php"
+        },
+        {
+            "src": "/",
+            "dest": "/index.php"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/index.php"
+        }
+    ]
+}
