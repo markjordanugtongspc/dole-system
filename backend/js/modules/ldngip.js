@@ -1,6 +1,15 @@
 import { getBasePath } from './auth.js';
 import { createNotification } from './notifications.js';
 import { pollingManager, apiGet, showToast, reinitFlowbite, generateChecksum } from './ajax-manager.js';
+import {
+    cacheBeneficiaries,
+    getLocalBeneficiaries,
+    upsertLocalBeneficiary,
+    deleteLocalBeneficiary,
+    getTimeSinceLastSync,
+    enqueueSync,
+} from './db-manager.js';
+import { processQueue } from './sync-manager.js';
 import Swal from 'sweetalert2';
 
 /**
@@ -15,35 +24,60 @@ let currentPage = 1;
 const itemsPerPage = 10;
 let filteredDataGlobal = null; // Store current filtered state for pagination
 /**
- * Load beneficiaries from backend API
+ * Load beneficiaries — Offline-First Strategy:
+ * 1. Instantly serve from IndexedDB (local cache) — zero network wait
+ * 2. Fetch fresh data from remote API in background
+ * 3. If data changed, update local cache and re-render
  */
 async function loadBeneficiaries() {
+    // ── STEP 1: Serve from local cache immediately ───────────────────────────
+    const localData = await getLocalBeneficiaries();
+    if (localData.length > 0) {
+        beneficiaries = localData;
+        syncExpiredStatusesLocally(beneficiaries);
+        const savedSort = localStorage.getItem('ldn_sort_preference');
+        if (savedSort) sortData(savedSort, false); else renderTable();
+        console.log(`[Offline-First] Rendered ${localData.length} records from local cache`);
+    }
+
+    // ── STEP 2: Check if we should refresh from remote ──────────────────────
+    const msSinceSync = await getTimeSinceLastSync();
+    const CACHE_TTL = 30 * 1000; // 30 seconds — only re-fetch if cache is stale
+
+    if (msSinceSync < CACHE_TTL && localData.length > 0) {
+        console.log(`[Offline-First] Cache is fresh (${Math.round(msSinceSync / 1000)}s old), skipping remote fetch`);
+        return; // Cache is good — don't hit the slow database
+    }
+
+    // ── STEP 3: Background refresh from remote API ───────────────────────────
     try {
         const response = await fetch(`${getBasePath()}api/beneficiaries.php`);
         const data = await response.json();
 
-        if (data.success) {
-            beneficiaries = data.beneficiaries || [];
-            syncExpiredStatusesLocally(beneficiaries);
-            
-            // Re-apply saved sort preference if exists
-            const savedSort = localStorage.getItem('ldn_sort_preference');
-            if (savedSort) {
-                sortData(savedSort, false); // false to avoid redundant localStorage.setItem
+        if (data.success && data.beneficiaries) {
+            const remoteData = data.beneficiaries;
+
+            // Only update if something actually changed
+            const localChecksum = generateChecksum(localData);
+            const remoteChecksum = generateChecksum(remoteData);
+
+            if (localChecksum !== remoteChecksum) {
+                await cacheBeneficiaries(remoteData); // Update local cache
+                beneficiaries = remoteData;
+                syncExpiredStatusesLocally(beneficiaries);
+                const savedSort = localStorage.getItem('ldn_sort_preference');
+                if (savedSort) sortData(savedSort, false); else renderTable();
+                console.log(`[Offline-First] Remote data synced and rendered (${remoteData.length} records)`);
             } else {
-                renderTable();
+                console.log(`[Offline-First] Remote data matches cache — no re-render needed`);
             }
-        } else {
-            console.error('Failed to load beneficiaries:', data.error);
-            beneficiaries = [];
-            renderTable();
         }
     } catch (error) {
-        console.error('Error fetching beneficiaries:', error);
-        beneficiaries = [];
-        renderTable();
+        // Network error — that's fine, we already rendered from local cache
+        console.warn('[Offline-First] Remote fetch failed (using local cache):', error.message);
     }
 }
+
 
 function syncExpiredStatusesLocally(dataArray) {
     const today = new Date();
@@ -350,48 +384,53 @@ export function sortData(criteria, saveToStorage = true) {
 }
 
 export async function addBeneficiary(data) {
-    try {
-        // Determine if this is an update (has existing ID) or new record
-        const method = data.id ? 'PUT' : 'POST';
-
-        // Automatically capitalize text fields as per senior request
-        const capitalizedData = { ...data };
-        const fieldsToCapitalize = ['name', 'address', 'education', 'designation'];
-
-        fieldsToCapitalize.forEach(field => {
-            if (capitalizedData[field] && typeof capitalizedData[field] === 'string') {
-                capitalizedData[field] = capitalizedData[field].toUpperCase().trim();
-            }
-        });
-
-        const response = await fetch(`${getBasePath()}api/beneficiaries.php`, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(capitalizedData)
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            // Trigger notification for new records
-            if (method === 'POST') {
-                createNotification(`New user <strong>${capitalizedData.name}</strong> added. pending "Required Documents" for review.`, 'success');
-            }
-
-            // Reload beneficiaries from database
-            await loadBeneficiaries();
-            return true;
-        } else {
-            console.error('Failed to save beneficiary:', result.error);
-            return false;
+    // ── STEP 1: Capitalize fields ──────────────────────────────────────────────
+    const capitalizedData = { ...data };
+    const fieldsToCapitalize = ['name', 'address', 'education', 'designation'];
+    fieldsToCapitalize.forEach(field => {
+        if (capitalizedData[field] && typeof capitalizedData[field] === 'string') {
+            capitalizedData[field] = capitalizedData[field].toUpperCase().trim();
         }
-    } catch (error) {
-        console.error('Error saving beneficiary:', error);
-        return false;
+    });
+
+    const method = capitalizedData.id ? 'PUT' : 'POST';
+
+    // ── STEP 2: Generate a temp id for new records so we can store locally ────
+    if (!capitalizedData.id && !capitalizedData.gip_id) {
+        capitalizedData._tempId = `temp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+        capitalizedData.id = capitalizedData._tempId;
     }
+
+    // ── STEP 3: Save to local IndexedDB immediately (INSTANT) ─────────────────
+    try {
+        await upsertLocalBeneficiary(capitalizedData);
+        // Refresh in-memory array for immediate re-render
+        const localData = await getLocalBeneficiaries();
+        beneficiaries = localData;
+        syncExpiredStatusesLocally(beneficiaries);
+        renderTable();
+        console.log(`[Offline-First] ✓ Saved "${capitalizedData.name}" to local cache`);
+    } catch (e) {
+        console.error('[Offline-First] Local save failed:', e);
+    }
+
+    // ── STEP 4: Send notification optimistically for new records ──────────────
+    if (method === 'POST') {
+        createNotification(`New user <strong>${capitalizedData.name}</strong> added. pending "Required Documents" for review.`, 'success');
+    }
+
+    // ── STEP 5: Enqueue remote API sync (runs in background) ──────────────────
+    try {
+        await enqueueSync(method, 'api/beneficiaries.php', capitalizedData);
+        // Trigger sync worker immediately (non-blocking)
+        processQueue();
+    } catch (e) {
+        console.error('[Offline-First] Failed to enqueue sync:', e);
+    }
+
+    return true; // Return immediately — don't wait for remote
 }
+
 
 export async function archiveRecord(id) {
     // Show Modern Confirmation Modal

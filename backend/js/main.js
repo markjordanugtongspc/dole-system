@@ -14,6 +14,7 @@ import { initExportPage } from './modules/export.js';
 import { getBasePath } from './modules/auth.js';
 import { initNotifications } from './modules/notifications.js';
 import { initDarkMode } from './modules/darkmode.js';
+import { initSyncIndicator, startSyncWorker } from './modules/sync-manager.js';
 
 // Initialize Smart Loader immediately
 initSmartLoader();
@@ -40,6 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initAutoYear();
     loadUserProfile();
     initNotifications();
+
+    // Offline-First: Initialize sync indicator pill and start background worker
+    initSyncIndicator();
+    startSyncWorker();
 
     // Page specific initialization
     if (path.includes('/export/')) {
