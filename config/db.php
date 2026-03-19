@@ -55,12 +55,12 @@ if (file_exists($envPath)) {
 
 // Database configuration from environment variables
 $dbConfig = [
-    'host' => $_ENV['DB_HOST'] ?? '127.0.0.1',
-    'port' => $_ENV['DB_PORT'] ?? '3306',
-    'database' => $_ENV['DB_DATABASE'] ?? 'dole_db',
-    'username' => $_ENV['DB_USERNAME'] ?? 'root',
-    'password' => $_ENV['DB_PASSWORD'] ?? '',
-    'charset' => 'utf8mb4',
+    'host'      => env('DB_HOST'),
+    'port'      => env('DB_PORT', '3306'),
+    'database'  => env('DB_DATABASE'),
+    'username'  => env('DB_USERNAME'),
+    'password'  => env('DB_PASSWORD'),
+    'charset'   => 'utf8mb4',
     'collation' => 'utf8mb4_unicode_ci',
 ];
 
@@ -131,7 +131,11 @@ function testDbConnection()
  */
 function env($key, $default = null)
 {
-    return $_ENV[$key] ?? $default;
+    if (isset($_ENV[$key])) return $_ENV[$key];
+    if (isset($_SERVER[$key])) return $_SERVER[$key];
+    $val = getenv($key);
+    if ($val !== false) return $val;
+    return $default;
 }
 
 // Set timezone from environment
