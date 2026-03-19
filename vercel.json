@@ -1,16 +1,31 @@
 {
     "version": 2,
     "functions": {
-        "api/index.php":        { "runtime": "vercel-php@0.7.4" },
-        "api/auth.php":         { "runtime": "vercel-php@0.7.4" },
-        "api/beneficiaries.php":{ "runtime": "vercel-php@0.7.4" },
-        "api/logs.php":         { "runtime": "vercel-php@0.7.4" },
-        "api/notifications.php":{ "runtime": "vercel-php@0.7.4" },
-        "api/profile.php":      { "runtime": "vercel-php@0.7.4" },
-        "api/check_duplicate.php":{ "runtime": "vercel-php@0.7.4" }
+        "api/index.php":           { "runtime": "vercel-php@0.7.4" },
+        "api/auth.php":            { "runtime": "vercel-php@0.7.4" },
+        "api/beneficiaries.php":   { "runtime": "vercel-php@0.7.4" },
+        "api/logs.php":            { "runtime": "vercel-php@0.7.4" },
+        "api/notifications.php":   { "runtime": "vercel-php@0.7.4" },
+        "api/profile.php":         { "runtime": "vercel-php@0.7.4" },
+        "api/check_duplicate.php": { "runtime": "vercel-php@0.7.4" }
     },
     "routes": [
-        { "handle": "filesystem" },
+        {
+            "src": "/dist/(.*)",
+            "dest": "/dist/$1"
+        },
+        {
+            "src": "/frontend/images/(.*)",
+            "dest": "/frontend/images/$1"
+        },
+        {
+            "src": "/frontend/css/(.*)",
+            "dest": "/frontend/css/$1"
+        },
+        {
+            "src": "/backend/css/(.*)",
+            "dest": "/backend/css/$1"
+        },
         {
             "src": "/api/auth",
             "dest": "/api/auth.php"
