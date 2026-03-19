@@ -1,4 +1,6 @@
-# Environment Configuration
+# Environment Configuration — DO NOT commit local .env at root
+# config/.env is committed so Vercel can read DB credentials
+# To protect secrets in production, set them in Vercel Dashboard > Settings > Environment Variables instead
 .env
 config/.env
 
@@ -23,8 +25,8 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# Build Output
-dist/
+# Build Output — dist/ is committed so Vercel can serve pre-built Vite assets
+# (Vercel does not run `npm run build` unless you configure a build command)
 build/
 .cache/
 
