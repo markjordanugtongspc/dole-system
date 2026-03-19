@@ -27,28 +27,8 @@
             "dest": "/backend/css/$1"
         },
         {
-            "src": "/api/auth",
-            "dest": "/api/auth.php"
-        },
-        {
-            "src": "/api/beneficiaries(.*)",
-            "dest": "/api/beneficiaries.php"
-        },
-        {
-            "src": "/api/logs(.*)",
-            "dest": "/api/logs.php"
-        },
-        {
-            "src": "/api/notifications(.*)",
-            "dest": "/api/notifications.php"
-        },
-        {
-            "src": "/api/profile(.*)",
-            "dest": "/api/profile.php"
-        },
-        {
-            "src": "/api/check_duplicate(.*)",
-            "dest": "/api/check_duplicate.php"
+            "src": "/api/(auth|beneficiaries|logs|notifications|profile|check_duplicate)(.*)",
+            "dest": "/api/$1.php"
         },
         {
             "src": "/(.*)",
