@@ -246,6 +246,61 @@ export const BulkApp = {
         }
     },
 
+    showProgressModal() {
+        const dk = isDarkMode();
+        const progress = Math.round((this.currentIndex / this.queue.length) * 100);
+        
+        const html = `
+            <div class="p-2 text-left font-montserrat">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-black text-blue-600 dark:text-blue-400 uppercase italic">Processing Data...</h3>
+                    <span class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">${this.currentIndex} / ${this.queue.length}</span>
+                </div>
+                
+                <div class="w-full bg-gray-100 dark:bg-slate-800 rounded-full h-4 mb-6 p-1 border border-gray-200 dark:border-slate-700">
+                    <div id="bulk-progress-bar" class="bg-blue-600 h-full rounded-full transition-all duration-300 shadow-sm shadow-blue-500/20" style="width: ${progress}%"></div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <p class="text-xs font-bold text-gray-600 dark:text-slate-300">Currently saving: <span class="text-blue-500" id="bulk-current-name">${this.queue[this.currentIndex]?.name || '...'}</span></p>
+                    <p class="text-[10px] text-gray-400 font-medium">Please do not close the window until complete.</p>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-gray-50 dark:border-slate-800 flex justify-end">
+                    <button id="stop-bulk-btn" class="px-5 py-2.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-[10px] font-black uppercase tracking-widest rounded-xl border border-red-100 dark:border-red-800/40 hover:bg-red-600 hover:text-white transition-all cursor-pointer">
+                        Stop Processing
+                    </button>
+                </div>
+            </div>
+        `;
+
+        if (Swal.isVisible() && Swal.getPopup().querySelector('#bulk-progress-bar')) {
+            // Just update the existing modal
+            const bar = document.getElementById('bulk-progress-bar');
+            const counter = Swal.getPopup().querySelector('span.text-\\[10px\\]');
+            const name = document.getElementById('bulk-current-name');
+            if (bar) bar.style.width = `${progress}%`;
+            if (counter) counter.textContent = `${this.currentIndex} / ${this.queue.length}`;
+            if (name) name.textContent = this.queue[this.currentIndex]?.name || '...';
+        } else {
+            // Create new progress modal
+            Swal.fire({
+                html: html,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                width: '450px',
+                customClass: {
+                    container: 'font-montserrat',
+                    popup: 'rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800'
+                },
+                didOpen: (popup) => {
+                    popup.querySelector('#stop-bulk-btn').onclick = () => this.onCancel();
+                }
+            });
+        }
+    },
+
     formatDate(dateStr) {
         if (!dateStr || dateStr.trim() === '') return '';
         const d = new Date(dateStr);
@@ -290,15 +345,18 @@ export const BulkApp = {
             data._bulkTotal = this.queue.length;
 
             if (this.isAutoSave) {
+                this.showProgressModal();
                 // AUTO-SAVE MODE: Directly call the API without showing modal
                 if (window.addBeneficiaryData) {
                     (async () => {
                         const success = await window.addBeneficiaryData(data);
-                        if (success) {
-                            this.onSaveSuccess();
-                        } else {
-                            // If it fails, show the modal so user can fix issues
-                            showAddDataModal(data);
+                        if (this.isActive) { // Check if still active (not cancelled during fetch)
+                            if (success) {
+                                this.onSaveSuccess();
+                            } else {
+                                // If it fails, show the modal so user can fix issues
+                                showAddDataModal(data);
+                            }
                         }
                     })();
                 } else {
