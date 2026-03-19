@@ -14,7 +14,7 @@ if ($path === '/' || $path === '/index.php') {
     exit;
 }
 
-if (strpos($path, '/dashboard') === 0) {
+if (strpos($path, '/frontend/dashboard') === 0 || strpos($path, '/dashboard') === 0) {
     require __DIR__ . '/../frontend/dashboard/index.php';
     exit;
 }
