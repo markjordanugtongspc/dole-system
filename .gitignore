@@ -1,8 +1,10 @@
-# Environment Configuration — DO NOT commit local .env at root
-# config/.env is committed so Vercel can read DB credentials
-# To protect secrets in production, set them in Vercel Dashboard > Settings > Environment Variables instead
+# Environment Configuration
 .env
 config/.env
+config/.env.production
+config/.env.local
+config/.env.*
+!config/.env.example
 
 # Database Backups
 *.sql.backup

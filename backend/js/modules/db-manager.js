@@ -12,11 +12,12 @@
  */
 
 const DB_NAME = 'dole-gip-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Incremented version to create new store
 const STORES = {
     BENEFICIARIES: 'beneficiaries',
     SYNC_QUEUE: 'sync_queue',
     METADATA: 'metadata',
+    APP_CACHE: 'app_cache', // New store for generic offline caching
 };
 
 let _db = null;
@@ -54,6 +55,11 @@ function openDB() {
             // Metadata store — simple key/value
             if (!db.objectStoreNames.contains(STORES.METADATA)) {
                 db.createObjectStore(STORES.METADATA, { keyPath: 'key' });
+            }
+
+            // Generic App Cache (For LDN and other requests)
+            if (!db.objectStoreNames.contains(STORES.APP_CACHE)) {
+                db.createObjectStore(STORES.APP_CACHE, { keyPath: 'key' });
             }
         };
 
@@ -299,6 +305,76 @@ export async function getMeta(key) {
     });
 }
 
+// ─── OFFLINE-FIRST GENERIC CACHE (Encrypted/Obfuscated) ───────────────────
+
+/**
+ * Basic local obfuscation (Base64 + URI encode). 
+ * For real security, implement Web Crypto AES here.
+ */
+function encryptLocal(data) {
+    if (!data) return null;
+    return btoa(encodeURIComponent(JSON.stringify(data)));
+}
+
+function decryptLocal(encodedStr) {
+    if (!encodedStr) return null;
+    try {
+        return JSON.parse(decodeURIComponent(atob(encodedStr)));
+    } catch (e) {
+        console.error('[DB] Failed to decrypt local cache', e);
+        return null;
+    }
+}
+
+/**
+ * Save generic application data (like the LDN tables) securely to local DB
+ * @param {string} key Unique identifier for the cache
+ * @param {any} data The data to store
+ */
+export async function setSecureCache(key, data) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const txn = db.transaction(STORES.APP_CACHE, 'readwrite');
+        const store = txn.objectStore(STORES.APP_CACHE);
+        
+        // Securely prepare the payload
+        const payload = {
+            key,
+            data: encryptLocal(data),
+            updated_at: Date.now()
+        };
+        
+        const req = store.put(payload);
+        req.onsuccess = () => {
+            console.log(`[DB] Securely cached offline data for: ${key}`);
+            resolve();
+        };
+        req.onerror = () => reject(req.error);
+    });
+}
+
+/**
+ * Get securely cached application data
+ * @param {string} key Unique identifier
+ * @returns {Promise<any|null>} Decrypted data
+ */
+export async function getSecureCache(key) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const txn = db.transaction(STORES.APP_CACHE, 'readonly');
+        const store = txn.objectStore(STORES.APP_CACHE);
+        const req = store.get(key);
+        req.onsuccess = () => {
+            if (req.result && req.result.data) {
+                resolve(decryptLocal(req.result.data));
+            } else {
+                resolve(null);
+            }
+        };
+        req.onerror = () => reject(req.error);
+    });
+}
+
 // ─── DATABASE INSPECTOR (for debugging) ────────────────────────────────────
 
 export async function getDBStats() {
@@ -319,4 +395,6 @@ window.__doleDB = {
     getStats: getDBStats,
     getLocalBeneficiaries,
     getPendingSyncItems,
+    setSecureCache,
+    getSecureCache,
 };

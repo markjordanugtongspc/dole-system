@@ -144,7 +144,7 @@ require_once __DIR__ . '/../../config/vite.php';
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <!-- Total Beneficiaries Card -->
                 <div
-                    class="relative overflow-hidden bg-white dark:bg-slate-800/80 border border-default dark:border-slate-700 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ease-out cursor-pointer group">
+                    class="relative overflow-hidden bg-white dark:bg-slate-800/80 border border-default dark:border-slate-700 rounded-r-2xl rounded-l-none p-4 sm:p-5 shadow-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ease-out cursor-pointer group">
                     <div class="absolute top-0 left-0 w-1 h-full bg-royal-blue"></div>
                     <div class="absolute -right-8 -bottom-8 w-24 h-24 bg-royal-blue/5 rounded-full blur-2xl group-hover:bg-royal-blue/10 transition-colors"></div>
                     <div class="flex items-center justify-between gap-4 relative z-10">
@@ -167,7 +167,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <!-- Female Ratio Card -->
                 <div
-                    class="relative overflow-hidden bg-white dark:bg-slate-800/80 border border-default dark:border-slate-700 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ease-out cursor-pointer group">
+                    class="relative overflow-hidden bg-white dark:bg-slate-800/80 border border-default dark:border-slate-700 rounded-r-2xl rounded-l-none p-4 sm:p-5 shadow-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ease-out cursor-pointer group">
                     <div class="absolute top-0 left-0 w-1 h-full bg-philippine-red"></div>
                     <div class="absolute -right-8 -bottom-8 w-24 h-24 bg-philippine-red/5 rounded-full blur-2xl group-hover:bg-philippine-red/10 transition-colors"></div>
                     <div class="flex items-center justify-between gap-4 relative z-10">
@@ -191,7 +191,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <!-- Deployment Sites Card -->
                 <div
-                    class="relative overflow-hidden bg-white dark:bg-slate-800/80 border border-default dark:border-slate-700 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ease-out cursor-pointer group">
+                    class="relative overflow-hidden bg-white dark:bg-slate-800/80 border border-default dark:border-slate-700 rounded-r-2xl rounded-l-none p-4 sm:p-5 shadow-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ease-out cursor-pointer group">
                     <div class="absolute top-0 left-0 w-1 h-full bg-golden-yellow"></div>
                     <div class="absolute -right-8 -bottom-8 w-24 h-24 bg-golden-yellow/5 rounded-full blur-2xl group-hover:bg-golden-yellow/10 transition-colors"></div>
                     <div class="flex items-center justify-between gap-4 relative z-10">
@@ -214,7 +214,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <!-- Average Age Range Card -->
                 <div
-                    class="relative overflow-hidden bg-white dark:bg-slate-800/80 border border-default dark:border-slate-700 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ease-out cursor-pointer group">
+                    class="relative overflow-hidden bg-white dark:bg-slate-800/80 border border-default dark:border-slate-700 rounded-r-2xl rounded-l-none p-4 sm:p-5 shadow-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ease-out cursor-pointer group">
                     <div class="absolute top-0 left-0 w-1 h-full bg-slate-400 dark:bg-slate-500"></div>
                     <div class="absolute -right-8 -bottom-8 w-24 h-24 bg-slate-500/5 rounded-full blur-2xl group-hover:bg-slate-500/10 transition-colors"></div>
                     <div class="flex items-center justify-between gap-4 relative z-10">
@@ -269,7 +269,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             <!-- Button -->
                             <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown"
                                 data-dropdown-placement="bottom"
-                                class="text-xs font-black text-slate-500 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-widest transition-colors duration-300"
+                                class="cursor-pointer text-xs font-black text-slate-500 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-widest transition-colors duration-300"
                                 type="button">
                                 Overall Stats
                                 <svg class="w-3 h-3 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -286,7 +286,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 </ul>
                             </div>
                             <a href="#"
-                                class="inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-xs hover:underline">
+                                class="cursor-pointer inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-xs hover:underline">
                                 View Details
                                 <svg class="w-3 h-3 ms-1.5 rtl:rotate-180" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -334,7 +334,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 Aggregated statistics
                             </div>
                             <a href="#"
-                                class="inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-xs hover:underline">
+                                class="cursor-pointer inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-xs hover:underline">
                                 View Report
                                 <svg class="w-3 h-3 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     fill="none" viewBox="0 0 24 24">
@@ -393,7 +393,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div class="flex items-center mb-1">
                             <h5 class="text-sm font-black uppercase tracking-[0.2em] text-slate-400">
                                 Education Profile</h5>
-                            <button data-popover-target="edu-progress-popover" class="ms-2">
+                            <button data-popover-target="edu-progress-popover" class="ms-2 cursor-pointer">
                                 <svg class="w-4 h-4 text-slate-300 hover:text-royal-blue transition-colors cursor-pointer"
                                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                                     viewBox="0 0 24 24">
@@ -420,7 +420,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             <!-- Button -->
                             <button id="dropdownLastDaysEduButton" data-dropdown-toggle="LastDaysEdudropdown"
                                 data-dropdown-placement="bottom"
-                                class="text-[10px] font-black text-slate-400 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-[0.15em] transition-colors"
+                                class="cursor-pointer text-[10px] font-black text-slate-400 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-[0.15em] transition-colors"
                                 type="button">
                                 Previous 7 Days
                                 <svg class="w-3 h-3 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -449,7 +449,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 </ul>
                             </div>
                             <a href="#"
-                                class="inline-flex items-center uppercase tracking-widest font-black text-royal-blue hover:text-blue-800 text-[10px] group">
+                                class="cursor-pointer inline-flex items-center uppercase tracking-widest font-black text-royal-blue hover:text-blue-800 text-[10px] group">
                                 View Full Report
                                 <svg class="w-3 h-3 ms-2 transform group-hover:translate-x-1 transition-transform"
                                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -497,7 +497,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             <!-- Button -->
                             <button id="dropdownLastDays3Button" data-dropdown-toggle="LastDays3dropdown"
                                 data-dropdown-placement="bottom"
-                                class="text-[10px] font-bold text-slate-500 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-wider"
+                                class="cursor-pointer text-[10px] font-bold text-slate-500 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-wider"
                                 type="button">
                                 Last 7 days
                                 <svg class="w-2.5 h-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -536,7 +536,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 </ul>
                             </div>
                             <a href="#"
-                                class="inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-[10px] hover:underline">
+                                class="cursor-pointer inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-[10px] hover:underline">
                                 Roles Report
                                 <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
