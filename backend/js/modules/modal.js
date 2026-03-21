@@ -71,8 +71,23 @@ export function showLoginSuccess(fast = false) {
 export function initModalHandler() {
     // Expose the functions to the global window object
     window.viewBeneficiary = async function (data, page = 0) {
+        const cacheKey = `logs_cache_${data.id}`;
+        let hasDisplayedCache = false;
+        
         try {
-            // Fetch real logs and docs from database
+            // STEP 1: Fast Cache Rendering (0 second delay)
+            if (window.__doleDB && window.__doleDB.getSecureCache) {
+                const cachedLogs = await window.__doleDB.getSecureCache(cacheKey);
+                if (cachedLogs) {
+                    data.arLogs = cachedLogs.arLogs || [];
+                    data.dtrLogs = cachedLogs.dtrLogs || [];
+                    data.docs = cachedLogs.docs || [];
+                    showBeneficiaryDrawer(data, page);
+                    hasDisplayedCache = true;
+                }
+            }
+
+            // STEP 2: Background network fetch
             const [arRes, dtrRes, docRes] = await Promise.all([
                 fetch(`${getBasePath()}api/logs.php?type=ar&gip_id=${encodeURIComponent(data.id)}`),
                 fetch(`${getBasePath()}api/logs.php?type=dtr&gip_id=${encodeURIComponent(data.id)}`),
@@ -83,17 +98,46 @@ export function initModalHandler() {
             const dtrData = await dtrRes.json();
             const docData = await docRes.json();
 
-            data.arLogs = arData.success ? arData.logs : [];
-            data.dtrLogs = dtrData.success ? dtrData.logs : [];
-            data.docs = docData.success ? docData.logs : [];
+            const fetchedArLogs = arData.success ? arData.logs : [];
+            const fetchedDtrLogs = dtrData.success ? dtrData.logs : [];
+            const fetchedDocs = docData.success ? docData.logs : [];
 
-            showBeneficiaryDrawer(data, page);
+            // STEP 3: Save to secure cache
+            const newLogsData = {
+                arLogs: fetchedArLogs,
+                dtrLogs: fetchedDtrLogs,
+                docs: fetchedDocs
+            };
+
+            if (window.__doleDB && window.__doleDB.setSecureCache) {
+                await window.__doleDB.setSecureCache(cacheKey, newLogsData);
+            }
+
+            // STEP 4: Render UI 
+            data.arLogs = fetchedArLogs;
+            data.dtrLogs = fetchedDtrLogs;
+            data.docs = fetchedDocs;
+            
+            if (!hasDisplayedCache) {
+                // First time visiting this user, show drawer now
+                showBeneficiaryDrawer(data, page);
+            } else {
+                // Drawer is already open with cached data. 
+                // Silently update if it is still physically on the screen
+                const drawerContainer = document.getElementById('beneficiary-drawer-container');
+                if (drawerContainer) {
+                    // This cleanly overwrites the old drawer with fresh network data
+                    showBeneficiaryDrawer(data, page);
+                }
+            }
         } catch (error) {
             console.error('Error fetching logs/docs:', error);
-            data.arLogs = [];
-            data.dtrLogs = [];
-            data.docs = [];
-            showBeneficiaryDrawer(data, page);
+            if (!hasDisplayedCache) {
+                data.arLogs = [];
+                data.dtrLogs = [];
+                data.docs = [];
+                showBeneficiaryDrawer(data, page);
+            }
         }
     };
     window.showAddDataModal = function (data) {
