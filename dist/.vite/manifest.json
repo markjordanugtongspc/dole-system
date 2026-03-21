@@ -1,6 +1,6 @@
 {
-  "_auth-Dt4MOxyY.js": {
-    "file": "assets/auth-Dt4MOxyY.js",
+  "_auth-FVEiqT_S.js": {
+    "file": "assets/auth-FVEiqT_S.js",
     "name": "auth",
     "imports": [
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
@@ -19,14 +19,14 @@
     "name": "vendor-charts"
   },
   "backend/js/main.js": {
-    "file": "assets/main-Dpvvz1xF.js",
+    "file": "assets/main-0cMbn33r.js",
     "name": "main",
     "src": "backend/js/main.js",
     "isEntry": true,
     "imports": [
       "_vendor-DC5wud4b.js",
       "node_modules/flowbite/lib/esm/index.js",
-      "_auth-Dt4MOxyY.js",
+      "_auth-FVEiqT_S.js",
       "_vendor-charts-BjInCqFR.js",
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
     ],
@@ -35,12 +35,12 @@
     ]
   },
   "backend/js/modules/settings.js": {
-    "file": "assets/settings-CTiTgl4U.js",
+    "file": "assets/settings-D4IYTbKS.js",
     "name": "settings",
     "src": "backend/js/modules/settings.js",
     "isEntry": true,
     "imports": [
-      "_auth-Dt4MOxyY.js",
+      "_auth-FVEiqT_S.js",
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
     ]
   },
