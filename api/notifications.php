@@ -5,16 +5,9 @@
  * Handles notification CRUD operations
  */
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit;
-}
-
 require_once __DIR__ . '/../config/db.php';
+handleCors();
+header('Content-Type: application/json');
 
 session_start();
 
@@ -22,9 +15,16 @@ session_start();
 // Accept user_id from session (localhost), POST body, GET param, or X-User-Id header.
 $user_id = $_SESSION['user_id'] ?? null;
 
-if (!$user_id && isset($_POST['user_id'])) {
-    $user_id = $_POST['user_id'];
+// Read JSON body once for POST requests (apiRequest sends JSON)
+$rawInput = file_get_contents('php://input');
+$jsonInput = [];
+if (!empty($rawInput)) {
+    $decoded = json_decode($rawInput, true);
+    if (is_array($decoded)) $jsonInput = $decoded;
 }
+
+if (!$user_id && isset($jsonInput['user_id'])) $user_id = $jsonInput['user_id'];
+if (!$user_id && isset($_POST['user_id'])) $user_id = $_POST['user_id'];
 if (!$user_id && isset($_GET['user_id'])) {
     $user_id = $_GET['user_id'];
 }
@@ -47,7 +47,7 @@ try {
         if (isset($_GET['check_new'])) {
             $stmt = $pdo->prepare("
                 SELECT COUNT(*) as unread_count,
-                       (SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0 AND created_at > DATE_SUB(NOW(), INTERVAL 1 MINUTE)) as has_new
+                       (SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0 AND created_at > CURRENT_TIMESTAMP - INTERVAL '1 MINUTE') as has_new
                 FROM notifications 
                 WHERE user_id = ? AND is_read = 0
             ");
@@ -105,7 +105,7 @@ try {
 
     // POST: Create, update, or mark notifications
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $input = json_decode(file_get_contents('php://input'), true);
+        $input = $jsonInput;
         $action = $input['action'] ?? '';
 
         // Create notification
@@ -122,13 +122,15 @@ try {
             $stmt = $pdo->prepare("
                 INSERT INTO notifications (user_id, message, type, is_read, created_at) 
                 VALUES (?, ?, ?, 0, NOW())
+                RETURNING id
             ");
             $stmt->execute([$targetUserId, $message, $type]);
+            $newId = $stmt->fetchColumn();
 
             echo json_encode([
                 'success' => true,
                 'message' => 'Notification created',
-                'notification_id' => $pdo->lastInsertId()
+                'notification_id' => $newId
             ]);
             exit;
         }

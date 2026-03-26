@@ -4,6 +4,8 @@
  * Automatically detects IP and loads assets from Vite dev server or production build
  */
 
+require_once __DIR__ . '/db.php';
+
 /**
  * Get Vite host dynamically based on request
  * This ensures Vite assets load correctly whether accessed via localhost or network IP

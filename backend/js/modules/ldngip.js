@@ -1,6 +1,6 @@
 import { getBasePath } from './auth.js';
 import { createNotification } from './notifications.js';
-import { pollingManager, apiGet, showToast, reinitFlowbite, generateChecksum } from './ajax-manager.js';
+import { pollingManager, apiGet, apiPut, showToast, reinitFlowbite, generateChecksum } from './ajax-manager.js';
 import {
     cacheBeneficiaries,
     getLocalBeneficiaries,
@@ -35,6 +35,16 @@ async function loadBeneficiaries() {
     if (localData.length > 0) {
         beneficiaries = localData;
         syncExpiredStatusesLocally(beneficiaries);
+
+        // If the cached records are missing date fields, force a remote refresh
+        // (prevents stale `N/A` while the remote DB actually has values).
+        const hasMissingDates = beneficiaries.some(b =>
+            (!b.startDateFormatted && !b.startDate) || (!b.endDateFormatted && !b.endDate)
+        );
+        window.__ldn_hasMissingDates = hasMissingDates;
+
+        // Initialize checksum so polling can correctly detect changes immediately.
+        lastDataChecksum = generateChecksum(beneficiaries);
         const savedSort = localStorage.getItem('ldn_sort_preference');
         if (savedSort) sortData(savedSort, false); else renderTable();
         console.log(`[Offline-First] Rendered ${localData.length} records from local cache`);
@@ -45,17 +55,19 @@ async function loadBeneficiaries() {
     const CACHE_TTL = 30 * 1000; // 30 seconds — only re-fetch if cache is stale
 
     if (msSinceSync < CACHE_TTL && localData.length > 0) {
-        console.log(`[Offline-First] Cache is fresh (${Math.round(msSinceSync / 1000)}s old), skipping remote fetch`);
-        return; // Cache is good — don't hit the slow database
+        const hasMissingDates = window.__ldn_hasMissingDates === true;
+        if (!hasMissingDates) {
+            console.log(`[Offline-First] Cache is fresh (${Math.round(msSinceSync / 1000)}s old), skipping remote fetch`);
+            return; // Cache is good — don't hit the slow database
+        }
+        console.log('[Offline-First] Cache fresh but missing dates detected — refreshing remote');
     }
 
     // ── STEP 3: Background refresh from remote API ───────────────────────────
     try {
-        const response = await fetch(`${getBasePath()}api/beneficiaries.php`);
-        const data = await response.json();
-
-        if (data.success && data.beneficiaries) {
-            const remoteData = data.beneficiaries;
+        const result = await apiGet('api/beneficiaries.php');
+        if (result.success && result.data?.success && result.data?.beneficiaries) {
+            const remoteData = result.data.beneficiaries;
 
             // Only update if something actually changed
             const localChecksum = generateChecksum(localData);
@@ -67,9 +79,11 @@ async function loadBeneficiaries() {
                 syncExpiredStatusesLocally(beneficiaries);
                 const savedSort = localStorage.getItem('ldn_sort_preference');
                 if (savedSort) sortData(savedSort, false); else renderTable();
+                lastDataChecksum = remoteChecksum;
                 console.log(`[Offline-First] Remote data synced and rendered (${remoteData.length} records)`);
             } else {
                 console.log(`[Offline-First] Remote data matches cache — no re-render needed`);
+                lastDataChecksum = remoteChecksum;
             }
         }
     } catch (error) {
@@ -91,11 +105,7 @@ function syncExpiredStatusesLocally(dataArray) {
                 b.remarks = 'EXPIRED';
                 // Trigger an async background sync to update exactly this record
                 const updatePayload = { ...b };
-                fetch(`${getBasePath()}api/beneficiaries.php`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatePayload)
-                }).catch(e => console.error("Auto sync failed", e));
+                apiPut('api/beneficiaries.php', updatePayload).catch(e => console.error("Auto sync failed", e));
             }
         }
     });
@@ -137,7 +147,7 @@ function initAutoRefresh() {
             const newChecksum = generateChecksum(newData);
 
             // Only update if data actually changed
-            if (lastDataChecksum && newChecksum !== lastDataChecksum) {
+            if (!lastDataChecksum || newChecksum !== lastDataChecksum) {
                 beneficiaries = newData;
                 renderTable();
                 reinitFlowbite();
@@ -207,11 +217,11 @@ export function renderTable(dataToRender = beneficiaries) {
                     </span>
                 </div>
             </td>
-            <td class="px-4 py-3 whitespace-nowrap text-center">
-                <span class="${(data.startDateFormatted || data.startDate) ? 'text-[11px] font-black text-royal-blue uppercase tracking-tight' : 'text-[10px] font-bold text-gray-300 italic'}">${data.startDateFormatted || data.startDate || 'N/A'}</span>
+            <td class="px-4 py-3 whitespace-nowrap text-center text-xs">
+                <span class="${(data.startDateFormatted || data.startDate) ? 'font-black text-royal-blue uppercase tracking-tight' : 'font-bold text-gray-300 italic'}">${data.startDateFormatted || data.startDate || 'N/A'}</span>
             </td>
-            <td class="px-4 py-3 whitespace-nowrap text-center">
-                <span class="${(data.endDateFormatted || data.endDate) ? 'text-[11px] font-black text-philippine-red uppercase tracking-tight' : 'text-[10px] font-bold text-gray-300 italic'}">${data.endDateFormatted || data.endDate || 'N/A'}</span>
+            <td class="px-4 py-3 whitespace-nowrap text-center text-xs">
+                <span class="${(data.endDateFormatted || data.endDate) ? 'font-black text-philippine-red uppercase tracking-tight' : 'font-bold text-gray-300 italic'}">${data.endDateFormatted || data.endDate || 'N/A'}</span>
             </td>
             <td class="px-4 py-3 text-center">
                 <span class="${getStatusClass(data.remarks)} text-xs font-bold px-2.5 py-0.5 rounded uppercase border">

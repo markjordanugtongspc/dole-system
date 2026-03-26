@@ -177,7 +177,7 @@ require_once __DIR__ . '/../../config/vite.php';
                     <!-- Filter / Sort Actions -->
                     <div class="relative shrink-0">
                         <button id="sort-dropdown-button" data-dropdown-toggle="sort-dropdown"
-                            class="flex items-center justify-center p-2.5 text-gray-500 rounded-full hover:bg-orange-50 hover:text-orange-600 transition-all duration-300 border border-default hover:border-orange-100 group shadow-sm">
+                            class="flex items-center justify-center p-2.5 text-gray-500 rounded-full hover:bg-orange-50 hover:text-orange-600 transition-all duration-300 border border-default hover:border-orange-100 group shadow-sm cursor-pointer">
                             <svg class="w-5 h-5 transition-transform group-hover:rotate-180" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

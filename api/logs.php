@@ -7,19 +7,9 @@
  * Supports: GET (list), POST (create), PUT (update status), DELETE (remove)
  */
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-
-// Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-// Load database connection
 require_once __DIR__ . '/../config/db.php';
+handleCors();
+header('Content-Type: application/json');
 
 try {
     $pdo = getDbConnection();
@@ -202,6 +192,7 @@ if ($method === 'GET') {
             $stmt = $pdo->prepare("
                 INSERT INTO accomplishment_reports (beneficiary_id, period, date_submitted, status)
                 VALUES (:beneficiary_id, :period, :date_submitted, :status)
+                RETURNING ar_id
             ");
 
             $stmt->execute([
@@ -211,7 +202,7 @@ if ($method === 'GET') {
                 'status' => $status
             ]);
 
-            $logId = $pdo->lastInsertId();
+            $logId = $stmt->fetchColumn();
             echo json_encode(['success' => true, 'message' => 'AR log created successfully', 'id' => $logId]);
 
         } elseif ($type === 'dtr') { // dtr
@@ -220,21 +211,28 @@ if ($method === 'GET') {
             $weekday = $data['weekday'] ?? strtoupper(date('l', strtotime($recordDate)));
             $status = $data['status'] ?? 'PENDING';
 
-            $stmt = $pdo->prepare("
-                INSERT INTO daily_time_records (beneficiary_id, record_date, weekday, status)
-                VALUES (:beneficiary_id, :record_date, :weekday, :status)
-                ON DUPLICATE KEY UPDATE status = :status_update
-            ");
+            $stmt_check = $pdo->prepare("SELECT dtr_id FROM daily_time_records WHERE beneficiary_id = :beneficiary_id AND record_date = :record_date");
+            $stmt_check->execute(['beneficiary_id' => $beneficiaryId, 'record_date' => $recordDate]);
+            $existingId = $stmt_check->fetchColumn();
 
-            $stmt->execute([
-                'beneficiary_id' => $beneficiaryId,
-                'record_date' => $recordDate,
-                'weekday' => $weekday,
-                'status' => $status,
-                'status_update' => $status
-            ]);
-
-            $logId = $pdo->lastInsertId();
+            if ($existingId) {
+                $stmt = $pdo->prepare("UPDATE daily_time_records SET status = :status_update WHERE dtr_id = :id");
+                $stmt->execute(['status_update' => $status, 'id' => $existingId]);
+                $logId = $existingId;
+            } else {
+                $stmt = $pdo->prepare("
+                    INSERT INTO daily_time_records (beneficiary_id, record_date, weekday, status)
+                    VALUES (:beneficiary_id, :record_date, :weekday, :status)
+                    RETURNING dtr_id
+                ");
+                $stmt->execute([
+                    'beneficiary_id' => $beneficiaryId,
+                    'record_date' => $recordDate,
+                    'weekday' => $weekday,
+                    'status' => $status
+                ]);
+                $logId = $stmt->fetchColumn();
+            }
             echo json_encode(['success' => true, 'message' => 'DTR log created successfully', 'id' => $logId]);
         } else { // docs
             // Create or Update Document status
@@ -248,24 +246,25 @@ if ($method === 'GET') {
                 exit();
             }
 
-            $stmt = $pdo->prepare("
-                INSERT INTO beneficiary_documents (beneficiary_id, document_name, status)
-                VALUES (:beneficiary_id, :doc_name, :status)
-                ON DUPLICATE KEY UPDATE status = :status_update
-            ");
+            $stmt_check = $pdo->prepare("SELECT doc_id FROM beneficiary_documents WHERE beneficiary_id = :bid AND document_name = :dname");
+            $stmt_check->execute(['bid' => $beneficiaryId, 'dname' => $docName]);
+            $existingId = $stmt_check->fetchColumn();
 
-            $stmt->execute([
-                'beneficiary_id' => $beneficiaryId,
-                'doc_name' => $docName,
-                'status' => $status,
-                'status_update' => $status
-            ]);
-
-            $logId = $pdo->lastInsertId();
-            // If it was an update, lastInsertId might be 0 or current.
-            if ($logId === 0 || $logId === "0") {
-                $stmt = $pdo->prepare("SELECT doc_id FROM beneficiary_documents WHERE beneficiary_id = :bid AND document_name = :dname");
-                $stmt->execute(['bid' => $beneficiaryId, 'dname' => $docName]);
+            if ($existingId) {
+                $stmt = $pdo->prepare("UPDATE beneficiary_documents SET status = :status_update WHERE doc_id = :id");
+                $stmt->execute(['status_update' => $status, 'id' => $existingId]);
+                $logId = $existingId;
+            } else {
+                $stmt = $pdo->prepare("
+                    INSERT INTO beneficiary_documents (beneficiary_id, document_name, status)
+                    VALUES (:beneficiary_id, :doc_name, :status)
+                    RETURNING doc_id
+                ");
+                $stmt->execute([
+                    'beneficiary_id' => $beneficiaryId,
+                    'doc_name' => $docName,
+                    'status' => $status
+                ]);
                 $logId = $stmt->fetchColumn();
             }
 

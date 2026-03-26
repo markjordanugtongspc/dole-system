@@ -742,7 +742,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <!-- Right Side Grid: Copyright -->
                         <div class="text-right group/copy cursor-default">
                             <p class="text-[7.5px] sm:text-[8px] font-bold uppercase tracking-widest whitespace-nowrap text-slate-400 group-hover/copy:text-black dark:text-slate-300 dark:group-hover/copy:text-white transition-colors duration-300">
-                                © <span class="auto-year">2026</span> DOLE-LDNPFO | GIP SYSTEM V4.1
+                                © <span class="auto-year">2026</span> DOLE-LDNPFO | GIP SYSTEM V<?php echo htmlspecialchars(env('APP_VERSION', '4.2')); ?>
                             </p>
                         </div>
                     </div>

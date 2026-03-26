@@ -20,7 +20,7 @@ try {
     $name = trim($data['name']);
     
     // We check for exact match or very close match
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM beneficiaries WHERE full_name = :name AND is_archived = 0");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM beneficiaries WHERE full_name = :name AND is_archived = FALSE");
     $stmt->execute(['name' => $name]);
     $count = $stmt->fetchColumn();
 

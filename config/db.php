@@ -42,19 +42,42 @@ function loadEnv($path)
     }
 }
 
-// Load .env file from config directory if it exists
+// Load environment files from config directory.
+// Priority:
+// - Always load `.env` if present (local defaults)
+// - If APP_ENV === production (from OS env or loaded `.env`), then load `.env.production` to override
 $envPath = __DIR__ . '/.env';
+$envPathProduction = __DIR__ . '/.env.production';
+
+$loadedBase = false;
 if (file_exists($envPath)) {
     try {
         loadEnv($envPath);
+        $loadedBase = true;
     } catch (Exception $e) {
-        // Log error locally if .env is corrupted, but don't halt here
+        error_log("Environment Error: " . $e->getMessage());
+    }
+}
+
+$requestedAppEnv = getenv('APP_ENV') ?: ($_SERVER['APP_ENV'] ?? ($_ENV['APP_ENV'] ?? null));
+if ($requestedAppEnv === 'production' && file_exists($envPathProduction)) {
+    try {
+        loadEnv($envPathProduction);
+    } catch (Exception $e) {
+        error_log("Environment Error: " . $e->getMessage());
+    }
+} elseif (!$loadedBase && file_exists($envPathProduction)) {
+    // If `.env` is missing, still load production config when available.
+    try {
+        loadEnv($envPathProduction);
+    } catch (Exception $e) {
         error_log("Environment Error: " . $e->getMessage());
     }
 }
 
 // Database configuration from environment variables
 $dbConfig = [
+    'driver'    => env('DB_CONNECTION', 'mysql'),
     'host'      => env('DB_HOST'),
     'port'      => env('DB_PORT', '3306'),
     'database'  => env('DB_DATABASE'),
@@ -77,24 +100,47 @@ function getDbConnection()
     if ($pdo === null) {
         global $dbConfig;
 
-        $dsn = sprintf(
-            "mysql:host=%s;port=%s;dbname=%s;charset=%s",
-            $dbConfig['host'],
-            $dbConfig['port'],
-            $dbConfig['database'],
-            $dbConfig['charset']
-        );
+        if ($dbConfig['driver'] === 'pgsql') {
+            // Supabase requires SSL for most direct Postgres connections.
+            // Keeping it configurable, but defaulting to `require`.
+            $sslMode = env('DB_SSLMODE', 'require');
+            $dsn = sprintf(
+                "pgsql:host=%s;port=%s;dbname=%s;sslmode=%s",
+                $dbConfig['host'],
+                $dbConfig['port'],
+                $dbConfig['database'],
+                $sslMode
+            );
 
-        $options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-            PDO::ATTR_TIMEOUT => 5, // 5 seconds timeout
-            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$dbConfig['charset']} COLLATE {$dbConfig['collation']}",
-        ];
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_TIMEOUT => 5,
+            ];
+        } else {
+            $dsn = sprintf(
+                "mysql:host=%s;port=%s;dbname=%s;charset=%s",
+                $dbConfig['host'],
+                $dbConfig['port'],
+                $dbConfig['database'],
+                $dbConfig['charset']
+            );
+
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_TIMEOUT => 5, // 5 seconds timeout
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$dbConfig['charset']} COLLATE {$dbConfig['collation']}",
+            ];
+        }
 
         try {
             $pdo = new PDO($dsn, $dbConfig['username'], $dbConfig['password'], $options);
+            if ($dbConfig['driver'] === 'pgsql') {
+                $pdo->exec("SET client_encoding TO 'UTF8'");
+            }
         } catch (PDOException $e) {
             // Log error (in production, log to file instead of displaying)
             error_log("Database Connection Error: " . $e->getMessage());
@@ -131,10 +177,13 @@ function testDbConnection()
  */
 function env($key, $default = null)
 {
-    if (isset($_ENV[$key])) return $_ENV[$key];
-    if (isset($_SERVER[$key])) return $_SERVER[$key];
+    // Prefer loaded .env values, but don't treat empty string as a valid override.
+    if (isset($_ENV[$key]) && $_ENV[$key] !== '') return $_ENV[$key];
+    if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') return $_SERVER[$key];
+
+    // Fallback to OS environment variables (e.g. in hosting / local process env)
     $val = getenv($key);
-    if ($val !== false) return $val;
+    if ($val !== false && $val !== '') return $val;
     return $default;
 }
 
@@ -166,7 +215,8 @@ function handleCors()
     }
 
     header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+    // Must include X-User-Id because apiRequest() injects it for auth-less PHP sessions.
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-User-Id');
     header('Access-Control-Allow-Credentials: true');
 
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

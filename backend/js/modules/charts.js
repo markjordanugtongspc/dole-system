@@ -39,6 +39,36 @@ let cachedRawData = null;
 let currentWorkforceFilter = 'ALL';
 let currentWorkforceLabel = 'Overall Stats';
 
+/**
+ * Parse Postgres/PHP date strings coming from the backend.
+ * Returns `Date` or `null` (if the string can't be parsed).
+ */
+function parseChartDate(value) {
+    if (!value) return null;
+    if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+    if (typeof value !== 'string') return null;
+
+    const v = value.trim();
+    if (!v) return null;
+
+    // "YYYY-MM-DD" -> local midnight
+    if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+        const d = new Date(`${v}T00:00:00`);
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    // "YYYY-MM-DD HH:MM:SS(.sss)?" -> ISO-like
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(v)) {
+        const fixed = v.replace(' ', 'T');
+        const d = new Date(fixed);
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    // Fallback (ISO and other browser-friendly strings)
+    const d = new Date(v);
+    return isNaN(d.getTime()) ? null : d;
+}
+
 // --- Performance Target Config ---
 const MUNICIPALITY_TARGETS = {
     'ILIGAN': 120,
@@ -58,8 +88,12 @@ const MUNICIPALITY_TARGETS = {
 /**
  * Initialize all dashboard charts
  */
-export async function initCharts() {
+export async function initCharts(forceRefresh = false) {
     let rawData = [];
+
+    if (forceRefresh) {
+        cachedRawData = null;
+    }
 
     if (cachedRawData) {
         rawData = cachedRawData;
@@ -91,8 +125,10 @@ export async function initCharts() {
 
     // --- 1. DYNAMIC YEAR DETECTION & DROPDOWN POPULATION ---
     const availableYears = [...new Set(rawData.map(b => {
-        const d = b.startDate || b.createdAt;
-        return d ? new Date(d).getFullYear().toString() : null;
+        // Use createdAt primarily because it is consistently present in your API select.
+        const rawDateStr = b.createdAt || b.startDate;
+        const date = parseChartDate(rawDateStr);
+        return date ? date.getFullYear().toString() : null;
     }).filter(y => y))].sort((a, b) => b - a);
     populateWorkforceDropdown(availableYears);
 
@@ -127,14 +163,18 @@ export async function initCharts() {
     timelineLabels.forEach(label => aggregated[label] = 0);
 
     rawData.forEach(b => {
-        const rawDateStr = b.startDate || b.createdAt;
+        const rawDateStr = b.createdAt || b.startDate;
         if (rawDateStr) {
-            const date = new Date(rawDateStr);
+            const date = parseChartDate(rawDateStr);
+            if (!date) return; // Skip invalid dates
+
             const yearStr = date.getFullYear().toString();
-            const dateStr = (typeof rawDateStr === 'string' && rawDateStr.includes('T')) ? rawDateStr.split('T')[0] : date.toISOString().split('T')[0];
+            const dateStr = date.toISOString().split('T')[0];
 
             if (currentWorkforceFilter === 'ALL') {
-                if (aggregated.hasOwnProperty(yearStr)) aggregated[yearStr]++;
+                if (aggregated.hasOwnProperty(yearStr)) {
+                    aggregated[yearStr]++;
+                }
             } else if (currentWorkforceFilter.includes('D')) {
                 if (aggregated.hasOwnProperty(dateStr)) aggregated[dateStr]++;
             } else if (yearStr === currentWorkforceFilter) {
@@ -145,7 +185,7 @@ export async function initCharts() {
     });
 
     const additionData = Object.values(aggregated);
-    const totalAdded = additionData.reduce((a, b) => a + b, 0);
+    const totalAdded = currentWorkforceFilter === 'ALL' ? rawData.length : additionData.reduce((a, b) => a + b, 0);
     const currentVal = additionData[additionData.length - 1] || 0;
     const prevVal = additionData[additionData.length - 2] || 0;
 
@@ -643,8 +683,13 @@ export function updateWorkforceFilter(filter, label) {
 
 window.updateWorkforceFilter = updateWorkforceFilter;
 
-// --- Auto-Reload on Theme Change ---
+// --- Auto-Reload on Theme Change or Data Sync ---
 document.addEventListener('themeChanged', () => {
     // Small delay to ensure Tailwind classes are fully applied
     setTimeout(() => initCharts(), 50);
+});
+
+window.addEventListener('dataSynced', () => {
+    console.log('[Charts] Data synced detected, refreshing analytics...');
+    initCharts(true); // Force refresh from remote
 });

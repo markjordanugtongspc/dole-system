@@ -99,22 +99,22 @@ if ($method === 'GET') {
                     b.contact_number as contact,
                     b.address,
                     b.birthday,
-                    COALESCE(b.age, TIMESTAMPDIFF(YEAR, b.birthday, CURDATE())) as age,
+                    COALESCE(b.age, EXTRACT(YEAR FROM AGE(CURRENT_DATE, b.birthday))) as age,
                     g.gender_name as gender,
                     b.education,
                     b.start_date as startDate,
                     b.end_date as endDate,
-                    DATE_FORMAT(b.start_date, '%b %d, %Y') as startDateFormatted,
-                    DATE_FORMAT(b.end_date, '%b %d, %Y') as endDateFormatted,
+                    TO_CHAR(b.start_date, 'Mon DD, YYYY') as startDateFormatted,
+                    TO_CHAR(b.end_date, 'Mon DD, YYYY') as endDateFormatted,
                     b.series_number as seriesNo,
                     COALESCE(o.office_name, b.office_name) as office,
                     b.designation,
                     b.replacement_notes as replacement,
                     s.status_name as remarks,
                     al.absorption_datetime as absorbDate,
-                    al.where as absorb_where,
-                    al.position as absorb_position,
-                    al.agency as absorb_agency,
+                    al.\"where\" as absorb_where,
+                    al.\"position\" as absorb_position,
+                    al.\"agency\" as absorb_agency,
                     u.username as absorb_by,
                     b.is_archived as isArchived,
                     b.created_at as createdAt,
@@ -155,22 +155,22 @@ if ($method === 'GET') {
                     b.contact_number as contact,
                     b.address,
                     b.birthday,
-                    COALESCE(b.age, TIMESTAMPDIFF(YEAR, b.birthday, CURDATE())) as age,
+                    COALESCE(b.age, EXTRACT(YEAR FROM AGE(CURRENT_DATE, b.birthday))) as age,
                     g.gender_name as gender,
                     b.education,
                     b.start_date as startDate,
                     b.end_date as endDate,
-                    DATE_FORMAT(b.start_date, '%b %d, %Y') as startDateFormatted,
-                    DATE_FORMAT(b.end_date, '%b %d, %Y') as endDateFormatted,
+                    TO_CHAR(b.start_date, 'Mon DD, YYYY') as startDateFormatted,
+                    TO_CHAR(b.end_date, 'Mon DD, YYYY') as endDateFormatted,
                     b.series_number as seriesNo,
                     COALESCE(o.office_name, b.office_name) as office,
                     b.designation,
                     b.replacement_notes as replacement,
                     s.status_name as remarks,
                     al.absorption_datetime as absorbDate,
-                    al.where as absorb_where,
-                    al.position as absorb_position,
-                    al.agency as absorb_agency,
+                    al.\"where\" as absorb_where,
+                    al.\"position\" as absorb_position,
+                    al.\"agency\" as absorb_agency,
                     u.username as absorb_by,
                     b.is_archived as isArchived,
                     b.created_at as createdAt
@@ -198,6 +198,12 @@ if ($method === 'GET') {
  * POST: Create new beneficiary
  */ elseif ($method === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
+    
+    if (!$data) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Invalid JSON']);
+        exit();
+    }
 
     // Validate required fields (ONLY name is now strictly required as per user's request)
     $required = ['name'];
@@ -240,8 +246,9 @@ if ($method === 'GET') {
         if (!empty($data['remarks']) && $data['remarks'] === 'ABSORBED') {
             $absorbDate = !empty($data['absorbDate']) ? date('Y-m-d H:i:s', strtotime($data['absorbDate'])) : date('Y-m-d H:i:s');
             $stmt = $pdo->prepare("
-                INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, `where`, `position`, `agency`, logged_by)
+                INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, \"where\", \"position\", \"agency\", logged_by)
                 VALUES (NULL, :absorbDate, :where, :position, :agency, :logged_by)
+                RETURNING log_id
             ");
             $stmt->execute([
                 'absorbDate' => $absorbDate,
@@ -250,7 +257,7 @@ if ($method === 'GET') {
                 'agency' => $data['absorb_agency'] ?? null,
                 'logged_by' => $current_user_id
             ]);
-            $absorptionLogId = $pdo->lastInsertId();
+            $absorptionLogId = $stmt->fetchColumn();
         }
 
         // Generate GIP ID if not provided
@@ -268,7 +275,7 @@ if ($method === 'GET') {
             }
         }
 
-        // Insert beneficiary
+        // Insert beneficiary with RETURNING beneficiary_id
         $stmt = $pdo->prepare("
             INSERT INTO beneficiaries (
                 gip_id, full_name, contact_number, address, birthday, age,
@@ -278,7 +285,7 @@ if ($method === 'GET') {
                 :gip_id, :name, :contact, :address, :birthday, :age,
                 :gender_id, :education, :start_date, :end_date, :series_no,
                 :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id
-            )
+            ) RETURNING beneficiary_id
         ");
 
         $stmt->execute([
@@ -290,8 +297,8 @@ if ($method === 'GET') {
             'age' => !empty($data['age']) ? intval($data['age']) : null,
             'gender_id' => $genderId,
             'education' => $data['education'] ?? null,
-            'start_date' => $data['startDate'],
-            'end_date' => $data['endDate'],
+            'start_date' => !empty($data['startDate']) ? $data['startDate'] : null,
+            'end_date' => !empty($data['endDate']) ? $data['endDate'] : null,
             'series_no' => $data['seriesNo'] ?? null,
             'office_id' => $officeId,
             'office_name' => $data['office'] ?? null,
@@ -303,15 +310,16 @@ if ($method === 'GET') {
 
         // Update absorption log with beneficiary_id
         if ($absorptionLogId) {
-            $beneficiaryId = $pdo->lastInsertId();
+            $beneficiaryId = $stmt->fetchColumn();
             $stmt = $pdo->prepare("UPDATE absorption_logs SET beneficiary_id = :bid WHERE log_id = :lid");
             $stmt->execute(['bid' => $beneficiaryId, 'lid' => $absorptionLogId]);
         }
 
         echo json_encode(['success' => true, 'message' => 'Beneficiary created successfully', 'id' => $gipId]);
-    } catch (PDOException $e) {
+    } catch (Throwable $e) {
+        error_log("POST EXCEPTION: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
         http_response_code(500);
-        echo json_encode(['success' => false, 'error' => 'Failed to create beneficiary: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'error' => 'Failed to process request: ' . $e->getMessage()]);
     }
 }
 
@@ -368,8 +376,9 @@ if ($method === 'GET') {
                 $beneficiaryId = $stmt->fetchColumn();
 
                 $stmt = $pdo->prepare("
-                    INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, `where`, `position`, `agency`, logged_by)
+                    INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, \"where\", \"position\", \"agency\", logged_by)
                     VALUES (:bid, :absorbDate, :where, :position, :agency, :logged_by)
+                    RETURNING log_id
                 ");
                 $stmt->execute([
                     'bid' => $beneficiaryId,
@@ -379,14 +388,14 @@ if ($method === 'GET') {
                     'agency' => $data['absorb_agency'] ?? null,
                     'logged_by' => $current_user_id
                 ]);
-                $absorptionLogId = $pdo->lastInsertId();
+                $absorptionLogId = $stmt->fetchColumn();
             } else {
                 // Update existing absorption log
                 $stmt = $pdo->prepare("
                     UPDATE absorption_logs SET 
-                        `where` = :where, 
-                        `position` = :position, 
-                        `agency` = :agency,
+                        \"where\" = :where, 
+                        \"position\" = :position, 
+                        \"agency\" = :agency,
                         logged_by = :logged_by
                     WHERE log_id = :log_id
                 ");
@@ -434,8 +443,8 @@ if ($method === 'GET') {
             'age' => !empty($data['age']) ? intval($data['age']) : null,
             'gender_id' => $genderId,
             'education' => $data['education'] ?? null,
-            'start_date' => $data['startDate'],
-            'end_date' => $data['endDate'],
+            'start_date' => !empty($data['startDate']) ? $data['startDate'] : null,
+            'end_date' => !empty($data['endDate']) ? $data['endDate'] : null,
             'series_no' => $data['seriesNo'] ?? null,
             'office_id' => $officeId,
             'office_name' => $data['office'] ?? null,

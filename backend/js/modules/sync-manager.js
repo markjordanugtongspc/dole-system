@@ -168,10 +168,17 @@ async function pushToRemote(item) {
     }
 
     const response = await fetch(finalUrl, opts);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    let result;
+    try {
+        result = await response.json();
+    } catch (e) {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        throw new Error('Invalid JSON response');
+    }
 
-    const result = await response.json();
-    if (!result.success) throw new Error(result.error || 'API returned failure');
+    if (!response.ok || !result.success) {
+        throw new Error(result.error || `HTTP ${response.status}`);
+    }
 
     return true;
 }
@@ -227,6 +234,11 @@ export async function processQueue() {
     }
 
     console.log(`[Sync] Batch complete. ✓ ${successCount} synced, ✗ ${failCount} failed. ${remaining} remaining.`);
+
+    // If any items were successfully pushed, notify other modules to refresh data
+    if (successCount > 0) {
+        window.dispatchEvent(new CustomEvent('dataSynced', { detail: { count: successCount } }));
+    }
 }
 
 // ─── BACKGROUND SYNC LOOP ───────────────────────────────────────────────────

@@ -75,7 +75,7 @@
     <!-- Original Footer - Fixed within margin space -->
     <footer class="text-center border-t border-gray-100 pt-3 pb-4 bg-white/95 backdrop-blur-sm z-20">
         <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest flex items-center justify-center gap-1">
-            &copy; <span class="auto-year"></span> System
+            &copy; <span class="auto-year"></span> System V<?php echo htmlspecialchars(env('APP_VERSION', '4.2')); ?>
             <span class="opacity-50">Developed by</span>
             <span class="text-royal-blue/60 font-black">Mark Jordan Ugtong</span>
             <span class="mx-1 text-gray-200">|</span>
