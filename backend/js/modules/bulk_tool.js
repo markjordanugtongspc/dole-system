@@ -2,6 +2,7 @@ import { isDarkMode } from './darkmode.js';
 import { showAddDataModal } from './modal.js';
 import { getBasePath } from './auth.js';
 import Swal from 'sweetalert2';
+import { apiGet } from './ajax-manager.js';
 
 export const BulkApp = {
     queue: [],
@@ -350,6 +351,24 @@ export const BulkApp = {
                 // AUTO-SAVE MODE: Directly call the API without showing modal
                 if (window.addBeneficiaryData) {
                     (async () => {
+                        // Ensure ROX ID + Series No are generated before saving (no temp IDs).
+                        try {
+                            const year = data.startDate ? new Date(data.startDate).getFullYear() : new Date().getFullYear();
+                            const [idRes, seriesRes] = await Promise.all([
+                                apiGet(`api/beneficiaries.php?next_id&year=${year}`),
+                                apiGet(`api/beneficiaries.php?next_series_no&year=${year}`),
+                            ]);
+                            if (idRes.success && idRes.data?.success && idRes.data?.nextId) {
+                                data.gip_id = idRes.data.nextId;
+                                data.id = null; // force POST branch in ldngip.js
+                            }
+                            if (seriesRes.success && seriesRes.data?.success && seriesRes.data?.nextSeries) {
+                                data.seriesNo = seriesRes.data.nextSeries;
+                            }
+                        } catch (e) {
+                            console.warn('[Bulk Add] Identifier fetch failed, continuing:', e?.message || e);
+                        }
+
                         const success = await window.addBeneficiaryData(data);
                         if (this.isActive) { // Check if still active (not cancelled during fetch)
                             if (success) {

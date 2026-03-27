@@ -6,6 +6,7 @@
 
 import { getBasePath } from './auth.js';
 import Swal from 'sweetalert2';
+import { logger } from './logger.js';
 
 /**
  * Generic fetch wrapper with error handling
@@ -34,6 +35,15 @@ export async function apiRequest(endpoint, options = {}) {
     };
 
     try {
+        logger.debug('[API] Request', { url, method: defaultOptions.method || 'GET', hasUserId: Boolean(userId) });
+        if (defaultOptions.body) {
+            try {
+                logger.json('[API] Payload', JSON.parse(defaultOptions.body));
+            } catch {
+                logger.debug('[API] Payload (raw)', defaultOptions.body);
+            }
+        }
+
         const response = await fetch(url, defaultOptions);
 
         if (!response.ok) {
@@ -41,9 +51,10 @@ export async function apiRequest(endpoint, options = {}) {
         }
 
         const data = await response.json();
+        logger.debug('[API] Response', { url, ok: true });
         return { success: true, data };
     } catch (error) {
-        console.error('API Request Error:', error);
+        logger.error('API Request Error:', error);
         return { success: false, error: error.message };
     }
 }

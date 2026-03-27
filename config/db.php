@@ -43,10 +43,13 @@ function loadEnv($path)
 }
 
 // Load environment files from config directory.
-// Priority:
-// - Always load `.env` if present (local defaults)
-// - If APP_ENV === production (from OS env or loaded `.env`), then load `.env.production` to override
+// Hybrid lock/key priority:
+// 1) Always load `.env` first (acts as LOCK/controller)
+// 2) If ENV_KEY=localhost -> load `.env.example` (local MySQL key)
+// 3) If ENV_KEY=production -> load `.env.production` (Supabase key)
+// 4) Fallback: APP_ENV=production -> load `.env.production`
 $envPath = __DIR__ . '/.env';
+$envPathExample = __DIR__ . '/.env.example';
 $envPathProduction = __DIR__ . '/.env.production';
 
 $loadedBase = false;
@@ -59,14 +62,33 @@ if (file_exists($envPath)) {
     }
 }
 
-$requestedAppEnv = getenv('APP_ENV') ?: ($_SERVER['APP_ENV'] ?? ($_ENV['APP_ENV'] ?? null));
-if ($requestedAppEnv === 'production' && file_exists($envPathProduction)) {
+$requestedEnvKey = getenv('ENV_KEY') ?: ($_SERVER['ENV_KEY'] ?? ($_ENV['ENV_KEY'] ?? null));
+$requestedEnvKey = $requestedEnvKey ? strtolower(trim((string)$requestedEnvKey)) : null;
+
+if ($requestedEnvKey === 'localhost' && file_exists($envPathExample)) {
+    try {
+        loadEnv($envPathExample);
+    } catch (Exception $e) {
+        error_log("Environment Error: " . $e->getMessage());
+    }
+} elseif ($requestedEnvKey === 'production' && file_exists($envPathProduction)) {
     try {
         loadEnv($envPathProduction);
     } catch (Exception $e) {
         error_log("Environment Error: " . $e->getMessage());
     }
-} elseif (!$loadedBase && file_exists($envPathProduction)) {
+} else {
+    $requestedAppEnv = getenv('APP_ENV') ?: ($_SERVER['APP_ENV'] ?? ($_ENV['APP_ENV'] ?? null));
+    if ($requestedAppEnv === 'production' && file_exists($envPathProduction)) {
+        try {
+            loadEnv($envPathProduction);
+        } catch (Exception $e) {
+            error_log("Environment Error: " . $e->getMessage());
+        }
+    }
+}
+
+if (!$loadedBase && file_exists($envPathProduction)) {
     // If `.env` is missing, still load production config when available.
     try {
         loadEnv($envPathProduction);
@@ -86,6 +108,51 @@ $dbConfig = [
     'charset'   => 'utf8mb4',
     'collation' => 'utf8mb4_unicode_ci',
 ];
+
+/**
+ * Hybrid mode flag:
+ * - USE_SUPABASE=true  -> force PostgreSQL/Supabase branch
+ * - USE_SUPABASE=false -> force local MySQL branch
+ * - if not set, infer from DB_CONNECTION
+ */
+function useSupabase()
+{
+    $raw = env('USE_SUPABASE', null);
+    if ($raw !== null) {
+        $normalized = strtolower(trim((string)$raw));
+        return in_array($normalized, ['1', 'true', 'yes', 'on'], true);
+    }
+    return env('DB_CONNECTION', 'mysql') === 'pgsql';
+}
+
+function isMysqlMode()
+{
+    return !useSupabase();
+}
+
+/**
+ * Debug logging controlled by DEBUG_MODE=true/false in env.
+ * Writes to PHP error_log (visible in server logs / Vercel logs).
+ */
+function debugModeEnabled()
+{
+    $raw = env('DEBUG_MODE', null);
+    if ($raw === null) return false;
+    $normalized = strtolower(trim((string)$raw));
+    return in_array($normalized, ['1', 'true', 'yes', 'on'], true);
+}
+
+function debugLog($label, $data = null)
+{
+    if (!debugModeEnabled()) return;
+    $payload = [
+        'label' => $label,
+        'use_supabase' => useSupabase(),
+        'time' => date('c'),
+        'data' => $data,
+    ];
+    error_log('[DOLE_DEBUG] ' . json_encode($payload));
+}
 
 /**
  * Get PDO Database Connection (Singleton Pattern)

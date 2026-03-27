@@ -99,7 +99,8 @@ export async function initCharts(forceRefresh = false) {
         rawData = cachedRawData;
     } else {
         try {
-            const response = await fetch(`${getBasePath()}api/beneficiaries.php`);
+            // Dashboard analytics should reflect total records, not just non-archived.
+            const response = await fetch(`${getBasePath()}api/beneficiaries.php?all=true`);
             const result = await response.json();
             if (result.success) {
                 rawData = result.beneficiaries || [];

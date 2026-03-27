@@ -1214,6 +1214,7 @@ export function showAddDataModal(data = null) {
                 const input = popup.querySelector(`#${inputId}`);
                 const container = popup.querySelector(`#${containerId}`);
                 if (!input || !container) return;
+                let suppressInputOpen = false;
 
                 input.addEventListener('focus', () => container.classList.remove('hidden'));
 
@@ -1225,6 +1226,10 @@ export function showAddDataModal(data = null) {
                 });
 
                 input.addEventListener('input', () => {
+                    if (suppressInputOpen) {
+                        suppressInputOpen = false;
+                        return;
+                    }
                     const filter = input.value.toLowerCase();
                     const options = container.querySelectorAll(`.${optionClass}`);
                     let hasVisible = false;
@@ -1247,10 +1252,10 @@ export function showAddDataModal(data = null) {
                     opt.addEventListener('click', () => {
                         const txtElem = opt.querySelector('.option-text');
                         input.value = txtElem ? txtElem.innerText.trim() : opt.innerText.trim();
+                        suppressInputOpen = true;
                         container.classList.add('hidden');
                         // Trigger change event for auto-save
                         input.dispatchEvent(new Event('change'));
-                        input.dispatchEvent(new Event('input'));
                     });
                 });
             }

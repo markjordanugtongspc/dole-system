@@ -10,6 +10,7 @@ header('Content-Type: application/json');
 
 try {
     $pdo = getDbConnection();
+    $isSupabase = useSupabase();
     $data = json_decode(file_get_contents('php://input'), true);
 
     if (empty($data['name'])) {
@@ -18,9 +19,14 @@ try {
     }
 
     $name = trim($data['name']);
+    debugLog('check_duplicate', ['name' => $name]);
     
     // We check for exact match or very close match
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM beneficiaries WHERE full_name = :name AND is_archived = FALSE");
+    $stmt = $pdo->prepare(
+        $isSupabase
+            ? "SELECT COUNT(*) FROM beneficiaries WHERE full_name = :name AND is_archived = FALSE"
+            : "SELECT COUNT(*) FROM beneficiaries WHERE full_name = :name AND is_archived = 0"
+    );
     $stmt->execute(['name' => $name]);
     $count = $stmt->fetchColumn();
 
