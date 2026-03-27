@@ -10,6 +10,33 @@ header('Content-Type: application/json');
 
 // Quick Database Connectivity Test
 if (isset($_GET['db_test'])) {
+    $dbPasswordRaw = (string) env('DB_PASSWORD', '');
+    $databaseUrlRaw = (string) (env('DATABASE_URL', '') ?: env('POSTGRES_URL', ''));
+    $passwordPlaceholders = [
+        'your_supabase_db_password',
+        'YOUR-PASSWORD',
+        'your_password',
+        'password',
+        'changeme',
+    ];
+
+    $passwordLooksPlaceholder = false;
+    foreach ($passwordPlaceholders as $placeholder) {
+        if (strcasecmp(trim($dbPasswordRaw), $placeholder) === 0) {
+            $passwordLooksPlaceholder = true;
+            break;
+        }
+    }
+
+    $urlLooksPlaceholder = false;
+    if (!empty($databaseUrlRaw)) {
+        $urlLower = strtolower($databaseUrlRaw);
+        $urlLooksPlaceholder = strpos($urlLower, '[your-password]') !== false
+            || strpos($urlLower, 'your-password') !== false
+            || strpos($urlLower, 'your_supabase_db_password') !== false
+            || strpos($urlLower, 'example') !== false;
+    }
+
     $diagnostics = [
         'app_env' => env('APP_ENV', 'unknown'),
         'env_key' => env('ENV_KEY', 'unset'),
@@ -20,7 +47,10 @@ if (isset($_GET['db_test'])) {
         'db_database_set' => !empty(env('DB_DATABASE', '')),
         'db_username_set' => !empty(env('DB_USERNAME', '')),
         'db_password_set' => !empty(env('DB_PASSWORD', '')),
+        'db_password_len' => strlen($dbPasswordRaw),
+        'db_password_looks_placeholder' => $passwordLooksPlaceholder,
         'database_url_set' => !empty(env('DATABASE_URL', '')) || !empty(env('POSTGRES_URL', '')),
+        'database_url_looks_placeholder' => $urlLooksPlaceholder,
         'db_sslmode' => env('DB_SSLMODE', 'unset'),
         'pdo_pgsql_loaded' => extension_loaded('pdo_pgsql'),
         'pdo_mysql_loaded' => extension_loaded('pdo_mysql'),
