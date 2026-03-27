@@ -104,6 +104,50 @@ if (!$loadedBase && file_exists($envPathProduction)) {
     }
 }
 
+// Optional: support platform-style Postgres URLs (e.g. Vercel DATABASE_URL/POSTGRES_URL).
+// This helps when DB_* vars are not individually defined in hosting.
+$postgresUrl = env('DATABASE_URL', null)
+    ?? env('POSTGRES_URL', null)
+    ?? env('POSTGRES_PRISMA_URL', null)
+    ?? env('SUPABASE_DB_URL', null);
+
+if (!empty($postgresUrl) && is_string($postgresUrl)) {
+    $parsed = parse_url($postgresUrl);
+    $scheme = strtolower((string)($parsed['scheme'] ?? ''));
+    if (in_array($scheme, ['postgres', 'postgresql', 'pgsql'], true)) {
+        $query = [];
+        if (!empty($parsed['query'])) {
+            parse_str($parsed['query'], $query);
+        }
+
+        // Prefer URL values when DB_* are missing or still placeholder-like.
+        $currentPassword = env('DB_PASSWORD', '');
+        $shouldApplyUrl = empty(env('DB_HOST', null))
+            || $currentPassword === 'your_supabase_db_password'
+            || $currentPassword === 'YOUR-PASSWORD';
+
+        if ($shouldApplyUrl) {
+            $_ENV['DB_CONNECTION'] = 'pgsql';
+            $_ENV['USE_SUPABASE'] = 'true';
+            $_ENV['DB_HOST'] = $parsed['host'] ?? ($_ENV['DB_HOST'] ?? '');
+            $_ENV['DB_PORT'] = isset($parsed['port']) ? (string)$parsed['port'] : ($_ENV['DB_PORT'] ?? '5432');
+            $_ENV['DB_DATABASE'] = isset($parsed['path']) ? ltrim($parsed['path'], '/') : ($_ENV['DB_DATABASE'] ?? '');
+            $_ENV['DB_USERNAME'] = $parsed['user'] ?? ($_ENV['DB_USERNAME'] ?? '');
+            $_ENV['DB_PASSWORD'] = $parsed['pass'] ?? ($_ENV['DB_PASSWORD'] ?? '');
+            $_ENV['DB_SSLMODE'] = $query['sslmode'] ?? env('DB_SSLMODE', 'require');
+
+            putenv('DB_CONNECTION=pgsql');
+            putenv('USE_SUPABASE=true');
+            putenv('DB_HOST=' . $_ENV['DB_HOST']);
+            putenv('DB_PORT=' . $_ENV['DB_PORT']);
+            putenv('DB_DATABASE=' . $_ENV['DB_DATABASE']);
+            putenv('DB_USERNAME=' . $_ENV['DB_USERNAME']);
+            putenv('DB_PASSWORD=' . $_ENV['DB_PASSWORD']);
+            putenv('DB_SSLMODE=' . $_ENV['DB_SSLMODE']);
+        }
+    }
+}
+
 // Database configuration from environment variables
 $dbConfig = [
     'driver'    => env('DB_CONNECTION', 'mysql'),

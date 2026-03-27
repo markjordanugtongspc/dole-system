@@ -10,13 +10,46 @@ header('Content-Type: application/json');
 
 // Quick Database Connectivity Test
 if (isset($_GET['db_test'])) {
+    $diagnostics = [
+        'app_env' => env('APP_ENV', 'unknown'),
+        'env_key' => env('ENV_KEY', 'unset'),
+        'db_connection' => env('DB_CONNECTION', 'unset'),
+        'use_supabase' => useSupabase(),
+        'db_host_set' => !empty(env('DB_HOST', '')),
+        'db_port' => env('DB_PORT', 'unset'),
+        'db_database_set' => !empty(env('DB_DATABASE', '')),
+        'db_username_set' => !empty(env('DB_USERNAME', '')),
+        'db_password_set' => !empty(env('DB_PASSWORD', '')),
+        'database_url_set' => !empty(env('DATABASE_URL', '')) || !empty(env('POSTGRES_URL', '')),
+        'db_sslmode' => env('DB_SSLMODE', 'unset'),
+        'pdo_pgsql_loaded' => extension_loaded('pdo_pgsql'),
+        'pdo_mysql_loaded' => extension_loaded('pdo_mysql'),
+    ];
+
+    if (useSupabase() && !$diagnostics['pdo_pgsql_loaded']) {
+        echo json_encode([
+            'success' => false,
+            'error' => 'PDO pgsql driver is not available in current runtime.',
+            'diagnostics' => $diagnostics
+        ]);
+        exit;
+    }
+
     try {
         $pdo = getDbConnection();
-        debugLog('auth.db_test', ['ok' => true]);
-        echo json_encode(['success' => true, 'message' => 'Database connection established!']);
+        debugLog('auth.db_test', ['ok' => true, 'diagnostics' => $diagnostics]);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Database connection established!',
+            'diagnostics' => $diagnostics
+        ]);
     } catch (Exception $e) {
-        debugLog('auth.db_test', ['ok' => false, 'error' => $e->getMessage()]);
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        debugLog('auth.db_test', ['ok' => false, 'error' => $e->getMessage(), 'diagnostics' => $diagnostics]);
+        echo json_encode([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'diagnostics' => $diagnostics
+        ]);
     }
     exit;
 }
