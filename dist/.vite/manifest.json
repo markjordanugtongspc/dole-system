@@ -1,6 +1,6 @@
 {
-  "_auth-DvGebLlv.js": {
-    "file": "assets/auth-DvGebLlv.js",
+  "_auth-NLLIHFTk.js": {
+    "file": "assets/auth-NLLIHFTk.js",
     "name": "auth",
     "imports": [
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
@@ -19,14 +19,14 @@
     "name": "vendor-charts"
   },
   "backend/js/main.js": {
-    "file": "assets/main-BPJrBked.js",
+    "file": "assets/main-Drx1fmaO.js",
     "name": "main",
     "src": "backend/js/main.js",
     "isEntry": true,
     "imports": [
       "_vendor-DC5wud4b.js",
       "node_modules/flowbite/lib/esm/index.js",
-      "_auth-DvGebLlv.js",
+      "_auth-NLLIHFTk.js",
       "_vendor-charts-BjInCqFR.js",
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
     ],
@@ -35,12 +35,12 @@
     ]
   },
   "backend/js/modules/settings.js": {
-    "file": "assets/settings-BiNf-_JU.js",
+    "file": "assets/settings-C_ib50F_.js",
     "name": "settings",
     "src": "backend/js/modules/settings.js",
     "isEntry": true,
     "imports": [
-      "_auth-DvGebLlv.js",
+      "_auth-NLLIHFTk.js",
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
     ]
   },
@@ -60,7 +60,7 @@
     "isDynamicEntry": true
   },
   "style.css": {
-    "file": "assets/style-BBTG_9Z4.css",
+    "file": "assets/style-BmiSarRR.css",
     "src": "style.css"
   }
 }

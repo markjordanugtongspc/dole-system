@@ -4,23 +4,18 @@
  * DOLE-GIP System
  */
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit;
-}
-
 require_once __DIR__ . '/../config/db.php';
+handleCors();
+header('Content-Type: application/json');
 
 session_start();
 
 // In serverless (Vercel), sessions don't persist between requests.
 // Accept user_id from session (localhost), POST body, GET param, or X-User-Id header.
 $user_id = $_SESSION['user_id'] ?? null;
+$jsonInput = json_decode(file_get_contents('php://input'), true) ?? [];
 
+if (!$user_id && isset($jsonInput['user_id'])) $user_id = $jsonInput['user_id'];
 if (!$user_id && isset($_POST['user_id'])) {
     $user_id = $_POST['user_id'];
 }
@@ -38,9 +33,11 @@ if (!$user_id) {
 
 try {
     $pdo = getDbConnection();
+    debugLog('profile.init', ['method' => $_SERVER['REQUEST_METHOD'] ?? null]);
 
     // GET: Fetch profile
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        debugLog('profile.get', ['user_id' => $user_id]);
         $stmt = $pdo->prepare("SELECT user_id, username, email, full_name, profile_picture_path, bio_graphy, home_address, phone_number, languages, date_of_birth, gender, religion, notifications_enabled FROM users WHERE user_id = ?");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -55,11 +52,14 @@ try {
 
     // POST: Update profile or password
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $request = !empty($_POST) ? $_POST : $jsonInput;
+        debugLog('profile.post', ['user_id' => $user_id, 'action' => $request['action'] ?? 'update_profile']);
+
         // Handle Password Change first if requested
-        if (isset($_POST['action']) && $_POST['action'] === 'change_password') {
-            $currentPassword = $_POST['current_password'] ?? '';
-            $newPassword = $_POST['new_password'] ?? '';
-            $confirmPassword = $_POST['confirm_password'] ?? '';
+        if (isset($request['action']) && $request['action'] === 'change_password') {
+            $currentPassword = $request['current_password'] ?? '';
+            $newPassword = $request['new_password'] ?? '';
+            $confirmPassword = $request['confirm_password'] ?? '';
 
             if ($newPassword !== $confirmPassword) {
                 echo json_encode(['success' => false, 'error' => 'Passwords do not match']);
@@ -83,16 +83,16 @@ try {
         }
 
         // Standard Profile Update
-        $fullName = $_POST['full_name'] ?? '';
-        $bio = $_POST['bio_graphy'] ?? '';
-        $address = $_POST['home_address'] ?? '';
-        $phone = $_POST['phone_number'] ?? '';
-        $languages = $_POST['languages'] ?? '';
-        $dob = $_POST['date_of_birth'] ?? null;
-        $gender = $_POST['gender'] ?? '';
-        $religion = $_POST['religion'] ?? '';
-        $email = $_POST['email'] ?? '';
-        $notifications = isset($_POST['notifications_enabled']) ? (int) $_POST['notifications_enabled'] : 1;
+        $fullName = $request['full_name'] ?? '';
+        $bio = $request['bio_graphy'] ?? '';
+        $address = $request['home_address'] ?? '';
+        $phone = $request['phone_number'] ?? '';
+        $languages = $request['languages'] ?? '';
+        $dob = $request['date_of_birth'] ?? null;
+        $gender = $request['gender'] ?? '';
+        $religion = $request['religion'] ?? '';
+        $email = $request['email'] ?? '';
+        $notifications = isset($request['notifications_enabled']) ? (int) $request['notifications_enabled'] : 1;
 
         $profilePicPath = null;
 

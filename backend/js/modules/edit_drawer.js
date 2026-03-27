@@ -8,6 +8,7 @@ export function showEditBeneficiaryDrawer(data) {
     const dk = isDarkMode();
     const inputClass = `w-full bg-transparent border-b-2 ${dk ? 'border-slate-700 text-white focus:border-brand placeholder-slate-600' : 'border-gray-200 text-gray-900 focus:border-brand placeholder-gray-300'} px-1 py-1 text-sm font-black outline-none transition-all focus:ring-0`;
     const headingInputClass = `w-full bg-transparent border-none ${dk ? 'text-white' : 'text-royal-blue'} px-0 py-0 text-xl sm:text-2xl font-black leading-tight tracking-tight focus:ring-0 outline-none placeholder-gray-300 resize-none overflow-hidden`;
+    const officeDefaults = ['DOLE Field Office', 'LGU', 'DEPED', 'DICT', 'PCA'];
 
     function calculateAge(birthday) {
         if (!birthday) return '';
@@ -20,7 +21,7 @@ export function showEditBeneficiaryDrawer(data) {
     }
 
     const drawerHtml = `
-<form id="edit-beneficiary-drawer-form" class="h-full flex flex-col pt-4 font-montserrat relative pb-20">
+<form id="edit-beneficiary-drawer-form" class="h-full flex flex-col pt-4 font-montserrat relative pb-20 overflow-y-auto">
     <input type="hidden" name="id" value="${data.id}">
     <input type="hidden" name="gip_id" value="${data.id}">
     
@@ -50,21 +51,17 @@ export function showEditBeneficiaryDrawer(data) {
 
     <div class="flex flex-col gap-1 text-left mt-4 mb-4">
         <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ASSIGNED OFFICE</span>
-        <input type="text" name="office" value="${data.office || ''}" list="edit-office-suggestions" 
+        <input type="text" name="office" id="edit-office-input" value="${data.office || ''}" 
             class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-[10px] sm:text-[11px] font-black px-2.5 py-2.5 rounded-lg border border-indigo-200 dark:border-indigo-800/60 uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full placeholder-indigo-300 dark:placeholder-indigo-700"
             placeholder="e.g. DOLE Field Office">
-        <datalist id="edit-office-suggestions">
-            <option value="DOLE Field Office">
-            <option value="LGU">
-            <option value="DEPED">
-            <option value="DICT">
-            <option value="PCA">
-        </datalist>
+        <div id="edit-office-suggestions-box" class="hidden mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+            ${officeDefaults.map(o => `<button type="button" class="edit-office-option w-full text-left px-3 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer"><span class="option-text">${o}</span></button>`).join('')}
+        </div>
     </div>
 
     <h4 class="text-sm font-bold text-heading mt-6 mb-4 pb-2 border-b border-default whitespace-nowrap">Personal Profile</h4>
     
-    <div class="flex flex-col gap-4 text-sm mt-3 px-1">
+    <div class="flex flex-col gap-4 text-sm mt-3 px-1 pb-24">
         <div class="flex justify-between items-center group">
             <span class="text-gray-500 font-medium whitespace-nowrap mr-4 shrink-0">Contact No.</span>
             <input type="text" name="contact" value="${data.contact || ''}" class="${inputClass} text-right font-mono max-w-[200px]" placeholder="09XX-XXX-XXXX">
@@ -82,7 +79,7 @@ export function showEditBeneficiaryDrawer(data) {
         
         <div class="flex justify-between items-center group">
             <span class="text-gray-500 font-medium whitespace-nowrap mr-4 shrink-0">Age</span>
-            <input type="text" name="age" id="edit-age-display" value="${data.age || calculateAge(data.birthday) || ''}" class="${inputClass} text-right max-w-[80px]" readonly placeholder="Auto">
+            <input type="text" name="age" id="edit-age-display" value="${data.age || calculateAge(data.birthday) || ''}" class="${inputClass} text-right max-w-[80px]" placeholder="Auto">
         </div>
         
         <div class="flex justify-between items-center group">
@@ -95,10 +92,10 @@ export function showEditBeneficiaryDrawer(data) {
         
         <div class="flex flex-col gap-2 pt-3 mt-1 border-t border-gray-50 dark:border-slate-800/60">
             <span class="text-gray-500 font-medium whitespace-nowrap">Education</span>
-            <input type="text" name="education" value="${data.education || ''}" list="course-suggestions" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm" placeholder="Course/Level...">
-            <datalist id="course-suggestions">
-                ${COMMON_COURSES.map(c => `<option value="${c.name}"></option>`).join('')}
-            </datalist>
+            <input type="text" name="education" id="edit-education-input" value="${data.education || ''}" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm" placeholder="Course/Level...">
+            <div id="edit-education-suggestions-box" class="hidden mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                ${COMMON_COURSES.map(c => `<button type="button" class="edit-education-option w-full text-left px-3 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer"><span class="option-text">${c.name}</span></button>`).join('')}
+            </div>
         </div>
     </div>
 
@@ -119,10 +116,10 @@ export function showEditBeneficiaryDrawer(data) {
         
         <div class="flex flex-col gap-2">
             <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest pl-1">Designation / Role</span>
-            <input type="text" name="designation" value="${data.designation || ''}" list="work-suggestions" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm" placeholder="Nature of Work...">
-            <datalist id="work-suggestions">
-                ${COMMON_NATURE_OF_WORK.map(w => `<option value="${w}"></option>`).join('')}
-            </datalist>
+            <input type="text" name="designation" id="edit-designation-input" value="${data.designation || ''}" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm" placeholder="Nature of Work...">
+            <div id="edit-designation-suggestions-box" class="hidden mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                ${COMMON_NATURE_OF_WORK.map(w => `<button type="button" class="edit-designation-option w-full text-left px-3 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer"><span class="option-text">${w}</span></button>`).join('')}
+            </div>
         </div>
         
         <div class="flex flex-col gap-2 mt-2 pb-6">
@@ -146,6 +143,14 @@ export function showEditBeneficiaryDrawer(data) {
 #edit-drawer-container::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.05); border-radius: 20px; }
 .dark #edit-drawer-container::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); }
 .text-right-select { text-align-last: right; }
+/* Editable field hint icon (shown only for editable controls) */
+.editable-indicator {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m16.862 3.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L9.582 16.07a4.5 4.5 0 0 1-1.897 1.13L4 18l.8-3.685a4.5 4.5 0 0 1 1.13-1.897L16.862 3.487Z' /%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 14px 14px;
+    background-position: right 0.6rem center;
+    padding-right: 2rem;
+}
 </style>
     `;
 
@@ -176,11 +181,15 @@ export function showEditBeneficiaryDrawer(data) {
         try {
             const res = await apiRequest('api/beneficiaries.php?get_offices=1');
             if (res.success && res.data.offices) {
-                const datalist = drawerContainer.querySelector('#edit-office-suggestions');
-                if (datalist) {
+                const box = drawerContainer.querySelector('#edit-office-suggestions-box');
+                if (box) {
                     const defaultOffices = ['DOLE Field Office', 'LGU', 'DEPED', 'DICT', 'PCA'];
                     const allOffices = [...new Set([...defaultOffices, ...res.data.offices])];
-                    datalist.innerHTML = allOffices.map(o => `<option value="${o}">`).join('');
+                    box.innerHTML = allOffices.map(o => `
+                        <button type="button" class="edit-office-option w-full text-left px-3 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer">
+                            <span class="option-text">${o}</span>
+                        </button>
+                    `).join('');
                 }
             }
         } catch (err) {
@@ -202,18 +211,74 @@ export function showEditBeneficiaryDrawer(data) {
 
         drawerContainer.querySelector('#close-edit-drawer-btn').addEventListener('click', () => drawer.hide());
         drawerContainer.querySelector('#edit-drawer-cancel-btn').addEventListener('click', () => drawer.hide());
+        const form = drawerContainer.querySelector('#edit-beneficiary-drawer-form');
 
         const bdayInput = drawerContainer.querySelector('#edit-bday-input');
         const ageDisplay = drawerContainer.querySelector('#edit-age-display');
+        let ageManuallyEdited = false;
         if (bdayInput && ageDisplay) {
+            ageDisplay.addEventListener('input', () => {
+                ageManuallyEdited = true;
+            });
             bdayInput.addEventListener('change', (e) => {
                 if (e.target.value) {
-                    ageDisplay.value = calculateAge(e.target.value);
+                    // Keep smart auto-calc, but do not override manual age edits.
+                    if (!ageManuallyEdited || !ageDisplay.value) {
+                        ageDisplay.value = calculateAge(e.target.value);
+                    }
                 }
             });
         }
 
-        const form = drawerContainer.querySelector('#edit-beneficiary-drawer-form');
+        // Suggestion dropdown helpers (close immediately after selection)
+        const setupSuggestionBox = (inputSelector, boxSelector, optionSelector) => {
+            const input = drawerContainer.querySelector(inputSelector);
+            const box = drawerContainer.querySelector(boxSelector);
+            if (!input || !box) return;
+
+            const close = () => box.classList.add('hidden');
+            const open = () => box.classList.remove('hidden');
+
+            input.addEventListener('focus', open);
+            input.addEventListener('input', () => {
+                const term = input.value.toLowerCase().trim();
+                let visible = 0;
+                box.querySelectorAll(optionSelector).forEach((opt) => {
+                    const txt = (opt.querySelector('.option-text')?.textContent || opt.textContent || '').toLowerCase();
+                    const match = txt.includes(term);
+                    opt.style.display = match ? 'block' : 'none';
+                    if (match) visible++;
+                });
+                if (visible > 0) open();
+                else close();
+            });
+
+            box.addEventListener('click', (e) => {
+                const opt = e.target.closest(optionSelector);
+                if (!opt) return;
+                input.value = (opt.querySelector('.option-text')?.textContent || opt.textContent || '').trim();
+                close();
+                input.dispatchEvent(new Event('change'));
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && !box.contains(e.target)) close();
+            });
+        };
+
+        setupSuggestionBox('#edit-education-input', '#edit-education-suggestions-box', '.edit-education-option');
+        setupSuggestionBox('#edit-designation-input', '#edit-designation-suggestions-box', '.edit-designation-option');
+        setupSuggestionBox('#edit-office-input', '#edit-office-suggestions-box', '.edit-office-option');
+
+        // Add small pencil hint only to editable controls.
+        form.querySelectorAll('input, select, textarea').forEach((el) => {
+            const type = (el.getAttribute('type') || '').toLowerCase();
+            const isEditable = !el.disabled && !el.readOnly && type !== 'hidden';
+            el.classList.remove('editable-indicator');
+            if (isEditable) {
+                el.classList.add('editable-indicator');
+            }
+        });
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const formData = new FormData(form);

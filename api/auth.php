@@ -4,24 +4,18 @@
  * DOLE-GIP System
  */
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(204);
-    exit;
-}
-
 require_once __DIR__ . '/../config/db.php';
+handleCors();
+header('Content-Type: application/json');
 
 // Quick Database Connectivity Test
 if (isset($_GET['db_test'])) {
     try {
         $pdo = getDbConnection();
+        debugLog('auth.db_test', ['ok' => true]);
         echo json_encode(['success' => true, 'message' => 'Database connection established!']);
     } catch (Exception $e) {
+        debugLog('auth.db_test', ['ok' => false, 'error' => $e->getMessage()]);
         echo json_encode(['success' => false, 'error' => $e->getMessage()]);
     }
     exit;
@@ -40,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         $pdo = getDbConnection();
+        debugLog('auth.login', ['username' => $username]);
         $stmt = $pdo->prepare("SELECT user_id, username, password_hash, full_name, email FROM users WHERE username = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch();

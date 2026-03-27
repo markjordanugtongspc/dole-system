@@ -15,12 +15,15 @@
  */
 
 import { getBasePath } from './auth.js';
+import { logger } from './logger.js';
 import {
     getPendingSyncItems,
     updateSyncStatus,
     dequeueSync,
     getPendingCount,
     getTimeSinceLastSync,
+    upsertLocalBeneficiary,
+    deleteLocalBeneficiary,
 } from './db-manager.js';
 
 const MAX_RETRIES = 3;
@@ -180,7 +183,14 @@ async function pushToRemote(item) {
         throw new Error(result.error || `HTTP ${response.status}`);
     }
 
-    return true;
+    logger.debug('[Sync] Remote ack', {
+        method: item.method,
+        endpoint: item.endpoint,
+        hasUserId: Boolean(userId),
+        finalUrl
+    });
+
+    return result;
 }
 
 /**
@@ -212,7 +222,39 @@ export async function processQueue() {
         }
 
         try {
-            await pushToRemote(item);
+            logger.debug('[Sync] Pushing', {
+                queueId: item.queueId,
+                method: item.method,
+                endpoint: item.endpoint,
+                payloadKeys: item.payload ? Object.keys(item.payload) : []
+            });
+            const remoteResult = await pushToRemote(item);
+
+            // If we POSTed a beneficiary with a temp id, replace local cache key immediately.
+            if (
+                item.method === 'POST' &&
+                item.endpoint === 'api/beneficiaries.php' &&
+                item.payload &&
+                item.payload._tempId &&
+                remoteResult &&
+                remoteResult.success &&
+                remoteResult.id
+            ) {
+                const realId = remoteResult.id;
+                const tempId = item.payload._tempId;
+
+                try {
+                    // Remove temp record and reinsert under real ROX id
+                    await deleteLocalBeneficiary(tempId);
+                    const upgraded = { ...item.payload, id: realId };
+                    delete upgraded._tempId;
+                    await upsertLocalBeneficiary(upgraded);
+                    logger.debug('[Sync] Upgraded temp id', { tempId, realId });
+                } catch (e) {
+                    logger.warn('[Sync] Failed upgrading temp id', e?.message || e);
+                }
+            }
+
             await dequeueSync(item.queueId);
             successCount++;
             console.log(`[Sync] ✓ Pushed ${item.method} ${item.endpoint} (queueId: ${item.queueId})`);

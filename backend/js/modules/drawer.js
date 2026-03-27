@@ -378,8 +378,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     customClass: {
                         container: 'font-montserrat',
                         popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100',
-                        confirmButton: 'bg-brand text-white hover:bg-brand-strong text-xs px-6 py-2.5 rounded-xl border border-transparent shadow-sm mx-2',
-                        cancelButton: 'bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs px-6 py-2.5 rounded-xl border border-gray-200 shadow-sm mx-2'
+                        confirmButton: 'bg-brand text-white hover:bg-brand-strong text-xs px-6 py-2.5 rounded-xl border border-transparent shadow-sm mx-2 cursor-pointer',
+                        cancelButton: 'bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs px-6 py-2.5 rounded-xl border border-gray-200 shadow-sm mx-2 cursor-pointer'
                     },
                     buttonsStyling: false,
                     preConfirm: () => {

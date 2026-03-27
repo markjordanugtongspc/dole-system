@@ -18,6 +18,78 @@ $current_username = null;
 
 try {
     $pdo = getDbConnection();
+    $isSupabase = useSupabase();
+    debugLog('beneficiaries.init', ['method' => $_SERVER['REQUEST_METHOD'] ?? null]);
+
+    /**
+     * Check if a column exists (hybrid-safe).
+     */
+    function tableHasColumn(PDO $pdo, bool $isSupabase, string $table, string $column): bool
+    {
+        static $cache = [];
+        $key = ($isSupabase ? 'pg' : 'my') . "|$table|$column";
+        if (array_key_exists($key, $cache)) return $cache[$key];
+
+        try {
+            if ($isSupabase) {
+                $stmt = $pdo->prepare("
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = current_schema()
+                      AND table_name = :t
+                      AND column_name = :c
+                    LIMIT 1
+                ");
+            } else {
+                $stmt = $pdo->prepare("
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_schema = DATABASE()
+                      AND table_name = :t
+                      AND column_name = :c
+                    LIMIT 1
+                ");
+            }
+            $stmt->execute(['t' => $table, 'c' => $column]);
+            $cache[$key] = (bool)$stmt->fetchColumn();
+            return $cache[$key];
+        } catch (Throwable $e) {
+            $cache[$key] = false;
+            return false;
+        }
+    }
+
+    /**
+     * Resolve status_id. If remarks missing, auto-derive based on endDate.
+     */
+    function resolveStatusId(PDO $pdo, ?string $remarks, ?string $endDate): array
+    {
+        $normalized = strtoupper(trim((string)($remarks ?? '')));
+
+        if ($normalized === '') {
+            // Auto-status: if endDate is before today => EXPIRED else ONGOING
+            $today = new DateTimeImmutable('today');
+            if (!empty($endDate)) {
+                try {
+                    $end = new DateTimeImmutable($endDate);
+                    $normalized = ($end < $today) ? 'EXPIRED' : 'ONGOING';
+                } catch (Throwable $e) {
+                    $normalized = 'ONGOING';
+                }
+            } else {
+                $normalized = 'ONGOING';
+            }
+        }
+
+        $stmt = $pdo->prepare("SELECT status_id FROM status_types WHERE UPPER(status_name) = :status LIMIT 1");
+        $stmt->execute(['status' => $normalized]);
+        $id = $stmt->fetchColumn();
+
+        return [
+            'status_name' => $normalized,
+            'status_id' => $id !== false ? (int)$id : null,
+        ];
+    }
 
     // DB connection is established, session is started.
     // We already have $current_user_id.
@@ -37,6 +109,30 @@ if ($method === 'GET') {
     $showArchived = isset($_GET['archived']) && $_GET['archived'] === 'true';
 
     try {
+        $ageExpr = $isSupabase
+            ? "COALESCE(b.age, EXTRACT(YEAR FROM AGE(CURRENT_DATE, b.birthday)))"
+            : "COALESCE(b.age, TIMESTAMPDIFF(YEAR, b.birthday, CURDATE()))";
+        $startDateFmtExpr = $isSupabase
+            ? "TO_CHAR(b.start_date, 'Mon DD, YYYY')"
+            : "DATE_FORMAT(b.start_date, '%b %d, %Y')";
+        $endDateFmtExpr = $isSupabase
+            ? "TO_CHAR(b.end_date, 'Mon DD, YYYY')"
+            : "DATE_FORMAT(b.end_date, '%b %d, %Y')";
+        $absorbWhereExpr = $isSupabase ? 'al."where"' : 'al.`where`';
+        $absorbPositionExpr = $isSupabase ? 'al."position"' : 'al.`position`';
+        $absorbAgencyExpr = $isSupabase ? 'al."agency"' : 'al.`agency`';
+
+        // Postgres lowercases unquoted identifiers, so preserve camelCase keys for JS consumers.
+        $aliasStartDate = $isSupabase ? '"startDate"' : 'startDate';
+        $aliasEndDate = $isSupabase ? '"endDate"' : 'endDate';
+        $aliasStartDateFormatted = $isSupabase ? '"startDateFormatted"' : 'startDateFormatted';
+        $aliasEndDateFormatted = $isSupabase ? '"endDateFormatted"' : 'endDateFormatted';
+        $aliasSeriesNo = $isSupabase ? '"seriesNo"' : 'seriesNo';
+        $aliasAbsorbDate = $isSupabase ? '"absorbDate"' : 'absorbDate';
+        $aliasIsArchived = $isSupabase ? '"isArchived"' : 'isArchived';
+        $aliasCreatedAt = $isSupabase ? '"createdAt"' : 'createdAt';
+        $aliasUpdatedAt = $isSupabase ? '"updatedAt"' : 'updatedAt';
+
         if (isset($_GET['get_offices'])) {
             // Get all unique office names from both the dedicated table and direct column
             $stmt = $pdo->prepare("
@@ -99,26 +195,26 @@ if ($method === 'GET') {
                     b.contact_number as contact,
                     b.address,
                     b.birthday,
-                    COALESCE(b.age, EXTRACT(YEAR FROM AGE(CURRENT_DATE, b.birthday))) as age,
+                    {$ageExpr} as age,
                     g.gender_name as gender,
                     b.education,
-                    b.start_date as startDate,
-                    b.end_date as endDate,
-                    TO_CHAR(b.start_date, 'Mon DD, YYYY') as startDateFormatted,
-                    TO_CHAR(b.end_date, 'Mon DD, YYYY') as endDateFormatted,
-                    b.series_number as seriesNo,
+                    b.start_date as {$aliasStartDate},
+                    b.end_date as {$aliasEndDate},
+                    {$startDateFmtExpr} as {$aliasStartDateFormatted},
+                    {$endDateFmtExpr} as {$aliasEndDateFormatted},
+                    b.series_number as {$aliasSeriesNo},
                     COALESCE(o.office_name, b.office_name) as office,
                     b.designation,
                     b.replacement_notes as replacement,
                     s.status_name as remarks,
-                    al.absorption_datetime as absorbDate,
-                    al.\"where\" as absorb_where,
-                    al.\"position\" as absorb_position,
-                    al.\"agency\" as absorb_agency,
+                    al.absorption_datetime as {$aliasAbsorbDate},
+                    {$absorbWhereExpr} as absorb_where,
+                    {$absorbPositionExpr} as absorb_position,
+                    {$absorbAgencyExpr} as absorb_agency,
                     u.username as absorb_by,
-                    b.is_archived as isArchived,
-                    b.created_at as createdAt,
-                    b.updated_at as updatedAt
+                    b.is_archived as {$aliasIsArchived},
+                    b.created_at as {$aliasCreatedAt},
+                    b.updated_at as {$aliasUpdatedAt}
                 FROM beneficiaries b
                 LEFT JOIN genders g ON b.gender_id = g.gender_id
                 LEFT JOIN offices o ON b.office_id = o.office_id
@@ -141,11 +237,11 @@ if ($method === 'GET') {
             $showAll = isset($_GET['all']) && $_GET['all'] === 'true';
             $showArchived = isset($_GET['archived']) && $_GET['archived'] === 'true';
 
-            $whereClause = "b.is_archived = FALSE";
+            $whereClause = $isSupabase ? "b.is_archived = FALSE" : "b.is_archived = 0";
             if ($showAll) {
                 $whereClause = "1=1";
             } elseif ($showArchived) {
-                $whereClause = "b.is_archived = TRUE";
+                $whereClause = $isSupabase ? "b.is_archived = TRUE" : "b.is_archived = 1";
             }
 
             $stmt = $pdo->prepare("
@@ -155,25 +251,25 @@ if ($method === 'GET') {
                     b.contact_number as contact,
                     b.address,
                     b.birthday,
-                    COALESCE(b.age, EXTRACT(YEAR FROM AGE(CURRENT_DATE, b.birthday))) as age,
+                    {$ageExpr} as age,
                     g.gender_name as gender,
                     b.education,
-                    b.start_date as startDate,
-                    b.end_date as endDate,
-                    TO_CHAR(b.start_date, 'Mon DD, YYYY') as startDateFormatted,
-                    TO_CHAR(b.end_date, 'Mon DD, YYYY') as endDateFormatted,
-                    b.series_number as seriesNo,
+                    b.start_date as {$aliasStartDate},
+                    b.end_date as {$aliasEndDate},
+                    {$startDateFmtExpr} as {$aliasStartDateFormatted},
+                    {$endDateFmtExpr} as {$aliasEndDateFormatted},
+                    b.series_number as {$aliasSeriesNo},
                     COALESCE(o.office_name, b.office_name) as office,
                     b.designation,
                     b.replacement_notes as replacement,
                     s.status_name as remarks,
-                    al.absorption_datetime as absorbDate,
-                    al.\"where\" as absorb_where,
-                    al.\"position\" as absorb_position,
-                    al.\"agency\" as absorb_agency,
+                    al.absorption_datetime as {$aliasAbsorbDate},
+                    {$absorbWhereExpr} as absorb_where,
+                    {$absorbPositionExpr} as absorb_position,
+                    {$absorbAgencyExpr} as absorb_agency,
                     u.username as absorb_by,
-                    b.is_archived as isArchived,
-                    b.created_at as createdAt
+                    b.is_archived as {$aliasIsArchived},
+                    b.created_at as {$aliasCreatedAt}
                 FROM beneficiaries b
                 LEFT JOIN genders g ON b.gender_id = g.gender_id
                 LEFT JOIN offices o ON b.office_id = o.office_id
@@ -216,6 +312,7 @@ if ($method === 'GET') {
     }
 
     try {
+        debugLog('beneficiaries.post', ['keys' => array_keys($data), 'id' => $data['id'] ?? null, 'gip_id' => $data['gip_id'] ?? null]);
         // Get foreign key IDs
         $genderId = null;
         if (!empty($data['gender'])) {
@@ -234,22 +331,29 @@ if ($method === 'GET') {
             $officeId = $stmt->fetchColumn() ?: null;
         }
 
-        $statusId = null;
-        if (!empty($data['remarks'])) {
-            $stmt = $pdo->prepare("SELECT status_id FROM status_types WHERE status_name = :status");
-            $stmt->execute(['status' => $data['remarks']]);
-            $statusId = $stmt->fetchColumn() ?: null;
+        $resolvedStatus = resolveStatusId($pdo, $data['remarks'] ?? null, $data['endDate'] ?? null);
+        $statusId = $resolvedStatus['status_id'];
+        // Keep JS-visible remarks consistent if caller didn't send it
+        if (empty($data['remarks']) && !empty($resolvedStatus['status_name'])) {
+            $data['remarks'] = $resolvedStatus['status_name'];
         }
 
         // Handle absorption log if status is ABSORBED
         $absorptionLogId = null;
         if (!empty($data['remarks']) && $data['remarks'] === 'ABSORBED') {
             $absorbDate = !empty($data['absorbDate']) ? date('Y-m-d H:i:s', strtotime($data['absorbDate'])) : date('Y-m-d H:i:s');
-            $stmt = $pdo->prepare("
-                INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, \"where\", \"position\", \"agency\", logged_by)
-                VALUES (NULL, :absorbDate, :where, :position, :agency, :logged_by)
-                RETURNING log_id
-            ");
+            if ($isSupabase) {
+                $stmt = $pdo->prepare("
+                    INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, \"where\", \"position\", \"agency\", logged_by)
+                    VALUES (NULL, :absorbDate, :where, :position, :agency, :logged_by)
+                    RETURNING log_id
+                ");
+            } else {
+                $stmt = $pdo->prepare("
+                    INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, `where`, `position`, `agency`, logged_by)
+                    VALUES (NULL, :absorbDate, :where, :position, :agency, :logged_by)
+                ");
+            }
             $stmt->execute([
                 'absorbDate' => $absorbDate,
                 'where' => $data['absorb_where'] ?? null,
@@ -257,11 +361,13 @@ if ($method === 'GET') {
                 'agency' => $data['absorb_agency'] ?? null,
                 'logged_by' => $current_user_id
             ]);
-            $absorptionLogId = $stmt->fetchColumn();
+            $absorptionLogId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
         }
 
         // Generate GIP ID if not provided
-        $gipId = $data['gip_id'] ?? $data['id'] ?? null;
+        $candidateId = $data['gip_id'] ?? $data['id'] ?? null;
+        // Never accept temp/local IDs as real database identifiers
+        $gipId = (is_string($candidateId) && str_starts_with($candidateId, 'temp_')) ? null : $candidateId;
         if (!$gipId) {
             // Auto-generate next ID
             $stmt = $pdo->query("SELECT gip_id FROM beneficiaries ORDER BY gip_id DESC LIMIT 1");
@@ -275,20 +381,46 @@ if ($method === 'GET') {
             }
         }
 
-        // Insert beneficiary with RETURNING beneficiary_id
-        $stmt = $pdo->prepare("
-            INSERT INTO beneficiaries (
-                gip_id, full_name, contact_number, address, birthday, age,
-                gender_id, education, start_date, end_date, series_number,
-                office_id, office_name, designation, replacement_notes, status_id, absorption_log_id
-            ) VALUES (
-                :gip_id, :name, :contact, :address, :birthday, :age,
-                :gender_id, :education, :start_date, :end_date, :series_no,
-                :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id
-            ) RETURNING beneficiary_id
-        ");
+        // Audit columns (only if present in schema)
+        $hasCreatedBy = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'created_by');
+        $hasUpdatedBy = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'updated_by');
 
-        $stmt->execute([
+        // Insert beneficiary with RETURNING beneficiary_id
+        if ($isSupabase) {
+            $stmt = $pdo->prepare("
+                INSERT INTO beneficiaries (
+                    gip_id, full_name, contact_number, address, birthday, age,
+                    gender_id, education, start_date, end_date, series_number,
+                    office_id, office_name, designation, replacement_notes, status_id, absorption_log_id
+                    " . ($hasCreatedBy ? ", created_by" : "") . "
+                    " . ($hasUpdatedBy ? ", updated_by" : "") . "
+                ) VALUES (
+                    :gip_id, :name, :contact, :address, :birthday, :age,
+                    :gender_id, :education, :start_date, :end_date, :series_no,
+                    :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id
+                    " . ($hasCreatedBy ? ", :created_by" : "") . "
+                    " . ($hasUpdatedBy ? ", :updated_by" : "") . "
+                ) RETURNING beneficiary_id
+            ");
+        } else {
+            $stmt = $pdo->prepare("
+                INSERT INTO beneficiaries (
+                    gip_id, full_name, contact_number, address, birthday, age,
+                    gender_id, education, start_date, end_date, series_number,
+                    office_id, office_name, designation, replacement_notes, status_id, absorption_log_id
+                    " . ($hasCreatedBy ? ", created_by" : "") . "
+                    " . ($hasUpdatedBy ? ", updated_by" : "") . "
+                ) VALUES (
+                    :gip_id, :name, :contact, :address, :birthday, :age,
+                    :gender_id, :education, :start_date, :end_date, :series_no,
+                    :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id
+                    " . ($hasCreatedBy ? ", :created_by" : "") . "
+                    " . ($hasUpdatedBy ? ", :updated_by" : "") . "
+                )
+            ");
+        }
+
+        $params = [
             'gip_id' => $gipId,
             'name' => $data['name'],
             'contact' => $data['contact'] ?? null,
@@ -306,11 +438,14 @@ if ($method === 'GET') {
             'replacement' => $data['replacement'] ?? null,
             'status_id' => $statusId,
             'absorption_log_id' => $absorptionLogId
-        ]);
+        ];
+        if ($hasCreatedBy) $params['created_by'] = $current_user_id;
+        if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
+        $stmt->execute($params);
 
         // Update absorption log with beneficiary_id
         if ($absorptionLogId) {
-            $beneficiaryId = $stmt->fetchColumn();
+            $beneficiaryId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
             $stmt = $pdo->prepare("UPDATE absorption_logs SET beneficiary_id = :bid WHERE log_id = :lid");
             $stmt->execute(['bid' => $beneficiaryId, 'lid' => $absorptionLogId]);
         }
@@ -335,6 +470,7 @@ if ($method === 'GET') {
     }
 
     try {
+        debugLog('beneficiaries.put', ['keys' => array_keys($data), 'id' => $data['id'] ?? null, 'gip_id' => $data['gip_id'] ?? null]);
         // Get foreign key IDs (similar to POST)
         $genderId = null;
         if (!empty($data['gender'])) {
@@ -353,11 +489,10 @@ if ($method === 'GET') {
             $officeId = $stmt->fetchColumn() ?: null;
         }
 
-        $statusId = null;
-        if (!empty($data['remarks'])) {
-            $stmt = $pdo->prepare("SELECT status_id FROM status_types WHERE status_name = :status");
-            $stmt->execute(['status' => $data['remarks']]);
-            $statusId = $stmt->fetchColumn() ?: null;
+        $resolvedStatus = resolveStatusId($pdo, $data['remarks'] ?? null, $data['endDate'] ?? null);
+        $statusId = $resolvedStatus['status_id'];
+        if (empty($data['remarks']) && !empty($resolvedStatus['status_name'])) {
+            $data['remarks'] = $resolvedStatus['status_name'];
         }
 
         // Handle absorption log if status changed to ABSORBED
@@ -376,9 +511,9 @@ if ($method === 'GET') {
                 $beneficiaryId = $stmt->fetchColumn();
 
                 $stmt = $pdo->prepare("
-                    INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, \"where\", \"position\", \"agency\", logged_by)
+                    INSERT INTO absorption_logs (beneficiary_id, absorption_datetime, " . ($isSupabase ? "\"where\", \"position\", \"agency\"" : "`where`, `position`, `agency`") . ", logged_by)
                     VALUES (:bid, :absorbDate, :where, :position, :agency, :logged_by)
-                    RETURNING log_id
+                    " . ($isSupabase ? "RETURNING log_id" : "") . "
                 ");
                 $stmt->execute([
                     'bid' => $beneficiaryId,
@@ -388,14 +523,14 @@ if ($method === 'GET') {
                     'agency' => $data['absorb_agency'] ?? null,
                     'logged_by' => $current_user_id
                 ]);
-                $absorptionLogId = $stmt->fetchColumn();
+                $absorptionLogId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
             } else {
                 // Update existing absorption log
                 $stmt = $pdo->prepare("
                     UPDATE absorption_logs SET 
-                        \"where\" = :where, 
-                        \"position\" = :position, 
-                        \"agency\" = :agency,
+                        " . ($isSupabase ? "\"where\"" : "`where`") . " = :where, 
+                        " . ($isSupabase ? "\"position\"" : "`position`") . " = :position, 
+                        " . ($isSupabase ? "\"agency\"" : "`agency`") . " = :agency,
                         logged_by = :logged_by
                     WHERE log_id = :log_id
                 ");
@@ -411,6 +546,7 @@ if ($method === 'GET') {
         }
 
         // Update beneficiary
+        $hasUpdatedBy = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'updated_by');
         $stmt = $pdo->prepare("
             UPDATE beneficiaries SET
                 gip_id = :new_gip_id,
@@ -430,10 +566,11 @@ if ($method === 'GET') {
                 replacement_notes = :replacement,
                 status_id = :status_id,
                 absorption_log_id = COALESCE(:absorption_log_id, absorption_log_id)
+                " . ($hasUpdatedBy ? ", updated_by = :updated_by" : "") . "
             WHERE gip_id = :old_id
         ");
 
-        $stmt->execute([
+        $params = [
             'old_id' => $data['id'],
             'new_gip_id' => $data['gip_id'] ?? $data['id'],
             'name' => $data['name'],
@@ -452,7 +589,9 @@ if ($method === 'GET') {
             'replacement' => $data['replacement'] ?? null,
             'status_id' => $statusId,
             'absorption_log_id' => $absorptionLogId
-        ]);
+        ];
+        if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
+        $stmt->execute($params);
 
         echo json_encode(['success' => true, 'message' => 'Beneficiary updated successfully']);
     } catch (PDOException $e) {
@@ -474,6 +613,7 @@ if ($method === 'GET') {
     }
 
     try {
+        debugLog('beneficiaries.patch', ['id' => $id, 'action' => $action]);
         if ($action === 'archive') {
             // Soft delete
             $stmt = $pdo->prepare("
