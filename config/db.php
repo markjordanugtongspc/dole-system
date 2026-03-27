@@ -43,10 +43,13 @@ function loadEnv($path)
 }
 
 // Load environment files from config directory.
-// Priority:
-// - Always load `.env` if present (local defaults)
-// - If APP_ENV === production (from OS env or loaded `.env`), then load `.env.production` to override
+// Hybrid lock/key priority:
+// 1) Always load `.env` first (acts as LOCK/controller)
+// 2) If ENV_KEY=localhost -> load `.env.example` (local MySQL key)
+// 3) If ENV_KEY=production -> load `.env.production` (Supabase key)
+// 4) Fallback: APP_ENV=production -> load `.env.production`
 $envPath = __DIR__ . '/.env';
+$envPathExample = __DIR__ . '/.env.example';
 $envPathProduction = __DIR__ . '/.env.production';
 
 $loadedBase = false;
@@ -59,14 +62,33 @@ if (file_exists($envPath)) {
     }
 }
 
-$requestedAppEnv = getenv('APP_ENV') ?: ($_SERVER['APP_ENV'] ?? ($_ENV['APP_ENV'] ?? null));
-if ($requestedAppEnv === 'production' && file_exists($envPathProduction)) {
+$requestedEnvKey = getenv('ENV_KEY') ?: ($_SERVER['ENV_KEY'] ?? ($_ENV['ENV_KEY'] ?? null));
+$requestedEnvKey = $requestedEnvKey ? strtolower(trim((string)$requestedEnvKey)) : null;
+
+if ($requestedEnvKey === 'localhost' && file_exists($envPathExample)) {
+    try {
+        loadEnv($envPathExample);
+    } catch (Exception $e) {
+        error_log("Environment Error: " . $e->getMessage());
+    }
+} elseif ($requestedEnvKey === 'production' && file_exists($envPathProduction)) {
     try {
         loadEnv($envPathProduction);
     } catch (Exception $e) {
         error_log("Environment Error: " . $e->getMessage());
     }
-} elseif (!$loadedBase && file_exists($envPathProduction)) {
+} else {
+    $requestedAppEnv = getenv('APP_ENV') ?: ($_SERVER['APP_ENV'] ?? ($_ENV['APP_ENV'] ?? null));
+    if ($requestedAppEnv === 'production' && file_exists($envPathProduction)) {
+        try {
+            loadEnv($envPathProduction);
+        } catch (Exception $e) {
+            error_log("Environment Error: " . $e->getMessage());
+        }
+    }
+}
+
+if (!$loadedBase && file_exists($envPathProduction)) {
     // If `.env` is missing, still load production config when available.
     try {
         loadEnv($envPathProduction);

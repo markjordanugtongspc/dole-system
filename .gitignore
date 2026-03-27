@@ -1,10 +1,10 @@
 # Environment Configuration
 .env
 config/.env
-config/.env.production
 config/.env.local
-config/.env.*
+config/.env.supabase.backup
 !config/.env.example
+!config/.env.production
 
 # Database Backups
 *.sql.backup
