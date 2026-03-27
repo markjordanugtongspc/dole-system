@@ -36,6 +36,13 @@ function loadEnv($path)
             // Remove quotes if present
             $value = trim($value, '"\'');
 
+            // Do not override non-empty runtime/server secrets (e.g. Vercel env vars).
+            $existingServer = $_SERVER[$key] ?? null;
+            $existingRuntime = getenv($key);
+            if (($existingServer !== null && $existingServer !== '') || ($existingRuntime !== false && $existingRuntime !== '')) {
+                continue;
+            }
+
             $_ENV[$key] = $value;
             putenv("$key=$value");
         }
@@ -244,13 +251,11 @@ function testDbConnection()
  */
 function env($key, $default = null)
 {
-    // Prefer loaded .env values, but don't treat empty string as a valid override.
-    if (isset($_ENV[$key]) && $_ENV[$key] !== '') return $_ENV[$key];
-    if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') return $_SERVER[$key];
-
-    // Fallback to OS environment variables (e.g. in hosting / local process env)
+    // Prefer runtime/server environment (hosting secrets) over committed files.
     $val = getenv($key);
     if ($val !== false && $val !== '') return $val;
+    if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') return $_SERVER[$key];
+    if (isset($_ENV[$key]) && $_ENV[$key] !== '') return $_ENV[$key];
     return $default;
 }
 
