@@ -1,12 +1,15 @@
 {
     "version": 2,
+    "env": {
+        "PHP_EXTENSIONS": "pdo_mysql,mysqli,openssl,mbstring"
+    },
     "functions": {
-        "api/**/*.php": { "runtime": "vercel-php@0.7.4" }
+        "api/*.php": { "runtime": "vercel-php@0.7.4" }
     },
     "routes": [
         { "handle": "filesystem" },
         {
-            "src": "/api/(.*)",
+            "src": "/api/(auth|beneficiaries|logs|notifications|profile|check_duplicate)(.*)",
             "dest": "/api/$1.php"
         },
         {
