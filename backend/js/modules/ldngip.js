@@ -403,7 +403,9 @@ export async function addBeneficiary(data) {
         }
     });
 
-    const method = capitalizedData.id ? 'PUT' : 'POST';
+    const isTempId = (val) => typeof val === 'string' && val.startsWith('temp_');
+    const hasRealId = Boolean(capitalizedData.id) && !isTempId(capitalizedData.id);
+    const method = hasRealId ? 'PUT' : 'POST';
 
     // ── STEP 2: Generate a temp id for new records so we can store locally ────
     if (!capitalizedData.id && !capitalizedData.gip_id) {
@@ -431,6 +433,8 @@ export async function addBeneficiary(data) {
 
     // ── STEP 5: Enqueue remote API sync (runs in background) ──────────────────
     try {
+        // For POST, keep temp id locally but do NOT let it be treated as gip_id server-side.
+        // `_tempId` will be used by the sync worker to replace the local record once the server returns the real ROX id.
         await enqueueSync(method, 'api/beneficiaries.php', capitalizedData);
         // Trigger sync worker immediately (non-blocking)
         processQueue();

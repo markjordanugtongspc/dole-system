@@ -88,6 +88,51 @@ $dbConfig = [
 ];
 
 /**
+ * Hybrid mode flag:
+ * - USE_SUPABASE=true  -> force PostgreSQL/Supabase branch
+ * - USE_SUPABASE=false -> force local MySQL branch
+ * - if not set, infer from DB_CONNECTION
+ */
+function useSupabase()
+{
+    $raw = env('USE_SUPABASE', null);
+    if ($raw !== null) {
+        $normalized = strtolower(trim((string)$raw));
+        return in_array($normalized, ['1', 'true', 'yes', 'on'], true);
+    }
+    return env('DB_CONNECTION', 'mysql') === 'pgsql';
+}
+
+function isMysqlMode()
+{
+    return !useSupabase();
+}
+
+/**
+ * Debug logging controlled by DEBUG_MODE=true/false in env.
+ * Writes to PHP error_log (visible in server logs / Vercel logs).
+ */
+function debugModeEnabled()
+{
+    $raw = env('DEBUG_MODE', null);
+    if ($raw === null) return false;
+    $normalized = strtolower(trim((string)$raw));
+    return in_array($normalized, ['1', 'true', 'yes', 'on'], true);
+}
+
+function debugLog($label, $data = null)
+{
+    if (!debugModeEnabled()) return;
+    $payload = [
+        'label' => $label,
+        'use_supabase' => useSupabase(),
+        'time' => date('c'),
+        'data' => $data,
+    ];
+    error_log('[DOLE_DEBUG] ' . json_encode($payload));
+}
+
+/**
  * Get PDO Database Connection (Singleton Pattern)
  * 
  * @return PDO Database connection instance

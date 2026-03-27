@@ -13,6 +13,8 @@ header('Content-Type: application/json');
 
 try {
     $pdo = getDbConnection();
+    $isSupabase = useSupabase();
+    debugLog('logs.init', ['method' => $_SERVER['REQUEST_METHOD'] ?? null]);
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Database connection failed']);
@@ -148,6 +150,7 @@ if ($method === 'GET') {
     }
 
     try {
+        debugLog('logs.post', ['type' => $type, 'gip_id' => $gipId, 'action' => $action]);
         // Handle POST-based deletion if specified
         if ($action === 'delete') {
             $logId = $data['log_id'] ?? $_GET['log_id'] ?? $_GET['id'] ?? null;
@@ -189,11 +192,18 @@ if ($method === 'GET') {
                 exit();
             }
 
-            $stmt = $pdo->prepare("
-                INSERT INTO accomplishment_reports (beneficiary_id, period, date_submitted, status)
-                VALUES (:beneficiary_id, :period, :date_submitted, :status)
-                RETURNING ar_id
-            ");
+            if ($isSupabase) {
+                $stmt = $pdo->prepare("
+                    INSERT INTO accomplishment_reports (beneficiary_id, period, date_submitted, status)
+                    VALUES (:beneficiary_id, :period, :date_submitted, :status)
+                    RETURNING ar_id
+                ");
+            } else {
+                $stmt = $pdo->prepare("
+                    INSERT INTO accomplishment_reports (beneficiary_id, period, date_submitted, status)
+                    VALUES (:beneficiary_id, :period, :date_submitted, :status)
+                ");
+            }
 
             $stmt->execute([
                 'beneficiary_id' => $beneficiaryId,
@@ -202,7 +212,7 @@ if ($method === 'GET') {
                 'status' => $status
             ]);
 
-            $logId = $stmt->fetchColumn();
+            $logId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
             echo json_encode(['success' => true, 'message' => 'AR log created successfully', 'id' => $logId]);
 
         } elseif ($type === 'dtr') { // dtr
@@ -220,18 +230,25 @@ if ($method === 'GET') {
                 $stmt->execute(['status_update' => $status, 'id' => $existingId]);
                 $logId = $existingId;
             } else {
-                $stmt = $pdo->prepare("
-                    INSERT INTO daily_time_records (beneficiary_id, record_date, weekday, status)
-                    VALUES (:beneficiary_id, :record_date, :weekday, :status)
-                    RETURNING dtr_id
-                ");
+                if ($isSupabase) {
+                    $stmt = $pdo->prepare("
+                        INSERT INTO daily_time_records (beneficiary_id, record_date, weekday, status)
+                        VALUES (:beneficiary_id, :record_date, :weekday, :status)
+                        RETURNING dtr_id
+                    ");
+                } else {
+                    $stmt = $pdo->prepare("
+                        INSERT INTO daily_time_records (beneficiary_id, record_date, weekday, status)
+                        VALUES (:beneficiary_id, :record_date, :weekday, :status)
+                    ");
+                }
                 $stmt->execute([
                     'beneficiary_id' => $beneficiaryId,
                     'record_date' => $recordDate,
                     'weekday' => $weekday,
                     'status' => $status
                 ]);
-                $logId = $stmt->fetchColumn();
+                $logId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
             }
             echo json_encode(['success' => true, 'message' => 'DTR log created successfully', 'id' => $logId]);
         } else { // docs
@@ -255,17 +272,24 @@ if ($method === 'GET') {
                 $stmt->execute(['status_update' => $status, 'id' => $existingId]);
                 $logId = $existingId;
             } else {
-                $stmt = $pdo->prepare("
-                    INSERT INTO beneficiary_documents (beneficiary_id, document_name, status)
-                    VALUES (:beneficiary_id, :doc_name, :status)
-                    RETURNING doc_id
-                ");
+                if ($isSupabase) {
+                    $stmt = $pdo->prepare("
+                        INSERT INTO beneficiary_documents (beneficiary_id, document_name, status)
+                        VALUES (:beneficiary_id, :doc_name, :status)
+                        RETURNING doc_id
+                    ");
+                } else {
+                    $stmt = $pdo->prepare("
+                        INSERT INTO beneficiary_documents (beneficiary_id, document_name, status)
+                        VALUES (:beneficiary_id, :doc_name, :status)
+                    ");
+                }
                 $stmt->execute([
                     'beneficiary_id' => $beneficiaryId,
                     'doc_name' => $docName,
                     'status' => $status
                 ]);
-                $logId = $stmt->fetchColumn();
+                $logId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
             }
 
             echo json_encode(['success' => true, 'message' => 'Document status saved successfully', 'id' => $logId]);
@@ -294,6 +318,7 @@ if ($method === 'GET') {
     }
 
     try {
+        debugLog('logs.put', ['type' => $type, 'id' => $logId]);
         if ($type === 'ar') {
             $updateFields = [];
             $params = ['id' => $logId];

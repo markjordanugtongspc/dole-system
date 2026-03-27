@@ -39,18 +39,29 @@ if (!$user_id) {
 
 try {
     $pdo = getDbConnection();
+    $isSupabase = useSupabase();
+    debugLog('notifications.init', ['method' => $_SERVER['REQUEST_METHOD'] ?? null]);
 
     // GET: Fetch notifications
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // Check for new notifications
         if (isset($_GET['check_new'])) {
-            $stmt = $pdo->prepare("
-                SELECT COUNT(*) as unread_count,
-                       (SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0 AND created_at > CURRENT_TIMESTAMP - INTERVAL '1 MINUTE') as has_new
-                FROM notifications 
-                WHERE user_id = ? AND is_read = 0
-            ");
+            if ($isSupabase) {
+                $stmt = $pdo->prepare("
+                    SELECT COUNT(*) as unread_count,
+                           (SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0 AND created_at > CURRENT_TIMESTAMP - INTERVAL '1 MINUTE') as has_new
+                    FROM notifications 
+                    WHERE user_id = ? AND is_read = 0
+                ");
+            } else {
+                $stmt = $pdo->prepare("
+                    SELECT COUNT(*) as unread_count,
+                           (SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0 AND created_at > DATE_SUB(NOW(), INTERVAL 1 MINUTE)) as has_new
+                    FROM notifications
+                    WHERE user_id = ? AND is_read = 0
+                ");
+            }
             $stmt->execute([$user_id, $user_id]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -107,6 +118,7 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $input = $jsonInput;
         $action = $input['action'] ?? '';
+        debugLog('notifications.post', ['action' => $action]);
 
         // Create notification
         if ($action === 'create') {
@@ -119,13 +131,22 @@ try {
                 exit;
             }
 
-            $stmt = $pdo->prepare("
-                INSERT INTO notifications (user_id, message, type, is_read, created_at) 
-                VALUES (?, ?, ?, 0, NOW())
-                RETURNING id
-            ");
-            $stmt->execute([$targetUserId, $message, $type]);
-            $newId = $stmt->fetchColumn();
+            if ($isSupabase) {
+                $stmt = $pdo->prepare("
+                    INSERT INTO notifications (user_id, message, type, is_read, created_at) 
+                    VALUES (?, ?, ?, 0, NOW())
+                    RETURNING id
+                ");
+                $stmt->execute([$targetUserId, $message, $type]);
+                $newId = $stmt->fetchColumn();
+            } else {
+                $stmt = $pdo->prepare("
+                    INSERT INTO notifications (user_id, message, type, is_read, created_at)
+                    VALUES (?, ?, ?, 0, NOW())
+                ");
+                $stmt->execute([$targetUserId, $message, $type]);
+                $newId = $pdo->lastInsertId();
+            }
 
             echo json_encode([
                 'success' => true,
