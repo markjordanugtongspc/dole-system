@@ -8,17 +8,20 @@ import Swal from 'sweetalert2';
 
 /**
  * Hybrid engine runtime flag for frontend modules.
- * - true  => Supabase/PostgreSQL cloud mode
- * - false => Local Laragon/MySQL mode
+ * - true  => [SUPABASE] Cloud mode (PostgreSQL)
+ * - false => [LOCALHOST] Laragon mode (MySQL)
  */
 export const USE_SUPABASE = String(import.meta.env.VITE_USE_SUPABASE ?? 'true').toLowerCase() === 'true';
 
+/**
+ * [HYBRID] Helper to check if current frontend state is Supabase
+ */
 export function isSupabaseMode() {
     return USE_SUPABASE;
 }
 
 /**
- * Get the base path of the project (e.g., /github/dole-system/)
+ * [HYBRID] Get the base path of the project dynamically (supports subdirectories)
  */
 export function getBasePath() {
     const path = window.location.pathname;

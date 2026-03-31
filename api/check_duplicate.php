@@ -10,33 +10,59 @@ header('Content-Type: application/json');
 
 try {
     $pdo = getDbConnection();
-    $isSupabase = useSupabase();
+    $isSupabase = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql';
+
     $data = json_decode(file_get_contents('php://input'), true);
 
-    if (empty($data['name'])) {
-        echo json_encode(['success' => false, 'error' => 'Name is required']);
+    if (empty($data['name']) && empty($data['names'])) {
+        echo json_encode(['success' => false, 'error' => 'Name or names array is required']);
         exit();
     }
 
-    $name = trim($data['name']);
-    debugLog('check_duplicate', ['name' => $name]);
-    
-    // We check for exact match or very close match
-    $stmt = $pdo->prepare(
-        $isSupabase
-            ? "SELECT COUNT(*) FROM beneficiaries WHERE full_name = :name AND is_archived = FALSE"
-            : "SELECT COUNT(*) FROM beneficiaries WHERE full_name = :name AND is_archived = 0"
-    );
-    $stmt->execute(['name' => $name]);
-    $count = $stmt->fetchColumn();
+    if (!empty($data['names']) && is_array($data['names'])) {
+        // Bulk check mode
+        $duplicates = [];
+        $names = array_map('trim', $data['names']);
+        $names = array_filter($names); // remove empty names
+        
+        if (count($names) > 0) {
+            $inQuery = implode(',', array_fill(0, count($names), '?'));
+            $sql = $isSupabase 
+                ? "SELECT full_name FROM beneficiaries WHERE full_name IN ($inQuery) AND is_archived = FALSE"
+                : "SELECT full_name FROM beneficiaries WHERE full_name IN ($inQuery) AND is_archived = 0";
+                
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(array_values($names));
+            $duplicates = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        }
 
-    echo json_encode([
-        'success' => true,
-        'exists' => $count > 0,
-        'name' => $name
-    ]);
+        echo json_encode([
+            'success' => true,
+            'duplicates' => $duplicates
+        ]);
+    } else {
+        // Single check mode
+        $name = trim($data['name']);
+        debugLog('check_duplicate', ['name' => $name]);
+        
+        // We check for exact match or very close match
+        $stmt = $pdo->prepare(
+            $isSupabase
+                ? "SELECT COUNT(*) FROM beneficiaries WHERE full_name = :name AND is_archived = FALSE"
+                : "SELECT COUNT(*) FROM beneficiaries WHERE full_name = :name AND is_archived = 0"
+        );
+        $stmt->execute(['name' => $name]);
+        $count = $stmt->fetchColumn();
+
+        echo json_encode([
+            'success' => true,
+            'exists' => $count > 0,
+            'name' => $name
+        ]);
+    }
 
 } catch (PDOException $e) {
     http_response_code(500);
+    error_log('check_duplicate error: ' . $e->getMessage());
     echo json_encode(['success' => false, 'error' => 'Database error']);
 }

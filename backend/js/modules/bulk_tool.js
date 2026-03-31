@@ -141,7 +141,7 @@ export const BulkApp = {
         reader.readAsText(file);
     },
 
-    parseCSV(text) {
+    async parseCSV(text) {
         let rows = [];
         let currentRow = '';
         let insideQuotes = false;
@@ -239,6 +239,44 @@ export const BulkApp = {
         }
 
         if (this.queue.length > 0) {
+            // BULK DUPLICATE CHECK
+            try {
+                Swal.fire({
+                    title: 'Checking duplicates...',
+                    html: '<p class="text-sm">Please wait while we cross-reference your data.</p>',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+                
+                const names = this.queue.map(item => item.name);
+                const checkResponse = await fetch(`${getBasePath()}api/check_duplicate.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ names: names })
+                });
+                const checkResult = await checkResponse.json();
+                
+                if (checkResult.success && checkResult.duplicates && checkResult.duplicates.length > 0) {
+                    const duplicateSet = new Set(checkResult.duplicates.map(n => n.toLowerCase().trim()));
+                    const originalLength = this.queue.length;
+                    
+                    this.queue = this.queue.filter(item => {
+                        const isDup = duplicateSet.has(item.name.toLowerCase().trim());
+                        if (isDup) console.warn(`%c[Bulk Add] SKIPPED: ${item.name} already exists in database.`, "color: #ff9800; font-weight: bold;");
+                        return !isDup;
+                    });
+                    
+                    console.log(`[Bulk Add] Removed ${originalLength - this.queue.length} duplicates ahead of time.`);
+                }
+            } catch (error) {
+                console.error("Bulk duplicate check failed:", error);
+            }
+
+            if (this.queue.length === 0) {
+                Swal.fire('All Skipped', 'All beneficiaries in the CSV already exist in the database.', 'info');
+                return;
+            }
+
             this.isActive = true;
             this.currentIndex = 0;
             Swal.close();
@@ -322,25 +360,6 @@ export const BulkApp = {
     async processNext() {
         if (this.currentIndex < this.queue.length) {
             const data = this.queue[this.currentIndex];
-
-            // DUPLICATE DETECTION LOGIC
-            try {
-                const checkResponse = await fetch(`${getBasePath()}api/check_duplicate.php`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: data.name })
-                });
-                const checkResult = await checkResponse.json();
-
-                if (checkResult.success && checkResult.exists) {
-                    console.warn(`%c[Bulk Add] SKIPPED: ${data.name} already exists in database.`, "color: #ff9800; font-weight: bold;");
-                    this.currentIndex++;
-                    return this.processNext(); // Auto-skip to next
-                }
-            } catch (error) {
-                console.error("Duplicate check failed:", error);
-                // Continue anyway if check fails, to not block the process
-            }
 
             data._isBulk = true;
             data._bulkCurrent = this.currentIndex + 1;

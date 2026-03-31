@@ -8,7 +8,7 @@
  */
 
 // Load environment variables from .env file
-function loadEnv($path)
+function loadBaseEnv($path)
 {
     if (!file_exists($path)) {
         throw new Exception(".env file not found at: $path");
@@ -52,9 +52,8 @@ function loadEnv($path)
 // Load environment files from config directory.
 // Hybrid lock/key priority:
 // 1) Always load `.env` first (acts as LOCK/controller)
-// 2) If ENV_KEY=localhost -> load `.env.example` (local MySQL key)
-// 3) If ENV_KEY=production -> load `.env.production` (Supabase key)
-// 4) Fallback: APP_ENV=production -> load `.env.production`
+// 2) Profile override: If ENV_KEY=localhost -> load `.env.example`
+// 3) Profile override: If ENV_KEY=production -> load `.env.production` (Supabase cloud)
 $envPath = __DIR__ . '/.env';
 $envPathExample = __DIR__ . '/.env.example';
 $envPathProduction = __DIR__ . '/.env.production';
@@ -62,45 +61,48 @@ $envPathProduction = __DIR__ . '/.env.production';
 $loadedBase = false;
 if (file_exists($envPath)) {
     try {
-        loadEnv($envPath);
+        loadBaseEnv($envPath);
         $loadedBase = true;
     } catch (Exception $e) {
         error_log("Environment Error: " . $e->getMessage());
     }
 }
 
-$requestedEnvKey = getenv('ENV_KEY') ?: ($_SERVER['ENV_KEY'] ?? ($_ENV['ENV_KEY'] ?? null));
+// Get the requested key from runtime environment OR loaded .env
+$requestedEnvKey = env('ENV_KEY', null);
 $requestedEnvKey = $requestedEnvKey ? strtolower(trim((string)$requestedEnvKey)) : null;
 
+// Apply Profile Overrides
 if ($requestedEnvKey === 'localhost' && file_exists($envPathExample)) {
     try {
-        loadEnv($envPathExample);
+        loadBaseEnv($envPathExample);
     } catch (Exception $e) {
-        error_log("Environment Error: " . $e->getMessage());
+        error_log("Environment Error (Localhost): " . $e->getMessage());
     }
 } elseif ($requestedEnvKey === 'production' && file_exists($envPathProduction)) {
     try {
-        loadEnv($envPathProduction);
+        loadBaseEnv($envPathProduction);
     } catch (Exception $e) {
-        error_log("Environment Error: " . $e->getMessage());
+        error_log("Environment Error (Production): " . $e->getMessage());
     }
 } else {
-    $requestedAppEnv = getenv('APP_ENV') ?: ($_SERVER['APP_ENV'] ?? ($_ENV['APP_ENV'] ?? null));
+    // Fallback based on application environment
+    $requestedAppEnv = env('APP_ENV', null);
     if ($requestedAppEnv === 'production' && file_exists($envPathProduction)) {
         try {
-            loadEnv($envPathProduction);
+            loadBaseEnv($envPathProduction);
         } catch (Exception $e) {
-            error_log("Environment Error: " . $e->getMessage());
+            error_log("Environment Error (AppEnv): " . $e->getMessage());
         }
     }
 }
 
+// Global safety: If absolutely nothing loaded yet, try production as last resort
 if (!$loadedBase && file_exists($envPathProduction)) {
-    // If `.env` is missing, still load production config when available.
     try {
-        loadEnv($envPathProduction);
+        loadBaseEnv($envPathProduction);
     } catch (Exception $e) {
-        error_log("Environment Error: " . $e->getMessage());
+        error_log("Environment Error (Safety): " . $e->getMessage());
     }
 }
 
@@ -168,11 +170,13 @@ $dbConfig = [
  */
 function useSupabase()
 {
+    // [HYBRID] Check if Supabase mode is explicitly toggled in .env
     $raw = env('USE_SUPABASE', null);
     if ($raw !== null) {
         $normalized = strtolower(trim((string)$raw));
         return in_array($normalized, ['1', 'true', 'yes', 'on'], true);
     }
+    // [FALLBACK] If not set, infer from DB_CONNECTION (pgsql = Supabase)
     return env('DB_CONNECTION', 'mysql') === 'pgsql';
 }
 
@@ -255,14 +259,29 @@ function getDbConnection()
         }
 
         try {
+            debugLog('db.connect.params', [
+                'driver' => $dbConfig['driver'],
+                'host' => $dbConfig['host'],
+                'port' => $dbConfig['port'],
+                'db' => $dbConfig['database'],
+                'user' => $dbConfig['username'],
+                'env_keys' => [
+                    'ENV_KEY' => env('ENV_KEY'),
+                    'APP_ENV' => env('APP_ENV'),
+                    'USE_SUPABASE' => env('USE_SUPABASE')
+                ]
+            ]);
+
             $pdo = new PDO($dsn, $dbConfig['username'], $dbConfig['password'], $options);
             if ($dbConfig['driver'] === 'pgsql') {
                 $pdo->exec("SET client_encoding TO 'UTF8'");
             }
+            debugLog('db.connect.success');
         } catch (PDOException $e) {
             // Log error (in production, log to file instead of displaying)
             error_log("Database Connection Error: " . $e->getMessage());
-            throw new PDOException("Could not connect to database. Please check your configuration.");
+            debugLog('db.connect.error', ['msg' => $e->getMessage()]);
+            throw new PDOException("Could not connect to database. Please check your configuration. (Mode: " . (useSupabase() ? 'PgSQL' : 'MySQL') . ")");
         }
     }
 

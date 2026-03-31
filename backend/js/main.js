@@ -16,18 +16,19 @@ import { initNotifications } from './modules/notifications.js';
 import { initDarkMode } from './modules/darkmode.js';
 import { initSyncIndicator, startSyncWorker } from './modules/sync-manager.js';
 
-// Initialize Smart Loader immediately
+// [HYBRID] Initialize Smart Loader immediately (handles FOUC & pre-loading state)
 initSmartLoader();
 
-// Apply dark/light theme ASAP to prevent FOUC
+// [HYBRID] Apply theme before initial paint to prevent flash of white/black
 initDarkMode();
 
-// Make Flowbite's initFlowbite globally available for AJAX re-initialization
+// [HYBRID] Make Flowbite globally available for AJAX re-initialization
 window.initFlowbite = initFlowbite;
 
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOLE System initialized');
+    // [HYBRID] Log current mode for easier debugging
+    console.log(`DOLE System initialized. Mode: ${import.meta.env.VITE_USE_SUPABASE === 'true' ? '[SUPABASE]' : '[LOCALHOST]'}`);
 
     const path = window.location.pathname;
 

@@ -218,15 +218,18 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     DTR Logs
                 </h5>
                 <div class="space-y-2">
-                    ${dtrLogs.length ? dtrLogs.map(l => `
-                        <div class="flex justify-between items-center p-3 rounded-xl border border-blue-100 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors edit-log-btn" data-type="dtr" data-id="${l.id}" data-val="${l.date || l.createdAt}">
+                    ${dtrLogs.length ? dtrLogs.map(l => {
+                        const s = l.status || 'PENDING';
+                        let sColor = s === 'VERIFIED' || s === 'COMPLETED' ? 'text-green-500' : (s === 'REJECTED' || s === 'DECLINED' ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
+                        return `
+                        <div class="flex justify-between items-center p-3 rounded-xl border border-blue-100 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors edit-log-btn" data-type="dtr" data-id="${l.id}" data-val="${l.date || l.createdAt}" data-status="${s}">
                             <span class="text-xs font-black text-royal-blue dark:text-blue-400 capitalize whitespace-nowrap pointer-events-none">${l.date || l.createdAt}</span>
-                            <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${l.status || 'RECEIVED'}</span>
-                            <button class="absolute top-0 right-0 h-full w-10 bg-red-500 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform cursor-pointer delete-log-btn" data-type="dtr" data-id="${l.id}">
+                            <span class="text-[11px] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
+                            <button class="absolute top-0 right-0 h-full w-10 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform cursor-pointer delete-log-btn" data-type="dtr" data-id="${l.id}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
-                    `).join('') : `<p class="text-[11px] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No DTR logs submitted.</p>`}
+                    `;}).join('') : `<p class="text-[11px] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No DTR logs submitted.</p>`}
                 </div>
             </div>
 
@@ -236,15 +239,18 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     AR Logs
                 </h5>
                 <div class="space-y-2">
-                    ${arLogs.length ? arLogs.map(l => `
-                        <div class="flex justify-between items-center p-3 rounded-xl border border-orange-100 dark:border-orange-900 bg-orange-50/50 dark:bg-orange-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors edit-log-btn" data-type="ar" data-id="${l.id}" data-val="${l.period || l.createdAt}">
+                    ${arLogs.length ? arLogs.map(l => {
+                        const s = l.status || 'PENDING';
+                        let sColor = s === 'VERIFIED' || s === 'COMPLETED' ? 'text-green-500' : (s === 'REJECTED' || s === 'DECLINED' ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
+                        return `
+                        <div class="flex justify-between items-center p-3 rounded-xl border border-orange-100 dark:border-orange-900/50 bg-orange-50/50 dark:bg-orange-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors edit-log-btn" data-type="ar" data-id="${l.id}" data-val="${l.period || l.createdAt}" data-status="${s}">
                             <span class="text-xs font-black text-orange-600 dark:text-orange-400 capitalize whitespace-nowrap pointer-events-none">${l.period || l.createdAt}</span>
-                            <span class="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${l.status || 'RECEIVED'}</span>
-                            <button class="absolute top-0 right-0 h-full w-10 bg-red-500 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform cursor-pointer delete-log-btn" data-type="ar" data-id="${l.id}">
+                            <span class="text-[11px] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
+                            <button class="absolute top-0 right-0 h-full w-10 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform cursor-pointer delete-log-btn" data-type="ar" data-id="${l.id}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
-                    `).join('') : `<p class="text-[11px] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No AR logs submitted.</p>`}
+                    `;}).join('') : `<p class="text-[11px] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No AR logs submitted.</p>`}
                 </div>
             </div>
          </div>
@@ -476,15 +482,40 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         };
 
         // Edit Log Logic
-        const promptEditLog = async (typeStr, dbType, logId, currentVal) => {
+        const promptEditLog = async (typeStr, dbType, logId, currentVal, currentStatus) => {
             const labelStr = dbType === 'dtr' ? 'Record Date' : 'Period';
+            const isD = isDarkMode();
+            
+            const btnBase = "flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[10px] sm:text-xs gap-2 ";
+            const checkIcon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+            const xIcon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+            
             const { value: formValues } = await Swal.fire({
                 title: `<span class="text-xl font-black text-heading uppercase tracking-tight">Edit ${typeStr} Log</span>`,
                 html: `
-                    <div class="flex flex-col gap-4 text-left font-montserrat mt-2">
+                    <div class="flex flex-col gap-5 text-left font-montserrat mt-2">
                         <div>
                             <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">${labelStr}</label>
-                            <input id="swal-log-val" value="${currentVal}" class="bg-gray-50 border border-gray-200 text-heading text-sm rounded-xl focus:ring-brand focus:border-brand block w-full p-2.5 font-bold uppercase transition-all" placeholder="Enter value">
+                            <input id="swal-log-val" value="${currentVal}" class="bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-slate-600 text-heading text-sm rounded-xl focus:ring-brand focus:border-brand block w-full p-2.5 font-bold uppercase transition-all" placeholder="Enter value">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Validation Status</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="relative block cursor-pointer">
+                                    <input type="radio" name="swal-log-status" value="VERIFIED" class="peer sr-only" ${currentStatus === 'VERIFIED' ? 'checked' : ''}>
+                                    <div class="${btnBase} border-gray-100 bg-gray-50 text-gray-400 dark:border-slate-700 dark:bg-slate-800/50 dark:text-gray-500 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-600 dark:peer-checked:border-green-500 dark:peer-checked:bg-green-900/20 dark:peer-checked:text-green-400 hover:bg-gray-100 dark:hover:bg-slate-700 group">
+                                        ${checkIcon}
+                                        <span>Verify</span>
+                                    </div>
+                                </label>
+                                <label class="relative block cursor-pointer">
+                                    <input type="radio" name="swal-log-status" value="REJECTED" class="peer sr-only" ${currentStatus === 'REJECTED' || currentStatus === 'DECLINED' ? 'checked' : ''}>
+                                    <div class="${btnBase} border-gray-100 bg-gray-50 text-gray-400 dark:border-slate-700 dark:bg-slate-800/50 dark:text-gray-500 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-600 dark:peer-checked:border-red-500 dark:peer-checked:bg-red-900/20 dark:peer-checked:text-red-400 hover:bg-gray-100 dark:hover:bg-slate-700 group">
+                                        ${xIcon}
+                                        <span>Reject</span>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 `,
@@ -494,21 +525,23 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 cancelButtonText: '<span class="font-black uppercase tracking-widest">CANCEL</span>',
                 customClass: {
                     container: 'font-montserrat',
-                    popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100',
+                    popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100 dark:border-slate-800 dark:bg-slate-900',
                     confirmButton: 'bg-brand text-white hover:bg-brand-strong text-xs px-6 py-2.5 rounded-xl border border-transparent shadow-sm mx-2',
-                    cancelButton: 'bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs px-6 py-2.5 rounded-xl border border-gray-200 shadow-sm mx-2'
+                    cancelButton: 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 text-xs px-6 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 shadow-sm mx-2'
                 },
                 buttonsStyling: false,
                 preConfirm: () => {
+                     const selectedStatus = document.querySelector('input[name="swal-log-status"]:checked');
                      return {
-                         val: document.getElementById('swal-log-val').value.trim().toUpperCase()
+                         val: document.getElementById('swal-log-val').value.trim().toUpperCase(),
+                         status: selectedStatus ? selectedStatus.value : 'PENDING'
                      }
                 }
             });
 
-            if (formValues && formValues.val !== currentVal) {
+            if (formValues && (formValues.val !== currentVal || formValues.status !== currentStatus)) {
                 try {
-                    const payload = { type: dbType, id: logId, status: 'PENDING' }; // or keep existing status, API defaults it if null but we need a PUT here for update
+                    const payload = { type: dbType, id: logId, status: formValues.status };
                     if (dbType === 'dtr') payload.record_date = formValues.val;
                     if (dbType === 'ar') payload.period = formValues.val;
 
@@ -542,7 +575,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 const logType = btn.dataset.type;
                 const logId = btn.dataset.id;
                 const logVal = btn.dataset.val;
-                promptEditLog(logType.toUpperCase(), logType, logId, logVal);
+                const logStatus = btn.dataset.status;
+                promptEditLog(logType.toUpperCase(), logType, logId, logVal, logStatus);
             });
         });
 

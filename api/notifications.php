@@ -39,7 +39,8 @@ if (!$user_id) {
 
 try {
     $pdo = getDbConnection();
-    $isSupabase = useSupabase();
+    $isSupabase = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql';
+
     debugLog('notifications.init', ['method' => $_SERVER['REQUEST_METHOD'] ?? null]);
 
     // GET: Fetch notifications

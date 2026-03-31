@@ -13,7 +13,8 @@ header('Content-Type: application/json');
 
 try {
     $pdo = getDbConnection();
-    $isSupabase = useSupabase();
+    $isSupabase = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql';
+
     debugLog('logs.init', ['method' => $_SERVER['REQUEST_METHOD'] ?? null]);
 } catch (PDOException $e) {
     http_response_code(500);

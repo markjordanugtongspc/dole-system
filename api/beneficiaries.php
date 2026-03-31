@@ -18,8 +18,10 @@ $current_username = null;
 
 try {
     $pdo = getDbConnection();
-    $isSupabase = useSupabase();
-    debugLog('beneficiaries.init', ['method' => $_SERVER['REQUEST_METHOD'] ?? null]);
+    // [HYBRID] Check actual PDO driver to mathematically guarantee we use the correct SQL syntax.
+    // This avoids false-negatives from out-of-sync environment variables between CLI and Apache.
+    $isSupabase = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql';
+    debugLog('beneficiaries.init', ['method' => $_SERVER['REQUEST_METHOD'] ?? null, 'driver' => $pdo->getAttribute(PDO::ATTR_DRIVER_NAME)]);
 
     /**
      * Check if a column exists (hybrid-safe).
@@ -285,8 +287,10 @@ if ($method === 'GET') {
             echo json_encode(['success' => true, 'beneficiaries' => $beneficiaries]);
         }
     } catch (PDOException $e) {
+        error_log("BENEFICIARIES GET ERROR: " . $e->getMessage() . " | SQL: " . ($stmt ? $stmt->queryString : "N/A"));
+        debugLog('beneficiaries.get.error', ['msg' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
         http_response_code(500);
-        echo json_encode(['success' => false, 'error' => 'Database query failed']);
+        echo json_encode(['success' => false, 'error' => 'Database query failed: ' . $e->getMessage()]);
     }
 }
 
@@ -435,7 +439,7 @@ if ($method === 'GET') {
             'office_id' => $officeId,
             'office_name' => $data['office'] ?? null,
             'designation' => $data['designation'],
-            'replacement' => $data['replacement'] ?? null,
+            'replacement' => (isset($data['replacement']) && trim($data['replacement']) !== '') ? trim($data['replacement']) : null,
             'status_id' => $statusId,
             'absorption_log_id' => $absorptionLogId
         ];
@@ -586,7 +590,7 @@ if ($method === 'GET') {
             'office_id' => $officeId,
             'office_name' => $data['office'] ?? null,
             'designation' => $data['designation'],
-            'replacement' => $data['replacement'] ?? null,
+            'replacement' => (isset($data['replacement']) && trim($data['replacement']) !== '') ? trim($data['replacement']) : null,
             'status_id' => $statusId,
             'absorption_log_id' => $absorptionLogId
         ];

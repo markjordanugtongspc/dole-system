@@ -85,3 +85,12 @@
         transform: translateY(0);
     }
 }
+
+/* Custom Notification Skeleton Component */
+.skeleton-component {
+    background-color: #E6E6E6; /* Light Gray */
+}
+
+.dark .skeleton-component {
+    background-color: #3f4e63; /* Lighter slate for visibility in dark mode */
+}
