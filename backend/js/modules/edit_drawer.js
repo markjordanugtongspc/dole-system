@@ -294,10 +294,12 @@ export function showEditBeneficiaryDrawer(data) {
                     const success = await window.addBeneficiaryData(beneficiaryData, true, false);
                     if (success) {
                         drawer.hide();
-                        // Close info drawer too if open
-                        const infoDrawerBtn = document.querySelector('#close-drawer-btn');
-                        if (infoDrawerBtn) infoDrawerBtn.click();
-                        
+                        // Instead of full hide/show cycle (flicker), update the view data directly
+                        if (window.viewBeneficiary) {
+                            // pass ONLY the id. This forces window.viewBeneficiary in modal.js 
+                            // to do a fresh fetch from Supabase/MySQL instead of using stale local memory.
+                            setTimeout(() => window.viewBeneficiary({ id: data.id }, 0), 100); 
+                        }
                         Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Record Updated', showConfirmButton: false, timer: 3000 });
                     }
                 })();

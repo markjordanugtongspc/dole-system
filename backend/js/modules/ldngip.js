@@ -1,6 +1,8 @@
 import { getBasePath } from './auth.js';
 import { createNotification } from './notifications.js';
 import { pollingManager, apiGet, apiPut, showToast, reinitFlowbite, generateChecksum } from './ajax-manager.js';
+import { supabase } from './supabase-client.js';
+import { isSupabaseMode } from './auth.js';
 import {
     cacheBeneficiaries,
     getLocalBeneficiaries,
@@ -65,13 +67,55 @@ async function loadBeneficiaries() {
 
     // ── STEP 3: Background refresh from remote API ───────────────────────────
     try {
-        const result = await apiGet('api/beneficiaries.php');
-        if (result.success && result.data?.success && result.data?.beneficiaries) {
-            const remoteData = result.data.beneficiaries;
+        let remoteData = [];
+        if (isSupabaseMode() && supabase) {
+            const { data, error } = await supabase
+                .from('beneficiaries')
+                .select('gip_id, full_name, contact_number, address, birthday, age, education, start_date, end_date, series_number, office_name, designation, replacement_notes, is_archived, created_at, genders(gender_name), offices(office_name), status_types(status_name), absorption_logs(absorption_datetime, "where", "position", "agency", users(username))')
+                .eq('is_archived', false)
+                .order('full_name', { ascending: true })
+                .order('created_at', { ascending: true });
 
-            // Only update if something actually changed
-            const localChecksum = generateChecksum(localData);
-            const remoteChecksum = generateChecksum(remoteData);
+            if (error) throw error;
+            
+            remoteData = (data || []).map(b => ({
+                id: b.gip_id,
+                name: b.full_name,
+                contact: b.contact_number,
+                address: b.address,
+                birthday: b.birthday,
+                age: b.age || (b.birthday ? new Date().getFullYear() - new Date(b.birthday).getFullYear() : 0),
+                gender: b.genders ? b.genders.gender_name : null,
+                education: b.education,
+                startDate: b.start_date,
+                endDate: b.end_date,
+                startDateFormatted: b.start_date ? new Date(b.start_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : null,
+                endDateFormatted: b.end_date ? new Date(b.end_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : null,
+                seriesNo: b.series_number,
+                office: (b.offices ? b.offices.office_name : b.office_name) || null,
+                designation: b.designation,
+                replacement: b.replacement_notes,
+                remarks: b.status_types ? b.status_types.status_name : null,
+                absorbDate: b.absorption_logs ? b.absorption_logs.absorption_datetime : null,
+                absorb_where: b.absorption_logs ? b.absorption_logs.where : null,
+                absorb_position: b.absorption_logs ? b.absorption_logs.position : null,
+                absorb_agency: b.absorption_logs ? b.absorption_logs.agency : null,
+                absorb_by: b.absorption_logs && b.absorption_logs.users ? b.absorption_logs.users.username : null,
+                isArchived: b.is_archived,
+                createdAt: b.created_at
+            }));
+        } else {
+            const result = await apiGet('api/beneficiaries.php');
+            if (result.success && result.data?.success && result.data?.beneficiaries) {
+                remoteData = result.data.beneficiaries;
+            } else {
+                throw new Error(result.error || 'Fetch failed from API');
+            }
+        }
+
+        // Only update if something actually changed
+        const localChecksum = generateChecksum(localData);
+        const remoteChecksum = generateChecksum(remoteData);
 
             if (localChecksum !== remoteChecksum) {
                 await cacheBeneficiaries(remoteData); // Update local cache
@@ -85,7 +129,6 @@ async function loadBeneficiaries() {
                 console.log(`[Offline-First] Remote data matches cache — no re-render needed`);
                 lastDataChecksum = remoteChecksum;
             }
-        }
     } catch (error) {
         // Network error — that's fine, we already rendered from local cache
         console.warn('[Offline-First] Remote fetch failed (using local cache):', error.message);
@@ -139,10 +182,51 @@ function initAutoRefresh() {
             return;
         }
 
-        const result = await apiGet('api/beneficiaries.php');
+        let newData = [];
+        if (isSupabaseMode() && supabase) {
+            const { data, error } = await supabase
+                .from('beneficiaries')
+                .select('gip_id, full_name, contact_number, address, birthday, age, education, start_date, end_date, series_number, office_name, designation, replacement_notes, is_archived, created_at, genders(gender_name), offices(office_name), status_types(status_name), absorption_logs(absorption_datetime, "where", "position", "agency", users(username))')
+                .eq('is_archived', false)
+                .order('full_name', { ascending: true })
+                .order('created_at', { ascending: true });
 
-        if (result.success && result.data.beneficiaries) {
-            const newData = result.data.beneficiaries;
+            if (!error && data) {
+                newData = data.map(b => ({
+                    id: b.gip_id,
+                    name: b.full_name,
+                    contact: b.contact_number,
+                    address: b.address,
+                    birthday: b.birthday,
+                    age: b.age || (b.birthday ? new Date().getFullYear() - new Date(b.birthday).getFullYear() : 0),
+                    gender: b.genders ? b.genders.gender_name : null,
+                    education: b.education,
+                    startDate: b.start_date,
+                    endDate: b.end_date,
+                    startDateFormatted: b.start_date ? new Date(b.start_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : null,
+                    endDateFormatted: b.end_date ? new Date(b.end_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : null,
+                    seriesNo: b.series_number,
+                    office: (b.offices ? b.offices.office_name : b.office_name) || null,
+                    designation: b.designation,
+                    replacement: b.replacement_notes,
+                    remarks: b.status_types ? b.status_types.status_name : null,
+                    absorbDate: b.absorption_logs ? b.absorption_logs.absorption_datetime : null,
+                    absorb_where: b.absorption_logs ? b.absorption_logs.where : null,
+                    absorb_position: b.absorption_logs ? b.absorption_logs.position : null,
+                    absorb_agency: b.absorption_logs ? b.absorption_logs.agency : null,
+                    absorb_by: b.absorption_logs && b.absorption_logs.users ? b.absorption_logs.users.username : null,
+                    isArchived: b.is_archived,
+                    createdAt: b.created_at
+                }));
+            }
+        } else {
+            const result = await apiGet('api/beneficiaries.php');
+            if (result.success && result.data && result.data.beneficiaries) {
+                newData = result.data.beneficiaries;
+            }
+        }
+
+        if (newData.length > 0) {
             syncExpiredStatusesLocally(newData);
             const newChecksum = generateChecksum(newData);
 
@@ -482,13 +566,27 @@ export async function archiveRecord(id) {
     if (!result.isConfirmed) return false;
 
     try {
-        const response = await fetch(`${getBasePath()}api/beneficiaries.php?id=${encodeURIComponent(id)}&action=archive`, {
-            method: 'PATCH'
-        });
+        let responseSuccess = false;
+        let errorMsg = 'Failed to archive';
 
-        const data = await response.json();
+        if (isSupabaseMode() && supabase) {
+            const { error } = await supabase
+                .from('beneficiaries')
+                .update({ is_archived: true })
+                .eq('gip_id', id);
+            
+            if (!error) responseSuccess = true;
+            else errorMsg = error.message;
+        } else {
+            const response = await fetch(`${getBasePath()}api/beneficiaries.php?id=${encodeURIComponent(id)}&action=archive`, {
+                method: 'PATCH'
+            });
+            const data = await response.json();
+            if (data.success) responseSuccess = true;
+            else errorMsg = data.error || errorMsg;
+        }
 
-        if (data.success) {
+        if (responseSuccess) {
             Swal.fire({
                 toast: true,
                 position: 'top-end',

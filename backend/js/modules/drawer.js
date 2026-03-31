@@ -415,11 +415,11 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                         let json = { success: false };
                         try { json = JSON.parse(responseText); } catch(e) {}
 
-                        if(json.success) {
-                            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Status updated!', showConfirmButton: false, timer: 1500 });
-                            drawer.hide();
-                            setTimeout(() => window.viewBeneficiary(data, rightGridPage), 400); 
-                        } else {
+            if (json.success) {
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Status updated!', showConfirmButton: false, timer: 1500 });
+                // Refresh data from source (Supabase/MySQL) to ensure everything is in sync
+                if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
+            } else {
                             Swal.fire('Error', json.error || 'Failed to update', 'error');
                         }
                     } catch(e) { Swal.fire('Error', e.message, 'error'); }
@@ -473,8 +473,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 
                 if (json.success) {
                     Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Auto-Added!', showConfirmButton: false, timer: 1500 });
-                    drawer.hide();
-                    setTimeout(() => window.viewBeneficiary(data, rightGridPage), 400);
+                    if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
                 } else {
                     Swal.fire('Error', 'Failed to add log.', 'error');
                 }
@@ -521,8 +520,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 `,
                 focusConfirm: false,
                 showCancelButton: true,
-                confirmButtonText: '<span class="font-black uppercase tracking-widest">SAVE REVISIONS</span>',
-                cancelButtonText: '<span class="font-black uppercase tracking-widest">CANCEL</span>',
+                confirmButtonText: '<span class="font-black uppercase tracking-widest cursor-pointer">SAVE REVISIONS</span>',
+                cancelButtonText: '<span class="font-black uppercase tracking-widest cursor-pointer">CANCEL</span>',
                 customClass: {
                     container: 'font-montserrat',
                     popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100 dark:border-slate-800 dark:bg-slate-900',
@@ -596,8 +595,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     customClass: {
                         container: 'font-montserrat',
                         popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100',
-                        confirmButton: 'bg-philippine-red text-white hover:bg-red-700 text-xs px-6 py-2.5 rounded-xl border border-transparent shadow-sm mx-2',
-                        cancelButton: 'bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs px-6 py-2.5 rounded-xl border border-gray-200 shadow-sm mx-2'
+                        confirmButton: 'bg-philippine-red text-white hover:bg-red-700 text-xs px-6 py-2.5 rounded-xl border border-transparent shadow-sm mx-2 cursor-pointer',
+                        cancelButton: 'bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs px-6 py-2.5 rounded-xl border border-gray-200 shadow-sm mx-2 cursor-pointer'
                     },
                     buttonsStyling: false
                 });
@@ -615,8 +614,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
                         if(json.success) {
                             Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Deleted', showConfirmButton: false, timer: 1500 });
-                            drawer.hide();
-                            setTimeout(() => window.viewBeneficiary(data, rightGridPage), 400); 
+                            if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
                         } else {
                             Swal.fire('Error', 'Failed to delete data.', 'error');
                         }
