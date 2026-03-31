@@ -14,7 +14,8 @@
  *  4. A status indicator in the UI shows pending vs. synced state.
  */
 
-import { getBasePath } from './auth.js';
+import { getBasePath, isSupabaseMode } from './auth.js';
+import { supabase } from './supabase-client.js';
 import { logger } from './logger.js';
 import {
     getPendingSyncItems,
@@ -148,6 +149,69 @@ function getUserId() {
  * @returns {Promise<boolean>} true on success
  */
 async function pushToRemote(item) {
+    // ── SUPABASE MODE: Direct SDK Push ──────────────────────────────────────
+    if (isSupabaseMode() && supabase) {
+        try {
+            const table = 'beneficiaries'; // Default table
+            let result = { success: false };
+
+            if (item.endpoint === 'api/beneficiaries.php') {
+                const payload = item.payload;
+                const id = payload.gip_id || payload.id;
+
+                // Prepare standard GIP data mapping for Supabase
+                const dbData = {
+                    full_name: payload.name,
+                    contact_number: payload.contact,
+                    address: payload.address,
+                    birthday: payload.birthday,
+                    age: payload.age,
+                    education: payload.education,
+                    start_date: payload.startDate,
+                    end_date: payload.endDate,
+                    series_number: payload.seriesNo,
+                    office_name: payload.office,
+                    designation: payload.designation,
+                    replacement_notes: payload.replacement,
+                    is_archived: payload.isArchived || false
+                };
+
+                if (item.method === 'POST') {
+                    const { data, error } = await supabase.from(table).insert([dbData]).select();
+                    if (error) throw error;
+                    result = { success: true, id: data[0].gip_id };
+                } 
+                else if (item.method === 'PUT' || item.method === 'PATCH') {
+                    // Action check for archive
+                    if (item.method === 'PATCH' && item.endpoint.includes('action=archive')) {
+                        const { error } = await supabase.from(table).update({ is_archived: true }).eq('gip_id', id);
+                        if (error) throw error;
+                    } else {
+                        const { error } = await supabase.from(table).update(dbData).eq('gip_id', id);
+                        if (error) throw error;
+                    }
+                    result = { success: true };
+                }
+            } else {
+                // Fallback for other potential endpoints (notifications, etc)
+                // Use standard fetch if not a beneficiary core operation
+                return await pushToFetch(item);
+            }
+
+            return result;
+        } catch (e) {
+            logger.error('[Sync] Supabase push failed', e);
+            throw e;
+        }
+    }
+
+    return await pushToFetch(item);
+}
+
+/**
+ * Standard fetch fallback for local Laragon/PHP
+ */
+async function pushToFetch(item) {
     const userId = getUserId();
     const url = `${getBasePath()}${item.endpoint}`;
 

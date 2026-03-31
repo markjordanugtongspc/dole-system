@@ -1,5 +1,6 @@
 import ApexCharts from 'apexcharts';
-import { getBasePath } from './auth.js';
+import { getBasePath, isSupabaseMode } from './auth.js';
+import { supabase } from './supabase-client.js';
 
 /**
  * 2026 LDNPFO GIP MONITORING - Data Visualization Module
@@ -99,16 +100,45 @@ export async function initCharts(forceRefresh = false) {
         rawData = cachedRawData;
     } else {
         try {
-            // Dashboard analytics should reflect total records, not just non-archived.
-            const response = await fetch(`${getBasePath()}api/beneficiaries.php?all=true`);
-            const result = await response.json();
-            if (result.success) {
-                rawData = result.beneficiaries || [];
-                cachedRawData = rawData; // Cache it
+            if (isSupabaseMode() && supabase) {
+                // Fetch total records (including archived for stats) directly from Supabase
+                const { data, error } = await supabase
+                    .from('beneficiaries')
+                    .select('gip_id, full_name, contact_number, address, birthday, age, education, start_date, end_date, series_number, office_name, designation, replacement_notes, is_archived, created_at, genders(gender_name), offices(office_name), status_types(status_name)');
+                
+                if (error) throw error;
+
+                rawData = (data || []).map(b => ({
+                    id: b.gip_id,
+                    name: b.full_name,
+                    contact: b.contact_number,
+                    address: b.address,
+                    birthday: b.birthday,
+                    age: b.age || (b.birthday ? new Date().getFullYear() - new Date(b.birthday).getFullYear() : 0),
+                    gender: b.genders ? b.genders.gender_name : null,
+                    education: b.education,
+                    startDate: b.start_date,
+                    endDate: b.end_date,
+                    seriesNo: b.series_number,
+                    office: (b.offices ? b.offices.office_name : b.office_name) || null,
+                    designation: b.designation,
+                    replacement: b.replacement_notes,
+                    remarks: b.status_types ? b.status_types.status_name : null,
+                    isArchived: b.is_archived,
+                    createdAt: b.created_at
+                }));
             } else {
-                console.error('Failed to load chart data:', result.error);
-                return;
+                // Dashboard analytics should reflect total records, not just non-archived.
+                const response = await fetch(`${getBasePath()}api/beneficiaries.php?all=true`);
+                const result = await response.json();
+                if (result.success) {
+                    rawData = result.beneficiaries || [];
+                } else {
+                    console.error('Failed to load chart data:', result.error);
+                    return;
+                }
             }
+            cachedRawData = rawData; // Cache it
         } catch (error) {
             console.error('Error fetching chart data:', error);
             return;

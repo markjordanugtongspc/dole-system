@@ -1,4 +1,5 @@
-import { getBasePath } from './auth.js';
+import { getBasePath, isSupabaseMode } from './auth.js';
+import { supabase } from './supabase-client.js';
 import { isDarkMode } from './darkmode.js';
 import Swal from 'sweetalert2';
 import { BulkApp } from './bulk_tool.js';
@@ -88,19 +89,36 @@ export function initModalHandler() {
             }
 
             // STEP 2: Background network fetch
-            const [arRes, dtrRes, docRes] = await Promise.all([
-                fetch(`${getBasePath()}api/logs.php?type=ar&gip_id=${encodeURIComponent(data.id)}`),
-                fetch(`${getBasePath()}api/logs.php?type=dtr&gip_id=${encodeURIComponent(data.id)}`),
-                fetch(`${getBasePath()}api/logs.php?type=docs&gip_id=${encodeURIComponent(data.id)}`)
-            ]);
+            let fetchedArLogs = [];
+            let fetchedDtrLogs = [];
+            let fetchedDocs = [];
 
-            const arData = await arRes.json();
-            const dtrData = await dtrRes.json();
-            const docData = await docRes.json();
+            if (isSupabaseMode() && supabase) {
+                // Fetch directly from Supabase tables
+                const [arRes, dtrRes, docRes] = await Promise.all([
+                    supabase.from('absorption_logs').select('*').eq('gip_id', data.id).order('absorption_datetime', { ascending: false }),
+                    supabase.from('dtr_logs').select('*').eq('gip_id', data.id).order('log_date', { ascending: false }),
+                    supabase.from('documents').select('*').eq('gip_id', data.id).order('created_at', { ascending: false })
+                ]);
 
-            const fetchedArLogs = arData.success ? arData.logs : [];
-            const fetchedDtrLogs = dtrData.success ? dtrData.logs : [];
-            const fetchedDocs = docData.success ? docData.logs : [];
+                fetchedArLogs = arRes.data || [];
+                fetchedDtrLogs = dtrRes.data || [];
+                fetchedDocs = docRes.data || [];
+            } else {
+                const [arRes, dtrRes, docRes] = await Promise.all([
+                    fetch(`${getBasePath()}api/logs.php?type=ar&gip_id=${encodeURIComponent(data.id)}`),
+                    fetch(`${getBasePath()}api/logs.php?type=dtr&gip_id=${encodeURIComponent(data.id)}`),
+                    fetch(`${getBasePath()}api/logs.php?type=docs&gip_id=${encodeURIComponent(data.id)}`)
+                ]);
+
+                const arData = await arRes.json();
+                const dtrData = await dtrRes.json();
+                const docData = await docRes.json();
+
+                fetchedArLogs = arData.success ? arData.logs : [];
+                fetchedDtrLogs = dtrData.success ? dtrData.logs : [];
+                fetchedDocs = docData.success ? docData.logs : [];
+            }
 
             // STEP 3: Save to secure cache
             const newLogsData = {
@@ -159,21 +177,37 @@ export function initModalHandler() {
  */
 export async function showProfileModal() {
     try {
-        // Pass user_id for Vercel serverless (no PHP sessions)
-        let uid = '';
-        try { const u = JSON.parse(localStorage.getItem('user')); if (u && u.id) uid = `?user_id=${u.id}`; } catch(e) {}
-        const response = await fetch(`${getBasePath()}api/profile.php${uid}`);
-        const result = await response.json();
+        if (isSupabaseMode() && supabase) {
+            let uid = '';
+            try { const u = JSON.parse(localStorage.getItem('user')); if (u && u.id) uid = u.id; } catch(e) {}
+            
+            if (!uid) throw new Error('User not logged in');
 
-        if (result.success) {
-            const profile = result.profile;
-            renderProfileModal(profile);
+            const { data, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', uid)
+                .single();
+            
+            if (error) throw error;
+            renderProfileModal(data);
         } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: result.error || 'Failed to load profile'
-            });
+            // Pass user_id for Vercel serverless (no PHP sessions)
+            let uid = '';
+            try { const u = JSON.parse(localStorage.getItem('user')); if (u && u.id) uid = `?user_id=${u.id}`; } catch(e) {}
+            const response = await fetch(`${getBasePath()}api/profile.php${uid}`);
+            const result = await response.json();
+
+            if (result.success) {
+                const profile = result.profile;
+                renderProfileModal(profile);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.error || 'Failed to load profile'
+                });
+            }
         }
     } catch (error) {
         console.error('Error fetching profile:', error);
