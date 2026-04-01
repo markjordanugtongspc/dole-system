@@ -1,17 +1,18 @@
 {
-  "_auth-B2dqDIaS.js": {
-    "file": "assets/auth-B2dqDIaS.js",
-    "name": "auth",
+  "_modal-C41ucjLZ.js": {
+    "file": "assets/modal-C41ucjLZ.js",
+    "name": "modal",
     "imports": [
-      "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
+      "node_modules/sweetalert2/dist/sweetalert2.esm.all.js",
+      "_vendor-DHtNC8Ux.js"
     ],
     "dynamicImports": [
       "node_modules/flowbite/lib/esm/index.js",
       "node_modules/flowbite/lib/esm/index.js"
     ]
   },
-  "_vendor-DC5wud4b.js": {
-    "file": "assets/vendor-DC5wud4b.js",
+  "_vendor-DHtNC8Ux.js": {
+    "file": "assets/vendor-DHtNC8Ux.js",
     "name": "vendor"
   },
   "_vendor-charts-BjInCqFR.js": {
@@ -19,14 +20,14 @@
     "name": "vendor-charts"
   },
   "backend/js/main.js": {
-    "file": "assets/main-pdzqYkPJ.js",
+    "file": "assets/main-DXSXgeoK.js",
     "name": "main",
     "src": "backend/js/main.js",
     "isEntry": true,
     "imports": [
-      "_vendor-DC5wud4b.js",
+      "_vendor-DHtNC8Ux.js",
       "node_modules/flowbite/lib/esm/index.js",
-      "_auth-B2dqDIaS.js",
+      "_modal-C41ucjLZ.js",
       "_vendor-charts-BjInCqFR.js",
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
     ],
@@ -35,22 +36,23 @@
     ]
   },
   "backend/js/modules/settings.js": {
-    "file": "assets/settings-DCugHD_J.js",
+    "file": "assets/settings-Bm-S_zpl.js",
     "name": "settings",
     "src": "backend/js/modules/settings.js",
     "isEntry": true,
     "imports": [
-      "_auth-B2dqDIaS.js",
-      "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
+      "_modal-C41ucjLZ.js",
+      "node_modules/sweetalert2/dist/sweetalert2.esm.all.js",
+      "_vendor-DHtNC8Ux.js"
     ]
   },
   "node_modules/flowbite/lib/esm/index.js": {
-    "file": "assets/vendor-flowbite-B2TFTxm5.js",
+    "file": "assets/vendor-flowbite-bBKPL--D.js",
     "name": "vendor-flowbite",
     "src": "node_modules/flowbite/lib/esm/index.js",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-DC5wud4b.js"
+      "_vendor-DHtNC8Ux.js"
     ]
   },
   "node_modules/sweetalert2/dist/sweetalert2.esm.all.js": {
@@ -60,7 +62,7 @@
     "isDynamicEntry": true
   },
   "style.css": {
-    "file": "assets/style-BaFKu6j2.css",
+    "file": "assets/style-CYaIHXN9.css",
     "src": "style.css"
   }
 }

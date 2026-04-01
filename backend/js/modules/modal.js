@@ -6,69 +6,6 @@ import { BulkApp } from './bulk_tool.js';
 import { showBeneficiaryDrawer } from './drawer.js';
 import { showEditBeneficiaryDrawer } from './edit_drawer.js';
 
-/**
- * Show modern error modal for authentication
- */
-export function showAuthError(message = 'Incorrect Username or Password') {
-    Swal.fire({
-        html: `
-            <div class="p-6">
-                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
-                    <svg class="h-10 w-10 text-philippine-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                </div>
-                <h3 class="text-xl font-black text-gray-900 mb-2">Authentication Failed</h3>
-                <p class="text-sm text-gray-600 font-medium">${message}</p>
-                <p class="text-xs text-gray-500 mt-3">Please check your credentials and try again.</p>
-            </div>
-        `,
-        timer: 3000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        showCloseButton: true,
-        width: '400px',
-        padding: '0',
-        customClass: {
-            container: 'font-montserrat',
-            popup: 'rounded-2xl shadow-2xl overflow-hidden',
-            timerProgressBar: 'bg-philippine-red h-1.5',
-            closeButton: 'text-gray-400 hover:text-gray-600 transition-colors focus:outline-none hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center'
-        },
-        backdrop: 'rgba(0, 0, 0, 0.4)'
-    });
-}
-
-export function showLoginSuccess(fast = false) {
-    return Swal.fire({
-        html: `
-            <div class="p-6">
-                <div class="mx-auto flex flex-col items-center justify-center">
-                    <div class="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mb-4 border-[3px] border-green-200">
-                        <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-black text-gray-900 mb-1">Welcome Back!</h3>
-                    <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Authentication successful</p>
-                </div>
-            </div>
-        `,
-        timer: fast ? 800 : 3000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        showCloseButton: false,
-        width: '350px',
-        padding: '0',
-        customClass: {
-            container: 'font-montserrat',
-            popup: 'rounded-[1.5rem] shadow-2xl overflow-hidden border border-gray-100',
-            timerProgressBar: 'bg-green-500 h-1.5'
-        },
-        backdrop: 'rgba(0, 0, 0, 0.4)'
-    });
-}
-
 export function initModalHandler() {
     // Expose the functions to the global window object
     window.viewBeneficiary = async function (data, page = 0) {

@@ -71,7 +71,7 @@ async function loadBeneficiaries() {
         if (isSupabaseMode() && supabase) {
             const { data, error } = await supabase
                 .from('beneficiaries')
-                .select('gip_id, full_name, contact_number, address, birthday, age, education, start_date, end_date, series_number, office_name, designation, replacement_notes, is_archived, created_at, genders(gender_name), offices(office_name), status_types(status_name), absorption_logs(absorption_datetime, "where", "position", "agency", users(username))')
+                .select('gip_id, full_name, contact_number, address, birthday, age, education, start_date, end_date, series_number, office_name, designation, replacement_notes, is_archived, created_at, genders(gender_name), offices(office_name), status_types(status_name), absorption_logs(absorption_datetime, "where", "position", "agency")')
                 .eq('is_archived', false)
                 .order('full_name', { ascending: true })
                 .order('created_at', { ascending: true });
@@ -186,7 +186,7 @@ function initAutoRefresh() {
         if (isSupabaseMode() && supabase) {
             const { data, error } = await supabase
                 .from('beneficiaries')
-                .select('gip_id, full_name, contact_number, address, birthday, age, education, start_date, end_date, series_number, office_name, designation, replacement_notes, is_archived, created_at, genders(gender_name), offices(office_name), status_types(status_name), absorption_logs(absorption_datetime, "where", "position", "agency", users(username))')
+                .select('gip_id, full_name, contact_number, address, birthday, age, education, start_date, end_date, series_number, office_name, designation, replacement_notes, is_archived, created_at, genders(gender_name), offices(office_name), status_types(status_name), absorption_logs(absorption_datetime, "where", "position", "agency")')
                 .eq('is_archived', false)
                 .order('full_name', { ascending: true })
                 .order('created_at', { ascending: true });
