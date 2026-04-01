@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 /**
  * Hybrid engine runtime flag for frontend modules.
  * - true  => [SUPABASE] Cloud mode (PostgreSQL)
- * - false => [LOCALHOST] Laragon mode (MySQL)
+ * - false => [MYSQL] InfinityFree / Local mode (MySQL)
  */
 export const USE_SUPABASE = String(import.meta.env.VITE_USE_SUPABASE ?? 'true').toLowerCase() === 'true';
 
@@ -17,6 +17,14 @@ export const USE_SUPABASE = String(import.meta.env.VITE_USE_SUPABASE ?? 'true').
  * [HYBRID] Helper to check if current frontend state is Supabase
  */
 export function isSupabaseMode() {
+    // If we're on localhost or 127.0.0.1, we default to false (MySQL/Infinity) unless VITE_USE_SUPABASE is explicitly true
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    if (isLocal) {
+        return USE_SUPABASE === true;
+    }
+    
+    // On Vercel (or other production hosts), we default to Supabase
     return USE_SUPABASE;
 }
 

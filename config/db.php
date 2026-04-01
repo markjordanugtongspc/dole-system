@@ -224,7 +224,6 @@ function getDbConnection()
 
         if ($dbConfig['driver'] === 'pgsql') {
             // Supabase requires SSL for most direct Postgres connections.
-            // Keeping it configurable, but defaulting to `require`.
             $sslMode = env('DB_SSLMODE', 'require');
             $dsn = sprintf(
                 "pgsql:host=%s;port=%s;dbname=%s;sslmode=%s",
@@ -241,6 +240,7 @@ function getDbConnection()
                 PDO::ATTR_TIMEOUT => 5,
             ];
         } else {
+            // MySQL Mode (Staging/InfinityFree or Localhost)
             $dsn = sprintf(
                 "mysql:host=%s;port=%s;dbname=%s;charset=%s",
                 $dbConfig['host'],
@@ -253,7 +253,7 @@ function getDbConnection()
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
-                PDO::ATTR_TIMEOUT => 5, // 5 seconds timeout
+                PDO::ATTR_TIMEOUT => 30, // Higher timeout for remote MySQL InfinityFree
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$dbConfig['charset']} COLLATE {$dbConfig['collation']}",
             ];
         }
