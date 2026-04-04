@@ -418,36 +418,11 @@ require_once __DIR__ . '/../../config/vite.php';
                     <div class="grid grid-cols-1 items-center border-t border-slate-200 justify-between mt-4">
                         <div class="flex justify-between items-center pt-4">
                             <!-- Button -->
-                            <button id="dropdownLastDaysEduButton" data-dropdown-toggle="LastDaysEdudropdown"
-                                data-dropdown-placement="bottom"
-                                class="cursor-pointer text-[10px] font-black text-slate-400 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-[0.15em] transition-colors"
-                                type="button">
-                                Previous 7 Days
-                                <svg class="w-3 h-3 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                    fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="m19 9-7 7-7-7" />
-                                </svg>
-                            </button>
-                            <!-- Dropdown menu -->
-                            <div id="LastDaysEdudropdown"
-                                class="z-10 hidden bg-white divide-y divide-slate-100 rounded-lg shadow-xl w-44 border border-slate-200">
-                                <ul class="py-2 text-xs font-bold text-slate-600"
-                                    aria-labelledby="dropdownLastDaysEduButton">
-                                    <li><a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors uppercase">Yesterday</a>
-                                    </li>
-                                    <li><a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors uppercase">Today</a>
-                                    </li>
-                                    <li><a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors uppercase">Last 7
-                                            days</a></li>
-                                    <li><a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors uppercase">Last
-                                            30 days</a></li>
-                                </ul>
+                            <!-- Label only -->
+                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] py-2">
+                                Distribution Profile
                             </div>
+
                             <a href="#"
                                 class="cursor-pointer inline-flex items-center uppercase tracking-widest font-black text-royal-blue hover:text-blue-800 text-[10px] group">
                                 View Full Report
@@ -495,46 +470,11 @@ require_once __DIR__ . '/../../config/vite.php';
                     <div class="grid grid-cols-1 items-center border-t border-slate-200 justify-between mt-2">
                         <div class="flex justify-between items-center pt-2 md:pt-3">
                             <!-- Button -->
-                            <button id="dropdownLastDays3Button" data-dropdown-toggle="LastDays3dropdown"
-                                data-dropdown-placement="bottom"
-                                class="cursor-pointer text-[10px] font-bold text-slate-500 hover:text-royal-blue text-center inline-flex items-center uppercase tracking-wider"
-                                type="button">
-                                Last 7 days
-                                <svg class="w-2.5 h-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                    fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="m19 9-7 7-7-7" />
-                                </svg>
-                            </button>
-                            <!-- Dropdown menu -->
-                            <div id="LastDays3dropdown"
-                                class="z-10 hidden bg-white divide-y divide-slate-100 rounded-lg shadow-xl w-44 border border-slate-200">
-                                <ul class="py-2 text-sm text-slate-700" aria-labelledby="dropdownLastDays3Button">
-                                    <li>
-                                        <a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors">Yesterday</a>
-                                    </li>
-                                    <li>
-                                        <a href="#"
-                                            class="block px-4 py-2 hover:bg-slate-50 transition-colors">Today</a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last
-                                            7
-                                            days</a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last
-                                            30
-                                            days</a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="block px-4 py-2 hover:bg-slate-50 transition-colors">Last
-                                            90
-                                            days</a>
-                                    </li>
-                                </ul>
+                            <!-- Label only -->
+                            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider py-2">
+                                Role Distribution
                             </div>
+
                             <a href="#"
                                 class="cursor-pointer inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-[10px] hover:underline">
                                 Roles Report

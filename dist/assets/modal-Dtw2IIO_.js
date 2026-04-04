@@ -522,7 +522,7 @@ import p from"./vendor-swal-BSk0fVSb.js";import{a as we}from"./vendor-DHtNC8Ux.j
                 </div>
                 <div>
                     <h2 class="text-xl font-black text-heading leading-tight italic">Report Generator</h2>
-                    <p class="text-[10px] font-bold text-gray-400 dark:!text-white uppercase tracking-widest">Configure your data output</p>
+                    <p class="text-[10px] font-bold text-gray-400 dark:text-white! uppercase tracking-widest">Configure your data output</p>
                 </div>
             </div>
 
@@ -531,7 +531,7 @@ import p from"./vendor-swal-BSk0fVSb.js";import{a as we}from"./vendor-DHtNC8Ux.j
                 <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="w-1.5 h-4 bg-royal-blue rounded-full"></span>
-                        <label class="text-[10px] font-black text-gray-400 dark:!text-white uppercase tracking-widest leading-none">Global Filters</label>
+                        <label class="text-[10px] font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Global Filters</label>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -540,7 +540,7 @@ import p from"./vendor-swal-BSk0fVSb.js";import{a as we}from"./vendor-DHtNC8Ux.j
                             <div class="relative group">
                                 <input type="text" id="export-search" value="${o.search}" placeholder="Name or ID..." 
                                     class="w-full bg-white border border-gray-200 rounded-xl px-9 py-2.5 text-xs font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
-                                <svg class="w-3.5 h-3.5 text-gray-400 dark:!text-white absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             </div>
                         </div>
 
@@ -554,7 +554,7 @@ import p from"./vendor-swal-BSk0fVSb.js";import{a as we}from"./vendor-DHtNC8Ux.j
                                     <option value="DICT" ${o.office==="DICT"?"selected":""}>DICT</option>
                                     <option value="DEPED" ${o.office==="DEPED"?"selected":""}>DEPED</option>
                                 </select>
-                                <svg class="w-3.5 h-3.5 text-gray-400 dark:!text-white absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
                         </div>
 
@@ -567,7 +567,7 @@ import p from"./vendor-swal-BSk0fVSb.js";import{a as we}from"./vendor-DHtNC8Ux.j
                                     <option value="id" ${o.sort==="id"?"selected":""}>ID NUMBER</option>
                                     <option value="office" ${o.sort==="office"?"selected":""}>OFFICE NAME</option>
                                 </select>
-                                <svg class="w-3.5 h-3.5 text-gray-400 dark:!text-white absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
                         </div>
                     </div>
@@ -580,7 +580,7 @@ import p from"./vendor-swal-BSk0fVSb.js";import{a as we}from"./vendor-DHtNC8Ux.j
                                 ${["ALL","ONGOING","ABSORBED","RESIGNED","EXPIRED"].map(s=>{const r={ALL:"peer-checked:bg-blue-600",ONGOING:"peer-checked:bg-green-500",ABSORBED:"peer-checked:bg-teal-600",RESIGNED:"peer-checked:bg-gray-700",EXPIRED:"peer-checked:bg-red-600"};return`
                                         <label class="cursor-pointer">
                                             <input type="radio" name="export-status" value="${s}" ${o.status===s?"checked":""} class="hidden peer">
-                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 dark:!text-white uppercase tracking-widest ${r[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${r[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
                                         </label>
                                     `}).join("")}
                             </div>
@@ -617,7 +617,7 @@ import p from"./vendor-swal-BSk0fVSb.js";import{a as we}from"./vendor-DHtNC8Ux.j
                 <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100 mt-4">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="w-1.5 h-4 bg-golden-yellow rounded-full"></span>
-                        <label class="text-[10px] font-black text-gray-400 dark:!text-white uppercase tracking-widest leading-none">Output Column Selection</label>
+                        <label class="text-[10px] font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Output Column Selection</label>
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -674,7 +674,7 @@ import p from"./vendor-swal-BSk0fVSb.js";import{a as we}from"./vendor-DHtNC8Ux.j
                         <div class="group">
                             <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
                             <input type="text" name="name" id="name-input-field" value="${e?.name||""}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} dark:text-white!" placeholder="e.g. Dela Cruz, Juan M.">
-                            <div id="duplicate-warning" class="hidden mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse">
+                            <div id="duplicate-warning" class="hidden mt-1 text-[10px] font-bold items-center gap-1.5 animate-pulse">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 <span>Beneficiary already exist</span>
                             </div>
@@ -720,7 +720,7 @@ import p from"./vendor-swal-BSk0fVSb.js";import{a as we}from"./vendor-DHtNC8Ux.j
                                     <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
                                         <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                                     </div>
-                                    <div id="course-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
+                                    <div id="course-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
                                         ${be.map(n=>`
                                             <div class="course-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
                                                 ${n.icon}
@@ -779,7 +779,7 @@ import p from"./vendor-swal-BSk0fVSb.js";import{a as we}from"./vendor-DHtNC8Ux.j
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                         <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                     </div>
-                                    <div id="office-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
+                                    <div id="office-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
                                         ${["DOLE Field Office","LGU","DEPED","DICT","PCA"].map(n=>`
                                             <div class="office-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
                                                 ${n}
@@ -804,7 +804,7 @@ import p from"./vendor-swal-BSk0fVSb.js";import{a as we}from"./vendor-DHtNC8Ux.j
                                     value="${e?.designation||""}" required 
                                     class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
                                     placeholder="e.g. Administrative Support">
-                                <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2 transform origin-top transition-all duration-200">
+                                <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2 transform origin-top transition-all duration-200">
                                     <div class="px-2 py-1.5 mb-1.5 border-b ${t.borderSuggHead}">
                                         <p class="text-[9px] font-black ${t.textWorkSuggHead} uppercase tracking-widest">Quick Select Roles</p>
                                     </div>
@@ -860,7 +860,7 @@ import p from"./vendor-swal-BSk0fVSb.js";import{a as we}from"./vendor-DHtNC8Ux.j
             </form>
 
             <!-- Action Bar -->
-            <div class="mt-6 flex flex-wrap lg:justify-end items-center gap-3 pt-6 rounded-b-[1.5rem] ${t.bgActionBar} border-t ${t.actionBarBorder}">
+            <div class="mt-6 flex flex-wrap lg:justify-end items-center gap-3 pt-6 rounded-b-3xl ${t.bgActionBar} border-t ${t.actionBarBorder}">
                 <button type="button" id="cancel-modal-btn"
                     class="group flex items-center justify-center gap-2.5 px-4 lg:px-6 py-3 lg:py-3.5 ${t.bgCancelBtn} ${t.textCancel} font-black rounded-xl hover:bg-[#ce1126] hover:text-white transition-all duration-300 shadow-sm border ${t.cancelBorder} hover:border-[#ce1126] cursor-pointer text-[10px] lg:text-[12px] active:scale-[0.98] uppercase tracking-wider whitespace-nowrap order-1 lg:order-2">
                     <svg class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
