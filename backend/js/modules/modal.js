@@ -1,73 +1,11 @@
 import { getBasePath, isSupabaseMode } from './auth.js';
 import { supabase } from './supabase-client.js';
 import { isDarkMode } from './darkmode.js';
+import { apiGet } from './ajax-manager.js';
 import Swal from 'sweetalert2';
 import { BulkApp } from './bulk_tool.js';
 import { showBeneficiaryDrawer } from './drawer.js';
 import { showEditBeneficiaryDrawer } from './edit_drawer.js';
-
-/**
- * Show modern error modal for authentication
- */
-export function showAuthError(message = 'Incorrect Username or Password') {
-    Swal.fire({
-        html: `
-            <div class="p-6">
-                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
-                    <svg class="h-10 w-10 text-philippine-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                </div>
-                <h3 class="text-xl font-black text-gray-900 mb-2">Authentication Failed</h3>
-                <p class="text-sm text-gray-600 font-medium">${message}</p>
-                <p class="text-xs text-gray-500 mt-3">Please check your credentials and try again.</p>
-            </div>
-        `,
-        timer: 3000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        showCloseButton: true,
-        width: '400px',
-        padding: '0',
-        customClass: {
-            container: 'font-montserrat',
-            popup: 'rounded-2xl shadow-2xl overflow-hidden',
-            timerProgressBar: 'bg-philippine-red h-1.5',
-            closeButton: 'text-gray-400 hover:text-gray-600 transition-colors focus:outline-none hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center'
-        },
-        backdrop: 'rgba(0, 0, 0, 0.4)'
-    });
-}
-
-export function showLoginSuccess(fast = false) {
-    return Swal.fire({
-        html: `
-            <div class="p-6">
-                <div class="mx-auto flex flex-col items-center justify-center">
-                    <div class="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mb-4 border-[3px] border-green-200">
-                        <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-black text-gray-900 mb-1">Welcome Back!</h3>
-                    <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Authentication successful</p>
-                </div>
-            </div>
-        `,
-        timer: fast ? 800 : 3000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        showCloseButton: false,
-        width: '350px',
-        padding: '0',
-        customClass: {
-            container: 'font-montserrat',
-            popup: 'rounded-[1.5rem] shadow-2xl overflow-hidden border border-gray-100',
-            timerProgressBar: 'bg-green-500 h-1.5'
-        },
-        backdrop: 'rgba(0, 0, 0, 0.4)'
-    });
-}
 
 export function initModalHandler() {
     // Expose the functions to the global window object
@@ -93,31 +31,26 @@ export function initModalHandler() {
             let fetchedDtrLogs = [];
             let fetchedDocs = [];
 
-            if (isSupabaseMode() && supabase) {
-                // Fetch directly from Supabase tables
-                const [arRes, dtrRes, docRes] = await Promise.all([
-                    supabase.from('absorption_logs').select('*').eq('gip_id', data.id).order('absorption_datetime', { ascending: false }),
-                    supabase.from('dtr_logs').select('*').eq('gip_id', data.id).order('log_date', { ascending: false }),
-                    supabase.from('documents').select('*').eq('gip_id', data.id).order('created_at', { ascending: false })
-                ]);
+            // [HYBRID-BRIDGE] Use authorized PHP API for logs/docs to bypass RLS and correct table names
+            const [arRes, dtrRes, docRes, absRes] = await Promise.all([
+                apiGet(`api/logs.php?type=ar&gip_id=${encodeURIComponent(data.id)}`),
+                apiGet(`api/logs.php?type=dtr&gip_id=${encodeURIComponent(data.id)}`),
+                apiGet(`api/logs.php?type=docs&gip_id=${encodeURIComponent(data.id)}`),
+                apiGet(`api/logs.php?type=absorption&gip_id=${encodeURIComponent(data.id)}`)
+            ]);
 
-                fetchedArLogs = arRes.data || [];
-                fetchedDtrLogs = dtrRes.data || [];
-                fetchedDocs = docRes.data || [];
-            } else {
-                const [arRes, dtrRes, docRes] = await Promise.all([
-                    fetch(`${getBasePath()}api/logs.php?type=ar&gip_id=${encodeURIComponent(data.id)}`),
-                    fetch(`${getBasePath()}api/logs.php?type=dtr&gip_id=${encodeURIComponent(data.id)}`),
-                    fetch(`${getBasePath()}api/logs.php?type=docs&gip_id=${encodeURIComponent(data.id)}`)
-                ]);
-
-                const arData = await arRes.json();
-                const dtrData = await dtrRes.json();
-                const docData = await docRes.json();
-
-                fetchedArLogs = arData.success ? arData.logs : [];
-                fetchedDtrLogs = dtrData.success ? dtrData.logs : [];
-                fetchedDocs = docData.success ? docData.logs : [];
+            fetchedArLogs = (arRes.success && arRes.data?.success) ? arRes.data.logs : [];
+            fetchedDtrLogs = (dtrRes.success && dtrRes.data?.success) ? dtrRes.data.logs : [];
+            fetchedDocs = (docRes.success && docRes.data?.success) ? docRes.data.logs : [];
+            const absorptionLogs = (absRes.success && absRes.data?.success) ? absRes.data.logs : [];
+            
+            // Map absorption data to the beneficiary object for the drawer if needed
+            if (absorptionLogs.length > 0) {
+                const latest = absorptionLogs[0];
+                data.absorbDate = latest.absorption_datetime;
+                data.absorb_where = latest.where || latest.absorb_where;
+                data.absorb_position = latest.position || latest.absorb_position;
+                data.absorb_agency = latest.agency || latest.absorb_agency;
             }
 
             // STEP 3: Save to secure cache
@@ -404,7 +337,7 @@ export function showExportConfigModal(callback) {
                 </div>
                 <div>
                     <h2 class="text-xl font-black text-heading leading-tight italic">Report Generator</h2>
-                    <p class="text-[10px] font-bold text-gray-400 dark:!text-white uppercase tracking-widest">Configure your data output</p>
+                    <p class="text-[10px] font-bold text-gray-400 dark:text-white! uppercase tracking-widest">Configure your data output</p>
                 </div>
             </div>
 
@@ -413,7 +346,7 @@ export function showExportConfigModal(callback) {
                 <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="w-1.5 h-4 bg-royal-blue rounded-full"></span>
-                        <label class="text-[10px] font-black text-gray-400 dark:!text-white uppercase tracking-widest leading-none">Global Filters</label>
+                        <label class="text-[10px] font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Global Filters</label>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -422,7 +355,7 @@ export function showExportConfigModal(callback) {
                             <div class="relative group">
                                 <input type="text" id="export-search" value="${currentFilters.search}" placeholder="Name or ID..." 
                                     class="w-full bg-white border border-gray-200 rounded-xl px-9 py-2.5 text-xs font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
-                                <svg class="w-3.5 h-3.5 text-gray-400 dark:!text-white absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             </div>
                         </div>
 
@@ -436,7 +369,7 @@ export function showExportConfigModal(callback) {
                                     <option value="DICT" ${currentFilters.office === 'DICT' ? 'selected' : ''}>DICT</option>
                                     <option value="DEPED" ${currentFilters.office === 'DEPED' ? 'selected' : ''}>DEPED</option>
                                 </select>
-                                <svg class="w-3.5 h-3.5 text-gray-400 dark:!text-white absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
                         </div>
 
@@ -449,7 +382,7 @@ export function showExportConfigModal(callback) {
                                     <option value="id" ${currentFilters.sort === 'id' ? 'selected' : ''}>ID NUMBER</option>
                                     <option value="office" ${currentFilters.sort === 'office' ? 'selected' : ''}>OFFICE NAME</option>
                                 </select>
-                                <svg class="w-3.5 h-3.5 text-gray-400 dark:!text-white absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                                <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
                         </div>
                     </div>
@@ -464,7 +397,7 @@ export function showExportConfigModal(callback) {
         return `
                                         <label class="cursor-pointer">
                                             <input type="radio" name="export-status" value="${s}" ${currentFilters.status === s ? 'checked' : ''} class="hidden peer">
-                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 dark:!text-white uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
                                         </label>
                                     `;
     }).join('')}
@@ -506,7 +439,7 @@ export function showExportConfigModal(callback) {
                 <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100 mt-4">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="w-1.5 h-4 bg-golden-yellow rounded-full"></span>
-                        <label class="text-[10px] font-black text-gray-400 dark:!text-white uppercase tracking-widest leading-none">Output Column Selection</label>
+                        <label class="text-[10px] font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Output Column Selection</label>
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -757,7 +690,7 @@ export function showAddDataModal(data = null) {
                         <div class="group">
                             <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
                             <input type="text" name="name" id="name-input-field" value="${data?.name || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} dark:text-white!" placeholder="e.g. Dela Cruz, Juan M.">
-                            <div id="duplicate-warning" class="hidden mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse">
+                            <div id="duplicate-warning" class="hidden mt-1 text-[10px] font-bold items-center gap-1.5 animate-pulse">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 <span>Beneficiary already exist</span>
                             </div>
@@ -803,7 +736,7 @@ export function showAddDataModal(data = null) {
                                     <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
                                         <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                                     </div>
-                                    <div id="course-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
+                                    <div id="course-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
                                         ${COMMON_COURSES.map(course => `
                                             <div class="course-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
                                                 ${course.icon}
@@ -862,7 +795,7 @@ export function showAddDataModal(data = null) {
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                         <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                     </div>
-                                    <div id="office-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
+                                    <div id="office-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
                                         ${['DOLE Field Office', 'LGU', 'DEPED', 'DICT', 'PCA'].map(office => `
                                             <div class="office-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
                                                 ${office}
@@ -887,7 +820,7 @@ export function showAddDataModal(data = null) {
                                     value="${data?.designation || ''}" required 
                                     class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
                                     placeholder="e.g. Administrative Support">
-                                <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2 transform origin-top transition-all duration-200">
+                                <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2 transform origin-top transition-all duration-200">
                                     <div class="px-2 py-1.5 mb-1.5 border-b ${t.borderSuggHead}">
                                         <p class="text-[9px] font-black ${t.textWorkSuggHead} uppercase tracking-widest">Quick Select Roles</p>
                                     </div>
@@ -951,7 +884,7 @@ export function showAddDataModal(data = null) {
             </form>
 
             <!-- Action Bar -->
-            <div class="mt-6 flex flex-wrap lg:justify-end items-center gap-3 pt-6 rounded-b-[1.5rem] ${t.bgActionBar} border-t ${t.actionBarBorder}">
+            <div class="mt-6 flex flex-wrap lg:justify-end items-center gap-3 pt-6 rounded-b-3xl ${t.bgActionBar} border-t ${t.actionBarBorder}">
                 <button type="button" id="cancel-modal-btn"
                     class="group flex items-center justify-center gap-2.5 px-4 lg:px-6 py-3 lg:py-3.5 ${t.bgCancelBtn} ${t.textCancel} font-black rounded-xl hover:bg-[#ce1126] hover:text-white transition-all duration-300 shadow-sm border ${t.cancelBorder} hover:border-[#ce1126] cursor-pointer text-[10px] lg:text-[12px] active:scale-[0.98] uppercase tracking-wider whitespace-nowrap order-1 lg:order-2">
                     <svg class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>

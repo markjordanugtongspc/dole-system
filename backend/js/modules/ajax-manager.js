@@ -18,11 +18,13 @@ export async function apiRequest(endpoint, options = {}) {
     const basePath = getBasePath();
     const url = `${basePath}${endpoint}`;
 
-    // Inject user_id header for Vercel serverless (no PHP sessions)
+    // Inject user_id header for Cloud environments (no PHP sessions)
     let userId = null;
     try {
         const user = JSON.parse(localStorage.getItem('user'));
-        if (user && user.id) userId = user.id;
+        if (user) {
+            userId = user.user_id || user.id || null;
+        }
     } catch (e) { /* ignore */ }
 
     const defaultOptions = {

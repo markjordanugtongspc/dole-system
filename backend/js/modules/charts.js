@@ -1,6 +1,6 @@
 import ApexCharts from 'apexcharts';
 import { getBasePath, isSupabaseMode } from './auth.js';
-import { supabase } from './supabase-client.js';
+import { apiGet } from './ajax-manager.js';
 
 /**
  * 2026 LDNPFO GIP MONITORING - Data Visualization Module
@@ -37,8 +37,21 @@ const COLORS = {
 
 // Data Cache to avoid re-fetching on theme change
 let cachedRawData = null;
-let currentWorkforceFilter = 'ALL';
-let currentWorkforceLabel = 'Overall Stats';
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const match = value.match(new RegExp(`;\\s*${name}=([^;]+)`));
+    return match ? decodeURIComponent(match[1]) : null;
+}
+
+function setCookie(name, value, days) {
+    let date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};path=/`;
+}
+
+let currentWorkforceFilter = getCookie('user_workforce_filter') || 'ALL';
+let currentWorkforceLabel = getCookie('user_workforce_label') || 'Overall Stats';
 
 /**
  * Parse Postgres/PHP date strings coming from the backend.
@@ -99,79 +112,75 @@ export async function initCharts(forceRefresh = false) {
     if (cachedRawData) {
         rawData = cachedRawData;
     } else {
+        // [HYBRID-BRIDGE] Use authorized PHP API to bypass RLS issues in Production
         try {
-            if (isSupabaseMode() && supabase) {
-                // Fetch total records (including archived for stats) directly from Supabase
-                const { data, error } = await supabase
-                    .from('beneficiaries')
-                    .select('gip_id, full_name, contact_number, address, birthday, age, education, start_date, end_date, series_number, office_name, designation, replacement_notes, is_archived, created_at, genders(gender_name), offices(office_name), status_types(status_name)');
-                
-                if (error) throw error;
-
-                rawData = (data || []).map(b => ({
-                    id: b.gip_id,
-                    name: b.full_name,
-                    contact: b.contact_number,
-                    address: b.address,
-                    birthday: b.birthday,
-                    age: b.age || (b.birthday ? new Date().getFullYear() - new Date(b.birthday).getFullYear() : 0),
-                    gender: b.genders ? b.genders.gender_name : null,
-                    education: b.education,
-                    startDate: b.start_date,
-                    endDate: b.end_date,
-                    seriesNo: b.series_number,
-                    office: (b.offices ? b.offices.office_name : b.office_name) || null,
-                    designation: b.designation,
-                    replacement: b.replacement_notes,
-                    remarks: b.status_types ? b.status_types.status_name : null,
-                    isArchived: b.is_archived,
-                    createdAt: b.created_at
-                }));
+            const result = await apiGet('api/beneficiaries.php?all=true');
+            if (result.success && result.data?.success && result.data?.beneficiaries) {
+                rawData = result.data.beneficiaries;
             } else {
-                // Dashboard analytics should reflect total records, not just non-archived.
-                const response = await fetch(`${getBasePath()}api/beneficiaries.php?all=true`);
-                const result = await response.json();
-                if (result.success) {
-                    rawData = result.beneficiaries || [];
-                } else {
-                    console.error('Failed to load chart data:', result.error);
-                    return;
-                }
+                console.error('[CHARTS] API Fetch Failed:', result.error || result.data?.error);
+                return;
             }
-            cachedRawData = rawData; // Cache it
+            cachedRawData = rawData; 
         } catch (error) {
-            console.error('Error fetching chart data:', error);
+            console.error('[CHARTS] Fatal Error:', error);
             return;
         }
     }
 
     if (rawData.length === 0) return;
 
+    // Initialize sidebar user profile from localStorage/session
+    initSidebarUser();
+
+    const theme = getThemeColors();
+
     // Clear existing charts to prevent duplication on theme change
     document.querySelectorAll('[id$="-chart"]').forEach(el => el.innerHTML = '');
 
-    const theme = getThemeColors();
-    const stats = processBeneficiaryData(rawData);
-    updateSummaryMetrics(stats);
-
-    // --- 1. DYNAMIC YEAR DETECTION & DROPDOWN POPULATION ---
     const availableYears = [...new Set(rawData.map(b => {
-        // Use createdAt primarily because it is consistently present in your API select.
-        const rawDateStr = b.createdAt || b.startDate;
+        // Use startDate primarily for years filtering
+        const rawDateStr = b.startDate || b.createdAt;
         const date = parseChartDate(rawDateStr);
         return date ? date.getFullYear().toString() : null;
     }).filter(y => y))].sort((a, b) => b - a);
     populateWorkforceDropdown(availableYears);
 
-    // --- 2. WORKFORCE ADDITION TREND (Filtered) ---
+    // Apply Workforce Filter to overall data stats (Total Beneficiaries, Genders, etc.)
     const now = new Date();
-    let timeframeData = [];
+    let filteredData = rawData;
+
+    if (currentWorkforceFilter !== 'ALL') {
+        filteredData = rawData.filter(b => {
+            if (currentWorkforceFilter.includes('D')) {
+                const d = parseChartDate(b.createdAt); // X Days filter uses createdAt
+                if (!d) return false;
+                const days = parseInt(currentWorkforceFilter);
+                const pastDate = new Date();
+                pastDate.setDate(now.getDate() - days);
+                pastDate.setHours(0,0,0,0);
+                return d >= pastDate;
+            } else if (availableYears.includes(currentWorkforceFilter)) {
+                const d = parseChartDate(b.startDate || b.createdAt); // Year filter uses startDate primarily
+                if (!d) return false;
+                return d.getFullYear().toString() === currentWorkforceFilter;
+            }
+            return true;
+        });
+    }
+
+    const totalStats = processBeneficiaryData(rawData); // Static stats for specific cards
+    const filteredStats = processBeneficiaryData(filteredData); // Filtered stats for charts/specific cards if needed
+    
+    // Update summary metrics - we'll customize which are static vs filtered inside this function
+    updateSummaryMetrics(totalStats, filteredStats);
+
+    // --- 2. WORKFORCE ADDITION TREND (Filtered) ---
     let timelineLabels = [];
     let intervalType = 'day';
 
     if (currentWorkforceFilter === 'ALL') {
         intervalType = 'year';
-        // Always show the full journey from 2020 to current year
         const startYear = 2020;
         const targetYear = new Date().getFullYear();
         for (let y = startYear; y <= targetYear; y++) {
@@ -186,26 +195,25 @@ export async function initCharts(forceRefresh = false) {
         timelineLabels = Array.from({ length: days }, (_, i) => {
             const d = new Date();
             d.setDate(now.getDate() - (days - 1 - i));
-            return d.toISOString().split('T')[0];
+            return new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
         });
     }
 
     const aggregated = {};
     timelineLabels.forEach(label => aggregated[label] = 0);
 
-    rawData.forEach(b => {
-        const rawDateStr = b.createdAt || b.startDate;
+    filteredData.forEach(b => {
+        const rawDateStr = b.startDate || b.createdAt;
+        
         if (rawDateStr) {
             const date = parseChartDate(rawDateStr);
-            if (!date) return; // Skip invalid dates
+            if (!date) return;
 
             const yearStr = date.getFullYear().toString();
-            const dateStr = date.toISOString().split('T')[0];
+            const dateStr = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
 
             if (currentWorkforceFilter === 'ALL') {
-                if (aggregated.hasOwnProperty(yearStr)) {
-                    aggregated[yearStr]++;
-                }
+                if (aggregated.hasOwnProperty(yearStr)) aggregated[yearStr]++;
             } else if (currentWorkforceFilter.includes('D')) {
                 if (aggregated.hasOwnProperty(dateStr)) aggregated[dateStr]++;
             } else if (yearStr === currentWorkforceFilter) {
@@ -216,11 +224,10 @@ export async function initCharts(forceRefresh = false) {
     });
 
     const additionData = Object.values(aggregated);
-    const totalAdded = currentWorkforceFilter === 'ALL' ? rawData.length : additionData.reduce((a, b) => a + b, 0);
+    const totalAdded = filteredData.length;
     const currentVal = additionData[additionData.length - 1] || 0;
     const prevVal = additionData[additionData.length - 2] || 0;
 
-    // Trend logic: in ALL mode, compare against historical average
     let isTrendingUp;
     if (currentWorkforceFilter === 'ALL') {
         const avg = totalAdded / timelineLabels.length;
@@ -228,11 +235,38 @@ export async function initCharts(forceRefresh = false) {
     } else {
         isTrendingUp = currentVal >= prevVal;
     }
+    
+    // Determine dynamic colors based on filter selection
+    let chartColor = isTrendingUp ? COLORS.successGreen : COLORS.philippineRed;
+    let badgeClass = isTrendingUp ? 'bg-green-500 shadow-green-500/30' : 'bg-red-500 shadow-red-500/30';
+    let textClass = isTrendingUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+
+    if (currentWorkforceFilter === 'ALL') {
+        chartColor = COLORS.successGreen; // Emerald/Success Green for Overall
+        badgeClass = 'bg-green-500 shadow-green-500/30';
+        textClass = 'text-green-600 dark:text-green-400';
+    } else if (currentWorkforceFilter === '7D') {
+        chartColor = '#fb923c'; // Light Orange
+        badgeClass = 'bg-orange-500 shadow-orange-500/30';
+        textClass = 'text-orange-500 dark:text-orange-400';
+    } else if (currentWorkforceFilter === '30D') {
+        chartColor = '#eab308'; // Solid Yellow
+        badgeClass = 'bg-yellow-500 shadow-yellow-500/30';
+        textClass = 'text-yellow-600 dark:text-yellow-400';
+    } else if (currentWorkforceFilter === '90D') {
+        chartColor = '#2563eb'; // Solid Blue
+        badgeClass = 'bg-blue-600 shadow-blue-600/30';
+        textClass = 'text-blue-600 dark:text-blue-400';
+    } else if (availableYears.includes(currentWorkforceFilter)) {
+        chartColor = '#f87171'; // Light Red for Years
+        badgeClass = 'bg-red-400 shadow-red-400/30';
+        textClass = 'text-red-500 dark:text-red-400';
+    }
 
     // Update UI Elements
     document.querySelectorAll('.metric-added-count').forEach(el => {
         el.textContent = totalAdded;
-        el.className = `text-3xl sm:text-5xl font-black transition-colors duration-500 leading-none metric-added-count ${isTrendingUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`;
+        el.className = `text-3xl sm:text-5xl font-black transition-colors duration-500 leading-none metric-added-count ${textClass}`;
     });
 
     const growthRate = prevVal > 0 ? Math.round(((currentVal - prevVal) / prevVal) * 100) : (currentVal > 0 ? 100 : 0);
@@ -240,22 +274,28 @@ export async function initCharts(forceRefresh = false) {
 
     const badge = document.getElementById('added-metric-badge');
     if (badge) {
-        badge.className = `flex items-center px-3 py-1 text-[10px] sm:text-xs font-black text-white rounded-full shadow-lg transition-all duration-500 border border-white/20 translate-y-1 ${isTrendingUp ? 'bg-green-500 shadow-green-500/30' : 'bg-red-500 shadow-red-500/30'}`;
+        badge.className = `flex items-center px-3 py-1 text-[10px] sm:text-xs font-black text-white rounded-full shadow-lg transition-all duration-500 border border-white/20 translate-y-1 ${badgeClass}`;
     }
 
     const icon = document.getElementById('added-metric-icon');
     if (icon) icon.style.transform = isTrendingUp ? 'rotate(0deg)' : 'rotate(180deg)';
 
-    const btn = document.getElementById('dropdownDefaultButton');
-    if (btn) btn.innerHTML = `${currentWorkforceLabel} <svg class="w-3 h-3 ms-1.5" aria-hidden="true" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7" /></svg>`;
+    const btnIds = ['dropdownDefaultButton', 'dropdownLastDaysEduButton', 'dropdownLastDays3Button'];
+    btnIds.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            // Re-apply SVG to maintain caret arrow
+            btn.innerHTML = `${currentWorkforceLabel} <svg class="w-3 h-3 ms-1.5" aria-hidden="true" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7" /></svg>`;
+        }
+    });
 
     const statusOptions = {
         chart: {
-            height: 160,
+            height: 250,
             type: "area",
             fontFamily: "Montserrat, sans-serif",
             toolbar: { show: false },
-            sparkline: { enabled: true },
+            sparkline: { enabled: false },
             background: 'transparent'
         },
         theme: { mode: isDark() ? 'dark' : 'light' },
@@ -267,35 +307,45 @@ export async function initCharts(forceRefresh = false) {
                 opacityTo: 0.1,
                 stops: [0, 90, 100],
                 colorStops: [
-                    { offset: 0, color: isTrendingUp ? COLORS.successGreen : COLORS.philippineRed, opacity: 0.6 },
-                    { offset: 100, color: isTrendingUp ? COLORS.successGreen : COLORS.philippineRed, opacity: 0.1 }
+                    { offset: 0, color: chartColor, opacity: 0.6 },
+                    { offset: 100, color: chartColor, opacity: 0.1 }
                 ]
             }
         },
         stroke: {
             curve: 'smooth',
             width: 3,
-            colors: [isTrendingUp ? COLORS.successGreen : COLORS.philippineRed]
+            colors: [chartColor]
         },
         series: [{
             name: "New Beneficiaries",
             data: additionData
         }],
-        xaxis: { categories: timelineLabels },
-        yaxis: { show: false },
+        xaxis: { 
+            categories: timelineLabels,
+            labels: { show: true, style: { colors: theme.muted, fontSize: '10px', fontWeight: 600 } },
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+        },
+        yaxis: { 
+            show: true,
+            labels: { show: true, style: { colors: theme.muted, fontSize: '10px', fontWeight: 600 } }
+        },
         grid: { 
-            show: false,
+            show: true,
+            borderColor: theme.grid,
+            strokeDashArray: 4,
             padding: {
                 left: 10,
-                right: 35, // Force padding to stop right-side overlap
+                right: 15,
                 top: 0,
                 bottom: 0
             }
         },
-        colors: [isTrendingUp ? COLORS.successGreen : COLORS.philippineRed],
+        colors: [chartColor],
         markers: {
             size: timelineLabels.length > 20 ? 0 : 4,
-            colors: [isTrendingUp ? COLORS.successGreen : COLORS.philippineRed],
+            colors: [chartColor],
             strokeColors: theme.cardBg,
             strokeWidth: 2,
             hover: { size: 6 }
@@ -310,7 +360,7 @@ export async function initCharts(forceRefresh = false) {
 
     // --- 2. GENDER DEMOGRAPHICS ---
     const genderOptions = {
-        series: [stats.genders['Female'] || 0, stats.genders['Male'] || 0],
+        series: [totalStats.genders['Female'] || 0, totalStats.genders['Male'] || 0],
         chart: { height: 320, type: 'donut', fontFamily: "Montserrat, sans-serif", background: theme.cardBg },
         colors: [COLORS.philippineRed, COLORS.royalBlue()],
         labels: ["Female", "Male"],
@@ -342,11 +392,18 @@ export async function initCharts(forceRefresh = false) {
 
     renderChart("gender-chart", genderOptions);
 
-    // --- 3. EDUCATION PROFILE ---
-    const eduValues = [stats.education["College Grad"], stats.education["College Lvl"], stats.education["HS Grad"], stats.education["Senior High"]];
+    // --- 3. EDUCATION PROFILE (Linked to Workforce Filter) ---
+    const eduValues = [filteredStats.education["College Grad"], filteredStats.education["College Lvl"], filteredStats.education["HS Grad"], filteredStats.education["Senior High"]];
+    
+    // Update the sub-metrics for Education section
+    const eduMap = { 'College Grad': '.count-college-grad', 'College Lvl': '.count-college-lvl', 'HS Grad': '.count-hs-grad', 'Senior High': '.count-senior-high' };
+    Object.entries(eduMap).forEach(([key, sel]) => {
+        document.querySelectorAll(sel).forEach(el => el.textContent = filteredStats.education[key] || 0);
+    });
+
     const educationOptions = {
-        series: eduValues.map(v => Math.round((v / rawData.length) * 100)),
-        chart: { height: 300, type: 'radialBar', background: theme.cardBg },
+        series: eduValues.map(v => filteredData.length > 0 ? Math.round((v / filteredData.length) * 100) : 0),
+        chart: { height: 300, type: 'radialBar', background: theme.cardBg, fontFamily: "Montserrat, sans-serif" },
         plotOptions: {
             radialBar: {
                 hollow: { size: '30%' },
@@ -373,9 +430,9 @@ export async function initCharts(forceRefresh = false) {
     renderChart("education-chart", educationOptions);
 
     // --- 4. JOB ROLES (Top 5) ---
-    const sortedRoles = Object.entries(stats.designations).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const sortedRoles = Object.entries(filteredStats.designations).sort((a, b) => b[1] - a[1]).slice(0, 5);
     const jobRolesOptions = {
-        series: [{ name: "Beneficiaries", data: sortedRoles.map(r => r[1]), color: COLORS.royalBlue() }],
+        series: [{ name: "Beneficiaries", data: sortedRoles.map(r => r[1]), color: chartColor }],
         chart: { type: 'bar', height: 180, toolbar: { show: false }, fontFamily: "Montserrat, sans-serif", background: theme.cardBg },
         plotOptions: { bar: { horizontal: true, columnWidth: '100%', borderRadius: 4, barHeight: '60%' } },
         dataLabels: { enabled: false },
@@ -406,7 +463,7 @@ export async function initCharts(forceRefresh = false) {
 
     // --- 5. AGE DEMOGRAPHICS ---
     const ageOptions = {
-        series: [{ name: "Beneficiaries", data: Object.values(stats.ages), color: COLORS.royalBlue() }],
+        series: [{ name: "Beneficiaries", data: Object.values(filteredStats.ages), color: chartColor }],
         chart: {
             type: 'area',
             height: 220,
@@ -424,7 +481,7 @@ export async function initCharts(forceRefresh = false) {
             background: { enabled: true, padding: 3, borderRadius: 4, borderWidth: 0, opacity: 0.9 }
         },
         xaxis: {
-            categories: Object.keys(stats.ages),
+            categories: Object.keys(filteredStats.ages),
             labels: { style: { fontWeight: 600, colors: theme.muted, fontSize: '10px' } },
             axisBorder: { show: false }
         },
@@ -629,13 +686,16 @@ function updatePerformanceSummary(perf) {
 
 /**
  * Update Summary Metrics
+ * @param {Object} totalStats - Overall statistics
+ * @param {Object} filteredStats - Statistics based on current selection
  */
-function updateSummaryMetrics(stats) {
-    const total = Object.values(stats.offices).reduce((a, b) => a + b, 0);
+function updateSummaryMetrics(totalStats, filteredStats) {
+    // Top Row Cards - static overall as requested
+    const total = Object.values(totalStats.offices).reduce((a, b) => a + b, 0);
     document.querySelectorAll('.metric-total-beneficiaries').forEach(el => el.textContent = total);
 
-    const female = stats.genders['Female'] || 0;
-    const male = stats.genders['Male'] || 0;
+    const female = totalStats.genders['Female'] || 0;
+    const male = totalStats.genders['Male'] || 0;
     const totalG = female + male;
     const fRatio = totalG > 0 ? Math.round((female / totalG) * 100) + '%' : '0%';
     const mRatio = totalG > 0 ? Math.round((male / totalG) * 100) + '%' : '0%';
@@ -643,27 +703,23 @@ function updateSummaryMetrics(stats) {
     document.querySelectorAll('.metric-female-ratio').forEach(el => el.textContent = fRatio);
     document.querySelectorAll('.metric-male-ratio').forEach(el => el.textContent = mRatio);
 
-    const siteCount = Object.keys(stats.offices).length;
+    const siteCount = Object.keys(totalStats.offices).length;
     document.querySelectorAll('.metric-deployment-sites').forEach(el => el.textContent = siteCount);
 
-    const avgAge = stats.ageCount > 0 ? Math.round(stats.totalAge / stats.ageCount) : 0;
+    const avgAge = totalStats.ageCount > 0 ? Math.round(totalStats.totalAge / totalStats.ageCount) : 0;
     document.querySelectorAll('.metric-avg-age').forEach(el => el.textContent = avgAge);
     document.querySelectorAll('.metric-avg-age-range').forEach(el => el.textContent = avgAge + ' YRS');
 
-    const eduMap = { 'College Grad': '.count-college-grad', 'College Lvl': '.count-college-lvl', 'HS Grad': '.count-hs-grad', 'Senior High': '.count-senior-high' };
-    Object.entries(eduMap).forEach(([key, sel]) => {
-        document.querySelectorAll(sel).forEach(el => el.textContent = stats.education[key] || 0);
-    });
-
-    const officeTotal = Object.values(stats.designations).reduce((a, b) => a + b, 0);
+    // Section specific metrics - filtered by workforce
+    const officeTotal = Object.values(filteredStats.designations).reduce((a, b) => a + b, 0);
     let fieldCount = 0;
-    Object.entries(stats.designations).forEach(([n, c]) => {
+    Object.entries(filteredStats.designations).forEach(([n, c]) => {
         if (n.toLowerCase().match(/field|driver|maintenance/)) fieldCount += c;
     });
     document.querySelectorAll('.count-office-based').forEach(el => el.textContent = officeTotal - fieldCount);
     document.querySelectorAll('.count-field-based').forEach(el => el.textContent = fieldCount);
 
-    const topRole = Object.entries(stats.designations).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+    const topRole = Object.entries(filteredStats.designations).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
     document.querySelectorAll('.metric-top-role').forEach(el => el.textContent = topRole);
 }
 
@@ -698,18 +754,65 @@ function populateWorkforceDropdown(years) {
 export function updateWorkforceFilter(filter, label) {
     currentWorkforceFilter = filter;
     currentWorkforceLabel = label;
+    setCookie('user_workforce_filter', filter, 30);
+    setCookie('user_workforce_label', label, 30);
 
     // Auto-hide Flowbite Dropdown
-    const dropdownEl = document.getElementById('lastDaysdropdown');
-    if (dropdownEl && window.FlowbiteInstances) {
-        const dropdown = window.FlowbiteInstances.getInstance('Dropdown', 'lastDaysdropdown');
-        if (dropdown) dropdown.hide();
-    } else if (dropdownEl) {
-        // Fallback for direct DOM manipulation if instance isn't available
-        dropdownEl.classList.add('hidden');
-    }
+    const dropdownIds = ['lastDaysdropdown'];
+    dropdownIds.forEach(id => {
+        const dropdownEl = document.getElementById(id);
+        if (dropdownEl && window.FlowbiteInstances) {
+            const dropdown = window.FlowbiteInstances.getInstance('Dropdown', id);
+            if (dropdown) dropdown.hide();
+        } else if (dropdownEl) {
+            dropdownEl.classList.add('hidden');
+        }
+    });
 
     initCharts(); // Re-render
+}
+
+/**
+ * Dynamically initialize the sidebar user profile from cached login data
+ */
+export function initSidebarUser() {
+    const userData = localStorage.getItem('user');
+    if (!userData) return;
+
+    try {
+        const user = JSON.parse(userData);
+        const name = user.full_name || user.username || 'System User';
+        const email = user.email || (user.username ? `${user.username}@dole.gov.ph` : 'user@dole.gov.ph');
+        const profilePic = user.profile_picture_path;
+        
+        // Extract Initials
+        const initials = name.trim().split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || '??';
+
+        // Update Text Elements
+        document.querySelectorAll('.sidebar-user-name').forEach(el => el.textContent = name);
+        document.querySelectorAll('.sidebar-user-email').forEach(el => el.textContent = email);
+
+        // Update Avatars
+        document.querySelectorAll('.sidebar-user-avatar').forEach(container => {
+            const initialEl = container.querySelector('.sidebar-avatar-initials');
+            const imgEl = container.querySelector('.sidebar-avatar-img');
+
+            if (profilePic && imgEl) {
+                const basePath = getBasePath();
+                // Ensure profilePic doesn't already have basePath
+                const src = profilePic.startsWith('http') ? profilePic : (basePath + profilePic.replace(/^\//, ''));
+                imgEl.src = src;
+                imgEl.classList.remove('hidden');
+                if (initialEl) initialEl.classList.add('hidden');
+            } else if (initialEl) {
+                initialEl.textContent = initials;
+                initialEl.classList.remove('hidden');
+                if (imgEl) imgEl.classList.add('hidden');
+            }
+        });
+    } catch (e) {
+        console.error('Failed to parse user data for sidebar:', e);
+    }
 }
 
 window.updateWorkforceFilter = updateWorkforceFilter;

@@ -118,11 +118,12 @@ $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
                     <div class="flex items-center">
                         <div
                             class="w-10 h-10 rounded-full bg-transparent border-2 border-white/30 flex items-center justify-center text-white font-black text-xs shadow-lg sidebar-user-avatar overflow-hidden">
-                            AD
+                            <span class="sidebar-avatar-initials">...</span>
+                            <img src="" class="sidebar-avatar-img hidden w-full h-full object-cover" alt="User Profile">
                         </div>
                         <div class="ms-2.5 text-left">
-                            <p class="text-[11px] font-bold text-white sidebar-user-name leading-tight">Admin User</p>
-                            <p class="text-[9px] text-white/80 truncate">admin@dole.gov.ph</p>
+                            <p class="text-[11px] font-bold text-white sidebar-user-name leading-tight">...</p>
+                            <p class="text-[9px] text-white/80 truncate sidebar-user-email">...</p>
                         </div>
                     </div>
                 </div>
@@ -181,11 +182,12 @@ $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
                 class="flex items-center w-full p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-200 hover:scale-[1.02] cursor-pointer border border-white/10">
                 <div
                     class="w-10 h-10 rounded-full bg-transparent border-2 border-white/30 flex items-center justify-center text-white font-black text-sm shadow-inner group-hover:scale-110 transition-transform sidebar-user-avatar overflow-hidden">
-                    AD
+                    <span class="sidebar-avatar-initials">...</span>
+                    <img src="" class="sidebar-avatar-img hidden w-full h-full object-cover" alt="User Profile">
                 </div>
                 <div class="ms-3 text-left flex-1">
-                    <p class="text-xs font-bold text-white sidebar-user-name">Admin User</p>
-                    <p class="text-[10px] text-white/60 truncate">admin@dole.gov.ph</p>
+                    <p class="text-xs font-bold text-white sidebar-user-name">...</p>
+                    <p class="text-[10px] text-white/60 truncate sidebar-user-email">...</p>
                 </div>
                 <svg class="w-4 h-4 text-white transition-transform duration-200" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">

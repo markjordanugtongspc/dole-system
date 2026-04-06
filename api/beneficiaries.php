@@ -12,14 +12,28 @@ handleCors();
 header('Content-Type: application/json');
 
 session_start();
-// In serverless (Vercel), sessions don't persist. Accept user_id from multiple sources.
-$current_user_id = $_SESSION['user_id'] ?? $_SERVER['HTTP_X_USER_ID'] ?? $_GET['user_id'] ?? null;
+
+// In Cloud/Serverless environments, sessions don't persist.
+// Accept user_id from session (localhost), POST body, GET param, or X-User-Id header.
+$current_user_id = $_SESSION['user_id'] ?? null;
+$rawBody = file_get_contents('php://input');
+$jsonInput = json_decode($rawBody, true) ?? [];
+
+if (!$current_user_id && isset($jsonInput['user_id'])) $current_user_id = $jsonInput['user_id'];
+if (!$current_user_id && isset($_POST['user_id'])) $current_user_id = $_POST['user_id'];
+if (!$current_user_id && isset($_GET['user_id'])) $current_user_id = $_GET['user_id'];
+if (!$current_user_id && isset($_SERVER['HTTP_X_USER_ID'])) $current_user_id = $_SERVER['HTTP_X_USER_ID'];
+
+if (!$current_user_id) {
+    echo json_encode(['success' => false, 'error' => 'Not authenticated']);
+    exit;
+}
+
 $current_username = null;
 
 try {
     $pdo = getDbConnection();
     // [HYBRID] Check actual PDO driver to mathematically guarantee we use the correct SQL syntax.
-    // This avoids false-negatives from out-of-sync environment variables between CLI and Apache.
     $isSupabase = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql';
     debugLog('beneficiaries.init', ['method' => $_SERVER['REQUEST_METHOD'] ?? null, 'driver' => $pdo->getAttribute(PDO::ATTR_DRIVER_NAME)]);
 

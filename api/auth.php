@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo = getDbConnection();
         debugLog('auth.login', ['username' => $username]);
-        $stmt = $pdo->prepare("SELECT user_id, username, password_hash, full_name, email FROM users WHERE username = ?");
+        $stmt = $pdo->prepare("SELECT user_id, username, password_hash, full_name, email, profile_picture_path FROM users WHERE username = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch();
 
@@ -110,7 +110,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'user' => [
                     'id' => $user['user_id'],
                     'username' => $user['username'],
-                    'full_name' => $user['full_name']
+                    'full_name' => $user['full_name'],
+                    'email' => $user['email'],
+                    'profile_picture_path' => $user['profile_picture_path']
                 ]
             ]);
         } else {

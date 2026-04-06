@@ -1,8 +1,7 @@
 <?php
 /**
- * Vercel PHP Router
- * This file routes requests to the appropriate PHP files since Vercel
- * enforces that all functions must be inside the /api directory.
+ * Cloud PHP Router
+ * This file routes requests to the appropriate PHP files.
  */
 
 $uri = $_SERVER['REQUEST_URI'];
