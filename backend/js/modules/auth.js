@@ -19,10 +19,8 @@ export function isSupabaseMode() {
     // Dynamically check if we are running locally to restore Local MySQL
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     
-    // Always use Local PHP/MySQL when running locally, regardless of Vite build-time env
-    if (isLocal) {
-        return false;
-    }
+    // We now rely exclusively on the build-time ENV for Vercel / Production.
+    // This allows testing Supabase production setups locally via Docker.
     
     // Default to build-time ENV for Vercel / Production
     return USE_SUPABASE;
@@ -33,11 +31,25 @@ export function isSupabaseMode() {
  */
 export function getBasePath() {
     const path = window.location.pathname;
+    
+    // Primary: look for the project folder name
     const searchStr = '/dole-system/';
     const index = path.toLowerCase().indexOf(searchStr.toLowerCase());
     if (index !== -1) {
         return path.substring(0, index + searchStr.length);
     }
+    
+    // Fallback: look for the start of the app (frontend/backend folders)
+    const frontendIndex = path.indexOf('/frontend/');
+    if (frontendIndex !== -1) {
+        return path.substring(0, frontendIndex + 1);
+    }
+
+    const backendIndex = path.indexOf('/backend/');
+    if (backendIndex !== -1) {
+        return path.substring(0, backendIndex + 1);
+    }
+
     return '/';
 }
 

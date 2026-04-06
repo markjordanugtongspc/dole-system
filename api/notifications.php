@@ -11,7 +11,7 @@ header('Content-Type: application/json');
 
 session_start();
 
-// In serverless (Vercel), sessions don't persist between requests.
+// In Cloud environments, sessions don't persist between requests.
 // Accept user_id from session (localhost), POST body, GET param, or X-User-Id header.
 $user_id = $_SESSION['user_id'] ?? null;
 

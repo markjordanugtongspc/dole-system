@@ -15,7 +15,27 @@ try {
     $pdo = getDbConnection();
     $isSupabase = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql';
 
-    debugLog('logs.init', ['method' => $_SERVER['REQUEST_METHOD'] ?? null]);
+    // [SECURITY] Robust User ID Detection (Match notifications.php Pattern)
+    function check_user_id() {
+        if (isset($_SESSION['user_id'])) return $_SESSION['user_id'];
+        if (isset($_POST['user_id'])) return $_POST['user_id'];
+        if (isset($_GET['user_id'])) return $_GET['user_id'];
+        
+        $headers = function_exists('getallheaders') ? getallheaders() : [];
+        if (isset($headers['X-User-Id'])) return $headers['X-User-Id'];
+        if (isset($_SERVER['HTTP_X_USER_ID'])) return $_SERVER['HTTP_X_USER_ID'];
+        
+        return null;
+    }
+
+    $current_user_id = check_user_id();
+    if (!$current_user_id) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'error' => 'Not Authenticated']);
+        exit();
+    }
+
+    debugLog('logs.init', ['method' => $_SERVER['REQUEST_METHOD'] ?? null, 'user_id' => $current_user_id]);
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Database connection failed']);
@@ -32,9 +52,9 @@ if ($method === 'GET') {
     $beneficiaryId = $_GET['beneficiary_id'] ?? null;
     $gipId = $_GET['gip_id'] ?? null;
 
-    if (!$type || ($type !== 'ar' && $type !== 'dtr' && $type !== 'docs')) {
+    if (!$type || !in_array($type, ['ar', 'dtr', 'docs', 'absorption'])) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'Type must be "ar", "dtr", or "docs"']);
+        echo json_encode(['success' => false, 'error' => 'Type must be "ar", "dtr", "docs", or "absorption"']);
         exit();
     }
 
@@ -99,6 +119,31 @@ if ($method === 'GET') {
             }
 
             echo json_encode(['success' => true, 'logs' => $logs, 'type' => 'dtr']);
+        } elseif ($type === 'absorption') {
+            // Get Absorption Logs
+            $whereExpr = $isSupabase ? '"where"' : '`where`';
+            $posExpr = $isSupabase ? '"position"' : '`position`';
+            $agencyExpr = $isSupabase ? '"agency"' : '`agency`';
+            
+            $query = "SELECT log_id as id, absorption_datetime, {$whereExpr}, {$posExpr}, {$agencyExpr}, logged_by
+                      FROM absorption_logs";
+
+            if ($beneficiaryId) {
+                // Find via join if gip_id was passed or direct beneficiary_id
+                $query .= " WHERE beneficiary_id = :beneficiary_id";
+            }
+
+            $query .= " ORDER BY absorption_datetime DESC";
+
+            $stmt = $pdo->prepare($query);
+            if ($beneficiaryId) {
+                $stmt->execute(['beneficiary_id' => $beneficiaryId]);
+            } else {
+                $stmt->execute();
+            }
+
+            $logs = $stmt->fetchAll();
+            echo json_encode(['success' => true, 'logs' => $logs, 'type' => 'absorption']);
         } else { // docs
             // Get Required Documents
             $query = "SELECT doc_id as id, document_name as name, status, updated_at 

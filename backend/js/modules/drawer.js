@@ -1,5 +1,6 @@
 import { getBasePath } from './auth.js';
 import { isDarkMode } from './darkmode.js';
+import { apiPost, apiPut, apiRequest } from './ajax-manager.js';
 import Swal from 'sweetalert2';
 
 function calculateAge(birthday) {
@@ -398,22 +399,20 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     if (newStatus === currentStatus) return;
 
                     try {
-                        const formData = new FormData();
-                        formData.append('gip_id', data.id);
-                        formData.append('doc_name', docName);
-
                         const apiMapping = {
                             'COMPLETED': 'VERIFIED',
                             'REJECTED': 'DECLINED',
                             'PENDING': 'PENDING'
                         };
                         const dbStatus = apiMapping[newStatus] || newStatus;
-                        formData.append('status', dbStatus);
 
-                        const res = await fetch(`${getBasePath()}api/logs.php?type=docs`, { method: 'POST', body: formData });
-                        const responseText = await res.text();
-                        let json = { success: false };
-                        try { json = JSON.parse(responseText); } catch(e) {}
+                        const result = await apiPost(`api/logs.php?type=docs`, {
+                            gip_id: data.id,
+                            doc_name: docName,
+                            status: dbStatus
+                        });
+
+                        const json = result.success ? result.data : { success: false, error: result.error };
 
             if (json.success) {
                 Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Status updated!', showConfirmButton: false, timer: 1500 });
@@ -463,13 +462,14 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             Swal.fire({ title: 'Adding...', allowOutsideClick: false, showConfirmButton: false });
             Swal.showLoading();
             try {
-                const formData = new FormData();
-                formData.append('gip_id', data.id);
-                if (dbType === 'dtr') formData.append('record_date', autoVal);
-                if (dbType === 'ar') formData.append('period', autoVal);
+                const payload = {
+                    gip_id: data.id
+                };
+                if (dbType === 'dtr') payload.record_date = autoVal;
+                if (dbType === 'ar') payload.period = autoVal;
 
-                const res = await fetch(`${getBasePath()}api/logs.php?type=${dbType}`, { method: 'POST', body: formData });
-                const json = await res.json();
+                const result = await apiPost(`api/logs.php?type=${dbType}`, payload);
+                const json = result.success ? result.data : { success: false, error: result.error };
                 
                 if (json.success) {
                     Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Auto-Added!', showConfirmButton: false, timer: 1500 });
@@ -544,12 +544,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     if (dbType === 'dtr') payload.record_date = formValues.val;
                     if (dbType === 'ar') payload.period = formValues.val;
 
-                    const res = await fetch(`${getBasePath()}api/logs.php`, { 
-                        method: 'PUT', 
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const json = await res.json();
+                    const result = await apiPut(`api/logs.php`, payload);
+                    const json = result.success ? result.data : { success: false, error: result.error };
                     
                     if (json.success) {
                         Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Log Updated!', showConfirmButton: false, timer: 1500 });
@@ -603,14 +599,11 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
                 if (result.isConfirmed) {
                     try {
-                        const formData = new FormData();
-                        formData.append('log_id', logId);
-                        formData.append('action', 'delete');
-                        
-                        const res = await fetch(`${getBasePath()}api/logs.php?type=${logType}`, { method: 'POST', body: formData });
-                        const responseText = await res.text();
-                        let json = { success: false };
-                        try { json = JSON.parse(responseText); } catch(e) {}
+                        const result = await apiPost(`api/logs.php?type=${logType}`, {
+                            log_id: logId,
+                            action: 'delete'
+                        });
+                        const json = result.success ? result.data : { success: false, error: result.error };
 
                         if(json.success) {
                             Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Deleted', showConfirmButton: false, timer: 1500 });

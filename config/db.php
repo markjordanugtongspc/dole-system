@@ -36,7 +36,7 @@ function loadBaseEnv($path)
             // Remove quotes if present
             $value = trim($value, '"\'');
 
-            // Do not override non-empty runtime/server secrets (e.g. Vercel env vars).
+            // Do not override non-empty runtime/server secrets (e.g. Cloud env vars).
             $existingServer = $_SERVER[$key] ?? null;
             $existingRuntime = getenv($key);
             if (($existingServer !== null && $existingServer !== '') || ($existingRuntime !== false && $existingRuntime !== '')) {

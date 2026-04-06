@@ -1,0 +1,37 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dole-system-app
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/node_modules
+      - /var/www/html/vendor
+    environment:
+      # These flags tell the richarvey image to skip composer/npm if we want
+      - SKIP_COMPOSER=1
+      - WEBROOT=/var/www/html
+      - APP_ENV=development
+      - APP_DEBUG=true
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:11.4
+    container_name: dole-system-db
+    restart: always
+    environment:
+      MARIADB_DATABASE: dole_system
+      MARIADB_ROOT_PASSWORD: root_password
+    ports:
+      - "3307:3306" # Connect via Laragon or HeidiSQL on port 3307 locally
+    volumes:
+      - dole_db_data:/var/lib/mysql
+      - ./config/database_schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./config/sample_data.sql:/docker-entrypoint-initdb.d/2-data.sql
+
+volumes:
+  dole_db_data:

@@ -48,7 +48,7 @@ export function initSyncIndicator() {
     pill.style.cssText = `
         position: fixed;
         bottom: 16px;
-        left: 16px;
+        right: 16px;
         z-index: 9999;
         display: flex;
         align-items: center;
@@ -139,7 +139,7 @@ export function updateSyncIndicator(state, count = 0) {
 function getUserId() {
     try {
         const user = JSON.parse(localStorage.getItem('user'));
-        return user?.id || null;
+        return user?.user_id || user?.id || null;
     } catch { return null; }
 }
 
@@ -149,62 +149,8 @@ function getUserId() {
  * @returns {Promise<boolean>} true on success
  */
 async function pushToRemote(item) {
-    // ── SUPABASE MODE: Direct SDK Push ──────────────────────────────────────
-    if (isSupabaseMode() && supabase) {
-        try {
-            const table = 'beneficiaries'; // Default table
-            let result = { success: false };
-
-            if (item.endpoint === 'api/beneficiaries.php') {
-                const payload = item.payload;
-                const id = payload.gip_id || payload.id;
-
-                // Prepare standard GIP data mapping for Supabase
-                const dbData = {
-                    full_name: payload.name,
-                    contact_number: payload.contact,
-                    address: payload.address,
-                    birthday: payload.birthday,
-                    age: payload.age,
-                    education: payload.education,
-                    start_date: payload.startDate,
-                    end_date: payload.endDate,
-                    series_number: payload.seriesNo,
-                    office_name: payload.office,
-                    designation: payload.designation,
-                    replacement_notes: payload.replacement,
-                    is_archived: payload.isArchived || false
-                };
-
-                if (item.method === 'POST') {
-                    const { data, error } = await supabase.from(table).insert([dbData]).select();
-                    if (error) throw error;
-                    result = { success: true, id: data[0].gip_id };
-                } 
-                else if (item.method === 'PUT' || item.method === 'PATCH') {
-                    // Action check for archive
-                    if (item.method === 'PATCH' && item.endpoint.includes('action=archive')) {
-                        const { error } = await supabase.from(table).update({ is_archived: true }).eq('gip_id', id);
-                        if (error) throw error;
-                    } else {
-                        const { error } = await supabase.from(table).update(dbData).eq('gip_id', id);
-                        if (error) throw error;
-                    }
-                    result = { success: true };
-                }
-            } else {
-                // Fallback for other potential endpoints (notifications, etc)
-                // Use standard fetch if not a beneficiary core operation
-                return await pushToFetch(item);
-            }
-
-            return result;
-        } catch (e) {
-            logger.error('[Sync] Supabase push failed', e);
-            throw e;
-        }
-    }
-
+    // [HYBRID-BRIDGE] Force all push operations through the PHP API bridge
+    // This bypasses direct Supabase SDK RLS issues and ensures consistent auth.
     return await pushToFetch(item);
 }
 

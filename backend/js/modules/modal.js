@@ -1,6 +1,7 @@
 import { getBasePath, isSupabaseMode } from './auth.js';
 import { supabase } from './supabase-client.js';
 import { isDarkMode } from './darkmode.js';
+import { apiGet } from './ajax-manager.js';
 import Swal from 'sweetalert2';
 import { BulkApp } from './bulk_tool.js';
 import { showBeneficiaryDrawer } from './drawer.js';
@@ -30,31 +31,26 @@ export function initModalHandler() {
             let fetchedDtrLogs = [];
             let fetchedDocs = [];
 
-            if (isSupabaseMode() && supabase) {
-                // Fetch directly from Supabase tables
-                const [arRes, dtrRes, docRes] = await Promise.all([
-                    supabase.from('absorption_logs').select('*').eq('gip_id', data.id).order('absorption_datetime', { ascending: false }),
-                    supabase.from('dtr_logs').select('*').eq('gip_id', data.id).order('log_date', { ascending: false }),
-                    supabase.from('documents').select('*').eq('gip_id', data.id).order('created_at', { ascending: false })
-                ]);
+            // [HYBRID-BRIDGE] Use authorized PHP API for logs/docs to bypass RLS and correct table names
+            const [arRes, dtrRes, docRes, absRes] = await Promise.all([
+                apiGet(`api/logs.php?type=ar&gip_id=${encodeURIComponent(data.id)}`),
+                apiGet(`api/logs.php?type=dtr&gip_id=${encodeURIComponent(data.id)}`),
+                apiGet(`api/logs.php?type=docs&gip_id=${encodeURIComponent(data.id)}`),
+                apiGet(`api/logs.php?type=absorption&gip_id=${encodeURIComponent(data.id)}`)
+            ]);
 
-                fetchedArLogs = arRes.data || [];
-                fetchedDtrLogs = dtrRes.data || [];
-                fetchedDocs = docRes.data || [];
-            } else {
-                const [arRes, dtrRes, docRes] = await Promise.all([
-                    fetch(`${getBasePath()}api/logs.php?type=ar&gip_id=${encodeURIComponent(data.id)}`),
-                    fetch(`${getBasePath()}api/logs.php?type=dtr&gip_id=${encodeURIComponent(data.id)}`),
-                    fetch(`${getBasePath()}api/logs.php?type=docs&gip_id=${encodeURIComponent(data.id)}`)
-                ]);
-
-                const arData = await arRes.json();
-                const dtrData = await dtrRes.json();
-                const docData = await docRes.json();
-
-                fetchedArLogs = arData.success ? arData.logs : [];
-                fetchedDtrLogs = dtrData.success ? dtrData.logs : [];
-                fetchedDocs = docData.success ? docData.logs : [];
+            fetchedArLogs = (arRes.success && arRes.data?.success) ? arRes.data.logs : [];
+            fetchedDtrLogs = (dtrRes.success && dtrRes.data?.success) ? dtrRes.data.logs : [];
+            fetchedDocs = (docRes.success && docRes.data?.success) ? docRes.data.logs : [];
+            const absorptionLogs = (absRes.success && absRes.data?.success) ? absRes.data.logs : [];
+            
+            // Map absorption data to the beneficiary object for the drawer if needed
+            if (absorptionLogs.length > 0) {
+                const latest = absorptionLogs[0];
+                data.absorbDate = latest.absorption_datetime;
+                data.absorb_where = latest.where || latest.absorb_where;
+                data.absorb_position = latest.position || latest.absorb_position;
+                data.absorb_agency = latest.agency || latest.absorb_agency;
             }
 
             // STEP 3: Save to secure cache
