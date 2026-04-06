@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 /**
  * Hybrid engine runtime flag for frontend modules.
  * - true  => [SUPABASE] Cloud mode (PostgreSQL)
- * - false => [LOCALHOST] Laragon mode (MySQL)
+ * - false => [MYSQL] InfinityFree / Local mode (MySQL)
  */
 export const USE_SUPABASE = String(import.meta.env.VITE_USE_SUPABASE ?? 'true').toLowerCase() === 'true';
 
