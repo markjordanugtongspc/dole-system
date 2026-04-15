@@ -8,6 +8,9 @@ import { getBasePath } from './auth.js';
 import Swal from 'sweetalert2';
 import { logger } from './logger.js';
 
+// Prevent noisy repeated network-offline errors from flooding the console.
+const apiNetworkErrorState = new Map();
+
 /**
  * Generic fetch wrapper with error handling
  * @param {string} endpoint - API endpoint path (e.g., 'api/beneficiaries.php')
@@ -53,10 +56,23 @@ export async function apiRequest(endpoint, options = {}) {
         }
 
         const data = await response.json();
+        // Clear prior network-error suppression once request recovers.
+        if (apiNetworkErrorState.has(url)) {
+            apiNetworkErrorState.delete(url);
+            logger.info?.('[API] Recovered', { url });
+        }
         logger.debug('[API] Response', { url, ok: true });
         return { success: true, data };
     } catch (error) {
-        logger.error('API Request Error:', error);
+        const isNetworkError = error instanceof TypeError && /fetch/i.test(error.message || '');
+        if (isNetworkError) {
+            if (!apiNetworkErrorState.get(url)) {
+                apiNetworkErrorState.set(url, true);
+                logger.error('API Request Network Error (suppressed for repeats):', { url, message: error.message });
+            }
+        } else {
+            logger.error('API Request Error:', error);
+        }
         return { success: false, error: error.message };
     }
 }

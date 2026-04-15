@@ -331,6 +331,25 @@ if ($method === 'GET') {
 
     try {
         debugLog('beneficiaries.post', ['keys' => array_keys($data), 'id' => $data['id'] ?? null, 'gip_id' => $data['gip_id'] ?? null]);
+        $generateNextGipId = function () use ($pdo): string {
+            $year = date('Y');
+            $prefix = "ROX-RD-ESIG-$year-";
+            $stmt = $pdo->prepare("
+                SELECT gip_id
+                FROM beneficiaries
+                WHERE gip_id LIKE :prefix
+                ORDER BY gip_id DESC
+                LIMIT 1
+            ");
+            $stmt->execute(['prefix' => $prefix . '%']);
+            $lastId = $stmt->fetchColumn();
+            if ($lastId && preg_match('/ROX-RD-ESIG-(\d{4})-(\d{4})/', $lastId, $matches)) {
+                $lastNum = intval($matches[2]);
+                return sprintf('ROX-RD-ESIG-%s-%04d', $matches[1], $lastNum + 1);
+            }
+            return sprintf('ROX-RD-ESIG-%s-0001', $year);
+        };
+
         // Get foreign key IDs
         $genderId = null;
         if (!empty($data['gender'])) {
@@ -387,16 +406,7 @@ if ($method === 'GET') {
         // Never accept temp/local IDs as real database identifiers
         $gipId = (is_string($candidateId) && str_starts_with($candidateId, 'temp_')) ? null : $candidateId;
         if (!$gipId) {
-            // Auto-generate next ID
-            $stmt = $pdo->query("SELECT gip_id FROM beneficiaries ORDER BY gip_id DESC LIMIT 1");
-            $lastId = $stmt->fetchColumn();
-            if ($lastId && preg_match('/ROX-RD-ESIG-(\d{4})-(\d{4})/', $lastId, $matches)) {
-                $year = $matches[1];
-                $num = intval($matches[2]) + 1;
-                $gipId = sprintf('ROX-RD-ESIG-%s-%04d', $year, $num);
-            } else {
-                $gipId = 'ROX-RD-ESIG-2025-0001';
-            }
+            $gipId = $generateNextGipId();
         }
 
         // Audit columns (only if present in schema)
@@ -438,28 +448,47 @@ if ($method === 'GET') {
             ");
         }
 
-        $params = [
-            'gip_id' => $gipId,
-            'name' => $data['name'],
-            'contact' => $data['contact'] ?? null,
-            'address' => $data['address'] ?? null,
-            'birthday' => !empty($data['birthday']) ? $data['birthday'] : null,
-            'age' => !empty($data['age']) ? intval($data['age']) : null,
-            'gender_id' => $genderId,
-            'education' => $data['education'] ?? null,
-            'start_date' => !empty($data['startDate']) ? $data['startDate'] : null,
-            'end_date' => !empty($data['endDate']) ? $data['endDate'] : null,
-            'series_no' => $data['seriesNo'] ?? null,
-            'office_id' => $officeId,
-            'office_name' => $data['office'] ?? null,
-            'designation' => $data['designation'],
-            'replacement' => (isset($data['replacement']) && trim($data['replacement']) !== '') ? trim($data['replacement']) : null,
-            'status_id' => $statusId,
-            'absorption_log_id' => $absorptionLogId
-        ];
-        if ($hasCreatedBy) $params['created_by'] = $current_user_id;
-        if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
-        $stmt->execute($params);
+        $maxInsertAttempts = 3;
+        $inserted = false;
+        $insertAttempts = 0;
+        while (!$inserted && $insertAttempts < $maxInsertAttempts) {
+            $insertAttempts++;
+            $params = [
+                'gip_id' => $gipId,
+                'name' => $data['name'],
+                'contact' => $data['contact'] ?? null,
+                'address' => $data['address'] ?? null,
+                'birthday' => !empty($data['birthday']) ? $data['birthday'] : null,
+                'age' => !empty($data['age']) ? intval($data['age']) : null,
+                'gender_id' => $genderId,
+                'education' => $data['education'] ?? null,
+                'start_date' => !empty($data['startDate']) ? $data['startDate'] : null,
+                'end_date' => !empty($data['endDate']) ? $data['endDate'] : null,
+                'series_no' => $data['seriesNo'] ?? null,
+                'office_id' => $officeId,
+                'office_name' => $data['office'] ?? null,
+                'designation' => $data['designation'],
+                'replacement' => (isset($data['replacement']) && trim($data['replacement']) !== '') ? trim($data['replacement']) : null,
+                'status_id' => $statusId,
+                'absorption_log_id' => $absorptionLogId
+            ];
+            if ($hasCreatedBy) $params['created_by'] = $current_user_id;
+            if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
+
+            try {
+                $stmt->execute($params);
+                $inserted = true;
+            } catch (PDOException $e) {
+                $isUniqueViolation = ((string)$e->getCode() === '23505') ||
+                    (stripos($e->getMessage(), 'beneficiaries_gip_id_key') !== false) ||
+                    (stripos($e->getMessage(), 'duplicate') !== false && stripos($e->getMessage(), 'gip_id') !== false);
+                if ($isUniqueViolation && $insertAttempts < $maxInsertAttempts) {
+                    $gipId = $generateNextGipId();
+                    continue;
+                }
+                throw $e;
+            }
+        }
 
         // Update absorption log with beneficiary_id
         if ($absorptionLogId) {
