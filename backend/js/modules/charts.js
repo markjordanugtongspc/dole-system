@@ -144,7 +144,7 @@ export async function initCharts(forceRefresh = false) {
         const date = parseChartDate(rawDateStr);
         return date ? date.getFullYear().toString() : null;
     }).filter(y => y))].sort((a, b) => b - a);
-    populateWorkforceDropdown(availableYears);
+    populateWorkforceDropdown(availableYears, rawData);
 
     // Apply Workforce Filter to overall data stats (Total Beneficiaries, Genders, etc.)
     const now = new Date();
@@ -726,23 +726,74 @@ function updateSummaryMetrics(totalStats, filteredStats) {
 /**
  * Populates the Workforce Trend Dropdown dynamically based on data availability
  */
-function populateWorkforceDropdown(years) {
+function populateWorkforceDropdown(years, rawData) {
     const list = document.querySelector('#lastDaysdropdown ul');
     if (!list) return;
 
-    // Keep basics
+    // Calculate total beneficiaries overall
+    const totalOverall = rawData.length;
+    
+    // Calculate 7D, 30D, 90D lengths
+    const now = new Date();
+    const countPastDays = (days) => {
+        const pastDate = new Date();
+        pastDate.setDate(now.getDate() - days);
+        pastDate.setHours(0,0,0,0);
+        return rawData.filter(b => {
+             const d = parseChartDate(b.createdAt);
+             return d && d >= pastDate;
+        }).length;
+    };
+    
+    // Yearly counts
+    const getYearlyCount = (yearStr) => {
+        return rawData.filter(b => {
+            const d = parseChartDate(b.startDate || b.createdAt);
+            return d && d.getFullYear().toString() === yearStr;
+        }).length;
+    };
+
+    // Keep basics with nice badges
     let html = `
-        <li><a href="javascript:void(0)" onclick="updateWorkforceFilter('ALL', 'Overall Stats')" class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === 'ALL' ? 'bg-royal-blue/10 text-royal-blue' : ''}">Overall Stats</a></li>
+        <li>
+            <a href="javascript:void(0)" onclick="updateWorkforceFilter('ALL', 'Overall Stats')" 
+                class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === 'ALL' ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
+                <span>Overall Stats</span>
+                <span class="bg-royal-blue/10 text-royal-blue dark:bg-blue-900/30 dark:text-blue-400 py-0.5 px-2 rounded-full text-[10px] font-black">${totalOverall}</span>
+            </a>
+        </li>
         <li class="border-t border-slate-100 dark:border-slate-700 my-1"></li>
-        <li><a href="javascript:void(0)" onclick="updateWorkforceFilter('7D', 'Last 7 Days')" class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === '7D' ? 'bg-royal-blue/10 text-royal-blue' : ''}">Last 7 Days</a></li>
-        <li><a href="javascript:void(0)" onclick="updateWorkforceFilter('30D', 'Last 30 Days')" class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === '30D' ? 'bg-royal-blue/10 text-royal-blue' : ''}">Last 30 Days</a></li>
-        <li><a href="javascript:void(0)" onclick="updateWorkforceFilter('90D', 'Last 90 Days')" class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === '90D' ? 'bg-royal-blue/10 text-royal-blue' : ''}">Last 90 Days</a></li>
+        <li>
+            <a href="javascript:void(0)" onclick="updateWorkforceFilter('7D', 'Last 7 Days')" class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === '7D' ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
+                <span>Last 7 Days</span>
+                <span class="bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 py-0.5 px-2 rounded-full text-[10px] font-black">${countPastDays(7)}</span>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" onclick="updateWorkforceFilter('30D', 'Last 30 Days')" class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === '30D' ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
+                <span>Last 30 Days</span>
+                <span class="bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400 py-0.5 px-2 rounded-full text-[10px] font-black">${countPastDays(30)}</span>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" onclick="updateWorkforceFilter('90D', 'Last 90 Days')" class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === '90D' ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
+                <span>Last 90 Days</span>
+                <span class="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 py-0.5 px-2 rounded-full text-[10px] font-black">${countPastDays(90)}</span>
+            </a>
+        </li>
         <li class="border-t border-slate-100 dark:border-slate-700 my-1"></li>
     `;
 
     // Add dynamic years
     years.forEach(year => {
-        html += `<li><a href="javascript:void(0)" onclick="updateWorkforceFilter('${year}', 'Year ${year}')" class="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === year ? 'bg-royal-blue/10 text-royal-blue' : ''}">Year ${year}</a></li>`;
+        const yearCount = getYearlyCount(year);
+        html += `
+        <li>
+            <a href="javascript:void(0)" onclick="updateWorkforceFilter('${year}', 'Year ${year}')" class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === year ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
+                <span>Year ${year}</span>
+                <span class="bg-slate-100 text-slate-600 dark:bg-slate-600/50 dark:text-slate-300 py-0.5 px-2 rounded-full text-[10px] font-black">${yearCount}</span>
+            </a>
+        </li>`;
     });
 
     list.innerHTML = html;

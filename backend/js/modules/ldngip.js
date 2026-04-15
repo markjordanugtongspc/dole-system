@@ -25,6 +25,220 @@ let lastDataChecksum = null; // For detecting data changes
 let currentPage = 1;
 const itemsPerPage = 10;
 let filteredDataGlobal = null; // Store current filtered state for pagination
+
+let currentStatusFilter = localStorage.getItem('ldn_status_filter') || 'ONGOING';
+let currentYearFilter = localStorage.getItem('ldn_year_filter') || 'ALL';
+const FILTER_MODE_COOKIE = 'ldn_filter_mode';
+const FILTER_MODE_STORAGE_KEY = 'ldn_filter_mode';
+const DEFAULT_STATUS_FILTER = 'ONGOING';
+const DEFAULT_YEAR_FILTER = 'ALL';
+let filterModeEnabled = (localStorage.getItem(FILTER_MODE_STORAGE_KEY) || 'OFF') === 'ON';
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const match = value.match(new RegExp(`;\\s*${name}=([^;]+)`));
+    return match ? decodeURIComponent(match[1]) : null;
+}
+
+function setCookie(name, value, days = 30) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};path=/`;
+}
+
+const filterModeFromCookie = getCookie(FILTER_MODE_COOKIE);
+if (filterModeFromCookie) {
+    filterModeEnabled = filterModeFromCookie === 'ON';
+}
+
+function getFilteredBeneficiaries() {
+    let result = beneficiaries;
+
+    if (filterModeEnabled) {
+        if (currentStatusFilter !== 'ALL') {
+            result = result.filter(b => (b.remarks || 'UNKNOWN').toUpperCase() === currentStatusFilter);
+        }
+
+        if (currentYearFilter !== 'ALL') {
+            result = result.filter(b => {
+                const rawDateStr = b.startDate || b.createdAt;
+                if (!rawDateStr) return false;
+                const d = new Date(rawDateStr);
+                if (isNaN(d.getTime())) return false;
+                return d.getFullYear().toString() === currentYearFilter;
+            });
+        }
+    } else {
+        // Default mode: always show latest ONGOING rows.
+        result = result.filter(b => (b.remarks || 'UNKNOWN').toUpperCase() === DEFAULT_STATUS_FILTER);
+    }
+
+    const searchInput = document.getElementById('table-search');
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+
+    if (query !== "") {
+        result = result.filter(b =>
+            (b.name?.toLowerCase().includes(query) || false) ||
+            (b.id?.toLowerCase().includes(query) || false) ||
+            (b.office?.toLowerCase().includes(query) || false) ||
+            (b.remarks?.toLowerCase().includes(query) || false) ||
+            (b.designation?.toLowerCase().includes(query) || false) ||
+            (b.address?.toLowerCase().includes(query) || false) ||
+            (b.education?.toLowerCase().includes(query) || false)
+        );
+    }
+
+    if (!filterModeEnabled) {
+        return [...result].sort((a, b) => {
+            const aDate = new Date(a.createdAt || 0).getTime();
+            const bDate = new Date(b.createdAt || 0).getTime();
+            return bDate - aDate;
+        });
+    }
+
+    return result;
+}
+
+function sortByLatestCreatedAtDesc(data) {
+    return [...data].sort((a, b) => {
+        const aDate = new Date(a.createdAt || 0).getTime();
+        const bDate = new Date(b.createdAt || 0).getTime();
+        return bDate - aDate;
+    });
+}
+
+function sortDatasetByCriteria(data, criteria) {
+    const sorted = [...data];
+    switch (criteria) {
+        case 'name_asc':
+            sorted.sort((a, b) => a.name.localeCompare(b.name));
+            break;
+        case 'name_desc':
+            sorted.sort((a, b) => b.name.localeCompare(a.name));
+            break;
+        case 'office':
+            sorted.sort((a, b) => (a.office || '').localeCompare(b.office || ''));
+            break;
+        case 'remarks':
+            sorted.sort((a, b) => (a.remarks || '').localeCompare(b.remarks || ''));
+            break;
+        case 'education':
+            sorted.sort((a, b) => (a.education || '').localeCompare(b.education || ''));
+            break;
+        case 'work':
+            sorted.sort((a, b) => (a.designation || '').localeCompare(b.designation || ''));
+            break;
+        case 'address':
+            sorted.sort((a, b) => (a.address || '').localeCompare(b.address || ''));
+            break;
+        default:
+            return sortByLatestCreatedAtDesc(sorted);
+    }
+    return sorted;
+}
+
+export function applyFilters() {
+    if (!filterModeEnabled) return;
+
+    const statusSelect = document.getElementById('filter-status');
+    const yearSelect = document.getElementById('filter-year');
+    if (statusSelect) {
+        currentStatusFilter = statusSelect.value;
+        localStorage.setItem('ldn_status_filter', currentStatusFilter);
+    }
+    if (yearSelect) {
+        currentYearFilter = yearSelect.value;
+        localStorage.setItem('ldn_year_filter', currentYearFilter);
+    }
+    currentPage = 1;
+    renderTable();
+    
+    const dropdown = document.getElementById('filter-dropdown');
+    if (dropdown && !dropdown.classList.contains('hidden')) {
+        dropdown.classList.add('hidden');
+    }
+}
+
+function updateFilterUI() {
+    const statusSelect = document.getElementById('filter-status');
+    const yearSelect = document.getElementById('filter-year');
+    if (statusSelect) statusSelect.value = filterModeEnabled ? currentStatusFilter : DEFAULT_STATUS_FILTER;
+    if (yearSelect) yearSelect.value = filterModeEnabled ? currentYearFilter : DEFAULT_YEAR_FILTER;
+}
+
+function persistFilterMode(enabled) {
+    filterModeEnabled = enabled;
+    const mode = enabled ? 'ON' : 'OFF';
+    localStorage.setItem(FILTER_MODE_STORAGE_KEY, mode);
+    setCookie(FILTER_MODE_COOKIE, mode, 30);
+}
+
+function updateFilterToggleButtonUI() {
+    const applyFiltersButton = document.getElementById('apply-filters-button');
+    if (!applyFiltersButton) return;
+
+    applyFiltersButton.textContent = `Filter Mode: ${filterModeEnabled ? 'ON' : 'OFF'}`;
+    applyFiltersButton.setAttribute('aria-pressed', filterModeEnabled ? 'true' : 'false');
+    applyFiltersButton.classList.remove('bg-blue-700', 'hover:bg-royal-blue', 'bg-royal-blue', 'hover:bg-blue-700');
+    if (filterModeEnabled) {
+        applyFiltersButton.classList.add('bg-royal-blue', 'hover:bg-blue-700');
+    } else {
+        applyFiltersButton.classList.add('bg-blue-700', 'hover:bg-royal-blue');
+    }
+}
+
+function updateFilterInputsAvailability() {
+    const statusSelect = document.getElementById('filter-status');
+    const yearSelect = document.getElementById('filter-year');
+    if (statusSelect) statusSelect.disabled = !filterModeEnabled;
+    if (yearSelect) yearSelect.disabled = !filterModeEnabled;
+}
+
+function toggleFilterMode() {
+    const nextMode = !filterModeEnabled;
+    persistFilterMode(nextMode);
+
+    if (!nextMode) {
+        currentStatusFilter = DEFAULT_STATUS_FILTER;
+        currentYearFilter = DEFAULT_YEAR_FILTER;
+        localStorage.setItem('ldn_status_filter', currentStatusFilter);
+        localStorage.setItem('ldn_year_filter', currentYearFilter);
+    } else {
+        const statusSelect = document.getElementById('filter-status');
+        const yearSelect = document.getElementById('filter-year');
+        if (statusSelect) currentStatusFilter = statusSelect.value;
+        if (yearSelect) currentYearFilter = yearSelect.value;
+        localStorage.setItem('ldn_status_filter', currentStatusFilter);
+        localStorage.setItem('ldn_year_filter', currentYearFilter);
+    }
+
+    updateFilterUI();
+    updateFilterInputsAvailability();
+    updateFilterToggleButtonUI();
+    currentPage = 1;
+    renderTable();
+}
+
+function populateYearFilter() {
+    const yearSelect = document.getElementById('filter-year');
+    if (!yearSelect) return;
+    
+    const availableYears = [...new Set(beneficiaries.map(b => {
+        const rawDateStr = b.startDate || b.createdAt;
+        if (!rawDateStr) return null;
+        const d = new Date(rawDateStr);
+        return isNaN(d.getTime()) ? null : d.getFullYear().toString();
+    }).filter(y => y))].sort((a, b) => b - a);
+
+    // Keep the "All Years" option and append others
+    let optionsHTML = '<option value="ALL">All Years</option>';
+    availableYears.forEach(y => {
+        optionsHTML += `<option value="${y}">Year ${y}</option>`;
+    });
+    
+    yearSelect.innerHTML = optionsHTML;
+    yearSelect.value = currentYearFilter;
+}
 /**
  * Load beneficiaries — Offline-First Strategy:
  * 1. Instantly serve from IndexedDB (local cache) — zero network wait
@@ -47,8 +261,10 @@ async function loadBeneficiaries() {
 
         // Initialize checksum so polling can correctly detect changes immediately.
         lastDataChecksum = generateChecksum(beneficiaries);
+        populateYearFilter();
+        updateFilterUI();
         const savedSort = localStorage.getItem('ldn_sort_preference');
-        if (savedSort) sortData(savedSort, false); else renderTable();
+        sortData(savedSort || 'name_asc', false);
         console.log(`[Offline-First] Rendered ${localData.length} records from local cache`);
     }
 
@@ -85,8 +301,10 @@ async function loadBeneficiaries() {
                 await cacheBeneficiaries(remoteData); // Update local cache
                 beneficiaries = remoteData;
                 syncExpiredStatusesLocally(beneficiaries);
+                populateYearFilter();
+                updateFilterUI();
                 const savedSort = localStorage.getItem('ldn_sort_preference');
-                if (savedSort) sortData(savedSort, false); else renderTable();
+                sortData(savedSort || 'name_asc', false);
                 lastDataChecksum = remoteChecksum;
                 console.log(`[Offline-First] Remote data synced and rendered (${remoteData.length} records)`);
             } else {
@@ -122,7 +340,22 @@ export function initLDNPage() {
     loadBeneficiaries(); // Load from database
     initLDNHeader();
     initSearch();
+    initFilterControls();
     initAutoRefresh(); // Start real-time polling
+}
+
+function initFilterControls() {
+    const applyFiltersButton = document.getElementById('apply-filters-button');
+    if (!applyFiltersButton) return;
+    updateFilterUI();
+    updateFilterInputsAvailability();
+    updateFilterToggleButtonUI();
+    applyFiltersButton.addEventListener('click', toggleFilterMode);
+
+    const statusSelect = document.getElementById('filter-status');
+    const yearSelect = document.getElementById('filter-year');
+    if (statusSelect) statusSelect.addEventListener('change', applyFilters);
+    if (yearSelect) yearSelect.addEventListener('change', applyFilters);
 }
 
 /**
@@ -212,7 +445,10 @@ function initAutoRefresh() {
     }, 10000); // Poll every 10 seconds
 }
 
-export function renderTable(dataToRender = beneficiaries) {
+export function renderTable(dataToRender = null) {
+    if (!dataToRender) {
+        dataToRender = getFilteredBeneficiaries();
+    }
     const tbody = document.getElementById('beneficiary-table-body');
     if (!tbody) return;
 
@@ -372,7 +608,7 @@ function generatePageNumbers(current, total) {
 
 window.changePage = (page) => {
     currentPage = page;
-    renderTable(filteredDataGlobal || beneficiaries);
+    renderTable(filteredDataGlobal);
 };
 
 function getOfficeClass(office) {
@@ -395,6 +631,20 @@ function getStatusClass(status) {
 }
 
 export function sortData(criteria, saveToStorage = true) {
+    if (!filterModeEnabled) {
+        if (saveToStorage) {
+            localStorage.setItem('ldn_sort_preference', criteria);
+        }
+        currentPage = 1;
+        renderTable(sortDatasetByCriteria(getFilteredBeneficiaries(), criteria));
+
+        const dropdown = document.getElementById('sort-dropdown');
+        if (dropdown && !dropdown.classList.contains('hidden')) {
+            dropdown.classList.add('hidden');
+        }
+        return;
+    }
+
     if (saveToStorage) {
         localStorage.setItem('ldn_sort_preference', criteria);
     }
@@ -597,26 +847,8 @@ function initSearch() {
     if (!searchInput) return;
 
     searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase().trim();
-
-        if (query === "") {
-            currentPage = 1;
-            renderTable(beneficiaries);
-            return;
-        }
-
-        const filtered = beneficiaries.filter(b =>
-            (b.name?.toLowerCase().includes(query) || false) ||
-            (b.id?.toLowerCase().includes(query) || false) ||
-            (b.office?.toLowerCase().includes(query) || false) ||
-            (b.remarks?.toLowerCase().includes(query) || false) ||
-            (b.designation?.toLowerCase().includes(query) || false) ||
-            (b.address?.toLowerCase().includes(query) || false) ||
-            (b.education?.toLowerCase().includes(query) || false)
-        );
-
         currentPage = 1;
-        renderTable(filtered);
+        renderTable();
     });
 
     // Handle the "/" keyboard shortcut
@@ -632,3 +864,4 @@ function initSearch() {
 window.sortData = sortData;
 window.archiveRecord = archiveRecord;
 window.addBeneficiaryData = addBeneficiary;
+window.applyFilters = applyFilters;

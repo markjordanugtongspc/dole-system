@@ -175,45 +175,90 @@ require_once __DIR__ . '/../../config/vite.php';
                     </div>
 
                     <!-- Filter / Sort Actions -->
-                    <div class="relative shrink-0">
-                        <button id="sort-dropdown-button" data-dropdown-toggle="sort-dropdown"
-                            class="flex items-center justify-center p-2.5 text-gray-500 rounded-full hover:bg-orange-50 hover:text-orange-600 transition-all duration-300 border border-default hover:border-orange-100 group shadow-sm cursor-pointer">
-                            <svg class="w-5 h-5 transition-transform group-hover:rotate-180" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                            </svg>
-                        </button>
-                        <!-- Sort Dropdown Menu -->
-                        <div id="sort-dropdown"
-                            class="z-50 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
-                            <div class="px-4 py-3 bg-orange-50/50 rounded-t-xl">
-                                <span class="block text-[10px] font-black text-orange-600 uppercase tracking-wider">Sort
-                                    Beneficiaries</span>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <!-- Filter Dropdown Button -->
+                        <div class="relative">
+                            <button id="filter-dropdown-button" data-dropdown-toggle="filter-dropdown"
+                                class="flex items-center justify-center p-2.5 text-gray-500 rounded-full hover:bg-blue-50 hover:text-royal-blue transition-all duration-300 border border-default hover:border-blue-100 group shadow-sm cursor-pointer">
+                                <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <!-- Funnel Icon -->
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                </svg>
+                            </button>
+                            <!-- Filter Dropdown Menu -->
+                            <div id="filter-dropdown"
+                                class="z-50 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
+                                <div class="px-4 py-3 bg-blue-50/50 rounded-t-xl">
+                                    <span class="block text-[10px] font-black text-royal-blue uppercase tracking-wider">Filter By</span>
+                                </div>
+                                <div class="p-4">
+                                    <!-- Year select -->
+                                    <div class="mb-3">
+                                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Year</label>
+                                        <select id="filter-year" class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
+                                            <option value="ALL">All Years</option>
+                                            <!-- Dynamically populated -->
+                                        </select>
+                                    </div>
+                                    <!-- Status select -->
+                                    <div class="mb-4">
+                                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Status</label>
+                                        <select id="filter-status" class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
+                                            <option value="ALL">All Status</option>
+                                            <option value="ONGOING">Ongoing</option>
+                                            <option value="EXPIRED">Expired</option>
+                                            <option value="RESIGNED">Resigned</option>
+                                            <option value="ABSORBED">Absorbed</option>
+                                        </select>
+                                    </div>
+                                    <button id="apply-filters-button" type="button" aria-pressed="false" class="w-full bg-blue-700 hover:bg-royal-blue text-white font-bold py-2 px-4 rounded-lg text-xs transition-colors cursor-pointer active:scale-95 shadow-md">
+                                        Filter Mode: OFF
+                                    </button>
+                                </div>
                             </div>
-                            <ul class="py-2 text-xs font-bold text-gray-700" aria-labelledby="sort-dropdown-button">
-                                <li><button onclick="sortData('name_asc')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Name
-                                        (A-Z)</button></li>
-                                <li><button onclick="sortData('name_desc')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Name
-                                        (Z-A)</button></li>
-                                <li><button onclick="sortData('office')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Office
-                                        / Assignment</button></li>
-                                <li><button onclick="sortData('remarks')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Remarks
-                                        Status</button></li>
-                                <li><button onclick="sortData('education')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Educational
-                                        Attainment</button></li>
-                                <li><button onclick="sortData('work')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Nature
-                                        of Work</button></li>
-                                <li><button onclick="sortData('address')"
-                                        class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Address
-                                        / Residency</button></li>
-                            </ul>
+                        </div>
+
+                        <!-- Sort actions -->
+                        <div class="relative shrink-0">
+                            <button id="sort-dropdown-button" data-dropdown-toggle="sort-dropdown"
+                                class="flex items-center justify-center p-2.5 text-gray-500 rounded-full hover:bg-orange-50 hover:text-orange-600 transition-all duration-300 border border-default hover:border-orange-100 group shadow-sm cursor-pointer">
+                                <svg class="w-5 h-5 transition-transform group-hover:rotate-180" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <!-- Sort Asc/Desc Icon -->
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                </svg>
+                            </button>
+                            <!-- Sort Dropdown Menu -->
+                            <div id="sort-dropdown"
+                                class="z-50 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
+                                <div class="px-4 py-3 bg-orange-50/50 rounded-t-xl">
+                                    <span class="block text-[10px] font-black text-orange-600 uppercase tracking-wider">Sort
+                                        Beneficiaries</span>
+                                </div>
+                                <ul class="py-2 text-xs font-bold text-gray-700" aria-labelledby="sort-dropdown-button">
+                                    <li><button onclick="sortData('name_asc')"
+                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Name
+                                            (A-Z)</button></li>
+                                    <li><button onclick="sortData('name_desc')"
+                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Name
+                                            (Z-A)</button></li>
+                                    <li><button onclick="sortData('office')"
+                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Office
+                                            / Assignment</button></li>
+                                    <li><button onclick="sortData('remarks')"
+                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Remarks
+                                            Status</button></li>
+                                    <li><button onclick="sortData('education')"
+                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Educational
+                                            Attainment</button></li>
+                                    <li><button onclick="sortData('work')"
+                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Nature
+                                            of Work</button></li>
+                                    <li><button onclick="sortData('address')"
+                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Address
+                                            / Residency</button></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
