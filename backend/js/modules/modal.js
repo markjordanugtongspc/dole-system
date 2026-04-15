@@ -811,15 +811,15 @@ export function showAddDataModal(data = null) {
                         </div>
 
                         <div class="group">
-                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 tracking-widest ${dk ? '' : 'transition-colors'} ${dk ? '' : 'group-focus-within:text-royal-blue'}">Nature of Work <span class="text-red-500">*</span></label>
+                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 tracking-widest ${dk ? '' : 'transition-colors'} ${dk ? '' : 'group-focus-within:text-royal-blue'}">Nature of Work</label>
                             <div class="relative" id="work-container">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="w-3.5 h-3.5 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                                 </div>
                                 <input type="text" name="designation" id="designation-input" autocomplete="off"
-                                    value="${data?.designation || ''}" required 
+                                    value="${data?.designation || 'N/A'}"
                                     class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
-                                    placeholder="e.g. Administrative Support">
+                                    placeholder="N/A">
                                 <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2 transform origin-top transition-all duration-200">
                                     <div class="px-2 py-1.5 mb-1.5 border-b ${t.borderSuggHead}">
                                         <p class="text-[9px] font-black ${t.textWorkSuggHead} uppercase tracking-widest">Quick Select Roles</p>
@@ -839,7 +839,14 @@ export function showAddDataModal(data = null) {
 
                         <div class="group">
                             <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">Replacement History (Optional)</label>
-                            <textarea name="replacement" rows="2" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[11px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder} resize-none min-h-[60px]">${data?.replacement || ''}</textarea>
+                            <input type="hidden" name="replacement" id="replacement-hidden" value="${data?.replacement || ''}">
+                            <div class="relative" id="replacement-container">
+                                <input type="text" id="replacement-search-input" autocomplete="off"
+                                    value="${data?.replacement || ''}"
+                                    class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[11px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}"
+                                    placeholder="Search beneficiary name...">
+                                <div id="replacement-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2"></div>
+                            </div>
                         </div>
 
                         <div class="group">
@@ -1022,35 +1029,103 @@ export function showAddDataModal(data = null) {
             const remarksRadios = popup.querySelectorAll('input[name="remarks"]');
             const extensionContainer = popup.querySelector('#extension-log-container');
 
-            const fetchNextIdentifiers = (year) => {
+            const fetchNextIdentifiers = async (year) => {
                 if (isEdit) return; 
 
                 if (fullIdInput) {
                     fullIdInput.classList.add('animate-pulse');
                     fullIdInput.placeholder = "Loading...";
-                    fetch(`${getBasePath()}api/beneficiaries.php?next_id&year=${year}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            fullIdInput.classList.remove('animate-pulse');
-                            if (data.success && data.nextId) {
-                                fullIdInput.value = data.nextId;
-                            }
-                        });
+                    try {
+                        const idRes = await apiGet(`api/beneficiaries.php?next_id&year=${encodeURIComponent(year)}`);
+                        if (idRes.success && idRes.data?.success && idRes.data?.nextId) {
+                            fullIdInput.value = idRes.data.nextId;
+                        }
+                    } finally {
+                        fullIdInput.classList.remove('animate-pulse');
+                    }
                 }
 
                 if (seriesNoInput) {
                     seriesNoInput.classList.add('animate-pulse');
                     seriesNoInput.placeholder = "Loading...";
-                    fetch(`${getBasePath()}api/beneficiaries.php?next_series_no&year=${year}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            seriesNoInput.classList.remove('animate-pulse');
-                            if (data.success && data.nextSeries) {
-                                seriesNoInput.value = data.nextSeries;
-                            }
-                        });
+                    try {
+                        const seriesRes = await apiGet(`api/beneficiaries.php?next_series_no&year=${encodeURIComponent(year)}`);
+                        if (seriesRes.success && seriesRes.data?.success && seriesRes.data?.nextSeries) {
+                            seriesNoInput.value = seriesRes.data.nextSeries;
+                        }
+                    } finally {
+                        seriesNoInput.classList.remove('animate-pulse');
+                    }
                 }
             };
+
+            const replacementSearchInput = popup.querySelector('#replacement-search-input');
+            const replacementHiddenInput = popup.querySelector('#replacement-hidden');
+            const replacementSuggestions = popup.querySelector('#replacement-suggestions');
+
+            const buildReplacementText = (candidate) => {
+                const name = (candidate.name || '').toUpperCase().trim();
+                const start = candidate.startDateFormatted || candidate.startDate || 'N/A';
+                const end = candidate.endDateFormatted || candidate.endDate || 'N/A';
+                return `${name} (${start.toUpperCase()} - ${end.toUpperCase()})`;
+            };
+
+            const renderReplacementSuggestions = (candidates) => {
+                if (!replacementSuggestions) return;
+                if (!candidates.length) {
+                    replacementSuggestions.innerHTML = `<div class="px-3 py-2 text-[10px] font-bold ${t.textCourseOpt}">No matching beneficiary found.</div>`;
+                    replacementSuggestions.classList.remove('hidden');
+                    return;
+                }
+
+                replacementSuggestions.innerHTML = candidates.map((candidate) => {
+                    const line = buildReplacementText(candidate);
+                    return `
+                        <button type="button" class="replacement-option w-full text-left px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors"
+                            data-replacement="${line.replace(/"/g, '&quot;')}">
+                            ${line}
+                        </button>
+                    `;
+                }).join('');
+
+                replacementSuggestions.classList.remove('hidden');
+                replacementSuggestions.querySelectorAll('.replacement-option').forEach((optionBtn) => {
+                    optionBtn.addEventListener('click', () => {
+                        const selected = optionBtn.getAttribute('data-replacement') || '';
+                        if (replacementSearchInput) replacementSearchInput.value = selected;
+                        if (replacementHiddenInput) replacementHiddenInput.value = selected;
+                        replacementSuggestions.classList.add('hidden');
+                    });
+                });
+            };
+
+            let replacementTimer = null;
+            const fetchReplacementCandidates = async (query = '') => {
+                const q = (query || '').trim();
+                const endpoint = `api/beneficiaries.php?replacement_candidates=1&limit=20${q ? `&q=${encodeURIComponent(q)}` : ''}`;
+                const res = await apiGet(endpoint);
+                if (res.success && res.data?.success && Array.isArray(res.data.candidates)) {
+                    renderReplacementSuggestions(res.data.candidates);
+                }
+            };
+
+            if (replacementSearchInput && replacementHiddenInput && replacementSuggestions) {
+                replacementSearchInput.addEventListener('focus', () => {
+                    fetchReplacementCandidates(replacementSearchInput.value || '');
+                });
+                replacementSearchInput.addEventListener('input', () => {
+                    replacementHiddenInput.value = replacementSearchInput.value.trim();
+                    clearTimeout(replacementTimer);
+                    replacementTimer = setTimeout(() => {
+                        fetchReplacementCandidates(replacementSearchInput.value || '');
+                    }, 250);
+                });
+                document.addEventListener('click', (e) => {
+                    if (!replacementSearchInput.contains(e.target) && !replacementSuggestions.contains(e.target)) {
+                        replacementSuggestions.classList.add('hidden');
+                    }
+                });
+            }
 
             const getSelectedRemarks = () => {
                 const checked = popup.querySelector('input[name="remarks"]:checked');
@@ -1293,7 +1368,7 @@ export function showAddDataModal(data = null) {
                     const contact = formData.get('contact');
                     const startDate = formData.get('startDate');
                     const endDate = formData.get('endDate');
-                    const designation = formData.get('designation');
+                    const designation = (formData.get('designation') || '').trim();
 
                     // Name validation (required + no numbers)
                     if (!name || name.trim() === "" || /[0-9]/.test(name)) {
@@ -1308,7 +1383,7 @@ export function showAddDataModal(data = null) {
                     // Simple existence checks
                     if (!startDate) markError('startDate');
                     if (!endDate) markError('endDate');
-                    if (!designation || designation.trim() === "") markError('designation');
+                    // Designation is optional; default to N/A when blank.
 
                     if (hasError) {
                         return;
@@ -1318,6 +1393,12 @@ export function showAddDataModal(data = null) {
                     formData.forEach((value, key) => {
                         beneficiaryData[key] = value;
                     });
+                    if (!designation) {
+                        beneficiaryData.designation = 'N/A';
+                    }
+                    if (!beneficiaryData.replacement) {
+                        beneficiaryData.replacement = '';
+                    }
 
                     // Prepare ID logic
                     const gipIdInput = popup.querySelector('#full-id-input')?.value;

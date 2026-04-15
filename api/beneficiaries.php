@@ -166,6 +166,53 @@ if ($method === 'GET') {
             exit();
         }
 
+        if (isset($_GET['replacement_candidates'])) {
+            $query = trim((string)($_GET['q'] ?? ''));
+            $limit = (int)($_GET['limit'] ?? 20);
+            if ($limit < 1) $limit = 20;
+            if ($limit > 50) $limit = 50;
+
+            if ($query !== '') {
+                $stmt = $pdo->prepare("
+                    SELECT
+                        b.gip_id as id,
+                        b.full_name as name,
+                        {$startDateFmtExpr} as {$aliasStartDateFormatted},
+                        {$endDateFmtExpr} as {$aliasEndDateFormatted},
+                        b.start_date as {$aliasStartDate},
+                        b.end_date as {$aliasEndDate}
+                    FROM beneficiaries b
+                    WHERE b.is_archived = " . ($isSupabase ? "FALSE" : "0") . "
+                      AND UPPER(b.full_name) LIKE :search
+                    ORDER BY b.full_name ASC
+                    LIMIT :limit
+                ");
+                $stmt->bindValue(':search', '%' . strtoupper($query) . '%', PDO::PARAM_STR);
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+                $stmt->execute();
+            } else {
+                $stmt = $pdo->prepare("
+                    SELECT
+                        b.gip_id as id,
+                        b.full_name as name,
+                        {$startDateFmtExpr} as {$aliasStartDateFormatted},
+                        {$endDateFmtExpr} as {$aliasEndDateFormatted},
+                        b.start_date as {$aliasStartDate},
+                        b.end_date as {$aliasEndDate}
+                    FROM beneficiaries b
+                    WHERE b.is_archived = " . ($isSupabase ? "FALSE" : "0") . "
+                    ORDER BY b.created_at DESC
+                    LIMIT :limit
+                ");
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+                $stmt->execute();
+            }
+
+            $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode(['success' => true, 'candidates' => $candidates]);
+            exit();
+        }
+
         if (isset($_GET['next_id'])) {
             $year = $_GET['year'] ?? date('Y');
             $stmt = $pdo->prepare("SELECT gip_id FROM beneficiaries WHERE gip_id LIKE :year_prefix ORDER BY gip_id DESC LIMIT 1");

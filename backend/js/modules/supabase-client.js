@@ -17,7 +17,7 @@ if (isSupabaseMode()) {
             console.error('[SUPABASE SDK] Failed to initialize client:', e);
         }
     } else {
-        console.error('[SUPABASE SDK] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in environment variables. Check your .env file or Vercel Environment Variables.');
+        console.warn('[SUPABASE SDK] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in build environment. PHP API mode still works; set Render/Vercel build env vars to enable direct SDK queries.');
     }
 } else {
     console.log('[SUPABASE SDK] Supabase mode is disabled (Localhost PHP mode active).');
