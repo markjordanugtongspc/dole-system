@@ -1,6 +1,6 @@
 import { getBasePath } from './auth.js';
 import { createNotification } from './notifications.js';
-import { pollingManager, apiGet, apiPut, apiPatch, showToast, reinitFlowbite, generateChecksum } from './ajax-manager.js';
+import { pollingManager, apiGet, apiPatch, showToast, reinitFlowbite, generateChecksum } from './ajax-manager.js';
 import { supabase } from './supabase-client.js';
 import { isSupabaseMode } from './auth.js';
 import {
@@ -245,7 +245,7 @@ function populateYearFilter() {
  * 2. Fetch fresh data from remote API in background
  * 3. If data changed, update local cache and re-render
  */
-async function loadBeneficiaries() {
+async function loadBeneficiaries(forceRemoteRefresh = false) {
     // ── STEP 1: Serve from local cache immediately ───────────────────────────
     const localData = await getLocalBeneficiaries();
     if (localData.length > 0) {
@@ -272,7 +272,7 @@ async function loadBeneficiaries() {
     const msSinceSync = await getTimeSinceLastSync();
     const CACHE_TTL = 30 * 1000; // 30 seconds — only re-fetch if cache is stale
 
-    if (msSinceSync < CACHE_TTL && localData.length > 0) {
+    if (!forceRemoteRefresh && msSinceSync < CACHE_TTL && localData.length > 0) {
         const hasMissingDates = window.__ldn_hasMissingDates === true;
         if (!hasMissingDates) {
             console.log(`[Offline-First] Cache is fresh (${Math.round(msSinceSync / 1000)}s old), skipping remote fetch`);
@@ -319,19 +319,11 @@ async function loadBeneficiaries() {
 
 
 function syncExpiredStatusesLocally(dataArray) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
+    // Keep server/source-of-truth remarks as-is.
+    // Do not auto-force EXPIRED locally, because it can override manual edits.
     dataArray.forEach(b => {
-        if (b.remarks === 'ONGOING' && b.endDate) {
-            const end = new Date(b.endDate);
-            end.setHours(0, 0, 0, 0);
-            if (end < today) {
-                b.remarks = 'EXPIRED';
-                // Trigger an async background sync to update exactly this record
-                const updatePayload = { ...b };
-                apiPut('api/beneficiaries.php', updatePayload).catch(e => console.error("Auto sync failed", e));
-            }
+        if (typeof b.remarks === 'string') {
+            b.remarks = b.remarks.trim().toUpperCase();
         }
     });
 }
@@ -342,6 +334,11 @@ export function initLDNPage() {
     initSearch();
     initFilterControls();
     initAutoRefresh(); // Start real-time polling
+
+    // Ensure table refreshes immediately after offline queue sync success.
+    window.addEventListener('dataSynced', () => {
+        loadBeneficiaries(true);
+    });
 }
 
 function initFilterControls() {

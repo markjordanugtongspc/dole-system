@@ -209,8 +209,15 @@ export function showEditBeneficiaryDrawer(data) {
         });
         drawer.show();
 
-        drawerContainer.querySelector('#close-edit-drawer-btn').addEventListener('click', () => drawer.hide());
-        drawerContainer.querySelector('#edit-drawer-cancel-btn').addEventListener('click', () => drawer.hide());
+        const hideDrawerSafely = () => {
+            if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                document.activeElement.blur();
+            }
+            drawer.hide();
+        };
+
+        drawerContainer.querySelector('#close-edit-drawer-btn').addEventListener('click', hideDrawerSafely);
+        drawerContainer.querySelector('#edit-drawer-cancel-btn').addEventListener('click', hideDrawerSafely);
         const form = drawerContainer.querySelector('#edit-beneficiary-drawer-form');
 
         const bdayInput = drawerContainer.querySelector('#edit-bday-input');
@@ -293,7 +300,7 @@ export function showEditBeneficiaryDrawer(data) {
                 (async () => {
                     const success = await window.addBeneficiaryData(beneficiaryData, true, false);
                     if (success) {
-                        drawer.hide();
+                        hideDrawerSafely();
                         // Instead of full hide/show cycle (flicker), update the view data directly
                         if (window.viewBeneficiary) {
                             // pass ONLY the id. This forces window.viewBeneficiary in modal.js 
