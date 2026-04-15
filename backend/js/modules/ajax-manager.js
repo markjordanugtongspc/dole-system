@@ -39,7 +39,12 @@ export async function apiRequest(endpoint, options = {}) {
         ...options
     };
 
-    try {
+    const shouldRetryNetwork = (defaultOptions.method || 'GET').toUpperCase() === 'GET';
+    const maxAttempts = shouldRetryNetwork ? 2 : 1;
+    let lastError = null;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
         logger.debug('[API] Request', { url, method: defaultOptions.method || 'GET', hasUserId: Boolean(userId) });
         if (defaultOptions.body) {
             try {
@@ -49,32 +54,43 @@ export async function apiRequest(endpoint, options = {}) {
             }
         }
 
-        const response = await fetch(url, defaultOptions);
+            const response = await fetch(url, defaultOptions);
 
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        // Clear prior network-error suppression once request recovers.
-        if (apiNetworkErrorState.has(url)) {
-            apiNetworkErrorState.delete(url);
-            logger.info?.('[API] Recovered', { url });
-        }
-        logger.debug('[API] Response', { url, ok: true });
-        return { success: true, data };
-    } catch (error) {
-        const isNetworkError = error instanceof TypeError && /fetch/i.test(error.message || '');
-        if (isNetworkError) {
-            if (!apiNetworkErrorState.get(url)) {
-                apiNetworkErrorState.set(url, true);
-                logger.error('API Request Network Error (suppressed for repeats):', { url, message: error.message });
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-        } else {
-            logger.error('API Request Error:', error);
+
+            const data = await response.json();
+            // Clear prior network-error suppression once request recovers.
+            if (apiNetworkErrorState.has(url)) {
+                apiNetworkErrorState.delete(url);
+                logger.info?.('[API] Recovered', { url });
+            }
+            logger.debug('[API] Response', { url, ok: true });
+            return { success: true, data };
+        } catch (error) {
+            lastError = error;
+            const isNetworkError = error instanceof TypeError && /fetch/i.test(error.message || '');
+            const canRetry = isNetworkError && attempt < maxAttempts;
+
+            if (canRetry) {
+                // Small backoff for cold-start / transient network conditions.
+                await new Promise(resolve => setTimeout(resolve, 1200));
+                continue;
+            }
         }
-        return { success: false, error: error.message };
     }
+
+    const isNetworkError = lastError instanceof TypeError && /fetch/i.test(lastError.message || '');
+    if (isNetworkError) {
+        if (!apiNetworkErrorState.get(url)) {
+            apiNetworkErrorState.set(url, true);
+            logger.error('API Request Network Error (suppressed for repeats):', { url, message: lastError.message });
+        }
+    } else {
+        logger.error('API Request Error:', lastError);
+    }
+    return { success: false, error: lastError?.message || 'Unknown request error' };
 }
 
 /**

@@ -123,19 +123,8 @@ function injectFavicon() {
         link.href = canvas.toDataURL();
     };
 
-    // Determine path based on project root
-    const path = window.location.pathname;
-    let basePath = '';
-
-    // Check if we are in the dole-system folder structure
-    if (path.includes('/dole-system/')) {
-        basePath = path.substring(0, path.indexOf('/dole-system/') + '/dole-system/'.length);
-    }
-
-
-
-    // Construct absolute path to image
-    img.src = `${basePath}frontend/images/logo/doleiligan.png`;
+    // Use centralized base-path resolver so Render subpaths do not break favicon URL.
+    img.src = `${getBasePath()}frontend/images/logo/doleiligan.png`;
 }
 
 /**
@@ -163,7 +152,17 @@ async function loadUserProfile() {
             if (user && user.id) userId = `?user_id=${user.id}`;
         } catch (e) { /* ignore */ }
 
-        const response = await fetch(`${getBasePath()}api/profile.php${userId}`);
+        const fetchWithRetry = async (url, options = {}, retries = 1, delayMs = 1200) => {
+            try {
+                return await fetch(url, options);
+            } catch (error) {
+                if (retries <= 0) throw error;
+                await new Promise(resolve => setTimeout(resolve, delayMs));
+                return fetchWithRetry(url, options, retries - 1, delayMs);
+            }
+        };
+
+        const response = await fetchWithRetry(`${getBasePath()}api/profile.php${userId}`);
         const result = await response.json();
         if (result.success) {
             updateUIProfile(result.profile);
