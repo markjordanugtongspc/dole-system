@@ -10,7 +10,20 @@ import { showEditBeneficiaryDrawer } from './edit_drawer.js';
 export function initModalHandler() {
     // Expose the functions to the global window object
     window.viewBeneficiary = async function (data, page = 0) {
-        const cacheKey = `logs_cache_${data.id}`;
+        const beneficiaryId = data?.id || data?.gip_id || null;
+        if (!beneficiaryId) return;
+
+        // If caller passed partial payload (e.g. only {id}), hydrate from API first.
+        const hasCoreFields = Boolean(data?.name && data?.office && data?.remarks);
+        let beneficiaryData = { ...data, id: beneficiaryId };
+        if (!hasCoreFields) {
+            const infoRes = await apiGet(`api/beneficiaries.php?id=${encodeURIComponent(beneficiaryId)}`);
+            if (infoRes.success && infoRes.data?.success && infoRes.data?.beneficiary) {
+                beneficiaryData = { ...infoRes.data.beneficiary, ...beneficiaryData, id: beneficiaryId };
+            }
+        }
+
+        const cacheKey = `logs_cache_${beneficiaryId}`;
         let hasDisplayedCache = false;
         
         try {
@@ -18,10 +31,10 @@ export function initModalHandler() {
             if (window.__doleDB && window.__doleDB.getSecureCache) {
                 const cachedLogs = await window.__doleDB.getSecureCache(cacheKey);
                 if (cachedLogs) {
-                    data.arLogs = cachedLogs.arLogs || [];
-                    data.dtrLogs = cachedLogs.dtrLogs || [];
-                    data.docs = cachedLogs.docs || [];
-                    showBeneficiaryDrawer(data, page);
+                    beneficiaryData.arLogs = cachedLogs.arLogs || [];
+                    beneficiaryData.dtrLogs = cachedLogs.dtrLogs || [];
+                    beneficiaryData.docs = cachedLogs.docs || [];
+                    showBeneficiaryDrawer(beneficiaryData, page);
                     hasDisplayedCache = true;
                 }
             }
@@ -33,10 +46,10 @@ export function initModalHandler() {
 
             // [HYBRID-BRIDGE] Use authorized PHP API for logs/docs to bypass RLS and correct table names
             const [arRes, dtrRes, docRes, absRes] = await Promise.all([
-                apiGet(`api/logs.php?type=ar&gip_id=${encodeURIComponent(data.id)}`),
-                apiGet(`api/logs.php?type=dtr&gip_id=${encodeURIComponent(data.id)}`),
-                apiGet(`api/logs.php?type=docs&gip_id=${encodeURIComponent(data.id)}`),
-                apiGet(`api/logs.php?type=absorption&gip_id=${encodeURIComponent(data.id)}`)
+                apiGet(`api/logs.php?type=ar&gip_id=${encodeURIComponent(beneficiaryId)}`),
+                apiGet(`api/logs.php?type=dtr&gip_id=${encodeURIComponent(beneficiaryId)}`),
+                apiGet(`api/logs.php?type=docs&gip_id=${encodeURIComponent(beneficiaryId)}`),
+                apiGet(`api/logs.php?type=absorption&gip_id=${encodeURIComponent(beneficiaryId)}`)
             ]);
 
             fetchedArLogs = (arRes.success && arRes.data?.success) ? arRes.data.logs : [];
@@ -47,10 +60,10 @@ export function initModalHandler() {
             // Map absorption data to the beneficiary object for the drawer if needed
             if (absorptionLogs.length > 0) {
                 const latest = absorptionLogs[0];
-                data.absorbDate = latest.absorption_datetime;
-                data.absorb_where = latest.where || latest.absorb_where;
-                data.absorb_position = latest.position || latest.absorb_position;
-                data.absorb_agency = latest.agency || latest.absorb_agency;
+                beneficiaryData.absorbDate = latest.absorption_datetime;
+                beneficiaryData.absorb_where = latest.where || latest.absorb_where;
+                beneficiaryData.absorb_position = latest.position || latest.absorb_position;
+                beneficiaryData.absorb_agency = latest.agency || latest.absorb_agency;
             }
 
             // STEP 3: Save to secure cache
@@ -65,29 +78,29 @@ export function initModalHandler() {
             }
 
             // STEP 4: Render UI 
-            data.arLogs = fetchedArLogs;
-            data.dtrLogs = fetchedDtrLogs;
-            data.docs = fetchedDocs;
+            beneficiaryData.arLogs = fetchedArLogs;
+            beneficiaryData.dtrLogs = fetchedDtrLogs;
+            beneficiaryData.docs = fetchedDocs;
             
             if (!hasDisplayedCache) {
                 // First time visiting this user, show drawer now
-                showBeneficiaryDrawer(data, page);
+                showBeneficiaryDrawer(beneficiaryData, page);
             } else {
                 // Drawer is already open with cached data. 
                 // Silently update if it is still physically on the screen
                 const drawerContainer = document.getElementById('beneficiary-drawer-container');
                 if (drawerContainer) {
                     // This cleanly overwrites the old drawer with fresh network data
-                    showBeneficiaryDrawer(data, page);
+                    showBeneficiaryDrawer(beneficiaryData, page);
                 }
             }
         } catch (error) {
             console.error('Error fetching logs/docs:', error);
             if (!hasDisplayedCache) {
-                data.arLogs = [];
-                data.dtrLogs = [];
-                data.docs = [];
-                showBeneficiaryDrawer(data, page);
+                beneficiaryData.arLogs = [];
+                beneficiaryData.dtrLogs = [];
+                beneficiaryData.docs = [];
+                showBeneficiaryDrawer(beneficiaryData, page);
             }
         }
     };

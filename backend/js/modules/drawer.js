@@ -35,6 +35,16 @@ function getStatusClass(status) {
 }
 
 export function showBeneficiaryDrawer(data, initialPage = 0) {
+    data = {
+        ...data,
+        id: data?.id || data?.gip_id || 'N/A',
+        name: data?.name || 'N/A',
+        office: data?.office || 'N/A',
+        remarks: data?.remarks || 'N/A',
+        designation: data?.designation || 'N/A'
+    };
+    const toastPosition = window.innerWidth < 640 ? 'top' : 'top-start';
+
     // Current Page Index for the Right Grid (0 = Info, 1 = Documents/etc)
     let rightGridPage = initialPage;
 
@@ -415,7 +425,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                         const json = result.success ? result.data : { success: false, error: result.error };
 
             if (json.success) {
-                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Status updated!', showConfirmButton: false, timer: 1500 });
+                Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Status updated!', showConfirmButton: false, timer: 1500 });
                 // Refresh data from source (Supabase/MySQL) to ensure everything is in sync
                 if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
             } else {
@@ -472,7 +482,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 const json = result.success ? result.data : { success: false, error: result.error };
                 
                 if (json.success) {
-                    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Auto-Added!', showConfirmButton: false, timer: 1500 });
+                    Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Auto-Added!', showConfirmButton: false, timer: 1500 });
                     if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
                 } else {
                     Swal.fire('Error', 'Failed to add log.', 'error');
@@ -548,9 +558,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     const json = result.success ? result.data : { success: false, error: result.error };
                     
                     if (json.success) {
-                        Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Log Updated!', showConfirmButton: false, timer: 1500 });
-                        drawer.hide();
-                        setTimeout(() => window.viewBeneficiary(data, rightGridPage), 400);
+                        Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Log Updated!', showConfirmButton: false, timer: 1500 });
+                        if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
                     } else {
                         Swal.fire('Error', json.error || 'Failed to update log.', 'error');
                     }
@@ -606,7 +615,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                         const json = result.success ? result.data : { success: false, error: result.error };
 
                         if(json.success) {
-                            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Deleted', showConfirmButton: false, timer: 1500 });
+                            Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Deleted', showConfirmButton: false, timer: 1500 });
                             if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
                         } else {
                             Swal.fire('Error', 'Failed to delete data.', 'error');
