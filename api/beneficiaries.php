@@ -96,9 +96,16 @@ try {
                 $normalized = 'ONGOING';
             }
         }
-
-        $stmt = $pdo->prepare("SELECT status_id FROM status_types WHERE UPPER(status_name) = :status LIMIT 1");
-        $stmt->execute(['status' => $normalized]);
+        // Normalize label matching to tolerate case/spacing differences.
+        // e.g. "ON GOING" vs "ONGOING"
+        $normalizedCompact = str_replace(' ', '', $normalized);
+        $stmt = $pdo->prepare("
+            SELECT status_id
+            FROM status_types
+            WHERE REPLACE(UPPER(TRIM(status_name)), ' ', '') = :status
+            LIMIT 1
+        ");
+        $stmt->execute(['status' => $normalizedCompact]);
         $id = $stmt->fetchColumn();
 
         return [
@@ -587,6 +594,12 @@ if ($method === 'GET') {
         $statusId = $resolvedStatus['status_id'];
         if (empty($data['remarks']) && !empty($resolvedStatus['status_name'])) {
             $data['remarks'] = $resolvedStatus['status_name'];
+        }
+        // Protect against silently nulling status_id on PUT when mapping fails.
+        if ($statusId === null) {
+            $stmt = $pdo->prepare("SELECT status_id FROM beneficiaries WHERE gip_id = :id LIMIT 1");
+            $stmt->execute(['id' => $data['id']]);
+            $statusId = $stmt->fetchColumn() ?: null;
         }
 
         // Handle absorption log if status changed to ABSORBED
