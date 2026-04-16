@@ -19,6 +19,22 @@ import Swal from 'sweetalert2';
  * Handles data fetching from backend API, rendering, and sorting for the LDN page
  */
 
+function translateDateToShortMonth(dateStr) {
+    if (!dateStr || dateStr === 'N/A') return 'N/A';
+    // Handle MM/DD/YYYY format
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+        const month = parseInt(parts[0]);
+        const day = parts[1];
+        const year = parts[2];
+        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        if (month >= 1 && month <= 12) {
+            return `${months[month - 1]} ${day.padStart(2, '0')}, ${year}`;
+        }
+    }
+    return dateStr.toUpperCase();
+}
+
 // Beneficiaries data loaded from database
 let beneficiaries = [];
 let lastDataChecksum = null; // For detecting data changes
@@ -499,10 +515,10 @@ export function renderTable(dataToRender = null) {
                 </div>
             </td>
             <td class="px-4 py-3 whitespace-nowrap text-center text-xs">
-                <span class="${(data.startDateFormatted || data.startDate) ? 'font-black text-royal-blue uppercase tracking-tight' : 'font-bold text-gray-300 italic'}">${data.startDateFormatted || data.startDate || 'N/A'}</span>
+                <span class="${(data.startDateFormatted || data.startDate) ? 'font-black text-royal-blue uppercase tracking-tight' : 'font-bold text-gray-300 italic'}">${translateDateToShortMonth(data.startDateFormatted || data.startDate)}</span>
             </td>
             <td class="px-4 py-3 whitespace-nowrap text-center text-xs">
-                <span class="${(data.endDateFormatted || data.endDate) ? 'font-black text-philippine-red uppercase tracking-tight' : 'font-bold text-gray-300 italic'}">${data.endDateFormatted || data.endDate || 'N/A'}</span>
+                <span class="${(data.endDateFormatted || data.endDate) ? 'font-black text-philippine-red uppercase tracking-tight' : 'font-bold text-gray-300 italic'}">${translateDateToShortMonth(data.endDateFormatted || data.endDate)}</span>
             </td>
             <td class="px-4 py-3 text-center">
                 <span class="${getStatusClass(data.remarks)} text-xs font-bold px-2.5 py-0.5 rounded uppercase border">

@@ -136,11 +136,11 @@ if ($method === 'GET') {
             ? "COALESCE(b.age, EXTRACT(YEAR FROM AGE(CURRENT_DATE, b.birthday)))"
             : "COALESCE(b.age, TIMESTAMPDIFF(YEAR, b.birthday, CURDATE()))";
         $startDateFmtExpr = $isSupabase
-            ? "TO_CHAR(b.start_date, 'Mon DD, YYYY')"
-            : "DATE_FORMAT(b.start_date, '%b %d, %Y')";
+            ? "TO_CHAR(b.start_date, 'MM/DD/YYYY')"
+            : "DATE_FORMAT(b.start_date, '%m/%d/%Y')";
         $endDateFmtExpr = $isSupabase
-            ? "TO_CHAR(b.end_date, 'Mon DD, YYYY')"
-            : "DATE_FORMAT(b.end_date, '%b %d, %Y')";
+            ? "TO_CHAR(b.end_date, 'MM/DD/YYYY')"
+            : "DATE_FORMAT(b.end_date, '%m/%d/%Y')";
         $absorbWhereExpr = $isSupabase ? 'al."where"' : 'al.`where`';
         $absorbPositionExpr = $isSupabase ? 'al."position"' : 'al.`position`';
         $absorbAgencyExpr = $isSupabase ? 'al."agency"' : 'al.`agency`';
@@ -222,15 +222,15 @@ if ($method === 'GET') {
 
         if (isset($_GET['next_id'])) {
             $year = $_GET['year'] ?? date('Y');
-            $stmt = $pdo->prepare("SELECT gip_id FROM beneficiaries WHERE gip_id LIKE :year_prefix ORDER BY gip_id DESC LIMIT 1");
-            $stmt->execute(['year_prefix' => "%-$year-%"]);
+            $prefix = "ROX-RD-ESIG-$year-";
+            // Fast anchored query using index
+            $stmt = $pdo->prepare("SELECT gip_id FROM beneficiaries WHERE gip_id LIKE :prefix ORDER BY gip_id DESC LIMIT 1");
+            $stmt->execute(['prefix' => $prefix . '%']);
             $lastId = $stmt->fetchColumn();
-            $nextId = sprintf('ROX-RD-ESIG-%s-0001', $year);
-
+            
+            $nextId = $prefix . '0001';
             if ($lastId && preg_match('/ROX-RD-ESIG-(\d{4})-(\d{4})/', $lastId, $matches)) {
-                $y = $matches[1];
-                $num = intval($matches[2]) + 1;
-                $nextId = sprintf('ROX-RD-ESIG-%s-%04d', $y, $num);
+                $nextId = sprintf('ROX-RD-ESIG-%s-%04d', $matches[1], intval($matches[2]) + 1);
             }
 
             echo json_encode(['success' => true, 'nextId' => $nextId]);
@@ -239,17 +239,15 @@ if ($method === 'GET') {
 
         if (isset($_GET['next_series_no'])) {
             $year = $_GET['year'] ?? date('Y');
-            $stmt = $pdo->prepare("SELECT series_number FROM beneficiaries WHERE series_number LIKE :year_prefix ORDER BY series_number DESC LIMIT 1");
-            $stmt->execute(['year_prefix' => $year . '-%']);
+            $prefix = $year . '-';
+            // Fast anchored query using index
+            $stmt = $pdo->prepare("SELECT series_number FROM beneficiaries WHERE series_number LIKE :prefix ORDER BY series_number DESC LIMIT 1");
+            $stmt->execute(['prefix' => $prefix . '%']);
             $lastSeries = $stmt->fetchColumn();
             
             $nextSeries = $year . '-00-001';
-
             if ($lastSeries && preg_match('/(\d{4})-(\d{2})-(\d{3})/', $lastSeries, $matches)) {
-                $y = $matches[1];
-                $mid = $matches[2];
-                $num = intval($matches[3]) + 1;
-                $nextSeries = sprintf('%s-%s-%03d', $y, $mid, $num);
+                $nextSeries = sprintf('%s-%s-%03d', $matches[1], $matches[2], intval($matches[3]) + 1);
             }
 
             echo json_encode(['success' => true, 'nextSeries' => $nextSeries]);
@@ -385,23 +383,18 @@ if ($method === 'GET') {
 
     try {
         debugLog('beneficiaries.post', ['keys' => array_keys($data), 'id' => $data['id'] ?? null, 'gip_id' => $data['gip_id'] ?? null]);
-        $generateNextGipId = function () use ($pdo): string {
-            $year = date('Y');
+        
+        $generateNextGipId = function (?string $year = null) use ($pdo): string {
+            $year = $year ?: date('Y');
             $prefix = "ROX-RD-ESIG-$year-";
-            $stmt = $pdo->prepare("
-                SELECT gip_id
-                FROM beneficiaries
-                WHERE gip_id LIKE :prefix
-                ORDER BY gip_id DESC
-                LIMIT 1
-            ");
+            $stmt = $pdo->prepare("SELECT gip_id FROM beneficiaries WHERE gip_id LIKE :prefix ORDER BY gip_id DESC LIMIT 1");
             $stmt->execute(['prefix' => $prefix . '%']);
             $lastId = $stmt->fetchColumn();
+            
             if ($lastId && preg_match('/ROX-RD-ESIG-(\d{4})-(\d{4})/', $lastId, $matches)) {
-                $lastNum = intval($matches[2]);
-                return sprintf('ROX-RD-ESIG-%s-%04d', $matches[1], $lastNum + 1);
+                return sprintf('ROX-RD-ESIG-%s-%04d', $matches[1], intval($matches[2]) + 1);
             }
-            return sprintf('ROX-RD-ESIG-%s-0001', $year);
+            return $prefix . '0001';
         };
 
         // Get foreign key IDs
@@ -460,7 +453,8 @@ if ($method === 'GET') {
         // Never accept temp/local IDs as real database identifiers
         $gipId = (is_string($candidateId) && str_starts_with($candidateId, 'temp_')) ? null : $candidateId;
         if (!$gipId) {
-            $gipId = $generateNextGipId();
+            $bYear = !empty($data['startDate']) ? date('Y', strtotime($data['startDate'])) : null;
+            $gipId = $generateNextGipId($bYear);
         }
 
         // Audit columns (only if present in schema)

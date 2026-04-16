@@ -429,6 +429,59 @@ export async function initCharts(forceRefresh = false) {
 
     renderChart("education-chart", educationOptions);
 
+    // --- 3.5 EMPLOYMENT STATUS (New Module) ---
+    document.querySelectorAll('.count-absorbed').forEach(el => el.textContent = filteredStats.status["ABSORBED"] || 0);
+    document.querySelectorAll('.count-ongoing').forEach(el => el.textContent = filteredStats.status["ONGOING"] || 0);
+
+    const statusColumnOptions = {
+        series: [{
+            name: 'Beneficiaries',
+            data: [
+                { x: 'Absorbed', y: filteredStats.status["ABSORBED"] || 0, fillWeight: 1 },
+                { x: 'Ongoing', y: filteredStats.status["ONGOING"] || 0 },
+                { x: 'Expired', y: filteredStats.status["EXPIRED"] || 0 },
+                { x: 'Resigned', y: filteredStats.status["RESIGNED"] || 0 }
+            ]
+        }],
+        chart: { 
+            type: 'bar', 
+            height: 280, 
+            fontFamily: "Montserrat, sans-serif", 
+            toolbar: { show: false },
+            background: 'transparent'
+        },
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                columnWidth: '65%',
+                borderRadius: 10,
+                distributed: true,
+                dataLabels: { position: 'top' }
+            }
+        },
+        colors: [COLORS.successGreen, COLORS.royalBlue(), COLORS.mutedSlate(), COLORS.philippineRed],
+        dataLabels: { 
+            enabled: true,
+            offsetY: -20,
+            style: { fontSize: '12px', fontWeight: '900', colors: [theme.text] }
+        },
+        legend: { show: false },
+        xaxis: {
+            categories: ['Absorbed', 'Ongoing', 'Expired', 'Resigned'],
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            labels: { style: { colors: theme.muted, fontWeight: 700 } }
+        },
+        yaxis: { show: false },
+        grid: { show: false },
+        tooltip: {
+            theme: isDark() ? 'dark' : 'light',
+            y: { formatter: (val) => val + " Beneficiaries" }
+        },
+        theme: { mode: isDark() ? 'dark' : 'light' }
+    };
+    renderChart("status-chart", statusColumnOptions);
+
     // --- 4. JOB ROLES (Top 5) ---
     const sortedRoles = Object.entries(filteredStats.designations).sort((a, b) => b[1] - a[1]).slice(0, 5);
     const jobRolesOptions = {
@@ -573,8 +626,12 @@ function processBeneficiaryData(data) {
         designations: {},
         ages: { "18-24": 0, "25-30": 0, "31-40": 0, "41+": 0 },
         totalAge: 0,
-        ageCount: 0
+        ageCount: 0,
+        status: { "ABSORBED": 0, "ONGOING": 0, "EXPIRED": 0, "RESIGNED": 0 }
     };
+
+    const now = new Date();
+    now.setHours(0,0,0,0);
 
     data.forEach(b => {
         const office = b.office || 'Unassigned';
@@ -592,6 +649,30 @@ function processBeneficiaryData(data) {
 
         const design = b.designation || 'General Support';
         stats.designations[design] = (stats.designations[design] || 0) + 1;
+
+        // Employment Status Parse - Basis: status_id join (remarks) + absorption_log_id join (absorbDate)
+        const remarksStr = (b.remarks || b.status_name || '').trim().replace(/\s+/g, '').toUpperCase();
+        const hasAbsorbLog = !!b.absorbDate; 
+
+        if (remarksStr.includes('ABSORBED') || hasAbsorbLog) {
+            stats.status["ABSORBED"]++;
+        } else if (remarksStr.includes('RESIGNED')) {
+            stats.status["RESIGNED"]++;
+        } else if (remarksStr === 'ONGOING' || remarksStr.includes('ONGOING') || remarksStr.includes('ACTIVE') || (b.status_id == 1)) {
+            // Priority 1: Explicitly marked as active in DB
+            stats.status["ONGOING"]++;
+        } else if (remarksStr.includes('EXPIRED')) {
+            stats.status["EXPIRED"]++;
+        } else {
+            // Auto-fallback logic: only if no explicit status remark exists
+            let isExpired = false;
+            if (b.endDate) {
+                const endD = parseChartDate(b.endDate);
+                if (endD && endD < now) isExpired = true;
+            }
+            if (isExpired) stats.status["EXPIRED"]++;
+            else stats.status["ONGOING"]++;
+        }
 
         const age = parseInt(b.age);
         if (!isNaN(age)) {

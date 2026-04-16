@@ -349,43 +349,41 @@ require_once __DIR__ . '/../../config/vite.php';
             </div>
 
             <!-- Secondary Charts Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
                 <!-- Education Profile (Enhanced Premium Layout) -->
                 <div
                     class="max-w-full w-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-500 p-4 md:p-8 flex flex-col min-h-[480px]">
 
-                    <!-- Education Stats Grid - Premium Facelift -->
+                    <!-- Education Stats Grid - Premium Facelift (Sticky Notes Aesthetic) -->
                     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
-                        <div
-                            class="relative bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/50 rounded-2xl p-4 shadow-xs flex flex-col items-center justify-center hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:-translate-y-1 transition-all duration-300 group overflow-hidden">
-                            <div class="absolute top-0 right-0 w-8 h-8 bg-royal-blue/5 rounded-bl-3xl"></div>
-                            <span
-                                class="text-3xl font-black text-royal-blue dark:text-blue-400 count-college-grad group-hover:scale-110 transition-transform">...</span>
+                        <!-- College Graduate -->
+                        <div class="relative bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-r-2xl rounded-l-none p-4 shadow-sm flex flex-col items-center justify-center hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 group overflow-hidden cursor-pointer">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-royal-blue"></div>
+                            <div class="absolute -right-4 -top-4 w-12 h-12 bg-royal-blue/5 rounded-full blur-xl group-hover:bg-royal-blue/10 transition-colors"></div>
+                            <span class="text-3xl font-black text-royal-blue dark:text-blue-400 count-college-grad group-hover:scale-110 transition-transform duration-500">...</span>
                             <span class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-2 text-center leading-tight">College<br>Graduate</span>
                         </div>
-                        <div
-                            class="relative bg-yellow-50/50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-800/50 rounded-2xl p-4 shadow-xs flex flex-col items-center justify-center hover:bg-yellow-50 dark:hover:bg-yellow-900/20 hover:-translate-y-1 transition-all duration-300 group overflow-hidden">
-                            <div class="absolute top-0 right-0 w-8 h-8 bg-golden-yellow/5 rounded-bl-3xl"></div>
-                            <span
-                                class="text-3xl font-black text-golden-yellow count-college-lvl group-hover:scale-110 transition-transform">...</span>
-                            <span
-                                class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-2 text-center leading-tight text-center">College<br>Level</span>
+                        <!-- College Level -->
+                        <div class="relative bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-r-2xl rounded-l-none p-4 shadow-sm flex flex-col items-center justify-center hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 group overflow-hidden cursor-pointer">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-golden-yellow"></div>
+                            <div class="absolute -right-4 -top-4 w-12 h-12 bg-golden-yellow/5 rounded-full blur-xl group-hover:bg-golden-yellow/10 transition-colors"></div>
+                            <span class="text-3xl font-black text-golden-yellow count-college-lvl group-hover:scale-110 transition-transform duration-500">...</span>
+                            <span class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-2 text-center leading-tight">College<br>Level</span>
                         </div>
-                        <div
-                            class="relative bg-red-50/50 dark:bg-red-900/10 border border-red-100 dark:border-red-800/50 rounded-2xl p-4 shadow-xs flex flex-col items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/20 hover:-translate-y-1 transition-all duration-300 group overflow-hidden">
-                            <div class="absolute top-0 right-0 w-8 h-8 bg-philippine-red/5 rounded-bl-3xl"></div>
-                            <span
-                                class="text-3xl font-black text-philippine-red dark:text-red-400 count-hs-grad group-hover:scale-110 transition-transform">...</span>
+                        <!-- HS Graduate -->
+                        <div class="relative bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-r-2xl rounded-l-none p-4 shadow-sm flex flex-col items-center justify-center hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 group overflow-hidden cursor-pointer">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-philippine-red"></div>
+                            <div class="absolute -right-4 -top-4 w-12 h-12 bg-philippine-red/5 rounded-full blur-xl group-hover:bg-philippine-red/10 transition-colors"></div>
+                            <span class="text-3xl font-black text-philippine-red dark:text-red-400 count-hs-grad group-hover:scale-110 transition-transform duration-500">...</span>
                             <span class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-2 text-center leading-tight">High School<br>Graduate</span>
                         </div>
-                        <div
-                            class="relative bg-gray-50 dark:bg-slate-700/20 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-xs flex flex-col items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-700/40 hover:-translate-y-1 transition-all duration-300 group overflow-hidden">
-                            <div class="absolute top-0 right-0 w-8 h-8 bg-slate-200 dark:bg-slate-600 rounded-bl-3xl"></div>
-                            <span
-                                class="text-3xl font-black text-slate-600 dark:text-slate-300 count-senior-high group-hover:scale-110 transition-transform">...</span>
-                            <span
-                                class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-2 text-center leading-tight font-mono">Senior High<br>Student/Grad</span>
+                        <!-- Senior High -->
+                        <div class="relative bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-r-2xl rounded-l-none p-4 shadow-sm flex flex-col items-center justify-center hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 group overflow-hidden cursor-pointer">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+                            <div class="absolute -right-4 -top-4 w-12 h-12 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-colors"></div>
+                            <span class="text-3xl font-black text-emerald-600 dark:text-emerald-400 count-senior-high group-hover:scale-110 transition-transform duration-500 font-mono">...</span>
+                            <span class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-2 text-center leading-tight">Senior High<br>Student/Grad</span>
                         </div>
                     </div>
 
@@ -423,9 +421,9 @@ require_once __DIR__ . '/../../config/vite.php';
                                 Distribution Profile
                             </div>
 
-                            <a href="#"
+                            <a href="../../frontend/export/index.php"
                                 class="cursor-pointer inline-flex items-center uppercase tracking-widest font-black text-royal-blue hover:text-blue-800 text-[10px] group">
-                                View Full Report
+                                Export Full Report
                                 <svg class="w-3 h-3 ms-2 transform group-hover:translate-x-1 transition-transform"
                                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                                     viewBox="0 0 24 24">
@@ -440,53 +438,67 @@ require_once __DIR__ . '/../../config/vite.php';
                 <!-- Job Roles (Exclusive Premium Container) -->
                 <div
                     class="max-w-full w-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-500 p-4 md:p-8 flex flex-col min-h-[350px] group/roles">
-                    <div class="flex justify-between border-slate-100 dark:border-slate-700 border-b pb-5 mb-4">
-                        <dl>
-                            <dt class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Primary Capacity</dt>
-                            <dd class="text-3xl font-black text-royal-blue dark:text-blue-400 leading-none mt-2 metric-top-role">...
+                    <div class="flex items-start justify-between border-slate-100 dark:border-slate-700 border-b pb-5 mb-4 gap-3">
+                        <dl class="flex-1 min-w-0">
+                            <dt class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">Primary Capacity</dt>
+                            <dd class="text-xl sm:text-2xl md:text-xl xl:text-2xl font-black text-royal-blue dark:text-blue-400 leading-tight md:leading-none metric-top-role truncate w-full" title="...">
+                                ...
                             </dd>
                         </dl>
-                        <div class="text-right">
-                            <span
-                                class="inline-flex items-center px-3 py-1 bg-blue-600 dark:bg-blue-500 text-white text-[10px] font-black rounded-full shadow-lg shadow-blue-500/30 uppercase tracking-wider">
+                        <div class="shrink-0 self-start">
+                            <span class="inline-flex items-center px-2 py-1 bg-blue-600 dark:bg-blue-500 text-white text-[9px] xl:text-[10px] font-black rounded-lg xl:rounded-full shadow-lg shadow-blue-500/30 uppercase tracking-widest">
                                 Active Load
                             </span>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 py-4 mb-4">
-                        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-100 dark:border-blue-900/30 transition-transform group-hover/roles:-translate-y-1">
-                            <dt class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1">Office Based</dt>
-                            <dd class="text-2xl font-black text-royal-blue dark:text-blue-400 count-office-based">...</dd>
+                    <div id="roles-content-view">
+                        <div class="grid grid-cols-2 gap-4 py-4 mb-4">
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-100 dark:border-blue-900/30 transition-transform group-hover/roles:-translate-y-1">
+                                <dt class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1">Office Based</dt>
+                                <dd class="text-2xl font-black text-royal-blue dark:text-blue-400 count-office-based">...</dd>
+                            </div>
+                            <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-100 dark:border-red-900/30 transition-transform group-hover/roles:-translate-y-1">
+                                <dt class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1">Field Based</dt>
+                                <dd class="text-2xl font-black text-philippine-red dark:text-red-400 count-field-based">...</dd>
+                            </div>
                         </div>
-                        <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-100 dark:border-red-900/30 transition-transform group-hover/roles:-translate-y-1">
-                            <dt class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1">Field Based</dt>
-                            <dd class="text-2xl font-black text-philippine-red dark:text-red-400 count-field-based">...</dd>
-                        </div>
+                        <div id="job-roles-chart" class="flex-1 w-full min-h-[220px]"></div>
                     </div>
 
-                    <div id="job-roles-chart" class="flex-1 w-full"></div>
+                    <div id="status-content-view" class="hidden flex flex-col h-full">
+                         <div class="grid grid-cols-2 gap-4 py-4 mb-2">
+                            <div class="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 transition-transform hover:-translate-y-1 duration-300 group/sbox">
+                                <dt class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1 text-center">Absorbed</dt>
+                                <dd class="text-3xl font-black text-emerald-600 dark:text-emerald-400 count-absorbed text-center">0</dd>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-100 dark:border-blue-900/30 transition-transform hover:-translate-y-1 duration-300 group/sbox">
+                                <dt class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1 text-center">Ongoing</dt>
+                                <dd class="text-3xl font-black text-royal-blue dark:text-blue-400 count-ongoing text-center">0</dd>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex items-center justify-center p-2">
+                            <div id="status-chart" class="w-full h-full min-h-[280px]"></div>
+                        </div>
+                    </div>
 
                     <div class="grid grid-cols-1 items-center border-t border-slate-200 justify-between mt-2">
                         <div class="flex justify-between items-center pt-2 md:pt-3">
-                            <!-- Button -->
-                            <!-- Label only -->
-                            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider py-2">
+                            <div id="card-mode-desc" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider py-2">
                                 Role Distribution
                             </div>
 
-                            <a href="#"
-                                class="cursor-pointer inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-[10px] hover:underline">
-                                Roles Report
-                                <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="M19 12H5m14 0-4 4m4-4-4-4" />
+                            <div id="card-mode-toggle" class="cursor-pointer inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-[10px] hover:underline group">
+                                <span id="toggle-label-text">Employment Status</span>
+                                <svg class="w-3 h-3 ms-1.5 transform group-hover:translate-x-1 transition-transform" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 12h14m-7 7 7-7-7-7" />
                                 </svg>
-                            </a>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+            </div>
 
                 <!-- Age Demographics (Workforce Heatmap Concept) -->
                 <div
@@ -733,6 +745,39 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 genBtn.addEventListener('click', () => switchView('general'));
                 perfBtn.addEventListener('click', () => switchView('performance'));
+
+                // Card Mode Toggle (Roles vs Status)
+                const cardToggle = document.getElementById('card-mode-toggle');
+                const rolesView = document.getElementById('roles-content-view');
+                const statusView = document.getElementById('status-content-view');
+                const toggleLabel = document.getElementById('toggle-label-text');
+                const modeDesc = document.getElementById('card-mode-desc');
+
+                if (cardToggle && rolesView && statusView) {
+                    cardToggle.addEventListener('click', function() {
+                        const isRolesActive = !rolesView.classList.contains('hidden');
+                        if (isRolesActive) {
+                            // Currently showing Roles -> Switch to Status
+                            rolesView.classList.add('hidden');
+                            statusView.classList.remove('hidden');
+                            statusView.classList.add('flex');
+                            toggleLabel.textContent = 'Role Distribution'; // Label to switch back
+                            modeDesc.textContent = 'Employment Status';    // Current visible mode
+                        } else {
+                            // Currently showing Status -> Switch to Roles
+                            statusView.classList.add('hidden');
+                            statusView.classList.remove('flex');
+                            rolesView.classList.remove('hidden');
+                            toggleLabel.textContent = 'Employment Status'; // Label to switch forward
+                            modeDesc.textContent = 'Role Distribution';    // Current visible mode
+                        }
+                        
+                        // Force a layout recalculation for ApexCharts
+                        setTimeout(() => {
+                            window.dispatchEvent(new Event('resize'));
+                        }, 100);
+                    });
+                }
             });
         </script>
 

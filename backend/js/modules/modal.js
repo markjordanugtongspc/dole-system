@@ -9,6 +9,40 @@ import { showEditBeneficiaryDrawer } from './edit_drawer.js';
 
 export function initModalHandler() {
     // Expose the functions to the global window object
+    /**
+     * SHARED UTILITIES
+     */
+    window.__maskDate = function(val) {
+        let v = val.replace(/\D/g,'').slice(0, 8);
+        if (v.length > 2 && v.length <= 4) v = v.slice(0,2) + '/' + v.slice(2);
+        else if (v.length > 4) v = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4);
+        return v;
+    };
+
+    window.__parseFormattedDate = function(str) {
+        if (!str) return null;
+        const parts = str.split('/');
+        if (parts.length === 3) {
+            const m = parseInt(parts[0]) - 1;
+            const d = parseInt(parts[1]);
+            const y = parseInt(parts[2]);
+            if (y > 1000 && m >= 0 && m < 12 && d > 0 && d <= 31) {
+                return new Date(y, m, d);
+            }
+        }
+        return null;
+    };
+
+    window.calculateAge = function(birthday) {
+        if (!birthday) return '';
+        const birthDate = (birthday instanceof Date) ? birthday : new Date(birthday);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+        return age >= 0 ? age : 0;
+    };
+
     window.viewBeneficiary = async function (data, page = 0) {
         const beneficiaryId = data?.id || data?.gip_id || null;
         if (!beneficiaryId) return;
@@ -671,6 +705,22 @@ export function showAddDataModal(data = null) {
     };
 
     const formContent = `
+        <style>
+            .datepicker { z-index: 99999 !important; }
+            .datepicker-picker { 
+                background-color: ${dk ? '#1e293b' : '#ffffff'} !important; 
+                border: 1px solid ${dk ? '#334155' : '#e2e8f0'} !important;
+                color: ${dk ? '#f8fafc' : '#1e293b'} !important;
+                border-radius: 0.75rem !important;
+                box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
+            }
+            .datepicker-header .datepicker-title, .datepicker-header .datepicker-controls .button { 
+                color: ${dk ? '#f8fafc' : '#1e293b'} !important;
+            }
+            .datepicker-cell.selected { background-color: #008148 !important; color: #fff !important; }
+            .datepicker-cell:hover { background-color: ${dk ? '#334155' : '#f1f5f9'} !important; }
+            .datepicker-controls .button:hover { background-color: ${dk ? '#334155' : '#f1f5f9'} !important; }
+        </style>
         <div class="text-left font-montserrat user-select-none relative p-0 max-w-full overflow-x-hidden">
             <!-- Modal Header -->
             <div class="mb-4 pb-3 border-b ${t.borderBase} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -723,11 +773,16 @@ export function showAddDataModal(data = null) {
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
                                 <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Birthday</label>
-                                <input type="date" name="birthday" value="${data?.birthday || ''}" id="birthday-input" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm uppercase">
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <svg class="w-4 h-4 ${t.iconColor}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
+                                    </div>
+                                    <input type="text" name="birthday" value="${data?.birthday || ''}" id="birthday-input" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY">
+                                </div>
                             </div>
                             <div class="group">
                                 <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Age</label>
-                                <input type="text" name="age" value="${data?.age || ''}" id="age-display" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-black ${t.textAge} outline-none font-mono focus:ring-4 ${t.focusGreen}" placeholder="Auto">
+                                <input type="text" name="age" value="${data?.age || ''}" id="age-display" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-black ${t.textAge} outline-none font-mono focus:ring-4 ${t.focusGreen}" placeholder="Auto/Manual">
                             </div>
                         </div>
 
@@ -767,14 +822,24 @@ export function showAddDataModal(data = null) {
                             <div class="w-1 h-5 bg-golden-yellow rounded-full"></div>
                             <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest">Contract Duration</p>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div id="date-range-picker" class="grid grid-cols-2 gap-3">
                             <div class="group">
                                 <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">Start Date</label>
-                                <input type="date" name="startDate" value="${data?.startDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusYellow} outline-none transition-all shadow-sm uppercase">
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <svg class="w-4 h-4 ${t.iconColor}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
+                                    </div>
+                                    <input type="text" name="startDate" id="datepicker-range-start" value="${data?.startDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusYellow} outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY">
+                                </div>
                             </div>
                             <div class="group">
                                 <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">End Date</label>
-                                <input type="date" name="endDate" value="${data?.endDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusRed} outline-none transition-all shadow-sm uppercase">
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <svg class="w-4 h-4 ${t.iconColor}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
+                                    </div>
+                                    <input type="text" name="endDate" id="datepicker-range-end" value="${data?.endDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusRed} outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -955,19 +1020,51 @@ export function showAddDataModal(data = null) {
                 });
             }
 
-            const bdayInput = popup.querySelector('#birthday-input');
-            const ageDisplay = popup.querySelector('#age-display');
-
-            if (bdayInput && ageDisplay) {
-                bdayInput.addEventListener('change', (e) => {
-                    if (e.target.value) {
-                        ageDisplay.value = calculateAge(e.target.value);
+            // --- Robust Date Input Logic ---
+            const setupInputDateBehavior = (input, onDateFound) => {
+                input.addEventListener('input', (e) => {
+                    const masked = window.__maskDate(e.target.value);
+                    if (e.target.value !== masked) e.target.value = masked;
+                    
+                    if (masked.length === 10) {
+                        const parsed = window.__parseFormattedDate(masked);
+                        if (parsed && onDateFound) {
+                            onDateFound(parsed);
+                            if (document.activeElement === input) {
+                                input.blur();
+                            }
+                        }
                     }
                 });
 
-                // Initial calculation for Edit mode if birthday is set and no age is already there
-                if (bdayInput.value && !data?.age) {
-                    ageDisplay.value = calculateAge(bdayInput.value);
+                input.addEventListener('changeDate', (e) => {
+                    if (e.detail && e.detail.date && onDateFound) {
+                        onDateFound(e.detail.date);
+                        // Force hide the picker after selection
+                        const picker = input._datepicker || (input.parentNode && input.parentNode._datepicker);
+                        if (picker && typeof picker.hide === 'function') {
+                            picker.hide();
+                        }
+                    }
+                });
+            };
+
+            const bdayInput = popup.querySelector('#birthday-input');
+            const ageDisplay = popup.querySelector('#age-display');
+
+            if (bdayInput) {
+                setupInputDateBehavior(bdayInput, (date) => {
+                    if (ageDisplay) {
+                        ageDisplay.value = window.calculateAge(date);
+                        ageDisplay.classList.add('animate-pulse');
+                        setTimeout(() => ageDisplay.classList.remove('animate-pulse'), 400);
+                    }
+                });
+
+                // Initialization of Picker (if library available)
+                const PickerClass = window.Datepicker || (typeof Datepicker !== 'undefined' ? Datepicker : null);
+                if (PickerClass) {
+                    input._datepicker = new PickerClass(bdayInput, { format: 'mm/dd/yyyy', autohide: true });
                 }
             }
 
@@ -1043,32 +1140,65 @@ export function showAddDataModal(data = null) {
             const extensionContainer = popup.querySelector('#extension-log-container');
 
             const fetchNextIdentifiers = async (year) => {
-                if (isEdit) return; 
+                if (isEdit || !year) return; 
 
-                if (fullIdInput) {
-                    fullIdInput.classList.add('animate-pulse');
-                    fullIdInput.placeholder = "Loading...";
-                    try {
-                        const idRes = await apiGet(`api/beneficiaries.php?next_id&year=${encodeURIComponent(year)}`);
-                        if (idRes.success && idRes.data?.success && idRes.data?.nextId) {
-                            fullIdInput.value = idRes.data.nextId;
-                        }
-                    } finally {
-                        fullIdInput.classList.remove('animate-pulse');
+                // Immediately set temporary template values so inputs aren't empty
+                if (fullIdInput && !fullIdInput.value) fullIdInput.value = `ROX-RD-ESIG-${year}-????`;
+                if (seriesNoInput && !seriesNoInput.value) seriesNoInput.value = `${year}-00-???`;
+
+                const cacheKeyId = `cache_next_id_${year}`;
+                const cacheKeySeries = `cache_next_series_${year}`;
+                const cacheExpiryKey = `cache_expiry_${year}`;
+                
+                const now = Date.now();
+                const cachedId = localStorage.getItem(cacheKeyId);
+                const cachedSeries = localStorage.getItem(cacheKeySeries);
+                const cacheExpiry = localStorage.getItem(cacheExpiryKey);
+                
+                // LOCAL CACHE CHECK: If valid, update everything IMMEDIATELY and TOGETHER
+                // LOCAL CACHE CHECK
+                if (cachedId && cachedSeries && cacheExpiry && now < parseInt(cacheExpiry, 10)) {
+                    if (fullIdInput) {
+                        fullIdInput.value = cachedId;
+                        fullIdInput.classList.remove('placeholder:text-gray-300'); // Ensure it looks like a value
                     }
+                    if (seriesNoInput) {
+                        seriesNoInput.value = cachedSeries;
+                    }
+                    return;
                 }
 
-                if (seriesNoInput) {
-                    seriesNoInput.classList.add('animate-pulse');
-                    seriesNoInput.placeholder = "Loading...";
-                    try {
-                        const seriesRes = await apiGet(`api/beneficiaries.php?next_series_no&year=${encodeURIComponent(year)}`);
-                        if (seriesRes.success && seriesRes.data?.success && seriesRes.data?.nextSeries) {
-                            seriesNoInput.value = seriesRes.data.nextSeries;
-                        }
-                    } finally {
-                        seriesNoInput.classList.remove('animate-pulse');
+                // ONLINE API: Parallel fetching to avoid "one by one" delay
+                const inputs = [fullIdInput, seriesNoInput].filter(Boolean);
+                inputs.forEach(el => {
+                    el.classList.add('animate-pulse');
+                    el.placeholder = "Syncing...";
+                });
+
+                try {
+                    const [idRes, seriesRes] = await Promise.all([
+                        apiGet(`api/beneficiaries.php?next_id&year=${encodeURIComponent(year)}`),
+                        apiGet(`api/beneficiaries.php?next_series_no&year=${encodeURIComponent(year)}`)
+                    ]);
+
+                    const nextId = (idRes.success && idRes.data?.success) ? idRes.data.nextId : null;
+                    const nextSeries = (seriesRes.success && seriesRes.data?.success) ? seriesRes.data.nextSeries : null;
+
+                    // Apply both together
+                    if (nextId && fullIdInput) {
+                        fullIdInput.value = nextId;
+                        localStorage.setItem(cacheKeyId, nextId);
                     }
+                    if (nextSeries && seriesNoInput) {
+                        seriesNoInput.value = nextSeries;
+                        localStorage.setItem(cacheKeySeries, nextSeries);
+                    }
+
+                    localStorage.setItem(cacheExpiryKey, (now + 300000).toString());
+                } catch (err) {
+                    console.error('ID Sync error:', err);
+                } finally {
+                    inputs.forEach(el => el.classList.remove('animate-pulse'));
                 }
             };
 
@@ -1154,15 +1284,17 @@ export function showAddDataModal(data = null) {
                 }
             };
 
+
             const updateRemarks = () => {
                 if (endDateInput && endDateInput.value) {
-                    const endArr = endDateInput.value.split('-');
-                    const end = new Date(endArr[0], endArr[1]-1, endArr[2]);
+                    const parsed = window.__parseFormattedDate(endDateInput.value);
+                    if (!parsed) return;
+                    
                     const now = new Date();
                     now.setHours(0, 0, 0, 0);
 
                     let newStatus = 'ONGOING';
-                    if (end < now) {
+                    if (parsed < now) {
                         newStatus = 'EXPIRED';
                     }
                     setSelectedRemarks(newStatus);
@@ -1213,29 +1345,48 @@ export function showAddDataModal(data = null) {
             };
 
             if (startDateInput) {
-                startDateInput.addEventListener('change', (e) => {
-                    const dateVal = e.target.value;
-                    if (dateVal) {
-                        const selectedYear = new Date(dateVal).getFullYear();
-                        fetchNextIdentifiers(selectedYear);
+                let lastYear = null;
+                setupInputDateBehavior(startDateInput, (parsed) => {
+                    const selectedYear = parsed.getFullYear();
+                    if (endDateInput) {
+                        const end = new Date(parsed);
+                        // Add exactly 3 months
+                        end.setMonth(end.getMonth() + 3);
+                        // Add exactly 1 day
+                        end.setDate(end.getDate() + 1);
+                        
+                        const m = String(end.getMonth() + 1).padStart(2, '0');
+                        const d = String(end.getDate()).padStart(2, '0');
+                        const y = end.getFullYear();
+                        endDateInput.value = `${m}/${d}/${y}`;
+                    }
+                    updateRemarks();
 
-                        if (endDateInput && !endDateInput.value) {
-                            const start = new Date(dateVal);
-                            start.setMonth(start.getMonth() + 1);
-                            endDateInput.value = start.toISOString().split('T')[0];
-                        }
-                        updateRemarks();
+                    if (selectedYear > 1900 && selectedYear !== lastYear) {
+                        lastYear = selectedYear;
+                        fetchNextIdentifiers(selectedYear);
                     }
                 });
 
+                if (endDateInput) {
+                    setupInputDateBehavior(endDateInput, () => updateRemarks());
+                }
+
+                // Picker Init
+                const PickerClass = window.Datepicker || (typeof Datepicker !== 'undefined' ? Datepicker : null);
+                if (PickerClass) {
+                    if (startDateInput) {
+                        startDateInput._datepicker = new PickerClass(startDateInput, { format: 'mm/dd/yyyy', autohide: true, orientation: 'bottom left' });
+                    }
+                    if (endDateInput) {
+                        endDateInput._datepicker = new PickerClass(endDateInput, { format: 'mm/dd/yyyy', autohide: true, orientation: 'bottom left' });
+                    }
+                }
+
                 if (!isEdit) {
-                    const baseYear = startDateInput.value ? new Date(startDateInput.value).getFullYear() : new Date().getFullYear();
+                    const baseYear = new Date().getFullYear();
                     fetchNextIdentifiers(baseYear);
                 }
-            }
-
-            if (endDateInput) {
-                endDateInput.addEventListener('change', updateRemarks);
             }
 
             remarksRadios.forEach(r => r.addEventListener('change', updateAbsorptionLog));
@@ -1404,7 +1555,20 @@ export function showAddDataModal(data = null) {
 
                     const beneficiaryData = {};
                     formData.forEach((value, key) => {
-                        beneficiaryData[key] = value;
+                        // Standardize dates to YYYY-MM-DD for backend if they are formatted as MM/DD/YYYY
+                        if (['birthday', 'startDate', 'endDate'].includes(key)) {
+                            const parsed = window.__parseFormattedDate(value);
+                            if (parsed) {
+                                const y = parsed.getFullYear();
+                                const m = String(parsed.getMonth() + 1).padStart(2, '0');
+                                const d = String(parsed.getDate()).padStart(2, '0');
+                                beneficiaryData[key] = `${y}-${m}-${d}`;
+                            } else {
+                                beneficiaryData[key] = value;
+                            }
+                        } else {
+                            beneficiaryData[key] = value;
+                        }
                     });
                     if (!designation) {
                         beneficiaryData.designation = 'N/A';

@@ -134,7 +134,19 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 </div>
 
 <!-- Container for right grid from modal -->
-<div class="mt-8 pt-6 border-t border-default relative">
+<div class="mt-8 pt-2 border-t border-default relative">
+    <!-- Relocated Navigation Grid -->
+    <div class="grid grid-cols-2 gap-3 pb-6 mb-2 border-b border-gray-100 dark:border-slate-800 relative z-10 w-full">
+        <button id="drawer-prev-btn" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-neutral-secondary-medium text-heading text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm border border-default-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-tertiary cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+            PREVIOUS
+        </button>
+        <button id="drawer-next-btn" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-brand text-white text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm shadow-brand-medium/50 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-strong cursor-pointer text-center">
+            NEXT
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+        </button>
+    </div>
+
     <!-- Pages Container -->
     <div id="drawer-page-0" class="flex-1 flex flex-col gap-4">
         
@@ -267,17 +279,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
          </div>
     </div>
 
-    <!-- Navigation Below (Same as modal logic but styled for drawer) -->
-    <!-- Grid columns structure for responsive desktop and mobile -->
-    <div class="grid grid-cols-2 gap-3 pt-6 mt-6 border-t border-gray-100 dark:border-slate-800 relative z-10 w-full mb-4">
-        <button id="drawer-prev-btn" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-neutral-secondary-medium text-heading text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm border border-default-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-tertiary cursor-pointer">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
-            PREVIOUS
-        </button>
-        <button id="drawer-next-btn" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-brand text-white text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm shadow-brand-medium/50 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-strong cursor-pointer">
-            NEXT
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
-    </div>
+    <!-- End of Pages -->
+</div>
 </div>
 
 <style>
@@ -377,30 +380,54 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 const docName = btn.dataset.name;
                 const currentStatus = btn.dataset.status;
                 
+                const btnBase = "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[9px] gap-2 transition-all duration-300 ";
+                
                 const result = await Swal.fire({
                     title: '<span class="text-xl font-black text-heading uppercase tracking-tight">Update Document</span>',
                     html: `
-                        <div class="font-montserrat text-left px-2">
-                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Set status for <span class="text-brand">${docName}</span></label>
-                            <select id="swal-doc-status" class="bg-gray-50 border border-gray-200 text-heading text-sm rounded-xl focus:ring-brand focus:border-brand block w-full p-2.5 font-bold uppercase transition-all mb-4">
-                                <option value="PENDING" ${currentStatus === 'PENDING' ? 'selected' : ''}>PENDING</option>
-                                <option value="COMPLETED" ${currentStatus === 'COMPLETED' ? 'selected' : ''}>COMPLETED</option>
-                                <option value="REJECTED" ${currentStatus === 'REJECTED' ? 'selected' : ''}>REJECTED</option>
-                            </select>
+                        <div class="font-montserrat text-left">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-4 ps-1">Set status for <span class="text-brand font-black">${docName}</span></label>
+                            
+                            <div class="grid grid-cols-3 gap-3">
+                                <label class="relative block cursor-pointer">
+                                    <input type="radio" name="swal-doc-status" value="PENDING" class="peer sr-only" ${currentStatus === 'PENDING' ? 'checked' : ''}>
+                                    <div class="${btnBase} border-gray-100 bg-gray-50 text-gray-400 dark:border-slate-700 dark:bg-slate-800/50 dark:text-gray-500 peer-checked:border-amber-400 peer-checked:bg-amber-50 peer-checked:text-amber-600 dark:peer-checked:bg-amber-900/20 dark:peer-checked:text-amber-400 hover:bg-amber-50/50 dark:hover:bg-slate-700">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span>Pending</span>
+                                    </div>
+                                </label>
+
+                                <label class="relative block cursor-pointer">
+                                    <input type="radio" name="swal-doc-status" value="COMPLETED" class="peer sr-only" ${currentStatus === 'COMPLETED' ? 'checked' : ''}>
+                                    <div class="${btnBase} border-gray-100 bg-gray-50 text-gray-400 dark:border-slate-700 dark:bg-slate-800/50 dark:text-gray-500 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-600 dark:peer-checked:bg-green-900/20 dark:peer-checked:text-green-400 hover:bg-green-50/50 dark:hover:bg-slate-700">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                        <span>Verify</span>
+                                    </div>
+                                </label>
+
+                                <label class="relative block cursor-pointer">
+                                    <input type="radio" name="swal-doc-status" value="REJECTED" class="peer sr-only" ${currentStatus === 'REJECTED' ? 'checked' : ''}>
+                                    <div class="${btnBase} border-gray-100 bg-gray-50 text-gray-400 dark:border-slate-700 dark:bg-slate-800/50 dark:text-gray-500 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-600 dark:peer-checked:bg-red-900/20 dark:peer-checked:text-red-400 hover:bg-red-50/50 dark:hover:bg-slate-700">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        <span>Reject</span>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
                     `,
                     showCancelButton: true,
-                    confirmButtonText: '<span class="font-black uppercase tracking-widest">Update</span>',
-                    cancelButtonText: '<span class="font-black uppercase tracking-widest">Cancel</span>',
+                    confirmButtonText: '<span class="font-black uppercase tracking-widest cursor-pointer">Update Status</span>',
+                    cancelButtonText: '<span class="font-black uppercase tracking-widest cursor-pointer">Cancel</span>',
                     customClass: {
                         container: 'font-montserrat',
-                        popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100',
-                        confirmButton: 'bg-brand text-white hover:bg-brand-strong text-xs px-6 py-2.5 rounded-xl border border-transparent shadow-sm mx-2 cursor-pointer',
-                        cancelButton: 'bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs px-6 py-2.5 rounded-xl border border-gray-200 shadow-sm mx-2 cursor-pointer'
+                        popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100 dark:border-slate-800 dark:bg-slate-900',
+                        confirmButton: 'bg-brand text-white hover:bg-brand-strong text-xs px-6 py-2.5 rounded-xl border border-transparent shadow-sm mx-2',
+                        cancelButton: 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 text-xs px-6 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 shadow-sm mx-2'
                     },
                     buttonsStyling: false,
                     preConfirm: () => {
-                        return document.getElementById('swal-doc-status').value;
+                        const selected = document.querySelector('input[name="swal-doc-status"]:checked');
+                        return selected ? selected.value : null;
                     }
                 });
 

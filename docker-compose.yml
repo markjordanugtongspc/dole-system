@@ -16,6 +16,17 @@ services:
       - WEBROOT=/var/www/html
       - APP_ENV=development
       - APP_DEBUG=true
+      - PHP_MEMORY_LIMIT=256M
+      - PHP_FPM_MAX_CHILDREN=10
+      - PHP_FPM_START_SERVERS=2
+      - PHP_FPM_MIN_SPARE_SERVERS=1
+      - PHP_FPM_MAX_SPARE_SERVERS=3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
     depends_on:
       - db
 
@@ -23,6 +34,12 @@ services:
     image: mariadb:11.4
     container_name: dole-system-db
     restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+        reservations:
+          memory: 128M
     environment:
       MARIADB_DATABASE: dole_system
       MARIADB_ROOT_PASSWORD: root_password
