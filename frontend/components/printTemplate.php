@@ -43,6 +43,7 @@
                     <?php echo date('F d, Y h:i A'); ?>
                 </span>
             </div>
+            <p id="print-filter-summary" class="mt-1 text-[9px] font-bold uppercase tracking-widest text-gray-500"></p>
         </div>
     </header>
 

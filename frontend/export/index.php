@@ -183,10 +183,11 @@ ob_start();
                 <th class="px-2 py-2 border border-royal-blue w-[8%]">ID NO.</th>
                 <th class="px-2 py-2 border border-royal-blue w-[25%]" title="Last Name, First Name, Middle Initial">
                     NAME</th>
-                <th class="px-2 py-2 border border-royal-blue w-[20%]">OFFICE / PLACE OF ASSIGNMENT</th>
-                <th class="px-2 py-2 border border-royal-blue w-[15%] text-xs">DESIGNATION</th>
-                <th class="px-2 py-2 border border-royal-blue w-[12%]">START DATE</th>
-                <th class="px-2 py-2 border border-royal-blue w-[12%]">END DATE</th>
+                <th class="px-2 py-2 border border-royal-blue w-[8%]">AGE</th>
+                <th class="px-2 py-2 border border-royal-blue w-[18%]">OFFICE / PLACE OF ASSIGNMENT</th>
+                <th class="px-2 py-2 border border-royal-blue w-[13%] text-xs">DESIGNATION</th>
+                <th class="px-2 py-2 border border-royal-blue w-[10%]">START DATE</th>
+                <th class="px-2 py-2 border border-royal-blue w-[10%]">END DATE</th>
                 <th class="px-2 py-2 border border-royal-blue w-[8%]">STATUS</th>
             </tr>
         </thead>

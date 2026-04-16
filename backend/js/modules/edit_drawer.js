@@ -1,6 +1,6 @@
 import { isDarkMode } from './darkmode.js';
 import { getBasePath } from './auth.js';
-import { apiRequest } from './ajax-manager.js';
+import { apiGet, apiRequest } from './ajax-manager.js';
 import Swal from 'sweetalert2';
 import { COMMON_COURSES, COMMON_NATURE_OF_WORK } from './modal.js';
 
@@ -23,7 +23,7 @@ export function showEditBeneficiaryDrawer(data) {
     const drawerHtml = `
 <form id="edit-beneficiary-drawer-form" class="h-full flex flex-col pt-4 font-montserrat relative pb-20 overflow-y-auto">
     <input type="hidden" name="id" value="${data.id}">
-    <input type="hidden" name="gip_id" value="${data.id}">
+    <input type="hidden" name="gip_id" value="${data.gip_id || data.id}">
     
     <div class="flex flex-col relative w-full border-b border-default pb-4 mb-5 pe-12">
         <textarea name="name" class="${headingInputClass}" rows="1" placeholder="Beneficiary Name" required oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'">${data.name || ''}</textarea>
@@ -246,6 +246,8 @@ export function showEditBeneficiaryDrawer(data) {
         const ageDisplay = drawerContainer.querySelector('#edit-age-display');
         const startDateInput = drawerContainer.querySelector('#edit-startDate-input');
         const endDateInput = drawerContainer.querySelector('#edit-endDate-input');
+        const seriesNoInput = drawerContainer.querySelector('input[name="seriesNo"]');
+        const hiddenGipInput = drawerContainer.querySelector('input[name="gip_id"]');
 
         let ageManuallyEdited = false;
         
@@ -293,6 +295,31 @@ export function showEditBeneficiaryDrawer(data) {
                     const d = String(end.getDate()).padStart(2, '0');
                     const y = end.getFullYear();
                     endDateInput.value = `${m}/${d}/${y}`;
+                }
+
+                const selectedYear = start.getFullYear();
+                if (selectedYear > 1900 && hiddenGipInput && seriesNoInput) {
+                    Promise.all([
+                        apiGet(`api/beneficiaries.php?next_id&year=${encodeURIComponent(selectedYear)}`),
+                        apiGet(`api/beneficiaries.php?next_series_no&year=${encodeURIComponent(selectedYear)}`)
+                    ]).then(([idRes, seriesRes]) => {
+                        const nextId = (idRes.success && idRes.data?.success) ? idRes.data.nextId : null;
+                        const nextSeries = (seriesRes.success && seriesRes.data?.success) ? seriesRes.data.nextSeries : null;
+
+                        const currentIdYearMatch = String(hiddenGipInput.value || '').match(/^ROX-RD-ESIG-(\d{4})-\d{4}$/);
+                        const currentSeriesYearMatch = String(seriesNoInput.value || '').match(/^(\d{4})-\d{2}-\d{3}$/);
+                        const idYear = currentIdYearMatch ? Number(currentIdYearMatch[1]) : null;
+                        const seriesYear = currentSeriesYearMatch ? Number(currentSeriesYearMatch[1]) : null;
+
+                        if (nextId && (idYear === null || idYear !== selectedYear)) {
+                            hiddenGipInput.value = nextId;
+                        }
+                        if (nextSeries && (seriesYear === null || seriesYear !== selectedYear)) {
+                            seriesNoInput.value = nextSeries;
+                        }
+                    }).catch((err) => {
+                        console.error('Edit drawer identifier sync error:', err);
+                    });
                 }
             });
         }

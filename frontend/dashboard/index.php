@@ -333,15 +333,21 @@ require_once __DIR__ . '/../../config/vite.php';
                                 </svg>
                                 Aggregated statistics
                             </div>
-                            <a href="#"
+                            <button id="gender-filter-button" data-dropdown-toggle="gender-filter-dropdown" data-dropdown-placement="bottom-end" type="button"
                                 class="cursor-pointer inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-xs hover:underline">
-                                View Report
+                                Category Filter
                                 <svg class="w-3 h-3 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2" d="M19 12H5m14 0-4 4m4-4-4-4" />
+                                        stroke-width="2" d="m19 9-7 7-7-7" />
                                 </svg>
-                            </a>
+                            </button>
+                            <div id="gender-filter-dropdown"
+                                class="z-20 hidden min-w-44 rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800">
+                                <ul class="py-2 text-[10px] sm:text-xs font-bold text-slate-700 dark:text-slate-300" id="gender-filter-options">
+                                    <li class="px-4 py-2 opacity-50 italic">Syncing years...</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -474,7 +480,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             </div>
                             <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-100 dark:border-blue-900/30 transition-transform hover:-translate-y-1 duration-300 group/sbox">
                                 <dt class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1 text-center">Ongoing</dt>
-                                <dd class="text-3xl font-black text-royal-blue dark:text-blue-400 count-ongoing text-center">0</dd>
+                                <dd class="text-3xl font-black text-emerald-400 dark:text-emerald-300 count-ongoing text-center">0</dd>
                             </div>
                         </div>
                         <div class="flex-1 flex items-center justify-center p-2">
@@ -633,10 +639,10 @@ require_once __DIR__ . '/../../config/vite.php';
                     </div>
 
                     <!-- Performance Charts -->
-                    <div class="grid grid-cols-1 gap-6 mb-8">
+                    <div class="grid grid-cols-1 gap-6 mb-8 mt-0 pt-0">
                         <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-2xl transition-shadow duration-500 relative overflow-hidden group/chart">
                             <div class="absolute inset-0 bg-gradient-to-b from-royal-blue/5 to-transparent opacity-0 group-hover/chart:opacity-100 transition-opacity duration-1000"></div>
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 relative z-10 pb-5 border-b border-slate-100 dark:border-slate-700">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 relative z-10 pb-3 border-b border-slate-100 dark:border-slate-700">
                                 <div>
                                     <h5 class="text-xl sm:text-2xl font-black text-heading dark:text-white uppercase tracking-tight flex items-center gap-2">
                                         Deployment Variances
@@ -755,6 +761,11 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 if (cardToggle && rolesView && statusView) {
                     cardToggle.addEventListener('click', function() {
+                        const topRoleEl = document.querySelector('.metric-top-role');
+                        const originalTopRole = topRoleEl?.dataset?.originalTopRole || topRoleEl?.textContent || 'N/A';
+                        if (topRoleEl && !topRoleEl.dataset.originalTopRole) {
+                            topRoleEl.dataset.originalTopRole = originalTopRole;
+                        }
                         const isRolesActive = !rolesView.classList.contains('hidden');
                         if (isRolesActive) {
                             // Currently showing Roles -> Switch to Status
@@ -763,6 +774,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             statusView.classList.add('flex');
                             toggleLabel.textContent = 'Role Distribution'; // Label to switch back
                             modeDesc.textContent = 'Employment Status';    // Current visible mode
+                            if (topRoleEl) topRoleEl.textContent = 'EMPLOYMENT STATUS';
                         } else {
                             // Currently showing Status -> Switch to Roles
                             statusView.classList.add('hidden');
@@ -770,6 +782,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             rolesView.classList.remove('hidden');
                             toggleLabel.textContent = 'Employment Status'; // Label to switch forward
                             modeDesc.textContent = 'Role Distribution';    // Current visible mode
+                            if (topRoleEl) topRoleEl.textContent = topRoleEl.dataset.originalTopRole || 'N/A';
                         }
                         
                         // Force a layout recalculation for ApexCharts

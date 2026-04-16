@@ -367,11 +367,13 @@ export function updateUIProfile(profile) {
 export function showExportConfigModal(callback) {
     const currentFilters = window.getExportFilters ? window.getExportFilters() : {
         office: 'ALL',
-        status: 'ALL',
+        remarks: 'ALL',
+        gender: 'ALL',
+        ageGroup: 'ALL',
         search: '',
         sort: 'name',
         section: 'ALL',
-        columns: ['id', 'name', 'office', 'position', 'startdate', 'enddate', 'status'],
+        columns: ['id', 'name', 'age', 'office', 'position', 'startdate', 'enddate', 'status'],
         preparedBy: localStorage.getItem('ldn_export_prepared') || '',
         approvedBy: localStorage.getItem('ldn_export_approved') || ''
     };
@@ -389,6 +391,12 @@ export function showExportConfigModal(callback) {
             </div>
 
             <form id="export-config-form" class="space-y-6">
+                <div class="pt-1">
+                    <button type="submit" class="w-full bg-royal-blue text-white font-black text-[10px] uppercase tracking-[0.2em] py-3.5 rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Apply Profile Configuration
+                    </button>
+                </div>
                 <!-- Main Filter Grid (3 columns on MD) -->
                 <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
                     <div class="flex items-center gap-2 mb-3">
@@ -434,16 +442,16 @@ export function showExportConfigModal(callback) {
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100/50">
-                        <!-- Employment Status -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-100/50">
+                        <!-- Gender Filter -->
                         <div>
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Employment Status Filter</label>
+                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Gender Filter</label>
                             <div class="flex flex-wrap gap-1.5">
-                                ${['ALL', 'ONGOING', 'ABSORBED', 'RESIGNED', 'EXPIRED'].map(s => {
-        const configs = { 'ALL': 'peer-checked:bg-blue-600', 'ONGOING': 'peer-checked:bg-green-500', 'ABSORBED': 'peer-checked:bg-teal-600', 'RESIGNED': 'peer-checked:bg-gray-700', 'EXPIRED': 'peer-checked:bg-red-600' };
+                                ${['ALL', 'FEMALE', 'MALE'].map(s => {
+        const configs = { 'ALL': 'peer-checked:bg-blue-600', 'FEMALE': 'peer-checked:bg-pink-600', 'MALE': 'peer-checked:bg-indigo-600' };
         return `
                                         <label class="cursor-pointer">
-                                            <input type="radio" name="export-status" value="${s}" ${currentFilters.status === s ? 'checked' : ''} class="hidden peer">
+                                            <input type="radio" name="export-gender" value="${s}" ${currentFilters.gender === s ? 'checked' : ''} class="hidden peer">
                                             <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
                                         </label>
                                     `;
@@ -469,6 +477,38 @@ export function showExportConfigModal(callback) {
                                 `).join('')}
                             </div>
                         </div>
+
+                        <!-- Remarks Filter -->
+                        <div>
+                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Remarks Filter</label>
+                            <div class="flex flex-wrap gap-1.5">
+                                ${['ALL', 'ONGOING', 'EXPIRED', 'RESIGNED', 'ABSORBED'].map(s => {
+        const configs = { 'ALL': 'peer-checked:bg-blue-600', 'ONGOING': 'peer-checked:bg-green-500', 'EXPIRED': 'peer-checked:bg-red-600', 'RESIGNED': 'peer-checked:bg-slate-600', 'ABSORBED': 'peer-checked:bg-teal-600' };
+        return `
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="export-remarks" value="${s}" ${currentFilters.remarks === s ? 'checked' : ''} class="hidden peer">
+                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                        </label>
+                                    `;
+    }).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Age Filter -->
+                        <div>
+                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Age Group Filter</label>
+                            <div class="flex flex-wrap gap-1.5">
+                                ${['ALL', '18-24', '25-30', '31-40', '41+'].map(s => {
+        const configs = { 'ALL': 'peer-checked:bg-blue-600', '18-24': 'peer-checked:bg-emerald-600', '25-30': 'peer-checked:bg-yellow-600', '31-40': 'peer-checked:bg-orange-600', '41+': 'peer-checked:bg-slate-600' };
+        return `
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="export-age-group" value="${s}" ${currentFilters.ageGroup === s ? 'checked' : ''} class="hidden peer">
+                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                        </label>
+                                    `;
+    }).join('')}
+                            </div>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100/50">
@@ -490,7 +530,7 @@ export function showExportConfigModal(callback) {
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        ${['ID', 'Name', 'Office', 'Position', 'Start Date', 'End Date', 'Status'].map(col => {
+                        ${['ID', 'Name', 'Age', 'Office', 'Position', 'Start Date', 'End Date', 'Status'].map(col => {
             const val = col.toLowerCase().replace(' ', '');
             const isChecked = currentFilters.columns.includes(val);
             const id = `col-switch-${val}`;
@@ -507,12 +547,6 @@ export function showExportConfigModal(callback) {
                     </div>
                 </div>
 
-                <div class="pt-2">
-                    <button type="submit" class="w-full bg-royal-blue text-white font-black text-[10px] uppercase tracking-[0.2em] py-3.5 rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Apply Profile Configuration
-                    </button>
-                </div>
             </form>
         </div>
     `;
@@ -537,8 +571,10 @@ export function showExportConfigModal(callback) {
                 const columnCheckboxes = form.querySelectorAll('input[name="export-column"]:checked');
                 const selectedColumns = Array.from(columnCheckboxes).map(cb => cb.value);
 
-                const statusRadio = form.querySelector('input[name="export-status"]:checked');
+                const genderRadio = form.querySelector('input[name="export-gender"]:checked');
                 const sectionRadio = form.querySelector('input[name="export-section"]:checked');
+                const remarksRadio = form.querySelector('input[name="export-remarks"]:checked');
+                const ageGroupRadio = form.querySelector('input[name="export-age-group"]:checked');
                 const prepared = form.querySelector('#export-prepared').value.trim();
                 const approved = form.querySelector('#export-approved').value.trim();
 
@@ -547,7 +583,9 @@ export function showExportConfigModal(callback) {
 
                 const filters = {
                     office: form.querySelector('#export-office').value,
-                    status: statusRadio ? statusRadio.value : (currentFilters.status || 'ALL'),
+                    gender: genderRadio ? genderRadio.value : (currentFilters.gender || 'ALL'),
+                    remarks: remarksRadio ? remarksRadio.value : (currentFilters.remarks || 'ALL'),
+                    ageGroup: ageGroupRadio ? ageGroupRadio.value : (currentFilters.ageGroup || 'ALL'),
                     search: form.querySelector('#export-search').value.trim().toLowerCase(),
                     sort: form.querySelector('#export-sort').value,
                     section: sectionRadio ? sectionRadio.value : 'ALL',
@@ -822,7 +860,7 @@ export function showAddDataModal(data = null) {
                             <div class="w-1 h-5 bg-golden-yellow rounded-full"></div>
                             <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest">Contract Duration</p>
                         </div>
-                        <div id="date-range-picker" class="grid grid-cols-2 gap-3">
+                        <div id="date-range-picker" date-rangepicker datepicker-autohide class="grid grid-cols-2 gap-3">
                             <div class="group">
                                 <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">Start Date</label>
                                 <div class="relative">
@@ -874,9 +912,17 @@ export function showAddDataModal(data = null) {
                                         <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                     </div>
                                     <div id="office-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
-                                        ${['DOLE Field Office', 'LGU', 'DEPED', 'DICT', 'PCA'].map(office => `
+                                        <!-- OFFICE CATEGORY MAP: edit this block for quick manual category adjustments -->
+                                        <div class="px-2.5 py-1 text-[8px] font-black uppercase tracking-widest ${t.textLabel} opacity-70">Public Sector</div>
+                                        ${['DOLE', 'LGU', 'DEPED'].map(office => `
                                             <div class="office-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
-                                                ${office}
+                                                <span class="option-text">${office}</span>
+                                            </div>
+                                        `).join('')}
+                                        <div class="px-2.5 py-1 mt-1 text-[8px] font-black uppercase tracking-widest ${t.textLabel} opacity-70">Private Sector</div>
+                                        ${['DICT', 'PCA'].map(office => `
+                                            <div class="office-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
+                                                <span class="option-text">${office}</span>
                                             </div>
                                         `).join('')}
                                     </div>
@@ -1064,7 +1110,7 @@ export function showAddDataModal(data = null) {
                 // Initialization of Picker (if library available)
                 const PickerClass = window.Datepicker || (typeof Datepicker !== 'undefined' ? Datepicker : null);
                 if (PickerClass) {
-                    input._datepicker = new PickerClass(bdayInput, { format: 'mm/dd/yyyy', autohide: true });
+                    bdayInput._datepicker = new PickerClass(bdayInput, { format: 'mm/dd/yyyy', autohide: true });
                 }
             }
 
@@ -1140,11 +1186,7 @@ export function showAddDataModal(data = null) {
             const extensionContainer = popup.querySelector('#extension-log-container');
 
             const fetchNextIdentifiers = async (year) => {
-                if (isEdit || !year) return; 
-
-                // Immediately set temporary template values so inputs aren't empty
-                if (fullIdInput && !fullIdInput.value) fullIdInput.value = `ROX-RD-ESIG-${year}-????`;
-                if (seriesNoInput && !seriesNoInput.value) seriesNoInput.value = `${year}-00-???`;
+                if (!year) return;
 
                 const cacheKeyId = `cache_next_id_${year}`;
                 const cacheKeySeries = `cache_next_series_${year}`;
@@ -1373,8 +1415,18 @@ export function showAddDataModal(data = null) {
                 }
 
                 // Picker Init
+                const rangeEl = popup.querySelector('#date-range-picker');
+                const RangePickerClass = window.DateRangePicker || (typeof DateRangePicker !== 'undefined' ? DateRangePicker : null);
                 const PickerClass = window.Datepicker || (typeof Datepicker !== 'undefined' ? Datepicker : null);
-                if (PickerClass) {
+                if (RangePickerClass && rangeEl && startDateInput && endDateInput) {
+                    const rangePicker = new RangePickerClass(rangeEl, {
+                        format: 'mm/dd/yyyy',
+                        autohide: true,
+                        allowOneSidedRange: true
+                    });
+                    startDateInput._datepicker = rangePicker.datepickers?.[0] || null;
+                    endDateInput._datepicker = rangePicker.datepickers?.[1] || null;
+                } else if (PickerClass) {
                     if (startDateInput) {
                         startDateInput._datepicker = new PickerClass(startDateInput, { format: 'mm/dd/yyyy', autohide: true, orientation: 'bottom left' });
                     }
@@ -1416,6 +1468,57 @@ export function showAddDataModal(data = null) {
             setupSuggestions('designation-input', 'work-suggestions', 'work-option');
             setupSuggestions('office-input', 'office-suggestions', 'office-option');
 
+            // Office groups with dynamic Supabase/API offices merged in.
+            const OFFICE_CATEGORY_MAP = {
+                // PUBLIC SECTOR BUCKET
+                publicSector: ['DOLE', 'LGU', 'DEPED'],
+                // PRIVATE SECTOR BUCKET
+                privateSector: ['DICT', 'PCA']
+            };
+
+            const renderOfficeSuggestions = (dbOffices = []) => {
+                const officeContainer = popup.querySelector('#office-suggestions');
+                if (!officeContainer) return;
+
+                const canonical = (v) => String(v || '').trim().toUpperCase();
+                const publicSet = new Set(OFFICE_CATEGORY_MAP.publicSector.map(canonical));
+                const privateSet = new Set(OFFICE_CATEGORY_MAP.privateSector.map(canonical));
+                const allKnown = new Set([...publicSet, ...privateSet]);
+
+                const dbNormalized = [...new Set((dbOffices || []).map(canonical).filter(Boolean))];
+                const uncategorized = dbNormalized.filter((o) => !allKnown.has(o));
+
+                const renderGroup = (title, list) => {
+                    if (!list.length) return '';
+                    return `
+                        <div class="px-2.5 py-1 text-[8px] font-black uppercase tracking-widest ${t.textLabel} opacity-70">${title}</div>
+                        ${list.map((office) => `
+                            <div class="office-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
+                                <span class="option-text">${office}</span>
+                            </div>
+                        `).join('')}
+                    `;
+                };
+
+                officeContainer.innerHTML = [
+                    renderGroup('Public Sector', [...publicSet]),
+                    renderGroup('Private Sector', [...privateSet]),
+                    renderGroup('Other Offices', uncategorized)
+                ].join('');
+            };
+
+            renderOfficeSuggestions();
+            (async () => {
+                try {
+                    const officeRes = await apiGet('api/beneficiaries.php?get_offices=1');
+                    if (officeRes.success && officeRes.data?.success && Array.isArray(officeRes.data.offices)) {
+                        renderOfficeSuggestions(officeRes.data.offices);
+                    }
+                } catch (officeErr) {
+                    console.error('Office suggestion sync failed:', officeErr);
+                }
+            })();
+
             function setupSuggestions(inputId, containerId, optionClass) {
                 const input = popup.querySelector(`#${inputId}`);
                 const container = popup.querySelector(`#${containerId}`);
@@ -1454,15 +1557,14 @@ export function showAddDataModal(data = null) {
                     else container.classList.add('hidden');
                 });
 
-                container.querySelectorAll(`.${optionClass}`).forEach(opt => {
-                    opt.addEventListener('click', () => {
-                        const txtElem = opt.querySelector('.option-text');
-                        input.value = txtElem ? txtElem.innerText.trim() : opt.innerText.trim();
-                        suppressInputOpen = true;
-                        container.classList.add('hidden');
-                        // Trigger change event for auto-save
-                        input.dispatchEvent(new Event('change'));
-                    });
+                container.addEventListener('click', (e) => {
+                    const opt = e.target.closest(`.${optionClass}`);
+                    if (!opt) return;
+                    const txtElem = opt.querySelector('.option-text');
+                    input.value = txtElem ? txtElem.innerText.trim() : opt.innerText.trim();
+                    suppressInputOpen = true;
+                    container.classList.add('hidden');
+                    input.dispatchEvent(new Event('change'));
                 });
             }
 

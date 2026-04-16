@@ -52,6 +52,8 @@ function setCookie(name, value, days) {
 
 let currentWorkforceFilter = getCookie('user_workforce_filter') || 'ALL';
 let currentWorkforceLabel = getCookie('user_workforce_label') || 'Overall Stats';
+let currentGenderFilter = getCookie('user_gender_filter') || 'ALL';
+let currentGenderLabel = getCookie('user_gender_label') || 'All Years';
 
 /**
  * Parse Postgres/PHP date strings coming from the backend.
@@ -145,6 +147,7 @@ export async function initCharts(forceRefresh = false) {
         return date ? date.getFullYear().toString() : null;
     }).filter(y => y))].sort((a, b) => b - a);
     populateWorkforceDropdown(availableYears, rawData);
+    populateGenderFilterDropdown(availableYears, rawData);
 
     // Apply Workforce Filter to overall data stats (Total Beneficiaries, Genders, etc.)
     const now = new Date();
@@ -359,8 +362,16 @@ export async function initCharts(forceRefresh = false) {
     renderChart("workforce-chart", statusOptions);
 
     // --- 2. GENDER DEMOGRAPHICS ---
+    const genderFilteredData = currentGenderFilter === 'ALL'
+        ? rawData
+        : rawData.filter((b) => {
+            const d = parseChartDate(b.startDate || b.createdAt);
+            return d && d.getFullYear().toString() === currentGenderFilter;
+        });
+    const genderStats = processBeneficiaryData(genderFilteredData);
+
     const genderOptions = {
-        series: [totalStats.genders['Female'] || 0, totalStats.genders['Male'] || 0],
+        series: [genderStats.genders['Female'] || 0, genderStats.genders['Male'] || 0],
         chart: { height: 320, type: 'donut', fontFamily: "Montserrat, sans-serif", background: theme.cardBg },
         colors: [COLORS.philippineRed, COLORS.royalBlue()],
         labels: ["Female", "Male"],
@@ -459,7 +470,15 @@ export async function initCharts(forceRefresh = false) {
                 dataLabels: { position: 'top' }
             }
         },
-        colors: [COLORS.successGreen, COLORS.royalBlue(), COLORS.mutedSlate(), COLORS.philippineRed],
+        colors: ['#059669', '#6ee7b7', '#CE1126', '#64748b'],
+        dropShadow: {
+            enabled: true,
+            top: 3,
+            left: 0,
+            blur: 4,
+            opacity: 0.22,
+            color: '#64748b'
+        },
         dataLabels: { 
             enabled: true,
             offsetY: -20,
@@ -801,7 +820,11 @@ function updateSummaryMetrics(totalStats, filteredStats) {
     document.querySelectorAll('.count-field-based').forEach(el => el.textContent = fieldCount);
 
     const topRole = Object.entries(filteredStats.designations).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
-    document.querySelectorAll('.metric-top-role').forEach(el => el.textContent = topRole);
+    document.querySelectorAll('.metric-top-role').forEach(el => {
+        el.dataset.originalTopRole = topRole;
+        const showingStatusMode = document.getElementById('status-content-view') && !document.getElementById('status-content-view').classList.contains('hidden');
+        el.textContent = showingStatusMode ? 'EMPLOYMENT STATUS' : topRole;
+    });
 }
 
 /**
@@ -880,6 +903,45 @@ function populateWorkforceDropdown(years, rawData) {
     list.innerHTML = html;
 }
 
+function populateGenderFilterDropdown(years, rawData) {
+    const list = document.getElementById('gender-filter-options');
+    const btn = document.getElementById('gender-filter-button');
+    if (!list || !btn) return;
+
+    const totalOverall = rawData.length;
+    const getYearlyCount = (yearStr) => rawData.filter((b) => {
+        const d = parseChartDate(b.startDate || b.createdAt);
+        return d && d.getFullYear().toString() === yearStr;
+    }).length;
+
+    let html = `
+        <li>
+            <a href="javascript:void(0)" onclick="updateGenderFilter('ALL', 'All Years')"
+                class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentGenderFilter === 'ALL' ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
+                <span>All Years</span>
+                <span class="bg-royal-blue/10 text-royal-blue dark:bg-blue-900/30 dark:text-blue-400 py-0.5 px-2 rounded-full text-[10px] font-black">${totalOverall}</span>
+            </a>
+        </li>
+        <li class="border-t border-slate-100 dark:border-slate-700 my-1"></li>
+    `;
+
+    years.forEach((year) => {
+        const yearCount = getYearlyCount(year);
+        html += `
+        <li>
+            <a href="javascript:void(0)" onclick="updateGenderFilter('${year}', 'Year ${year}')"
+                class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentGenderFilter === year ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
+                <span>Year ${year}</span>
+                <span class="bg-slate-100 text-slate-600 dark:bg-slate-600/50 dark:text-slate-300 py-0.5 px-2 rounded-full text-[10px] font-black">${yearCount}</span>
+            </a>
+        </li>
+        `;
+    });
+
+    list.innerHTML = html;
+    btn.innerHTML = `${currentGenderLabel} <svg class="w-3 h-3 ms-1.5" aria-hidden="true" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7" /></svg>`;
+}
+
 /**
  * Update Workforce Trend Filter
  */
@@ -902,6 +964,23 @@ export function updateWorkforceFilter(filter, label) {
     });
 
     initCharts(); // Re-render
+}
+
+export function updateGenderFilter(filter, label) {
+    currentGenderFilter = filter;
+    currentGenderLabel = label;
+    setCookie('user_gender_filter', filter, 30);
+    setCookie('user_gender_label', label, 30);
+
+    const dropdownEl = document.getElementById('gender-filter-dropdown');
+    if (dropdownEl && window.FlowbiteInstances) {
+        const dropdown = window.FlowbiteInstances.getInstance('Dropdown', 'gender-filter-dropdown');
+        if (dropdown) dropdown.hide();
+    } else if (dropdownEl) {
+        dropdownEl.classList.add('hidden');
+    }
+
+    initCharts();
 }
 
 /**
@@ -948,6 +1027,7 @@ export function initSidebarUser() {
 }
 
 window.updateWorkforceFilter = updateWorkforceFilter;
+window.updateGenderFilter = updateGenderFilter;
 
 // --- Auto-Reload on Theme Change or Data Sync ---
 document.addEventListener('themeChanged', () => {

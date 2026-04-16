@@ -1,4 +1,4 @@
-import { getBasePath } from './auth.js';
+import { apiGet } from './ajax-manager.js';
 import Swal from 'sweetalert2';
 
 /**
@@ -6,14 +6,16 @@ import Swal from 'sweetalert2';
  */
 
 let allBeneficiaries = [];
-let activeColumns = ['id', 'name', 'office', 'position', 'status']; // Default columns
+let activeColumns = ['id', 'name', 'age', 'office', 'position', 'status']; // Default columns
 let currentFilters = {
     office: 'ALL',
-    status: 'ALL',
+    remarks: 'ALL',
+    gender: 'ALL',
+    ageGroup: 'ALL',
     search: '',
     sort: 'name',
     section: 'ALL', // ALL, ACTIVE, ARCHIVED
-    columns: ['id', 'name', 'office', 'position', 'status'],
+    columns: ['id', 'name', 'age', 'office', 'position', 'status'],
     preparedBy: localStorage.getItem('ldn_export_prepared') || '',
     approvedBy: localStorage.getItem('ldn_export_approved') || ''
 };
@@ -42,16 +44,32 @@ function saveConfig() {
 
 async function loadBeneficiaryData() {
     try {
-        const response = await fetch(`${getBasePath()}api/beneficiaries.php?all=true`);
-        const data = await response.json();
-
-        if (data.success && data.beneficiaries) {
-            allBeneficiaries = data.beneficiaries;
-            // Apply loaded filters to the initial display
-            window.handleFilterUpdate(currentFilters);
+        const response = await apiGet('api/beneficiaries.php?all=true');
+        if (!response.success) {
+            throw new Error(response.error || 'Failed to fetch beneficiaries');
         }
+
+        const payload = response.data || {};
+        const beneficiaries = Array.isArray(payload.beneficiaries)
+            ? payload.beneficiaries
+            : (payload.data?.success && Array.isArray(payload.data.beneficiaries) ? payload.data.beneficiaries : []);
+
+        allBeneficiaries = beneficiaries;
+        window.handleFilterUpdate(currentFilters);
     } catch (error) {
         console.error('Error loading data for export', error);
+        const tbody = document.getElementById('web-table-body');
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="${activeColumns.length}" class="px-6 py-12 text-center text-red-500 font-bold uppercase text-[10px] tracking-widest">Failed to load data</td></tr>`;
+        }
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: 'Failed loading export data',
+            showConfirmButton: false,
+            timer: 2800
+        });
     }
 }
 
@@ -63,6 +81,7 @@ window.handleFilterUpdate = function (filters) {
 
     if (filters.columns) {
         activeColumns = filters.columns;
+        currentFilters.columns = filters.columns;
     }
     if (filters.preparedBy !== undefined) currentFilters.preparedBy = filters.preparedBy;
     if (filters.approvedBy !== undefined) currentFilters.approvedBy = filters.approvedBy;
@@ -84,9 +103,19 @@ window.handleFilterUpdate = function (filters) {
         filtered = filtered.filter(b => b.office.includes(currentFilters.office));
     }
 
-    // Status Filter
-    if (currentFilters.status !== 'ALL') {
-        filtered = filtered.filter(b => b.remarks.toUpperCase() === currentFilters.status.toUpperCase());
+    // Gender Filter
+    if (currentFilters.gender && currentFilters.gender !== 'ALL') {
+        filtered = filtered.filter((b) => normalizeGender(b.gender) === currentFilters.gender);
+    }
+
+    // Remarks Filter
+    if (currentFilters.remarks && currentFilters.remarks !== 'ALL') {
+        filtered = filtered.filter(b => (b.remarks || '').toUpperCase() === currentFilters.remarks.toUpperCase());
+    }
+
+    // Age Group Filter
+    if (currentFilters.ageGroup && currentFilters.ageGroup !== 'ALL') {
+        filtered = filtered.filter((b) => getAgeGroup(b.age) === currentFilters.ageGroup);
     }
 
     // Section Filter (Active / Archived)
@@ -122,11 +151,37 @@ window.handleFilterUpdate = function (filters) {
 // Add a helper to get current filters for the modal
 window.getExportFilters = () => currentFilters;
 
+function normalizeGender(rawGender) {
+    const v = String(rawGender || '').trim().toUpperCase();
+    if (v === 'F' || v === 'FEMALE') return 'FEMALE';
+    if (v === 'M' || v === 'MALE') return 'MALE';
+    return 'UNKNOWN';
+}
+
+function getAgeGroup(rawAge) {
+    const age = parseInt(rawAge, 10);
+    if (Number.isNaN(age)) return 'UNKNOWN';
+    if (age >= 18 && age <= 24) return '18-24';
+    if (age >= 25 && age <= 30) return '25-30';
+    if (age >= 31 && age <= 40) return '31-40';
+    if (age >= 41) return '41+';
+    return 'UNKNOWN';
+}
+
 function updateDisplays(data) {
     renderWebTable(data);
     renderPrintTable(data);
     const countEl = document.getElementById('record-count');
     if (countEl) countEl.textContent = data.length;
+    const printFilterSummary = document.getElementById('print-filter-summary');
+    if (printFilterSummary) {
+        const parts = [];
+        if (currentFilters.office !== 'ALL') parts.push(`OFFICE: ${currentFilters.office}`);
+        if (currentFilters.remarks !== 'ALL') parts.push(`REMARKS: ${currentFilters.remarks}`);
+        if (currentFilters.gender !== 'ALL') parts.push(`GENDER: ${currentFilters.gender}`);
+        if (currentFilters.ageGroup !== 'ALL') parts.push(`AGE: ${currentFilters.ageGroup}`);
+        printFilterSummary.textContent = parts.length ? parts.join(' | ') : 'FILTER: ALL RECORDS';
+    }
 
     // Store current filtered data for Excel export
     window.currentFilteredData = data;
@@ -243,6 +298,7 @@ window.exportToExcel = function () {
 const COL_MAP = {
     id: 'ID NO.',
     name: 'NAME',
+    age: 'AGE',
     office: 'OFFICE',
     position: 'DESIGNATION',
     status: 'STATUS',
@@ -269,6 +325,7 @@ function generateTableRow(row, columns, isPrint = false) {
         if (c === 'startdate') val = row.startDateFormatted || row.startDate || '-';
         if (c === 'enddate') val = row.endDateFormatted || row.endDate || '-';
         if (c === 'status') val = row.remarks || 'N/A';
+        if (c === 'age') val = row.age || '-';
 
         if (isPrint) {
             let classes = "px-3 py-2 border border-gray-200 text-center";
@@ -283,6 +340,7 @@ function generateTableRow(row, columns, isPrint = false) {
         } else {
             if (c === 'id') return `<th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap font-mono text-xs text-center">${val}</th>`;
             if (c === 'name') return `<td class="px-4 py-3 font-bold text-royal-blue group-hover/row:translate-x-1 transition-transform uppercase">${val}</td>`;
+            if (c === 'age') return `<td class="px-4 py-3 text-center text-[11px] font-black text-emerald-700 uppercase tracking-tight">${val}</td>`;
             if (c === 'office') return `<td class="px-4 py-3 text-center"><span class="bg-white text-blue-700 px-2 py-0.5 rounded text-[10px] border border-blue-100 font-bold shadow-sm">${val}</span></td>`;
             if (c === 'status') {
                 const colors = { 'ABSORBED': 'bg-golden-yellow/10 text-golden-yellow border-golden-yellow/20', 'RESIGNED': 'bg-slate-100 text-slate-500 border-slate-200', 'EXPIRED': 'bg-red-50 text-philippine-red border-red-100', 'ONGOING': 'bg-green-50 text-green-600 border-green-100' };
