@@ -414,7 +414,7 @@ export async function initCharts(forceRefresh = false) {
 
     const educationOptions = {
         series: eduValues.map(v => filteredData.length > 0 ? Math.round((v / filteredData.length) * 100) : 0),
-        chart: { height: 300, type: 'radialBar', background: theme.cardBg, fontFamily: "Montserrat, sans-serif" },
+        chart: { height: 260, type: 'radialBar', background: theme.cardBg, fontFamily: "Montserrat, sans-serif" },
         plotOptions: {
             radialBar: {
                 hollow: { size: '30%' },
@@ -456,7 +456,7 @@ export async function initCharts(forceRefresh = false) {
         }],
         chart: { 
             type: 'bar', 
-            height: 280, 
+            height: 260, 
             fontFamily: "Montserrat, sans-serif", 
             toolbar: { show: false },
             background: 'transparent'
@@ -505,8 +505,8 @@ export async function initCharts(forceRefresh = false) {
     const sortedRoles = Object.entries(filteredStats.designations).sort((a, b) => b[1] - a[1]).slice(0, 5);
     const jobRolesOptions = {
         series: [{ name: "Beneficiaries", data: sortedRoles.map(r => r[1]), color: chartColor }],
-        chart: { type: 'bar', height: 180, toolbar: { show: false }, fontFamily: "Montserrat, sans-serif", background: theme.cardBg },
-        plotOptions: { bar: { horizontal: true, columnWidth: '100%', borderRadius: 4, barHeight: '60%' } },
+        chart: { type: 'bar', height: '100%', toolbar: { show: false }, fontFamily: "Montserrat, sans-serif", background: theme.cardBg },
+        plotOptions: { bar: { horizontal: true, columnWidth: '100%', borderRadius: 6, barHeight: '60%' } },
         dataLabels: { enabled: false },
         xaxis: {
             categories: sortedRoles.map(r => r[0]),
@@ -524,7 +524,7 @@ export async function initCharts(forceRefresh = false) {
         responsive: [{
             breakpoint: 640,
             options: {
-                chart: { height: 160 },
+                chart: { height: 400 },
                 xaxis: { labels: { style: { fontSize: '8px' } } },
                 yaxis: { labels: { style: { fontSize: '9px' } } }
             }

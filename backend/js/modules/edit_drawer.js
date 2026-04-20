@@ -20,10 +20,19 @@ export function showEditBeneficiaryDrawer(data) {
         return age >= 0 ? age : 0;
     }
 
+    function getRemarksClass(status) {
+        if (!status) return 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-white border-gray-200 dark:border-slate-700';
+        const s = String(status).toUpperCase();
+        if (s === 'ONGOING') return 'bg-green-100 text-green-700 border-green-200';
+        if (s === 'EXPIRED') return 'bg-red-400 text-white border-red-400';
+        if (s === 'RESIGNED') return 'bg-[#ce1126] text-white border-[#ce1126]';
+        if (s === 'ABSORBED') return 'bg-[#2e7d32] text-white border-[#2e7d32]';
+        return 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-white border-gray-200 dark:border-slate-700';
+    }
+
     const drawerHtml = `
 <form id="edit-beneficiary-drawer-form" class="h-full flex flex-col pt-4 font-montserrat relative pb-20 overflow-y-auto">
     <input type="hidden" name="id" value="${data.id}">
-    <input type="hidden" name="gip_id" value="${data.gip_id || data.id}">
     
     <div class="flex flex-col relative w-full border-b border-default pb-4 mb-5 pe-12">
         <textarea name="name" class="${headingInputClass}" rows="1" placeholder="Beneficiary Name" required oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'">${data.name || ''}</textarea>
@@ -33,29 +42,38 @@ export function showEditBeneficiaryDrawer(data) {
         </button>
     </div>
 
-    <div class="grid grid-cols-2 gap-4 w-full">
-        <div class="flex flex-col gap-1 text-left">
-            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ID No.</span>
+    <div class="flex flex-col sm:flex-row gap-4 w-full">
+        <div class="flex-1 flex flex-col gap-1 text-left">
+            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ROX-ID</span>
+            <input type="text" name="gip_id" value="${data.gip_id || data.id || ''}" class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-white text-[10px] sm:text-[11px] font-black px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full" placeholder="ROX-RD-ESIG-0000-0000">
+        </div>
+        <div class="flex-1 flex flex-col gap-1 text-left">
+            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">SERIES NO.</span>
             <input type="text" name="seriesNo" value="${data.seriesNo || ''}" class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-white text-[10px] sm:text-[11px] font-black px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full" placeholder="2025-00-000">
         </div>
-        <div class="flex flex-col gap-1 text-left overflow-hidden">
-             <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">REMARKS</span>
-             <select name="remarks" class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-white text-[10px] sm:text-[11px] font-black px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full cursor-pointer">
-                 <option value="ONGOING" ${data.remarks === 'ONGOING' ? 'selected' : ''}>ONGOING</option>
-                 <option value="EXPIRED" ${data.remarks === 'EXPIRED' ? 'selected' : ''}>EXPIRED</option>
-                 <option value="RESIGNED" ${data.remarks === 'RESIGNED' ? 'selected' : ''}>RESIGNED</option>
-                 <option value="ABSORBED" ${data.remarks === 'ABSORBED' ? 'selected' : ''}>ABSORBED</option>
-             </select>
-        </div>
     </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mt-4 mb-4">
+        <div class="flex flex-col gap-1 text-left overflow-hidden relative">
+             <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">REMARKS (STATUS)</span>
+             <select id="edit-drawer-remarks" name="remarks" class="appearance-none ${getRemarksClass(data.remarks)} text-[10px] sm:text-[11px] font-black px-2.5 py-2.5 rounded-lg border uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full cursor-pointer transition-colors duration-300 h-[42px]">
+                 <option value="ONGOING" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-bold" ${data.remarks === 'ONGOING' ? 'selected' : ''}>ONGOING</option>
+                 <option value="EXPIRED" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-bold" ${data.remarks === 'EXPIRED' ? 'selected' : ''}>EXPIRED</option>
+                 <option value="RESIGNED" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-bold" ${data.remarks === 'RESIGNED' ? 'selected' : ''}>RESIGNED</option>
+                 <option value="ABSORBED" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-bold" ${data.remarks === 'ABSORBED' ? 'selected' : ''}>ABSORBED</option>
+             </select>
+             <div class="pointer-events-none absolute right-3 top-[28px] text-inherit">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+             </div>
+        </div>
 
-    <div class="flex flex-col gap-1 text-left mt-4 mb-4">
-        <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ASSIGNED OFFICE</span>
-        <input type="text" name="office" id="edit-office-input" value="${data.office || ''}" 
-            class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-[10px] sm:text-[11px] font-black px-2.5 py-2.5 rounded-lg border border-indigo-200 dark:border-indigo-800/60 uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full placeholder-indigo-300 dark:placeholder-indigo-700"
-            placeholder="e.g. DOLE Field Office">
-        <div id="edit-office-suggestions-box" class="hidden mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-            ${officeDefaults.map(o => `<button type="button" class="edit-office-option w-full text-left px-3 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer"><span class="option-text">${o}</span></button>`).join('')}
+        <div class="flex flex-col gap-1 text-left">
+            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ASSIGNED OFFICE</span>
+            <input type="text" name="office" id="edit-office-input" value="${data.office || ''}" 
+                class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-[10px] sm:text-[11px] font-black px-2.5 py-2.5 rounded-lg border border-indigo-200 dark:border-indigo-800/60 uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full placeholder-indigo-300 dark:placeholder-indigo-700 h-[42px]"
+                placeholder="e.g. DOLE Field Office">
+            <div id="edit-office-suggestions-box" class="hidden absolute mt-[60px] z-[60] bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg max-h-40 overflow-y-auto w-full sm:w-[50%] right-0">
+                ${officeDefaults.map(o => `<button type="button" class="edit-office-option w-full text-left px-3 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer"><span class="option-text">${o}</span></button>`).join('')}
+            </div>
         </div>
     </div>
 
@@ -137,9 +155,17 @@ export function showEditBeneficiaryDrawer(data) {
             </div>
         </div>
         
-        <div class="flex flex-col gap-2 mt-2 pb-6">
+        <div class="flex flex-col gap-2 mt-2 pb-6 relative">
             <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest pl-1">Replacement History</span>
-            <textarea name="replacement" rows="2" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm placeholder-gray-400" placeholder="History...">${data.replacement || ''}</textarea>
+            <input type="text" name="replacement" id="edit-replacement-input" value="${data.replacement || ''}" autocomplete="off"
+                class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm placeholder-gray-400"
+                placeholder="Search GIP beneficiary to replace...">
+            <div id="edit-replacement-suggestions-box" class="hidden absolute top-[60px] left-0 w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-2xl max-h-48 overflow-y-auto z-[60]">
+                <!-- Suggestions will populate here -->
+            </div>
+            <div id="edit-replacement-loading" class="hidden absolute right-3 top-[32px]">
+                <svg class="animate-spin h-4 w-4 text-brand" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            </div>
         </div>
     </div>
 </form>
@@ -247,7 +273,16 @@ export function showEditBeneficiaryDrawer(data) {
         const startDateInput = drawerContainer.querySelector('#edit-startDate-input');
         const endDateInput = drawerContainer.querySelector('#edit-endDate-input');
         const seriesNoInput = drawerContainer.querySelector('input[name="seriesNo"]');
-        const hiddenGipInput = drawerContainer.querySelector('input[name="gip_id"]');
+        const gipIdInput = drawerContainer.querySelector('input[name="gip_id"]');
+        
+        // Setup dynamic styling for remarks dropdown
+        const remarksSelect = drawerContainer.querySelector('#edit-drawer-remarks');
+        if (remarksSelect) {
+            remarksSelect.addEventListener('change', (e) => {
+                const baseClasses = "text-[10px] sm:text-[11px] font-black px-2.5 py-2.5 rounded-lg border uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full cursor-pointer transition-colors duration-300";
+                remarksSelect.className = `${getRemarksClass(e.target.value)} ${baseClasses} editable-indicator`;
+            });
+        }
 
         let ageManuallyEdited = false;
         
@@ -298,7 +333,7 @@ export function showEditBeneficiaryDrawer(data) {
                 }
 
                 const selectedYear = start.getFullYear();
-                if (selectedYear > 1900 && hiddenGipInput && seriesNoInput) {
+                if (selectedYear > 1900 && gipIdInput && seriesNoInput) {
                     Promise.all([
                         apiGet(`api/beneficiaries.php?next_id&year=${encodeURIComponent(selectedYear)}`),
                         apiGet(`api/beneficiaries.php?next_series_no&year=${encodeURIComponent(selectedYear)}`)
@@ -306,13 +341,13 @@ export function showEditBeneficiaryDrawer(data) {
                         const nextId = (idRes.success && idRes.data?.success) ? idRes.data.nextId : null;
                         const nextSeries = (seriesRes.success && seriesRes.data?.success) ? seriesRes.data.nextSeries : null;
 
-                        const currentIdYearMatch = String(hiddenGipInput.value || '').match(/^ROX-RD-ESIG-(\d{4})-\d{4}$/);
+                        const currentIdYearMatch = String(gipIdInput.value || '').match(/^ROX-RD-ESIG-(\d{4})-\d{4}$/);
                         const currentSeriesYearMatch = String(seriesNoInput.value || '').match(/^(\d{4})-\d{2}-\d{3}$/);
                         const idYear = currentIdYearMatch ? Number(currentIdYearMatch[1]) : null;
                         const seriesYear = currentSeriesYearMatch ? Number(currentSeriesYearMatch[1]) : null;
 
                         if (nextId && (idYear === null || idYear !== selectedYear)) {
-                            hiddenGipInput.value = nextId;
+                            gipIdInput.value = nextId;
                         }
                         if (nextSeries && (seriesYear === null || seriesYear !== selectedYear)) {
                             seriesNoInput.value = nextSeries;
@@ -382,6 +417,58 @@ export function showEditBeneficiaryDrawer(data) {
         setupSuggestionBox('#edit-education-input', '#edit-education-suggestions-box', '.edit-education-option');
         setupSuggestionBox('#edit-designation-input', '#edit-designation-suggestions-box', '.edit-designation-option');
         setupSuggestionBox('#edit-office-input', '#edit-office-suggestions-box', '.edit-office-option');
+
+        // Replacement User Search Logic
+        const repInput = drawerContainer.querySelector('#edit-replacement-input');
+        const repBox = drawerContainer.querySelector('#edit-replacement-suggestions-box');
+        const repLoader = drawerContainer.querySelector('#edit-replacement-loading');
+        let repTimeout = null;
+
+        if (repInput && repBox) {
+            repInput.addEventListener('input', (e) => {
+                const q = e.target.value.trim();
+                clearTimeout(repTimeout);
+                repBox.classList.add('hidden');
+                
+                if (q.length < 2) return;
+
+                if (repLoader) repLoader.classList.remove('hidden');
+                repTimeout = setTimeout(async () => {
+                    try {
+                        const res = await apiRequest(`api/beneficiaries.php?replacement_candidates=1&q=${encodeURIComponent(q)}&limit=10`);
+                        if (res.success && res.data && res.data.candidates && res.data.candidates.length > 0) {
+                            repBox.innerHTML = res.data.candidates.map(c => `
+                                <button type="button" class="w-full text-left px-4 py-3 border-b border-gray-100 dark:border-slate-700 hover:bg-brand-50 dark:hover:bg-slate-700/50 flex flex-col gap-1 group/cand transition-colors" data-name="${c.name}">
+                                    <span class="text-xs font-black text-gray-900 dark:text-white group-hover/cand:text-brand pointer-events-none">${c.name}</span>
+                                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pointer-events-none">${c.id}</span>
+                                </button>
+                            `).join('');
+                            repBox.classList.remove('hidden');
+                        } else {
+                            repBox.innerHTML = `<div class="px-4 py-3 text-xs text-gray-500 italic text-center font-medium">No active beneficiaries found.</div>`;
+                            repBox.classList.remove('hidden');
+                        }
+                    } catch (err) {
+                        console.error("Replacement fetch error:", err);
+                    } finally {
+                        if (repLoader) repLoader.classList.add('hidden');
+                    }
+                }, 400);
+            });
+
+            repBox.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                repInput.value = btn.dataset.name;
+                repBox.classList.add('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!repInput.contains(e.target) && !repBox.contains(e.target)) {
+                    repBox.classList.add('hidden');
+                }
+            });
+        }
 
         // Add small pencil hint only to editable controls.
         form.querySelectorAll('input, select, textarea').forEach((el) => {
