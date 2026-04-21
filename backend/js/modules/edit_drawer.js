@@ -294,6 +294,7 @@ export function showEditBeneficiaryDrawer(data) {
         }
 
         let ageManuallyEdited = false;
+        let blockAutoCompute = false;
         
         // --- Robust Masking Fallback ---
         const setupDateMask = (input, onValid) => {
@@ -305,7 +306,7 @@ export function showEditBeneficiaryDrawer(data) {
                 if (masked.length === 10) {
                     const parsed = window.__parseFormattedDate(masked);
                     if (parsed && onValid) {
-                        onValid(parsed);
+                        if (!blockAutoCompute) onValid(parsed);
                         if (document.activeElement === input) {
                             input.blur();
                         }
@@ -315,7 +316,7 @@ export function showEditBeneficiaryDrawer(data) {
 
             input.addEventListener('changeDate', (e) => {
                 if (e.detail && e.detail.date && onValid) {
-                    onValid(e.detail.date);
+                    if (!blockAutoCompute) onValid(e.detail.date);
                     if (input._datepicker) input._datepicker.hide();
                 }
             });
@@ -390,19 +391,30 @@ export function showEditBeneficiaryDrawer(data) {
 
         // Specifically fetch the latest start and end dates from backend to ensure data accuracy.
         if (data.id) {
+            blockAutoCompute = true;
             apiGet(`api/beneficiaries.php?id=${encodeURIComponent(data.id)}`).then(res => {
                 if (res.success && res.data && res.data.beneficiary) {
                     const ben = res.data.beneficiary;
-                    if (startDateInput && ben.startDateFormatted) {
-                        startDateInput.value = ben.startDateFormatted;
-                        if (startDateInput._datepicker) startDateInput._datepicker.setDate(ben.startDateFormatted);
+                    if (startDateInput && ben.startDate) {
+                        const parsedStart = new Date(ben.startDate);
+                        if (!isNaN(parsedStart)) {
+                            startDateInput.value = ben.startDateFormatted || '';
+                            if (startDateInput._datepicker) startDateInput._datepicker.setDate(parsedStart);
+                        }
                     }
-                    if (endDateInput && ben.endDateFormatted) {
-                        endDateInput.value = ben.endDateFormatted;
-                        if (endDateInput._datepicker) endDateInput._datepicker.setDate(ben.endDateFormatted);
+                    if (endDateInput && ben.endDate) {
+                        const parsedEnd = new Date(ben.endDate);
+                        if (!isNaN(parsedEnd)) {
+                            endDateInput.value = ben.endDateFormatted || '';
+                            if (endDateInput._datepicker) endDateInput._datepicker.setDate(parsedEnd);
+                        }
                     }
                 }
-            }).catch(err => console.error('Error fetching accurate beneficiary dates:', err));
+                setTimeout(() => { blockAutoCompute = false; }, 100);
+            }).catch(err => {
+                console.error('Error fetching accurate beneficiary dates:', err);
+                blockAutoCompute = false;
+            });
         }
 
         if (ageDisplay) {
