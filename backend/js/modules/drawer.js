@@ -172,6 +172,52 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             <label class="text-[9px] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest">Replacement History</label>
              <p class="text-xs text-gray-500 dark:text-gray-400 font-medium italic">${data.replacement || 'None found.'}</p>
         </div>
+
+        ${data.remarks === 'ABSORBED' ? `
+        <div class="bg-[#e8f5e9]/50 dark:bg-green-900/10 p-4 rounded-xl border border-[#c8e6c9] dark:border-green-900/30 mt-2">
+            <p class="text-[9px] uppercase font-black text-[#2e7d32] dark:text-green-500 border-b border-green-200 dark:border-slate-800 pb-1 flex items-center gap-2 mb-3">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> 
+                Absorption Details
+            </p>
+            <div class="flex flex-col gap-2">
+                <div class="flex justify-between items-start group">
+                    <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4">Date</span>
+                    <span class="font-black text-[#1b5e20] dark:text-green-400 text-xs text-right whitespace-nowrap">${data.absorbDate ? (new Date(data.absorbDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })).toUpperCase() : 'N/A'}</span>
+                </div>
+                <div class="flex justify-between items-start group">
+                    <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4 mt-0.5">Where</span>
+                    <span class="font-black text-heading text-xs text-right break-words max-w-[60%] leading-tight">${data.absorb_where || 'N/A'}</span>
+                </div>
+                <div class="flex justify-between items-start group">
+                    <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4 mt-0.5">Position</span>
+                    <span class="font-black text-heading text-xs text-right break-words max-w-[60%] leading-tight">${data.absorb_position || 'N/A'}</span>
+                </div>
+                <div class="flex justify-between items-start group">
+                    <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4 mt-0.5">Agency</span>
+                    <span class="font-black text-heading text-xs text-right break-words max-w-[60%] leading-tight">${data.absorb_agency || 'N/A'}</span>
+                </div>
+            </div>
+        </div>
+        ` : ''}
+
+        ${data.remarks === 'RESIGNED' ? `
+        <div class="bg-[#ffebee]/50 dark:bg-red-900/10 p-4 rounded-xl border border-[#ffcdd2] dark:border-red-900/30 mt-2">
+            <p class="text-[9px] uppercase font-black text-[#ce1126] dark:text-red-500 border-b border-red-200 dark:border-slate-800 pb-1 flex items-center gap-2 mb-3">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg> 
+                Resignation Details
+            </p>
+            <div class="flex flex-col gap-2">
+                <div class="flex justify-between items-start group">
+                    <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4">Date</span>
+                    <span class="font-black text-[#b71c1c] dark:text-red-400 text-xs text-right whitespace-nowrap">${data.resignedDate ? (new Date(data.resignedDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })).toUpperCase() : 'N/A'}</span>
+                </div>
+                <div class="flex justify-between items-start group">
+                    <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4 mt-0.5">Reason</span>
+                    <span class="font-black text-heading text-xs text-right break-words max-w-[60%] leading-tight">${data.resigned_reason || 'N/A'}</span>
+                </div>
+            </div>
+        </div>
+        ` : ''}
     </div>
     
     <div id="drawer-page-1" class="hidden flex-1 flex flex-col gap-4">
@@ -244,9 +290,18 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     ${dtrLogs.length ? dtrLogs.map(l => {
                         const s = l.status || 'PENDING';
                         let sColor = s === 'VERIFIED' || s === 'COMPLETED' ? 'text-green-500' : (s === 'REJECTED' || s === 'DECLINED' ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
+                        let rawStr = l.date || l.createdAt;
+                        let displayDate = rawStr;
+                        if (rawStr) {
+                            // If pure ISO date (YYYY-MM-DD), parse as UTC to avoid timezone off-by-one
+                            const isoDate = /^\d{4}-\d{2}-\d{2}$/.test(rawStr)
+                                ? new Date(rawStr + 'T00:00:00Z')
+                                : new Date(rawStr);
+                            if (!isNaN(isoDate)) displayDate = isoDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'Asia/Manila' }).toUpperCase();
+                        }
                         return `
-                        <div class="flex justify-between items-center p-3 rounded-xl border border-blue-100 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors edit-log-btn" data-type="dtr" data-id="${l.id}" data-val="${l.date || l.createdAt}" data-status="${s}">
-                            <span class="text-xs font-black text-royal-blue dark:text-blue-400 capitalize whitespace-nowrap pointer-events-none">${l.date || l.createdAt}</span>
+                        <div class="flex justify-between items-center p-3 rounded-xl border border-blue-100 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors edit-log-btn" data-type="dtr" data-id="${l.id}" data-val="${rawStr}" data-status="${s}">
+                            <span class="text-xs font-black text-royal-blue dark:text-blue-400 capitalize whitespace-nowrap pointer-events-none">${displayDate}</span>
                             <span class="text-[11px] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
                             <button class="absolute top-0 right-0 h-full w-10 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform cursor-pointer delete-log-btn" data-type="dtr" data-id="${l.id}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -265,9 +320,18 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     ${arLogs.length ? arLogs.map(l => {
                         const s = l.status || 'PENDING';
                         let sColor = s === 'VERIFIED' || s === 'COMPLETED' ? 'text-green-500' : (s === 'REJECTED' || s === 'DECLINED' ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
+                        let rawStr = l.period || l.createdAt;
+                        let displayDate = rawStr;
+                        if (rawStr) {
+                            // If pure ISO date (YYYY-MM-DD), parse as UTC to avoid timezone off-by-one
+                            const isoDate = /^\d{4}-\d{2}-\d{2}$/.test(rawStr)
+                                ? new Date(rawStr + 'T00:00:00Z')
+                                : new Date(rawStr);
+                            if (!isNaN(isoDate)) displayDate = isoDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'Asia/Manila' }).toUpperCase();
+                        }
                         return `
-                        <div class="flex justify-between items-center p-3 rounded-xl border border-orange-100 dark:border-orange-900/50 bg-orange-50/50 dark:bg-orange-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors edit-log-btn" data-type="ar" data-id="${l.id}" data-val="${l.period || l.createdAt}" data-status="${s}">
-                            <span class="text-xs font-black text-orange-600 dark:text-orange-400 capitalize whitespace-nowrap pointer-events-none">${l.period || l.createdAt}</span>
+                        <div class="flex justify-between items-center p-3 rounded-xl border border-orange-100 dark:border-orange-900/50 bg-orange-50/50 dark:bg-orange-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors edit-log-btn" data-type="ar" data-id="${l.id}" data-val="${rawStr}" data-status="${s}">
+                            <span class="text-xs font-black text-orange-600 dark:text-orange-400 capitalize whitespace-nowrap pointer-events-none">${displayDate}</span>
                             <span class="text-[11px] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
                             <button class="absolute top-0 right-0 h-full w-10 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform cursor-pointer delete-log-btn" data-type="ar" data-id="${l.id}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>

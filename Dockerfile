@@ -5,13 +5,12 @@ WORKDIR /app
 
 # Copy package files first (better caching)
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install
 
 # Copy source code
 COPY . .
 
 # Build Vite assets (TailwindCSS, SweetAlert2, Flowbite, ApexCharts, etc.)
-RUN npm install
 RUN npm run build
 
 # ==================== STAGE 2: PHP + Nginx (production-ready for Render) ====================

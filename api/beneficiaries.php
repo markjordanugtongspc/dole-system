@@ -152,6 +152,7 @@ if ($method === 'GET') {
         $aliasEndDateFormatted = $isSupabase ? '"endDateFormatted"' : 'endDateFormatted';
         $aliasSeriesNo = $isSupabase ? '"seriesNo"' : 'seriesNo';
         $aliasAbsorbDate = $isSupabase ? '"absorbDate"' : 'absorbDate';
+        $aliasResignedDate = $isSupabase ? '"resignedDate"' : 'resignedDate';
         $aliasIsArchived = $isSupabase ? '"isArchived"' : 'isArchived';
         $aliasCreatedAt = $isSupabase ? '"createdAt"' : 'createdAt';
         $aliasUpdatedAt = $isSupabase ? '"updatedAt"' : 'updatedAt';
@@ -280,6 +281,9 @@ if ($method === 'GET') {
                     {$absorbPositionExpr} as absorb_position,
                     {$absorbAgencyExpr} as absorb_agency,
                     u.username as absorb_by,
+                    rl.resignation_datetime as {$aliasResignedDate},
+                    rl.reason_description as resigned_reason,
+                    ru.username as resigned_by,
                     b.is_archived as {$aliasIsArchived},
                     b.created_at as {$aliasCreatedAt},
                     b.updated_at as {$aliasUpdatedAt}
@@ -289,6 +293,8 @@ if ($method === 'GET') {
                 LEFT JOIN status_types s ON b.status_id = s.status_id
                 LEFT JOIN absorption_logs al ON b.absorption_log_id = al.log_id
                 LEFT JOIN users u ON al.logged_by = u.user_id
+                LEFT JOIN resigned_logs rl ON b.resigned_log_id = rl.log_id
+                LEFT JOIN users ru ON rl.logged_by = ru.user_id
                 WHERE b.gip_id = :id
             ");
             $stmt->execute(['id' => $id]);
@@ -336,6 +342,9 @@ if ($method === 'GET') {
                     {$absorbPositionExpr} as absorb_position,
                     {$absorbAgencyExpr} as absorb_agency,
                     u.username as absorb_by,
+                    rl.resignation_datetime as {$aliasResignedDate},
+                    rl.reason_description as resigned_reason,
+                    ru.username as resigned_by,
                     b.is_archived as {$aliasIsArchived},
                     b.created_at as {$aliasCreatedAt}
                 FROM beneficiaries b
@@ -344,6 +353,8 @@ if ($method === 'GET') {
                 LEFT JOIN status_types s ON b.status_id = s.status_id
                 LEFT JOIN absorption_logs al ON b.absorption_log_id = al.log_id
                 LEFT JOIN users u ON al.logged_by = u.user_id
+                LEFT JOIN resigned_logs rl ON b.resigned_log_id = rl.log_id
+                LEFT JOIN users ru ON rl.logged_by = ru.user_id
                 WHERE $whereClause
                 ORDER BY b.full_name ASC, b.created_at ASC
             ");
@@ -448,6 +459,30 @@ if ($method === 'GET') {
             $absorptionLogId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
         }
 
+        // Handle resigned log if status is RESIGNED
+        $resignedLogId = null;
+        if (!empty($data['remarks']) && $data['remarks'] === 'RESIGNED') {
+            $resignedDate = !empty($data['resignedDate']) ? date('Y-m-d H:i:s', strtotime($data['resignedDate'])) : date('Y-m-d H:i:s');
+            if ($isSupabase) {
+                $stmt = $pdo->prepare("
+                    INSERT INTO resigned_logs (beneficiary_id, resignation_datetime, reason_description, logged_by)
+                    VALUES (NULL, :resignedDate, :reason, :logged_by)
+                    RETURNING log_id
+                ");
+            } else {
+                $stmt = $pdo->prepare("
+                    INSERT INTO resigned_logs (beneficiary_id, resignation_datetime, reason_description, logged_by)
+                    VALUES (NULL, :resignedDate, :reason, :logged_by)
+                ");
+            }
+            $stmt->execute([
+                'resignedDate' => $resignedDate,
+                'reason' => $data['resigned_reason'] ?? null,
+                'logged_by' => $current_user_id
+            ]);
+            $resignedLogId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
+        }
+
         // Generate GIP ID if not provided
         $candidateId = $data['gip_id'] ?? $data['id'] ?? null;
         // Never accept temp/local IDs as real database identifiers
@@ -467,13 +502,13 @@ if ($method === 'GET') {
                 INSERT INTO beneficiaries (
                     gip_id, full_name, contact_number, address, birthday, age,
                     gender_id, education, start_date, end_date, series_number,
-                    office_id, office_name, designation, replacement_notes, status_id, absorption_log_id
+                    office_id, office_name, designation, replacement_notes, status_id, absorption_log_id, resigned_log_id
                     " . ($hasCreatedBy ? ", created_by" : "") . "
                     " . ($hasUpdatedBy ? ", updated_by" : "") . "
                 ) VALUES (
                     :gip_id, :name, :contact, :address, :birthday, :age,
                     :gender_id, :education, :start_date, :end_date, :series_no,
-                    :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id
+                    :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id, :resigned_log_id
                     " . ($hasCreatedBy ? ", :created_by" : "") . "
                     " . ($hasUpdatedBy ? ", :updated_by" : "") . "
                 ) RETURNING beneficiary_id
@@ -483,13 +518,13 @@ if ($method === 'GET') {
                 INSERT INTO beneficiaries (
                     gip_id, full_name, contact_number, address, birthday, age,
                     gender_id, education, start_date, end_date, series_number,
-                    office_id, office_name, designation, replacement_notes, status_id, absorption_log_id
+                    office_id, office_name, designation, replacement_notes, status_id, absorption_log_id, resigned_log_id
                     " . ($hasCreatedBy ? ", created_by" : "") . "
                     " . ($hasUpdatedBy ? ", updated_by" : "") . "
                 ) VALUES (
                     :gip_id, :name, :contact, :address, :birthday, :age,
                     :gender_id, :education, :start_date, :end_date, :series_no,
-                    :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id
+                    :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id, :resigned_log_id
                     " . ($hasCreatedBy ? ", :created_by" : "") . "
                     " . ($hasUpdatedBy ? ", :updated_by" : "") . "
                 )
@@ -518,7 +553,8 @@ if ($method === 'GET') {
                 'designation' => $data['designation'],
                 'replacement' => (isset($data['replacement']) && trim($data['replacement']) !== '') ? trim($data['replacement']) : null,
                 'status_id' => $statusId,
-                'absorption_log_id' => $absorptionLogId
+                'absorption_log_id' => $absorptionLogId,
+                'resigned_log_id' => $resignedLogId
             ];
             if ($hasCreatedBy) $params['created_by'] = $current_user_id;
             if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
@@ -543,6 +579,13 @@ if ($method === 'GET') {
             $beneficiaryId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
             $stmt = $pdo->prepare("UPDATE absorption_logs SET beneficiary_id = :bid WHERE log_id = :lid");
             $stmt->execute(['bid' => $beneficiaryId, 'lid' => $absorptionLogId]);
+        }
+        
+        // Update resigned log with beneficiary_id
+        if ($resignedLogId) {
+            $beneficiaryId = $beneficiaryId ?? ($isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId());
+            $stmt = $pdo->prepare("UPDATE resigned_logs SET beneficiary_id = :bid WHERE log_id = :lid");
+            $stmt->execute(['bid' => $beneficiaryId, 'lid' => $resignedLogId]);
         }
 
         echo json_encode(['success' => true, 'message' => 'Beneficiary created successfully', 'id' => $gipId]);
@@ -646,6 +689,48 @@ if ($method === 'GET') {
             }
         }
 
+        // Handle resigned log if status changed to RESIGNED
+        $resignedLogId = null;
+        if (!empty($data['remarks']) && $data['remarks'] === 'RESIGNED') {
+            $stmt = $pdo->prepare("SELECT resigned_log_id FROM beneficiaries WHERE gip_id = :id");
+            $stmt->execute(['id' => $data['id']]);
+            $existingLogId = $stmt->fetchColumn();
+
+            $resignedDate = !empty($data['resignedDate']) ? date('Y-m-d H:i:s', strtotime($data['resignedDate'])) : date('Y-m-d H:i:s');
+
+            if (!$existingLogId) {
+                $stmt = $pdo->prepare("SELECT beneficiary_id FROM beneficiaries WHERE gip_id = :id");
+                $stmt->execute(['id' => $data['id']]);
+                $beneficiaryId = $stmt->fetchColumn();
+
+                $stmt = $pdo->prepare("
+                    INSERT INTO resigned_logs (beneficiary_id, resignation_datetime, reason_description, logged_by)
+                    VALUES (:bid, :resignedDate, :reason, :logged_by)
+                    " . ($isSupabase ? "RETURNING log_id" : "") . "
+                ");
+                $stmt->execute([
+                    'bid' => $beneficiaryId,
+                    'resignedDate' => $resignedDate,
+                    'reason' => $data['resigned_reason'] ?? null,
+                    'logged_by' => $current_user_id
+                ]);
+                $resignedLogId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
+            } else {
+                $stmt = $pdo->prepare("
+                    UPDATE resigned_logs SET 
+                        reason_description = :reason,
+                        logged_by = :logged_by
+                    WHERE log_id = :log_id
+                ");
+                $stmt->execute([
+                    'reason' => $data['resigned_reason'] ?? null,
+                    'logged_by' => $current_user_id,
+                    'log_id' => $existingLogId
+                ]);
+                $resignedLogId = $existingLogId;
+            }
+        }
+
         // Update beneficiary
         $hasUpdatedBy = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'updated_by');
         $stmt = $pdo->prepare("
@@ -666,7 +751,8 @@ if ($method === 'GET') {
                 designation = :designation,
                 replacement_notes = :replacement,
                 status_id = :status_id,
-                absorption_log_id = COALESCE(:absorption_log_id, absorption_log_id)
+                absorption_log_id = COALESCE(:absorption_log_id, absorption_log_id),
+                resigned_log_id = COALESCE(:resigned_log_id, resigned_log_id)
                 " . ($hasUpdatedBy ? ", updated_by = :updated_by" : "") . "
             WHERE gip_id = :old_id
         ");
@@ -689,7 +775,8 @@ if ($method === 'GET') {
             'designation' => $data['designation'],
             'replacement' => (isset($data['replacement']) && trim($data['replacement']) !== '') ? trim($data['replacement']) : null,
             'status_id' => $statusId,
-            'absorption_log_id' => $absorptionLogId
+            'absorption_log_id' => $absorptionLogId,
+            'resigned_log_id' => $resignedLogId
         ];
         if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
         $stmt->execute($params);

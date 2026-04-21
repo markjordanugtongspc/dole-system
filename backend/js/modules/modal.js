@@ -1384,6 +1384,31 @@ export function showAddDataModal(data = null) {
                             </div>
                         </div>
                     `;
+                } else if (status === 'RESIGNED') {
+                    const dateStr = data?.resignedDate || new Date().toLocaleString('en-US', {
+                        timeZone: 'Asia/Manila',
+                        month: 'short', day: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', hour12: true
+                    });
+                    extensionContainer.innerHTML = `
+                        <div class="mt-4 pt-4 border-t ${dk ? 'border-slate-800' : 'border-gray-100'}">
+                            <p class="text-[9px] uppercase font-black ${dk ? 'text-red-500' : 'text-[#ce1126]'} border-b ${dk ? 'border-slate-800' : 'border-red-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg> Resignation Details</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                <div class="${dk ? 'bg-red-900/10 border-red-900/30' : 'bg-[#ffebee]/50 border-[#ffcdd2]'} rounded-lg p-2.5 flex items-center justify-between border">
+                                    <div>
+                                        <label class="text-[8px] ${dk ? 'text-red-500' : 'text-[#ce1126]'} font-bold uppercase block mb-0.5">Resignation Date</label>
+                                        <p class="text-[10px] font-black ${dk ? 'text-red-400' : 'text-[#b71c1c]'} uppercase">${dateStr}</p>
+                                        <input type="hidden" name="resignedDate" value="${dateStr}">
+                                    </div>
+                                    <svg class="w-4 h-4 ${dk ? 'text-red-400' : 'text-[#ce1126]'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                </div>
+                                <div class="group">
+                                    <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Reason (Optional)</label>
+                                    <input type="text" name="resigned_reason" value="${data?.resigned_reason || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-red-500/10 focus:border-red-500' : 'focus:ring-[#ce1126]/10 focus:border-[#ce1126]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="Why resigned?">
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 } else {
                     extensionContainer.innerHTML = '';
                 }
@@ -1426,16 +1451,16 @@ export function showAddDataModal(data = null) {
                         format: 'mm/dd/yyyy',
                         autohide: true,
                         allowOneSidedRange: true,
-                        orientation: 'bottom right'
+                        orientation: 'auto'
                     });
                     startDateInput._datepicker = rangePicker.datepickers?.[0] || null;
                     endDateInput._datepicker = rangePicker.datepickers?.[1] || null;
                 } else if (PickerClass) {
                     if (startDateInput) {
-                        startDateInput._datepicker = new PickerClass(startDateInput, { format: 'mm/dd/yyyy', autohide: true, orientation: 'bottom right' });
+                        startDateInput._datepicker = new PickerClass(startDateInput, { format: 'mm/dd/yyyy', autohide: true, orientation: 'auto' });
                     }
                     if (endDateInput) {
-                        endDateInput._datepicker = new PickerClass(endDateInput, { format: 'mm/dd/yyyy', autohide: true, orientation: 'bottom right' });
+                        endDateInput._datepicker = new PickerClass(endDateInput, { format: 'mm/dd/yyyy', autohide: true, orientation: 'auto' });
                     }
                 }
 

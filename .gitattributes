@@ -1,0 +1,32 @@
+# Handle line endings automatically for text files
+# and force LF in the repository
+* text=auto eol=lf
+
+# Explicitly define file types
+*.php text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.sql text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf
+.htaccess text eol=lf
+.dockerignore text eol=lf
+.gitignore text eol=lf
+
+# Force binary files to be treated as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+
+# SVG can be treated as text
+*.svg text eol=lf

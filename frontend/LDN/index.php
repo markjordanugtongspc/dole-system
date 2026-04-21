@@ -167,10 +167,13 @@ require_once __DIR__ . '/../../config/vite.php';
                             class="block w-full ps-11 sm:ps-12 pe-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-heading bg-gray-50/50 border border-gray-200 rounded-full focus:bg-white focus:border-royal-blue/30 focus:ring-4 focus:ring-royal-blue/10 focus:shadow-lg transition-all duration-300 ease-out placeholder:text-gray-400"
                             placeholder="Search beneficiaries...">
 
-                        <!-- Optional Keyboard Shortcut Hint -->
-                        <div class="absolute inset-y-0 end-0 flex items-center pe-4 pointer-events-none hidden sm:flex">
-                            <span
-                                class="text-xs text-gray-400 border border-gray-200 rounded px-1.5 py-0.5 group-focus-within:border-royal-blue/30 group-focus-within:text-royal-blue transition-colors duration-300">/</span>
+                        <!-- Clear Search Button -->
+                        <div class="absolute inset-y-0 end-0 flex items-center pe-2">
+                            <button type="button" id="clear-search-btn" class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-full outline-none transition-colors duration-300 hidden cursor-pointer">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
                         </div>
                     </div>
 

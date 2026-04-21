@@ -857,12 +857,26 @@ function initLDNHeader() {
 
 function initSearch() {
     const searchInput = document.getElementById('table-search');
+    const clearBtn = document.getElementById('clear-search-btn');
     if (!searchInput) return;
 
     searchInput.addEventListener('input', (e) => {
         currentPage = 1;
         renderTable();
+        if (clearBtn) {
+            clearBtn.classList.toggle('hidden', searchInput.value.length === 0);
+        }
     });
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            currentPage = 1;
+            renderTable();
+            clearBtn.classList.add('hidden');
+            searchInput.focus();
+        });
+    }
 
     // Handle the "/" keyboard shortcut
     window.addEventListener('keydown', (e) => {
