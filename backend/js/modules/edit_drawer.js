@@ -250,12 +250,21 @@ export function showEditBeneficiaryDrawer(data) {
             placement: 'right',
             backdrop: true,
             bodyScrolling: false,
+            edge: false,
+            edgeOffset: '',
             backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-50',
             onHide: () => {
-                setTimeout(() => { if (drawerContainer.parentNode) drawerContainer.remove(); }, 300);
+                setTimeout(() => {
+                    if (drawerContainer && drawerContainer.parentNode) {
+                        drawerContainer.remove();
+                    }
+                }, 400); 
             }
         });
         drawer.show();
+
+        // [FLOWBITE FIX] Re-initialize flowbite for dynamic elements
+        if (window.initFlowbite) window.initFlowbite();
 
         const hideDrawerSafely = () => {
             if (document.activeElement && typeof document.activeElement.blur === 'function') {

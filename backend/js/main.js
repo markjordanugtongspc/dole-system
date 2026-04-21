@@ -6,6 +6,8 @@ import '../css/main.css';
 import 'animate.css';
 import 'flowbite';
 import { initFlowbite } from 'flowbite';
+import Datepicker from 'flowbite-datepicker/Datepicker';
+import DateRangePicker from 'flowbite-datepicker/DateRangePicker';
 import { initLoginHandler, initLogoutHandler, initSmartLoader, initMobileSplash } from './modules/auth.js';
 import { initCharts } from './modules/charts.js';
 import { initLDNPage } from './modules/ldngip.js';
@@ -24,6 +26,8 @@ initDarkMode();
 
 // [HYBRID] Make Flowbite globally available for AJAX re-initialization
 window.initFlowbite = initFlowbite;
+window.Datepicker = Datepicker;
+window.DateRangePicker = DateRangePicker;
 
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

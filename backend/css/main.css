@@ -57,6 +57,11 @@
     .rounded-base {
         border-radius: 0.75rem;
     }
+
+    /* [FLOWBITE FIX] Ensure datepicker is always on top of modals/drawers */
+    .datepicker {
+        z-index: 100000 !important;
+    }
 }
 
 body {
