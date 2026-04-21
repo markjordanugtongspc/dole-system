@@ -203,16 +203,16 @@ export function showEditBeneficiaryDrawer(data) {
     `;
 
     let drawerContainer = document.getElementById('edit-drawer-container');
-    if(drawerContainer) {
+    if (drawerContainer) {
         drawerContainer.remove();
     }
-    
+
     drawerContainer = document.createElement('div');
     drawerContainer.id = 'edit-drawer-container';
     drawerContainer.className = 'fixed top-0 right-0 z-[100] h-screen p-4 sm:p-6 overflow-y-auto transition-transform duration-500 ease-in-out translate-x-full bg-white dark:bg-slate-900 w-full sm:w-[550px] lg:w-[650px] shadow-2xl pb-0';
     drawerContainer.setAttribute('tabindex', '-1');
     drawerContainer.innerHTML = drawerHtml;
-    
+
     document.body.appendChild(drawerContainer);
 
     // Initial resize for textarea
@@ -223,7 +223,7 @@ export function showEditBeneficiaryDrawer(data) {
             ta.style.height = ta.scrollHeight + 'px';
         }
     }, 10);
-    
+
     // Fetch offices for suggestions from database
     (async () => {
         try {
@@ -258,7 +258,7 @@ export function showEditBeneficiaryDrawer(data) {
                     if (drawerContainer && drawerContainer.parentNode) {
                         drawerContainer.remove();
                     }
-                }, 400); 
+                }, 400);
             }
         });
         drawer.show();
@@ -283,7 +283,7 @@ export function showEditBeneficiaryDrawer(data) {
         const endDateInput = drawerContainer.querySelector('#edit-endDate-input');
         const seriesNoInput = drawerContainer.querySelector('input[name="seriesNo"]');
         const gipIdInput = drawerContainer.querySelector('input[name="gip_id"]');
-        
+
         // Setup dynamic styling for remarks dropdown
         const remarksSelect = drawerContainer.querySelector('#edit-drawer-remarks');
         if (remarksSelect) {
@@ -295,14 +295,14 @@ export function showEditBeneficiaryDrawer(data) {
 
         let ageManuallyEdited = false;
         let blockAutoCompute = false;
-        
+
         // --- Robust Masking Fallback ---
         const setupDateMask = (input, onValid) => {
             input.addEventListener('input', (e) => {
                 const val = e.target.value;
                 const masked = window.__maskDate(val);
                 if (val !== masked) e.target.value = masked;
-                
+
                 if (masked.length === 10) {
                     const parsed = window.__parseFormattedDate(masked);
                     if (parsed && onValid) {
@@ -379,9 +379,9 @@ export function showEditBeneficiaryDrawer(data) {
         }
         const rangeEl = drawerContainer.querySelector('#edit-date-range-picker');
         if (RangePickerClass && rangeEl) {
-            const rangePicker = new RangePickerClass(rangeEl, { 
-                format: 'mm/dd/yyyy', 
-                autohide: true, 
+            const rangePicker = new RangePickerClass(rangeEl, {
+                format: 'mm/dd/yyyy',
+                autohide: true,
                 allowOneSidedRange: true,
                 orientation: 'bottom right'
             });
@@ -395,6 +395,7 @@ export function showEditBeneficiaryDrawer(data) {
             apiGet(`api/beneficiaries.php?id=${encodeURIComponent(data.id)}`).then(res => {
                 if (res.success && res.data && res.data.beneficiary) {
                     const ben = res.data.beneficiary;
+                    // Safely utilize native DB start_date/end_date column bypass string parsing bugs:
                     if (startDateInput && ben.startDate) {
                         const parsedStart = new Date(ben.startDate);
                         if (!isNaN(parsedStart)) {
@@ -472,7 +473,7 @@ export function showEditBeneficiaryDrawer(data) {
                 const q = e.target.value.trim();
                 clearTimeout(repTimeout);
                 repBox.classList.add('hidden');
-                
+
                 if (q.length < 2) return;
 
                 if (repLoader) repLoader.classList.remove('hidden');
@@ -541,7 +542,7 @@ export function showEditBeneficiaryDrawer(data) {
                         if (window.viewBeneficiary) {
                             // pass ONLY the id. This forces window.viewBeneficiary in modal.js 
                             // to do a fresh fetch from Supabase/MySQL instead of using stale local memory.
-                            setTimeout(() => window.viewBeneficiary({ id: data.id }, 0), 100); 
+                            setTimeout(() => window.viewBeneficiary({ id: data.id }, 0), 100);
                         }
                         Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Record Updated', showConfirmButton: false, timer: 3000 });
                     }
