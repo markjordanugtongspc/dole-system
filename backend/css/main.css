@@ -74,7 +74,6 @@
 
     /* [POSITION FIX] Prevent datepicker overflow on right-hand drawers/modals */
     .datepicker.datepicker-orient-right {
-        transform: translateX(-140px) !important;
         z-index: 100000 !important;
     }
 
