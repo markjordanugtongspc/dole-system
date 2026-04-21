@@ -96,7 +96,7 @@ export function showEditBeneficiaryDrawer(data) {
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <svg class="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
                 </div>
-                <input type="text" name="birthday" id="edit-bday-input" value="${data.birthday || ''}" class="${inputClass} !pl-9 text-right uppercase" placeholder="MM/DD/YYYY" datepicker>
+                <input type="text" name="birthday" id="edit-bday-input" value="${data.birthday || ''}" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white pl-9 pr-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm font-mono uppercase" placeholder="MM/DD/YYYY">
             </div>
         </div>
         
@@ -126,7 +126,7 @@ export function showEditBeneficiaryDrawer(data) {
     <h4 class="text-sm font-bold text-heading mt-8 pb-2 border-b border-default whitespace-nowrap">Contract & Work Details</h4>
     
     <div class="flex flex-col gap-4 text-sm mt-4 px-1">
-        <div id="edit-date-range-picker" date-rangepicker class="grid grid-cols-2 gap-3 mb-2">
+        <div id="edit-date-range-picker" class="grid grid-cols-2 gap-3 mb-2">
             <div class="flex flex-col gap-1">
                 <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest pl-1">Start Date</span>
                 <div class="relative">
@@ -374,11 +374,16 @@ export function showEditBeneficiaryDrawer(data) {
         const RangePickerClass = window.DateRangePicker || (typeof DateRangePicker !== 'undefined' ? DateRangePicker : null);
 
         if (PickerClass && bdayInput) {
-            bdayInput._datepicker = new PickerClass(bdayInput, { format: 'mm/dd/yyyy', autohide: true });
+            bdayInput._datepicker = new PickerClass(bdayInput, { format: 'mm/dd/yyyy', autohide: true, orientation: 'bottom right' });
         }
         const rangeEl = drawerContainer.querySelector('#edit-date-range-picker');
         if (RangePickerClass && rangeEl) {
-            const rangePicker = new RangePickerClass(rangeEl, { format: 'mm/dd/yyyy', autohide: true, allowOneSidedRange: true });
+            const rangePicker = new RangePickerClass(rangeEl, { 
+                format: 'mm/dd/yyyy', 
+                autohide: true, 
+                allowOneSidedRange: true,
+                orientation: 'bottom right'
+            });
             if (startDateInput) startDateInput._datepicker = rangePicker.datepickers[0];
             if (endDateInput) endDateInput._datepicker = rangePicker.datepickers[1];
         }

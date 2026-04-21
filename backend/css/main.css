@@ -62,6 +62,27 @@
     .datepicker {
         z-index: 100000 !important;
     }
+
+    /* [FLOWBITE FIX] Fade out days from other months in datepicker */
+    .datepicker-cell.prev,
+    .datepicker-cell.next,
+    .datepicker-cell.old,
+    .datepicker-cell.new {
+        color: #94a3b8 !important;
+        opacity: 0.35 !important;
+    }
+
+    /* [POSITION FIX] Prevent datepicker overflow on right-hand drawers/modals */
+    .datepicker.datepicker-orient-right {
+        transform: translateX(-140px) !important;
+        z-index: 100000 !important;
+    }
+
+    /* Ensure specific hover state for other-month days isn't too strong */
+    .datepicker-cell.prev:hover,
+    .datepicker-cell.next:hover {
+        opacity: 0.8 !important;
+    }
 }
 
 body {

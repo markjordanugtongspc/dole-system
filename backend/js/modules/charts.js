@@ -414,10 +414,10 @@ export async function initCharts(forceRefresh = false) {
 
     const educationOptions = {
         series: eduValues.map(v => filteredData.length > 0 ? Math.round((v / filteredData.length) * 100) : 0),
-        chart: { height: 260, type: 'radialBar', background: theme.cardBg, fontFamily: "Montserrat, sans-serif" },
+        chart: { height: 380, type: 'radialBar', background: theme.cardBg, fontFamily: "Montserrat, sans-serif" },
         plotOptions: {
             radialBar: {
-                hollow: { size: '30%' },
+                hollow: { size: '45%' },
                 dataLabels: {
                     name: { fontSize: '11px', fontWeight: 700, color: theme.muted, offsetY: -5 },
                     value: { fontSize: '16px', fontWeight: 900, color: theme.text, offsetY: 5 },
@@ -432,8 +432,8 @@ export async function initCharts(forceRefresh = false) {
         responsive: [{
             breakpoint: 640,
             options: {
-                chart: { height: 260 },
-                plotOptions: { radialBar: { hollow: { size: '20%' }, dataLabels: { value: { fontSize: '14px' } } } }
+                chart: { height: 320 },
+                plotOptions: { radialBar: { hollow: { size: '30%' }, dataLabels: { value: { fontSize: '14px' } } } }
             }
         }]
     };
@@ -505,8 +505,8 @@ export async function initCharts(forceRefresh = false) {
     const sortedRoles = Object.entries(filteredStats.designations).sort((a, b) => b[1] - a[1]).slice(0, 5);
     const jobRolesOptions = {
         series: [{ name: "Beneficiaries", data: sortedRoles.map(r => r[1]), color: chartColor }],
-        chart: { type: 'bar', height: '100%', toolbar: { show: false }, fontFamily: "Montserrat, sans-serif", background: theme.cardBg },
-        plotOptions: { bar: { horizontal: true, columnWidth: '100%', borderRadius: 6, barHeight: '60%' } },
+        chart: { type: 'bar', height: 320, toolbar: { show: false }, fontFamily: "Montserrat, sans-serif", background: theme.cardBg },
+        plotOptions: { bar: { horizontal: true, columnWidth: '100%', borderRadius: 8, barHeight: '52%' } },
         dataLabels: { enabled: false },
         xaxis: {
             categories: sortedRoles.map(r => r[0]),
@@ -524,7 +524,7 @@ export async function initCharts(forceRefresh = false) {
         responsive: [{
             breakpoint: 640,
             options: {
-                chart: { height: 400 },
+                chart: { height: 350 },
                 xaxis: { labels: { style: { fontSize: '8px' } } },
                 yaxis: { labels: { style: { fontSize: '9px' } } }
             }

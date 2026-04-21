@@ -1,14 +1,14 @@
 {
-  "_modal-7Xx9A--Z.js": {
-    "file": "assets/modal-7Xx9A--Z.js",
+  "_modal-DMI2JRuM.js": {
+    "file": "assets/modal-DMI2JRuM.js",
     "name": "modal",
     "imports": [
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js",
       "_vendor-DHtNC8Ux.js"
     ],
     "dynamicImports": [
-      "node_modules/flowbite/lib/esm/index.js",
-      "node_modules/flowbite/lib/esm/index.js"
+      "_vendor-flowbite-B7rSfpuT.js",
+      "_vendor-flowbite-B7rSfpuT.js"
     ]
   },
   "_vendor-DHtNC8Ux.js": {
@@ -19,15 +19,23 @@
     "file": "assets/vendor-charts-BjInCqFR.js",
     "name": "vendor-charts"
   },
+  "_vendor-flowbite-B7rSfpuT.js": {
+    "file": "assets/vendor-flowbite-B7rSfpuT.js",
+    "name": "vendor-flowbite",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DHtNC8Ux.js"
+    ]
+  },
   "backend/js/main.js": {
-    "file": "assets/main-EKwxJ2Uk.js",
+    "file": "assets/main-C7g99FvE.js",
     "name": "main",
     "src": "backend/js/main.js",
     "isEntry": true,
     "imports": [
       "_vendor-DHtNC8Ux.js",
-      "node_modules/flowbite/lib/esm/index.js",
-      "_modal-7Xx9A--Z.js",
+      "_vendor-flowbite-B7rSfpuT.js",
+      "_modal-DMI2JRuM.js",
       "_vendor-charts-BjInCqFR.js",
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
     ],
@@ -36,22 +44,13 @@
     ]
   },
   "backend/js/modules/settings.js": {
-    "file": "assets/settings-pl2SyaQH.js",
+    "file": "assets/settings-CeWjRIUr.js",
     "name": "settings",
     "src": "backend/js/modules/settings.js",
     "isEntry": true,
     "imports": [
-      "_modal-7Xx9A--Z.js",
+      "_modal-DMI2JRuM.js",
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js",
-      "_vendor-DHtNC8Ux.js"
-    ]
-  },
-  "node_modules/flowbite/lib/esm/index.js": {
-    "file": "assets/vendor-flowbite-bBKPL--D.js",
-    "name": "vendor-flowbite",
-    "src": "node_modules/flowbite/lib/esm/index.js",
-    "isDynamicEntry": true,
-    "imports": [
       "_vendor-DHtNC8Ux.js"
     ]
   },
@@ -62,7 +61,7 @@
     "isDynamicEntry": true
   },
   "style.css": {
-    "file": "assets/style-ClyGwAZq.css",
+    "file": "assets/style-DWLmAo-V.css",
     "src": "style.css"
   }
 }
