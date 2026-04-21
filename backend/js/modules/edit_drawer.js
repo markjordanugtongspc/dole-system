@@ -167,6 +167,11 @@ export function showEditBeneficiaryDrawer(data) {
                 <svg class="animate-spin h-4 w-4 text-brand" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             </div>
         </div>
+        </div>
+    </div>
+
+    <div id="edit-extension-log-container" class="transition-all duration-300 px-1">
+        <!-- Absorption or Resignation details will be injected here -->
     </div>
 </form>
 
@@ -198,6 +203,14 @@ export function showEditBeneficiaryDrawer(data) {
     background-size: 14px 14px;
     background-position: right 0.6rem center;
     padding-right: 2rem;
+}
+@keyframes pulse-highlight {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(16, 185, 129, 0.1); }
+    100% { background-color: transparent; }
+}
+.pulse-highlight {
+    animation: pulse-highlight 1.5s ease-out;
 }
 </style>
     `;
@@ -284,14 +297,110 @@ export function showEditBeneficiaryDrawer(data) {
         const seriesNoInput = drawerContainer.querySelector('input[name="seriesNo"]');
         const gipIdInput = drawerContainer.querySelector('input[name="gip_id"]');
 
-        // Setup dynamic styling for remarks dropdown
+        // Setup dynamic styling and extension fields for remarks dropdown
         const remarksSelect = drawerContainer.querySelector('#edit-drawer-remarks');
+        const extensionContainer = drawerContainer.querySelector('#edit-extension-log-container');
+
+        const updateExtensionFields = () => {
+            if (!extensionContainer) return;
+            const status = remarksSelect.value;
+            const dk = isDarkMode();
+
+            if (status === 'ABSORBED') {
+                const dateStr = data.absorbDate || new Date().toLocaleString('en-US', {
+                    timeZone: 'Asia/Manila',
+                    month: 'short', day: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', hour12: true
+                });
+                extensionContainer.innerHTML = `
+                    <div class="mt-4 pt-4 border-t ${dk ? 'border-slate-800' : 'border-gray-100'}">
+                        <p class="text-[9px] uppercase font-black ${dk ? 'text-green-500' : 'text-[#2e7d32]'} border-b ${dk ? 'border-slate-800' : 'border-green-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> Absorption Details</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                            <div class="group">
+                                <label class="text-[9px] ${dk ? 'text-green-500' : 'text-[#2e7d32]'} font-black uppercase block mb-1">Absorption Date</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <svg class="w-3.5 h-3.5 ${dk ? 'text-green-400' : 'text-green-600'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    </div>
+                                    <input type="text" name="absorbDate" value="${dateStr}" class="absorb-date-picker w-full ${dk ? 'bg-slate-800 text-white border-slate-700' : 'bg-green-50 text-slate-900 border-green-200'} rounded-lg pl-9 pr-3 py-2 text-[11px] font-bold focus:ring-2 focus:ring-brand outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY HH:MM AM/PM">
+                                </div>
+                            </div>
+                            <div class="group">
+                                <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400'} font-black uppercase block mb-1">Where?</label>
+                                <input type="text" name="absorb_where" value="${data.absorb_where || ''}" class="w-full ${dk ? 'bg-slate-800 text-white border-slate-700' : 'bg-gray-50 text-slate-900 border-gray-200'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-2 focus:ring-brand outline-none transition-all shadow-sm" placeholder="Where to absorb?">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                            <div class="group">
+                                <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400'} font-black uppercase block mb-1">Position</label>
+                                <input type="text" name="absorb_position" value="${data.absorb_position || ''}" class="w-full ${dk ? 'bg-slate-800 text-white border-slate-700' : 'bg-gray-50 text-slate-900 border-gray-200'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-2 focus:ring-brand outline-none transition-all shadow-sm" placeholder="What kind of position?">
+                            </div>
+                            <div class="group">
+                                <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400'} font-black uppercase block mb-1">Agency</label>
+                                <input type="text" name="absorb_agency" value="${data.absorb_agency || ''}" class="w-full ${dk ? 'bg-slate-800 text-white border-slate-700' : 'bg-gray-50 text-slate-900 border-gray-200'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-2 focus:ring-brand outline-none transition-all shadow-sm" placeholder="On what agency?">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (status === 'RESIGNED') {
+                const dateStr = data.resignedDate || new Date().toLocaleString('en-US', {
+                    timeZone: 'Asia/Manila',
+                    month: 'short', day: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', hour12: true
+                });
+                extensionContainer.innerHTML = `
+                    <div class="mt-4 pt-4 border-t ${dk ? 'border-slate-800' : 'border-gray-100'}">
+                        <p class="text-[9px] uppercase font-black ${dk ? 'text-red-500' : 'text-[#ce1126]'} border-b ${dk ? 'border-slate-800' : 'border-red-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg> Resignation Details</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                            <div class="group">
+                                <label class="text-[9px] ${dk ? 'text-red-500' : 'text-[#ce1126]'} font-black uppercase block mb-1">Resignation Date</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <svg class="w-3.5 h-3.5 ${dk ? 'text-red-400' : 'text-red-600'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </div>
+                                    <input type="text" name="resignedDate" value="${dateStr}" class="resign-date-picker w-full ${dk ? 'bg-slate-800 text-white border-slate-700' : 'bg-red-50 text-slate-900 border-red-200'} rounded-lg pl-9 pr-3 py-2 text-[11px] font-bold focus:ring-2 focus:ring-brand outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY HH:MM AM/PM">
+                                </div>
+                            </div>
+                            <div class="group">
+                                <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400'} font-black uppercase block mb-1">Reason (Optional)</label>
+                                <input type="text" name="resigned_reason" value="${data.resigned_reason || ''}" class="w-full ${dk ? 'bg-slate-800 text-white border-slate-700' : 'bg-gray-50 text-slate-900 border-gray-200'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-2 focus:ring-brand outline-none transition-all shadow-sm" placeholder="Why resigned?">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                extensionContainer.innerHTML = '';
+            }
+
+            // Sync datepickers for the new inputs if library is loaded
+            const Picker = window.Datepicker || (typeof Datepicker !== 'undefined' ? Datepicker : null);
+            if (Picker) {
+                const newPickers = extensionContainer.querySelectorAll('.absorb-date-picker, .resign-date-picker');
+                newPickers.forEach(el => {
+                   new Picker(el, { format: 'M dd, yyyy', autohide: true, orientation: 'bottom' });
+                });
+            }
+        };
+
         if (remarksSelect) {
             remarksSelect.addEventListener('change', (e) => {
-                const baseClasses = "text-[10px] sm:text-[11px] font-black px-2.5 py-2.5 rounded-lg border uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full cursor-pointer transition-colors duration-300";
+                const baseClasses = "text-[10px] sm:text-[11px] font-black px-2.5 py-2.5 rounded-lg border uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full cursor-pointer transition-colors duration-300 h-[42px]";
                 remarksSelect.className = `${getRemarksClass(e.target.value)} ${baseClasses} editable-indicator`;
+                updateExtensionFields();
+
+                // Highlight and scroll effect
+                if (remarksSelect.value === 'ABSORBED' || remarksSelect.value === 'RESIGNED') {
+                    setTimeout(() => {
+                        extensionContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        extensionContainer.classList.add('pulse-highlight');
+                        setTimeout(() => extensionContainer.classList.remove('pulse-highlight'), 1500);
+                    }, 50);
+                }
             });
         }
+        
+        // Run once on load
+        updateExtensionFields();
 
         let ageManuallyEdited = false;
         let blockAutoCompute = false;

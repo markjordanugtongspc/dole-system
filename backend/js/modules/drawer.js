@@ -170,7 +170,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         
          <div class="bg-gray-50/30 dark:bg-slate-800/30 p-4 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
             <label class="text-[9px] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest">Replacement History</label>
-             <p class="text-xs text-gray-500 dark:text-gray-400 font-medium italic">${data.replacement || 'None found.'}</p>
+             <p class="text-sm text-emerald-600 dark:text-emerald-400 font-bold italic underline decoration-emerald-500/30 underline-offset-4 cursor-default">${data.replacement || 'None found.'}</p>
         </div>
 
         ${data.remarks === 'ABSORBED' ? `
