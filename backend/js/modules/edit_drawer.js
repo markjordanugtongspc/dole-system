@@ -307,23 +307,17 @@ export function showEditBeneficiaryDrawer(data) {
             const dk = isDarkMode();
 
             if (status === 'ABSORBED') {
-                const dateStr = data.absorbDate || new Date().toLocaleString('en-US', {
-                    timeZone: 'Asia/Manila',
-                    month: 'short', day: '2-digit', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit', hour12: true
-                });
+                const d = (data.absorbDate && !String(data.absorbDate).includes('0000-00-00')) ? new Date(data.absorbDate) : new Date();
+                const tzOffset = d.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(d.getTime() - tzOffset)).toISOString().slice(0,16);
+                
                 extensionContainer.innerHTML = `
                     <div class="mt-4 pt-4 border-t ${dk ? 'border-slate-800' : 'border-gray-100'}">
                         <p class="text-[9px] uppercase font-black ${dk ? 'text-green-500' : 'text-[#2e7d32]'} border-b ${dk ? 'border-slate-800' : 'border-green-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> Absorption Details</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                             <div class="group">
-                                <label class="text-[9px] ${dk ? 'text-green-500' : 'text-[#2e7d32]'} font-black uppercase block mb-1">Absorption Date</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <svg class="w-3.5 h-3.5 ${dk ? 'text-green-400' : 'text-green-600'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                    </div>
-                                    <input type="text" name="absorbDate" value="${dateStr}" class="absorb-date-picker w-full ${dk ? 'bg-slate-800 text-white border-slate-700' : 'bg-green-50 text-slate-900 border-green-200'} rounded-lg pl-9 pr-3 py-2 text-[11px] font-bold focus:ring-2 focus:ring-brand outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY HH:MM AM/PM">
-                                </div>
+                                <label class="text-[9px] ${dk ? 'text-green-500' : 'text-[#2e7d32]'} font-black uppercase block mb-1 cursor-pointer" for="absorbDateInput">Absorption Date</label>
+                                <input type="datetime-local" id="absorbDateInput" name="absorbDate" value="${localISOTime}" class="w-full ${dk ? 'bg-slate-800 text-white border-slate-700' : 'bg-green-50 text-slate-900 border-green-200'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-2 focus:ring-brand outline-none transition-all shadow-sm font-mono cursor-pointer">
                             </div>
                             <div class="group">
                                 <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400'} font-black uppercase block mb-1">Where?</label>
@@ -343,23 +337,17 @@ export function showEditBeneficiaryDrawer(data) {
                     </div>
                 `;
             } else if (status === 'RESIGNED') {
-                const dateStr = data.resignedDate || new Date().toLocaleString('en-US', {
-                    timeZone: 'Asia/Manila',
-                    month: 'short', day: '2-digit', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit', hour12: true
-                });
+                const d = (data.resignedDate && !String(data.resignedDate).includes('0000-00-00')) ? new Date(data.resignedDate) : new Date();
+                const tzOffset = d.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(d.getTime() - tzOffset)).toISOString().slice(0,16);
+                
                 extensionContainer.innerHTML = `
                     <div class="mt-4 pt-4 border-t ${dk ? 'border-slate-800' : 'border-gray-100'}">
                         <p class="text-[9px] uppercase font-black ${dk ? 'text-red-500' : 'text-[#ce1126]'} border-b ${dk ? 'border-slate-800' : 'border-red-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg> Resignation Details</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
                             <div class="group">
-                                <label class="text-[9px] ${dk ? 'text-red-500' : 'text-[#ce1126]'} font-black uppercase block mb-1">Resignation Date</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <svg class="w-3.5 h-3.5 ${dk ? 'text-red-400' : 'text-red-600'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    </div>
-                                    <input type="text" name="resignedDate" value="${dateStr}" class="resign-date-picker w-full ${dk ? 'bg-slate-800 text-white border-slate-700' : 'bg-red-50 text-slate-900 border-red-200'} rounded-lg pl-9 pr-3 py-2 text-[11px] font-bold focus:ring-2 focus:ring-brand outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY HH:MM AM/PM">
-                                </div>
+                                <label class="text-[9px] ${dk ? 'text-red-500' : 'text-[#ce1126]'} font-black uppercase block mb-1 cursor-pointer" for="resignedDateInput">Resignation Date</label>
+                                <input type="datetime-local" id="resignedDateInput" name="resignedDate" value="${localISOTime}" class="w-full ${dk ? 'bg-slate-800 text-white border-slate-700' : 'bg-red-50 text-slate-900 border-red-200'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-2 focus:ring-brand outline-none transition-all shadow-sm font-mono cursor-pointer">
                             </div>
                             <div class="group">
                                 <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400'} font-black uppercase block mb-1">Reason (Optional)</label>
@@ -368,17 +356,6 @@ export function showEditBeneficiaryDrawer(data) {
                         </div>
                     </div>
                 `;
-            } else {
-                extensionContainer.innerHTML = '';
-            }
-
-            // Sync datepickers for the new inputs if library is loaded
-            const Picker = window.Datepicker || (typeof Datepicker !== 'undefined' ? Datepicker : null);
-            if (Picker) {
-                const newPickers = extensionContainer.querySelectorAll('.absorb-date-picker, .resign-date-picker');
-                newPickers.forEach(el => {
-                   new Picker(el, { format: 'M dd, yyyy', autohide: true, orientation: 'bottom' });
-                });
             }
         };
 

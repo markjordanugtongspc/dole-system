@@ -1350,22 +1350,17 @@ export function showAddDataModal(data = null) {
                 if (!extensionContainer) return;
                 const status = getSelectedRemarks();
                 if (status === 'ABSORBED') {
-                    const dateStr = data?.absorbDate || new Date().toLocaleString('en-US', {
-                        timeZone: 'Asia/Manila',
-                        month: 'short', day: '2-digit', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit', hour12: true
-                    });
+                    const d = (data?.absorbDate && !String(data.absorbDate).includes('0000-00-00')) ? new Date(data.absorbDate) : new Date();
+                    const tzOffset = d.getTimezoneOffset() * 60000;
+                    const localISOTime = (new Date(d.getTime() - tzOffset)).toISOString().slice(0,16);
+                    
                     extensionContainer.innerHTML = `
                         <div class="mt-4 pt-4 border-t ${dk ? 'border-slate-800' : 'border-gray-100'}">
                             <p class="text-[9px] uppercase font-black ${dk ? 'text-green-500' : 'text-[#2e7d32]'} border-b ${dk ? 'border-slate-800' : 'border-green-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> Absorption Details</p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                <div class="${dk ? 'bg-green-900/10 border-green-900/30' : 'bg-[#e8f5e9]/50 border-[#c8e6c9]'} rounded-lg p-2.5 flex items-center justify-between border">
-                                    <div>
-                                        <label class="text-[8px] ${dk ? 'text-green-500' : 'text-[#2e7d32]'} font-bold uppercase block mb-0.5">Absorption Date</label>
-                                        <p class="text-[10px] font-black ${dk ? 'text-green-400' : 'text-[#1b5e20]'} uppercase">${dateStr}</p>
-                                        <input type="hidden" name="absorbDate" value="${dateStr}">
-                                    </div>
-                                    <svg class="w-4 h-4 ${dk ? 'text-green-400' : 'text-[#2e7d32]'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <div class="group">
+                                    <label class="text-[9px] ${dk ? 'text-green-500' : 'text-[#2e7d32]'} font-black uppercase block mb-1 cursor-pointer" for="absorbDateModal">Absorption Date</label>
+                                    <input type="datetime-local" id="absorbDateModal" name="absorbDate" value="${localISOTime}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm font-mono cursor-pointer">
                                 </div>
                                 <div class="group">
                                     <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Where?</label>
@@ -1385,22 +1380,17 @@ export function showAddDataModal(data = null) {
                         </div>
                     `;
                 } else if (status === 'RESIGNED') {
-                    const dateStr = data?.resignedDate || new Date().toLocaleString('en-US', {
-                        timeZone: 'Asia/Manila',
-                        month: 'short', day: '2-digit', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit', hour12: true
-                    });
+                    const d = (data?.resignedDate && !String(data.resignedDate).includes('0000-00-00')) ? new Date(data.resignedDate) : new Date();
+                    const tzOffset = d.getTimezoneOffset() * 60000;
+                    const localISOTime = (new Date(d.getTime() - tzOffset)).toISOString().slice(0,16);
+                    
                     extensionContainer.innerHTML = `
                         <div class="mt-4 pt-4 border-t ${dk ? 'border-slate-800' : 'border-gray-100'}">
                             <p class="text-[9px] uppercase font-black ${dk ? 'text-red-500' : 'text-[#ce1126]'} border-b ${dk ? 'border-slate-800' : 'border-red-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg> Resignation Details</p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                <div class="${dk ? 'bg-red-900/10 border-red-900/30' : 'bg-[#ffebee]/50 border-[#ffcdd2]'} rounded-lg p-2.5 flex items-center justify-between border">
-                                    <div>
-                                        <label class="text-[8px] ${dk ? 'text-red-500' : 'text-[#ce1126]'} font-bold uppercase block mb-0.5">Resignation Date</label>
-                                        <p class="text-[10px] font-black ${dk ? 'text-red-400' : 'text-[#b71c1c]'} uppercase">${dateStr}</p>
-                                        <input type="hidden" name="resignedDate" value="${dateStr}">
-                                    </div>
-                                    <svg class="w-4 h-4 ${dk ? 'text-red-400' : 'text-[#ce1126]'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <div class="group">
+                                    <label class="text-[9px] ${dk ? 'text-red-500' : 'text-[#ce1126]'} font-black uppercase block mb-1 cursor-pointer" for="resignedDateModal">Resignation Date</label>
+                                    <input type="datetime-local" id="resignedDateModal" name="resignedDate" value="${localISOTime}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-red-500/10 focus:border-red-500' : 'focus:ring-[#ce1126]/10 focus:border-[#ce1126]'} outline-none transition-all shadow-sm font-mono cursor-pointer">
                                 </div>
                                 <div class="group">
                                     <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Reason (Optional)</label>

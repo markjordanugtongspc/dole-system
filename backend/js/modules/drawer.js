@@ -182,7 +182,12 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             <div class="flex flex-col gap-2">
                 <div class="flex justify-between items-start group">
                     <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4">Date</span>
-                    <span class="font-black text-[#1b5e20] dark:text-green-400 text-xs text-right whitespace-nowrap">${data.absorbDate ? (new Date(data.absorbDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })).toUpperCase() : 'N/A'}</span>
+                    <span class="font-black text-[#1b5e20] dark:text-green-400 text-xs text-right whitespace-nowrap">${(() => {
+                        if (!data.absorbDate || String(data.absorbDate).includes('0000-00-00')) return 'N/A';
+                        const d = new Date(data.absorbDate);
+                        if (isNaN(d.getTime()) || d.getFullYear() < 1900) return 'N/A';
+                        return (d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })).toUpperCase();
+                    })()}</span>
                 </div>
                 <div class="flex justify-between items-start group">
                     <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4 mt-0.5">Where</span>
@@ -209,7 +214,12 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             <div class="flex flex-col gap-2">
                 <div class="flex justify-between items-start group">
                     <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4">Date</span>
-                    <span class="font-black text-[#b71c1c] dark:text-red-400 text-xs text-right whitespace-nowrap">${data.resignedDate ? (new Date(data.resignedDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })).toUpperCase() : 'N/A'}</span>
+                    <span class="font-black text-[#b71c1c] dark:text-red-400 text-xs text-right whitespace-nowrap">${(() => {
+                        if (!data.resignedDate || String(data.resignedDate).includes('0000-00-00')) return 'N/A';
+                        const d = new Date(data.resignedDate);
+                        if (isNaN(d.getTime()) || d.getFullYear() < 1900) return 'N/A';
+                        return (d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })).toUpperCase();
+                    })()}</span>
                 </div>
                 <div class="flex justify-between items-start group">
                     <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4 mt-0.5">Reason</span>

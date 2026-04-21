@@ -672,6 +672,7 @@ if ($method === 'GET') {
                 // Update existing absorption log
                 $stmt = $pdo->prepare("
                     UPDATE absorption_logs SET 
+                        absorption_datetime = :absorbDate,
                         " . ($isSupabase ? "\"where\"" : "`where`") . " = :where, 
                         " . ($isSupabase ? "\"position\"" : "`position`") . " = :position, 
                         " . ($isSupabase ? "\"agency\"" : "`agency`") . " = :agency,
@@ -679,6 +680,7 @@ if ($method === 'GET') {
                     WHERE log_id = :log_id
                 ");
                 $stmt->execute([
+                    'absorbDate' => $absorbDate,
                     'where' => $data['absorb_where'] ?? null,
                     'position' => $data['absorb_position'] ?? null,
                     'agency' => $data['absorb_agency'] ?? null,
@@ -718,11 +720,13 @@ if ($method === 'GET') {
             } else {
                 $stmt = $pdo->prepare("
                     UPDATE resigned_logs SET 
+                        resignation_datetime = :resignedDate,
                         reason_description = :reason,
                         logged_by = :logged_by
                     WHERE log_id = :log_id
                 ");
                 $stmt->execute([
+                    'resignedDate' => $resignedDate,
                     'reason' => $data['resigned_reason'] ?? null,
                     'logged_by' => $current_user_id,
                     'log_id' => $existingLogId
