@@ -388,6 +388,23 @@ export function showEditBeneficiaryDrawer(data) {
             if (endDateInput) endDateInput._datepicker = rangePicker.datepickers[1];
         }
 
+        // Specifically fetch the latest start and end dates from backend to ensure data accuracy.
+        if (data.id) {
+            apiGet(`api/beneficiaries.php?id=${encodeURIComponent(data.id)}`).then(res => {
+                if (res.success && res.data && res.data.beneficiary) {
+                    const ben = res.data.beneficiary;
+                    if (startDateInput && ben.startDateFormatted) {
+                        startDateInput.value = ben.startDateFormatted;
+                        if (startDateInput._datepicker) startDateInput._datepicker.setDate(ben.startDateFormatted);
+                    }
+                    if (endDateInput && ben.endDateFormatted) {
+                        endDateInput.value = ben.endDateFormatted;
+                        if (endDateInput._datepicker) endDateInput._datepicker.setDate(ben.endDateFormatted);
+                    }
+                }
+            }).catch(err => console.error('Error fetching accurate beneficiary dates:', err));
+        }
+
         if (ageDisplay) {
             ageDisplay.addEventListener('input', () => ageManuallyEdited = true);
         }
