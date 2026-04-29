@@ -41,7 +41,9 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         name: data?.name || 'N/A',
         office: data?.office || 'N/A',
         remarks: data?.remarks || 'N/A',
-        designation: data?.designation || 'N/A'
+        designation: data?.designation || 'N/A',
+        designatedBeneficiary: data?.designatedBeneficiary || 'N/A',
+        relationshipToAssured: data?.relationshipToAssured || 'N/A'
     };
     const toastPosition = window.innerWidth < 640 ? 'top' : 'top-start';
 
@@ -130,6 +132,14 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             </div>
             <span class="text-[11px] lg:text-sm font-black text-heading whitespace-nowrap tracking-tight truncate" title="${data.education}">${data.education || 'N/A'}</span>
         </div>
+    </div>
+    <div class="flex justify-between items-start group pt-3 mt-1 border-t border-gray-50 dark:border-slate-800/60">
+        <span class="text-gray-500 font-medium whitespace-nowrap mr-4 mt-1">Designated Beneficiary</span>
+        <span class="${data.designatedBeneficiary !== 'N/A' ? 'font-black text-heading' : 'font-bold text-gray-300 italic'} text-right wrap-break-word leading-snug max-w-[60%] uppercase">${data.designatedBeneficiary}</span>
+    </div>
+    <div class="flex justify-between items-center group">
+        <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Relationship to Assured</span>
+        <span class="${data.relationshipToAssured !== 'N/A' ? 'font-black text-[#2e7d32] dark:text-green-400' : 'font-bold text-gray-300 italic'} text-right uppercase">${data.relationshipToAssured}</span>
     </div>
 </div>
 
@@ -385,6 +395,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
     if(drawerContainer) {
         // Destroy existing instance gracefully
         drawerContainer.remove();
+        document.documentElement.classList.remove('overflow-hidden');
+        document.body.classList.remove('overflow-hidden');
     }
     
     drawerContainer = document.createElement('div');
@@ -395,6 +407,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
     drawerContainer.innerHTML = drawerHtml;
     
     document.body.appendChild(drawerContainer);
+    document.documentElement.classList.add('overflow-hidden');
+    document.body.classList.add('overflow-hidden');
 
     import('flowbite').then(({ Drawer }) => {
         const options = {
@@ -405,6 +419,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             edgeOffset: '',
             backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-50',
             onHide: () => {
+                document.documentElement.classList.remove('overflow-hidden');
+                document.body.classList.remove('overflow-hidden');
                 setTimeout(() => {
                     if (drawerContainer && drawerContainer.parentNode) {
                         drawerContainer.remove();

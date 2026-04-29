@@ -650,6 +650,27 @@ export const COMMON_NATURE_OF_WORK = [
     "Project Monitoring Assist."
 ];
 
+export const ASSURED_RELATIONSHIPS = [
+    "MOTHER",
+    "FATHER",
+    "STEP MOTHER",
+    "STEP FATHER",
+    "BROTHER",
+    "SISTER",
+    "GRANDFATHER",
+    "GRANDMOTHER",
+    "SPOUSE",
+    "SON",
+    "DAUGHTER",
+    "UNCLE",
+    "AUNT",
+    "NEPHEW",
+    "NIECE",
+    "COUSIN",
+    "GUARDIAN",
+    "RELATIVE"
+];
+
 function calculateAge(birthday) {
     if (!birthday) return '';
     const birthDate = new Date(birthday);
@@ -853,6 +874,22 @@ export function showAddDataModal(data = null) {
                                 </div>
                             </div>
                         </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t ${dk ? 'border-slate-800/70' : 'border-gray-100'}">
+                            <div class="group">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Designated Beneficiary</label>
+                                <input type="text" name="designatedBeneficiary" value="${data?.designatedBeneficiary || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="Assured family member">
+                            </div>
+                            <div class="group">
+                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Relationship to Assured</label>
+                                <select name="relationshipToAssured" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm cursor-pointer appearance-none uppercase">
+                                    <option value="">SELECT RELATIONSHIP</option>
+                                    ${ASSURED_RELATIONSHIPS.map((relationship) => `
+                                        <option value="${relationship}" ${data?.relationshipToAssured === relationship ? 'selected' : ''}>${relationship}</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="pt-1">
@@ -1041,6 +1078,14 @@ export function showAddDataModal(data = null) {
             container: 'font-montserrat',
             popup: 'rounded-2xl ldn-modal-popup'
         },
+        willOpen: () => {
+            document.documentElement.classList.add('overflow-hidden');
+            document.body.classList.add('overflow-hidden');
+        },
+        didClose: () => {
+            document.documentElement.classList.remove('overflow-hidden');
+            document.body.classList.remove('overflow-hidden');
+        },
         didOpen: (popup) => {
             // [FLOWBITE FIX] Initialize Flowbite for dynamic modal content
             if (window.initFlowbite) window.initFlowbite();
@@ -1123,33 +1168,50 @@ export function showAddDataModal(data = null) {
             
             if (nameField && dupWarning) {
                 let dupTimer;
+                const getCurrentUserId = () => {
+                    try {
+                        return JSON.parse(localStorage.getItem('user') || '{}')?.id || null;
+                    } catch (e) {
+                        return null;
+                    }
+                };
+                const setDuplicateWarning = (visible, duplicateName = '') => {
+                    dupWarning.className = `mt-1 text-[10px] font-bold ${visible ? 'flex' : 'hidden'} items-center gap-1.5 animate-pulse ${isDarkMode() ? 'text-red-400' : 'text-red-600'}`;
+                    const label = dupWarning.querySelector('span');
+                    if (label) {
+                        label.textContent = duplicateName ? `Beneficiary already exists: ${duplicateName}` : 'Beneficiary already exists';
+                    }
+                };
+                const checkDuplicateName = async (name) => {
+                    const userId = getCurrentUserId();
+                    const response = await fetch(`${getBasePath()}api/check_duplicate.php`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(userId ? { 'X-User-Id': String(userId) } : {})
+                        },
+                        body: JSON.stringify({ name, user_id: userId, exclude_id: isEdit ? data?.id : null })
+                    });
+                    if (!response.ok) throw new Error(`Duplicate check failed (${response.status})`);
+                    return response.json();
+                };
+
                 nameField.addEventListener('input', (e) => {
                     const name = e.target.value.trim();
                     clearTimeout(dupTimer);
                     
                     if (name.length < 3) {
-                        dupWarning.classList.add('hidden');
+                        setDuplicateWarning(false);
                         return;
                     }
 
                     dupTimer = setTimeout(async () => {
                         try {
-                            const response = await fetch(`${getBasePath()}api/check_duplicate.php`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ name })
-                            });
-                            const res = await response.json();
-                            
+                            const res = await checkDuplicateName(name);
                             if (res.success && res.exists) {
-                                dupWarning.classList.remove('hidden');
-                                if (isDarkMode()) {
-                                    dupWarning.className = 'mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse text-red-400';
-                                } else {
-                                    dupWarning.className = 'mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse text-red-600';
-                                }
+                                setDuplicateWarning(true, res.match || res.name);
                             } else {
-                                dupWarning.classList.add('hidden');
+                                setDuplicateWarning(false);
                             }
                         } catch (err) {
                             console.error('Duplicate check error:', err);
@@ -1159,22 +1221,12 @@ export function showAddDataModal(data = null) {
                 
                 if (data?.name) {
                     // Trigger check for Pre-filled data
-                    dupWarning.classList.add('hidden');
+                    setDuplicateWarning(false);
                     // We call it manually to not wait for 500ms
                     (async () => {
-                        const res = await fetch(`${getBasePath()}api/check_duplicate.php`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ name: data.name })
-                        });
-                        const result = await res.json();
+                        const result = await checkDuplicateName(data.name);
                         if (result.success && result.exists) {
-                            dupWarning.classList.remove('hidden');
-                             if (isDarkMode()) {
-                                dupWarning.className = 'mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse text-red-400';
-                            } else {
-                                dupWarning.className = 'mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse text-red-600';
-                            }
+                            setDuplicateWarning(true, result.match || result.name);
                         }
                     })();
                 }
@@ -1190,28 +1242,6 @@ export function showAddDataModal(data = null) {
 
             const fetchNextIdentifiers = async (year) => {
                 if (!year) return;
-
-                const cacheKeyId = `cache_next_id_${year}`;
-                const cacheKeySeries = `cache_next_series_${year}`;
-                const cacheExpiryKey = `cache_expiry_${year}`;
-                
-                const now = Date.now();
-                const cachedId = localStorage.getItem(cacheKeyId);
-                const cachedSeries = localStorage.getItem(cacheKeySeries);
-                const cacheExpiry = localStorage.getItem(cacheExpiryKey);
-                
-                // LOCAL CACHE CHECK: If valid, update everything IMMEDIATELY and TOGETHER
-                // LOCAL CACHE CHECK
-                if (cachedId && cachedSeries && cacheExpiry && now < parseInt(cacheExpiry, 10)) {
-                    if (fullIdInput) {
-                        fullIdInput.value = cachedId;
-                        fullIdInput.classList.remove('placeholder:text-gray-300'); // Ensure it looks like a value
-                    }
-                    if (seriesNoInput) {
-                        seriesNoInput.value = cachedSeries;
-                    }
-                    return;
-                }
 
                 // ONLINE API: Parallel fetching to avoid "one by one" delay
                 const inputs = [fullIdInput, seriesNoInput].filter(Boolean);
@@ -1232,14 +1262,10 @@ export function showAddDataModal(data = null) {
                     // Apply both together
                     if (nextId && fullIdInput) {
                         fullIdInput.value = nextId;
-                        localStorage.setItem(cacheKeyId, nextId);
                     }
                     if (nextSeries && seriesNoInput) {
                         seriesNoInput.value = nextSeries;
-                        localStorage.setItem(cacheKeySeries, nextSeries);
                     }
-
-                    localStorage.setItem(cacheExpiryKey, (now + 300000).toString());
                 } catch (err) {
                     console.error('ID Sync error:', err);
                 } finally {
@@ -1410,10 +1436,7 @@ export function showAddDataModal(data = null) {
                     const selectedYear = parsed.getFullYear();
                     if (endDateInput) {
                         const end = new Date(parsed);
-                        // Add exactly 3 months
-                        end.setMonth(end.getMonth() + 3);
-                        // Add exactly 1 day
-                        end.setDate(end.getDate() + 1);
+                        end.setDate(end.getDate() + 182);
                         
                         const m = String(end.getMonth() + 1).padStart(2, '0');
                         const d = String(end.getDate()).padStart(2, '0');

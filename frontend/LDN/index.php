@@ -315,7 +315,7 @@ require_once __DIR__ . '/../../config/vite.php';
         if (localStorage.getItem('isLoggedIn') !== 'true') {
             const path = window.location.pathname;
             const base = path.includes('/dole-system/') ? path.substring(0, path.indexOf('/dole-system/') + '/dole-system/'.length) : '';
-            window.location.href = `${base}`;
+            window.location.href = `${base}${window.location.search}${window.location.hash}`;
         }
     </script>
 

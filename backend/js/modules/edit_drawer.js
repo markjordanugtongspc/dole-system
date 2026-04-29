@@ -2,7 +2,7 @@ import { isDarkMode } from './darkmode.js';
 import { getBasePath } from './auth.js';
 import { apiGet, apiRequest } from './ajax-manager.js';
 import Swal from 'sweetalert2';
-import { COMMON_COURSES, COMMON_NATURE_OF_WORK } from './modal.js';
+import { ASSURED_RELATIONSHIPS, COMMON_COURSES, COMMON_NATURE_OF_WORK } from './modal.js';
 
 export function showEditBeneficiaryDrawer(data) {
     const dk = isDarkMode();
@@ -120,6 +120,18 @@ export function showEditBeneficiaryDrawer(data) {
                 ${COMMON_COURSES.map(c => `<button type="button" class="edit-education-option w-full text-left px-3 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer"><span class="option-text">${c.name}</span></button>`).join('')}
             </div>
         </div>
+
+        <div class="flex justify-between items-start group pt-3 mt-1 border-t border-gray-50 dark:border-slate-800/60">
+            <span class="text-gray-500 font-medium whitespace-nowrap mr-4 mt-1 shrink-0">Designated Beneficiary</span>
+            <input type="text" name="designatedBeneficiary" value="${data.designatedBeneficiary || ''}" class="${inputClass} text-right max-w-[250px]" placeholder="Assured family member">
+        </div>
+        <div class="flex justify-between items-center group">
+            <span class="text-gray-500 font-medium whitespace-nowrap mr-4 shrink-0">Relationship to Assured</span>
+            <select name="relationshipToAssured" class="${inputClass} cursor-pointer max-w-[190px] text-right-select !pr-1 uppercase" style="direction: rtl;">
+                <option value=""></option>
+                ${ASSURED_RELATIONSHIPS.map((relationship) => `<option value="${relationship}" ${data.relationshipToAssured === relationship ? 'selected' : ''}>${relationship}</option>`).join('')}
+            </select>
+        </div>
     </div>
 
     <!-- Contract & Work Info Tab -->
@@ -218,6 +230,8 @@ export function showEditBeneficiaryDrawer(data) {
     let drawerContainer = document.getElementById('edit-drawer-container');
     if (drawerContainer) {
         drawerContainer.remove();
+        document.documentElement.classList.remove('overflow-hidden');
+        document.body.classList.remove('overflow-hidden');
     }
 
     drawerContainer = document.createElement('div');
@@ -227,6 +241,8 @@ export function showEditBeneficiaryDrawer(data) {
     drawerContainer.innerHTML = drawerHtml;
 
     document.body.appendChild(drawerContainer);
+    document.documentElement.classList.add('overflow-hidden');
+    document.body.classList.add('overflow-hidden');
 
     // Initial resize for textarea
     setTimeout(() => {
@@ -267,6 +283,8 @@ export function showEditBeneficiaryDrawer(data) {
             edgeOffset: '',
             backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-50',
             onHide: () => {
+                document.documentElement.classList.remove('overflow-hidden');
+                document.body.classList.remove('overflow-hidden');
                 setTimeout(() => {
                     if (drawerContainer && drawerContainer.parentNode) {
                         drawerContainer.remove();
@@ -420,8 +438,7 @@ export function showEditBeneficiaryDrawer(data) {
             setupDateMask(startDateInput, (start) => {
                 if (endDateInput) {
                     const end = new Date(start);
-                    end.setMonth(end.getMonth() + 3);
-                    end.setDate(end.getDate() + 1);
+                    end.setDate(end.getDate() + 182);
                     const m = String(end.getMonth() + 1).padStart(2, '0');
                     const d = String(end.getDate()).padStart(2, '0');
                     const y = end.getFullYear();
@@ -616,8 +633,7 @@ export function showEditBeneficiaryDrawer(data) {
             formData.forEach((v, k) => beneficiaryData[k] = v);
 
             beneficiaryData.id = data.id;
-            // Original modal checks form input for gip_id
-            beneficiaryData.gip_id = data.id;
+            beneficiaryData.gip_id = beneficiaryData.gip_id || data.id;
 
             if (window.addBeneficiaryData) {
                 (async () => {

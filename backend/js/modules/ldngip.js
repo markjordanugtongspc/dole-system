@@ -38,9 +38,11 @@ function translateDateToShortMonth(dateStr) {
 // Beneficiaries data loaded from database
 let beneficiaries = [];
 let lastDataChecksum = null; // For detecting data changes
-let currentPage = 1;
+const LDN_PAGE_SESSION_KEY = 'ldn_current_page';
+let currentPage = getPageFromUrl();
 const itemsPerPage = 10;
 let filteredDataGlobal = null; // Store current filtered state for pagination
+let isInitialDataHydrating = true;
 
 let currentStatusFilter = localStorage.getItem('ldn_status_filter') || 'ONGOING';
 let currentYearFilter = localStorage.getItem('ldn_year_filter') || 'ALL';
@@ -49,6 +51,33 @@ const FILTER_MODE_STORAGE_KEY = 'ldn_filter_mode';
 const DEFAULT_STATUS_FILTER = 'ONGOING';
 const DEFAULT_YEAR_FILTER = 'ALL';
 let filterModeEnabled = (localStorage.getItem(FILTER_MODE_STORAGE_KEY) || 'OFF') === 'ON';
+
+function getPageFromUrl() {
+    const page = Number.parseInt(new URLSearchParams(window.location.search).get('page') || '1', 10);
+    if (Number.isFinite(page) && page > 0) {
+        sessionStorage.setItem(LDN_PAGE_SESSION_KEY, String(page));
+        return page;
+    }
+
+    const storedPage = Number.parseInt(sessionStorage.getItem(LDN_PAGE_SESSION_KEY) || '1', 10);
+    if (Number.isFinite(storedPage) && storedPage > 1) {
+        syncPageToUrl(storedPage);
+        return storedPage;
+    }
+
+    return 1;
+}
+
+function syncPageToUrl(page) {
+    sessionStorage.setItem(LDN_PAGE_SESSION_KEY, String(page));
+    const url = new URL(window.location.href);
+    if (page > 1) {
+        url.searchParams.set('page', String(page));
+    } else {
+        url.searchParams.delete('page');
+    }
+    window.history.replaceState({}, '', url);
+}
 
 function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -167,6 +196,7 @@ export function applyFilters() {
         localStorage.setItem('ldn_year_filter', currentYearFilter);
     }
     currentPage = 1;
+    syncPageToUrl(currentPage);
     renderTable();
     
     const dropdown = document.getElementById('filter-dropdown');
@@ -292,6 +322,7 @@ async function loadBeneficiaries(forceRemoteRefresh = false) {
         const hasMissingDates = window.__ldn_hasMissingDates === true;
         if (!hasMissingDates) {
             console.log(`[Offline-First] Cache is fresh (${Math.round(msSinceSync / 1000)}s old), skipping remote fetch`);
+            isInitialDataHydrating = false;
             return; // Cache is good — don't hit the slow database
         }
         console.log('[Offline-First] Cache fresh but missing dates detected — refreshing remote');
@@ -330,6 +361,8 @@ async function loadBeneficiaries(forceRemoteRefresh = false) {
     } catch (error) {
         // Network error — that's fine, we already rendered from local cache
         console.warn('[Offline-First] Remote fetch failed (using local cache):', error.message);
+    } finally {
+        isInitialDataHydrating = false;
     }
 }
 
@@ -490,11 +523,15 @@ export function renderTable(dataToRender = null) {
     const totalItems = dataToRender.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     
-    // Ensure currentPage is within bounds
-    if (currentPage > totalPages) currentPage = totalPages || 1;
-    if (currentPage < 1) currentPage = 1;
+    // Keep requested page during initial hydration so URL/page won't collapse early.
+    const renderPage = Math.min(Math.max(currentPage, 1), totalPages || 1);
+    const wasAutoAdjusted = renderPage !== currentPage;
+    if (!(isInitialDataHydrating && wasAutoAdjusted && currentPage > 1)) {
+        currentPage = renderPage;
+        syncPageToUrl(currentPage);
+    }
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
+    const startIndex = (renderPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const pagedData = dataToRender.slice(startIndex, endIndex);
 
@@ -548,13 +585,13 @@ export function renderTable(dataToRender = null) {
         </tr>
     `).join('');
 
-    renderPagination(totalItems, totalPages);
+    renderPagination(totalItems, totalPages, renderPage);
     
     // Re-initialize Flowbite components after DOM update
     reinitFlowbite();
 }
 
-function renderPagination(totalItems, totalPages) {
+function renderPagination(totalItems, totalPages, activePage = currentPage) {
     const container = document.getElementById('pagination-controls');
     if (!container) return;
 
@@ -566,8 +603,8 @@ function renderPagination(totalItems, totalPages) {
         return;
     }
 
-    const startIdx = (currentPage - 1) * itemsPerPage + 1;
-    const endIdx = Math.min(currentPage * itemsPerPage, totalItems);
+    const startIdx = (activePage - 1) * itemsPerPage + 1;
+    const endIdx = Math.min(activePage * itemsPerPage, totalItems);
 
     container.innerHTML = `
         <span class="text-xs font-bold text-gray-500 px-2 py-1">
@@ -575,15 +612,15 @@ function renderPagination(totalItems, totalPages) {
         </span>
         <div class="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-100">
             <!-- Previous Button -->
-            <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
+            <button onclick="changePage(${activePage - 1})" ${activePage === 1 ? 'disabled' : ''} 
                 class="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:text-royal-blue hover:border-royal-blue/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
             </button>
             
-            ${generatePageNumbers(currentPage, totalPages)}
+            ${generatePageNumbers(activePage, totalPages)}
 
             <!-- Next Button -->
-            <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
+            <button onclick="changePage(${activePage + 1})" ${activePage === totalPages ? 'disabled' : ''} 
                 class="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:text-royal-blue hover:border-royal-blue/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </button>
@@ -621,6 +658,7 @@ function generatePageNumbers(current, total) {
 
 window.changePage = (page) => {
     currentPage = page;
+    syncPageToUrl(currentPage);
     renderTable(filteredDataGlobal);
 };
 
@@ -649,6 +687,7 @@ export function sortData(criteria, saveToStorage = true) {
             localStorage.setItem('ldn_sort_preference', criteria);
         }
         currentPage = 1;
+        syncPageToUrl(currentPage);
         renderTable(sortDatasetByCriteria(getFilteredBeneficiaries(), criteria));
 
         const dropdown = document.getElementById('sort-dropdown');
@@ -695,6 +734,7 @@ export function sortData(criteria, saveToStorage = true) {
     }
     
     currentPage = 1;
+    syncPageToUrl(currentPage);
     renderTable();
 
     // Auto-hide the dropdown menu
@@ -707,7 +747,7 @@ export function sortData(criteria, saveToStorage = true) {
 export async function addBeneficiary(data) {
     // ── STEP 1: Capitalize fields ──────────────────────────────────────────────
     const capitalizedData = { ...data };
-    const fieldsToCapitalize = ['name', 'address', 'education', 'designation'];
+    const fieldsToCapitalize = ['name', 'address', 'education', 'designation', 'designatedBeneficiary', 'relationshipToAssured'];
     fieldsToCapitalize.forEach(field => {
         if (capitalizedData[field] && typeof capitalizedData[field] === 'string') {
             capitalizedData[field] = capitalizedData[field].toUpperCase().trim();
@@ -862,6 +902,7 @@ function initSearch() {
 
     searchInput.addEventListener('input', (e) => {
         currentPage = 1;
+        syncPageToUrl(currentPage);
         renderTable();
         if (clearBtn) {
             clearBtn.classList.toggle('hidden', searchInput.value.length === 0);
@@ -872,6 +913,7 @@ function initSearch() {
         clearBtn.addEventListener('click', () => {
             searchInput.value = '';
             currentPage = 1;
+            syncPageToUrl(currentPage);
             renderTable();
             clearBtn.classList.add('hidden');
             searchInput.focus();

@@ -156,6 +156,10 @@ if ($method === 'GET') {
         $aliasIsArchived = $isSupabase ? '"isArchived"' : 'isArchived';
         $aliasCreatedAt = $isSupabase ? '"createdAt"' : 'createdAt';
         $aliasUpdatedAt = $isSupabase ? '"updatedAt"' : 'updatedAt';
+        $aliasDesignatedBeneficiary = $isSupabase ? '"designatedBeneficiary"' : 'designatedBeneficiary';
+        $aliasRelationshipToAssured = $isSupabase ? '"relationshipToAssured"' : 'relationshipToAssured';
+        $designatedBeneficiaryExpr = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'designated_beneficiary') ? 'b.designated_beneficiary' : 'NULL';
+        $relationshipToAssuredExpr = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'relationship_to_assured') ? 'b.relationship_to_assured' : 'NULL';
 
         if (isset($_GET['get_offices'])) {
             // Get all unique office names from both the dedicated table and direct column
@@ -267,6 +271,8 @@ if ($method === 'GET') {
                     {$ageExpr} as age,
                     g.gender_name as gender,
                     b.education,
+                    {$designatedBeneficiaryExpr} as {$aliasDesignatedBeneficiary},
+                    {$relationshipToAssuredExpr} as {$aliasRelationshipToAssured},
                     b.start_date as {$aliasStartDate},
                     b.end_date as {$aliasEndDate},
                     {$startDateFmtExpr} as {$aliasStartDateFormatted},
@@ -328,6 +334,8 @@ if ($method === 'GET') {
                     {$ageExpr} as age,
                     g.gender_name as gender,
                     b.education,
+                    {$designatedBeneficiaryExpr} as {$aliasDesignatedBeneficiary},
+                    {$relationshipToAssuredExpr} as {$aliasRelationshipToAssured},
                     b.start_date as {$aliasStartDate},
                     b.end_date as {$aliasEndDate},
                     {$startDateFmtExpr} as {$aliasStartDateFormatted},
@@ -495,6 +503,12 @@ if ($method === 'GET') {
         // Audit columns (only if present in schema)
         $hasCreatedBy = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'created_by');
         $hasUpdatedBy = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'updated_by');
+        $hasDesignatedBeneficiary = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'designated_beneficiary');
+        $hasRelationshipToAssured = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'relationship_to_assured');
+        $beneficiaryExtraColumns = ($hasDesignatedBeneficiary ? ", designated_beneficiary" : "") .
+            ($hasRelationshipToAssured ? ", relationship_to_assured" : "");
+        $beneficiaryExtraValues = ($hasDesignatedBeneficiary ? ", :designated_beneficiary" : "") .
+            ($hasRelationshipToAssured ? ", :relationship_to_assured" : "");
 
         // Insert beneficiary with RETURNING beneficiary_id
         if ($isSupabase) {
@@ -503,12 +517,14 @@ if ($method === 'GET') {
                     gip_id, full_name, contact_number, address, birthday, age,
                     gender_id, education, start_date, end_date, series_number,
                     office_id, office_name, designation, replacement_notes, status_id, absorption_log_id, resigned_log_id
+                    " . $beneficiaryExtraColumns . "
                     " . ($hasCreatedBy ? ", created_by" : "") . "
                     " . ($hasUpdatedBy ? ", updated_by" : "") . "
                 ) VALUES (
                     :gip_id, :name, :contact, :address, :birthday, :age,
                     :gender_id, :education, :start_date, :end_date, :series_no,
                     :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id, :resigned_log_id
+                    " . $beneficiaryExtraValues . "
                     " . ($hasCreatedBy ? ", :created_by" : "") . "
                     " . ($hasUpdatedBy ? ", :updated_by" : "") . "
                 ) RETURNING beneficiary_id
@@ -519,12 +535,14 @@ if ($method === 'GET') {
                     gip_id, full_name, contact_number, address, birthday, age,
                     gender_id, education, start_date, end_date, series_number,
                     office_id, office_name, designation, replacement_notes, status_id, absorption_log_id, resigned_log_id
+                    " . $beneficiaryExtraColumns . "
                     " . ($hasCreatedBy ? ", created_by" : "") . "
                     " . ($hasUpdatedBy ? ", updated_by" : "") . "
                 ) VALUES (
                     :gip_id, :name, :contact, :address, :birthday, :age,
                     :gender_id, :education, :start_date, :end_date, :series_no,
                     :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id, :resigned_log_id
+                    " . $beneficiaryExtraValues . "
                     " . ($hasCreatedBy ? ", :created_by" : "") . "
                     " . ($hasUpdatedBy ? ", :updated_by" : "") . "
                 )
@@ -556,6 +574,8 @@ if ($method === 'GET') {
                 'absorption_log_id' => $absorptionLogId,
                 'resigned_log_id' => $resignedLogId
             ];
+            if ($hasDesignatedBeneficiary) $params['designated_beneficiary'] = $data['designatedBeneficiary'] ?? null;
+            if ($hasRelationshipToAssured) $params['relationship_to_assured'] = $data['relationshipToAssured'] ?? null;
             if ($hasCreatedBy) $params['created_by'] = $current_user_id;
             if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
 
@@ -737,6 +757,10 @@ if ($method === 'GET') {
 
         // Update beneficiary
         $hasUpdatedBy = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'updated_by');
+        $hasDesignatedBeneficiary = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'designated_beneficiary');
+        $hasRelationshipToAssured = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'relationship_to_assured');
+        $beneficiaryExtraSet = ($hasDesignatedBeneficiary ? ", designated_beneficiary = :designated_beneficiary" : "") .
+            ($hasRelationshipToAssured ? ", relationship_to_assured = :relationship_to_assured" : "");
         $stmt = $pdo->prepare("
             UPDATE beneficiaries SET
                 gip_id = :new_gip_id,
@@ -757,6 +781,7 @@ if ($method === 'GET') {
                 status_id = :status_id,
                 absorption_log_id = COALESCE(:absorption_log_id, absorption_log_id),
                 resigned_log_id = COALESCE(:resigned_log_id, resigned_log_id)
+                " . $beneficiaryExtraSet . "
                 " . ($hasUpdatedBy ? ", updated_by = :updated_by" : "") . "
             WHERE gip_id = :old_id
         ");
@@ -782,6 +807,8 @@ if ($method === 'GET') {
             'absorption_log_id' => $absorptionLogId,
             'resigned_log_id' => $resignedLogId
         ];
+        if ($hasDesignatedBeneficiary) $params['designated_beneficiary'] = $data['designatedBeneficiary'] ?? null;
+        if ($hasRelationshipToAssured) $params['relationship_to_assured'] = $data['relationshipToAssured'] ?? null;
         if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
         $stmt->execute($params);
 

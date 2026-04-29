@@ -249,10 +249,19 @@ export const BulkApp = {
                 });
                 
                 const names = this.queue.map(item => item.name);
+                let userId = null;
+                try {
+                    userId = JSON.parse(localStorage.getItem('user') || '{}')?.id || null;
+                } catch (e) {
+                    userId = null;
+                }
                 const checkResponse = await fetch(`${getBasePath()}api/check_duplicate.php`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ names: names })
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(userId ? { 'X-User-Id': String(userId) } : {})
+                    },
+                    body: JSON.stringify({ names: names, user_id: userId })
                 });
                 const checkResult = await checkResponse.json();
                 
