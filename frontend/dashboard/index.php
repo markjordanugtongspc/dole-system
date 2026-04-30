@@ -105,7 +105,7 @@ require_once __DIR__ . '/../../config/vite.php';
     <?php include __DIR__ . '/../components/sidebar/index.php'; ?>
 
     <div class="px-1 sm:px-4 sm:ml-64 mt-14">
-        <div class="px-1 py-6 sm:p-6 min-h-screen">
+        <div class="px-1 py-6 sm:p-6">
 
             <!-- Page Header -->
             <!-- Page Header (Premium Modern Facelift) -->

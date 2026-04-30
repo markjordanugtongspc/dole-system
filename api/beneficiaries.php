@@ -574,8 +574,8 @@ if ($method === 'GET') {
                 'absorption_log_id' => $absorptionLogId,
                 'resigned_log_id' => $resignedLogId
             ];
-            if ($hasDesignatedBeneficiary) $params['designated_beneficiary'] = $data['designatedBeneficiary'] ?? null;
-            if ($hasRelationshipToAssured) $params['relationship_to_assured'] = $data['relationshipToAssured'] ?? null;
+            if ($hasDesignatedBeneficiary) $params['designated_beneficiary'] = ($data['designatedBeneficiary'] ?? '') !== '' ? $data['designatedBeneficiary'] : null;
+            if ($hasRelationshipToAssured) $params['relationship_to_assured'] = ($data['relationshipToAssured'] ?? '') !== '' ? $data['relationshipToAssured'] : null;
             if ($hasCreatedBy) $params['created_by'] = $current_user_id;
             if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
 
@@ -807,8 +807,8 @@ if ($method === 'GET') {
             'absorption_log_id' => $absorptionLogId,
             'resigned_log_id' => $resignedLogId
         ];
-        if ($hasDesignatedBeneficiary) $params['designated_beneficiary'] = $data['designatedBeneficiary'] ?? null;
-        if ($hasRelationshipToAssured) $params['relationship_to_assured'] = $data['relationshipToAssured'] ?? null;
+        if ($hasDesignatedBeneficiary) $params['designated_beneficiary'] = ($data['designatedBeneficiary'] ?? '') !== '' ? $data['designatedBeneficiary'] : null;
+        if ($hasRelationshipToAssured) $params['relationship_to_assured'] = ($data['relationshipToAssured'] ?? '') !== '' ? $data['relationshipToAssured'] : null;
         if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
         $stmt->execute($params);
 

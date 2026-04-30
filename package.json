@@ -1,6 +1,6 @@
 {
   "name": "dole-system",
-  "version": "6.9.1",
+  "version": "7.0.0",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build"

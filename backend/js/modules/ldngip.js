@@ -375,7 +375,7 @@ export function initLDNPage() {
     initLDNHeader();
     initSearch();
     initFilterControls();
-    initAutoRefresh(); // Start real-time polling
+    // initAutoRefresh(); // Removed as per user request to rely on Supabase Realtime instead
 
     // Wire the Export Logs button
     const exportBtn = document.getElementById('ldn-export-logs-btn');
