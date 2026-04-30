@@ -1,6 +1,7 @@
 import { getBasePath } from './auth.js';
 import { isDarkMode } from './darkmode.js';
 import { apiPost, apiPut, apiRequest } from './ajax-manager.js';
+import { generateExcelExport } from './logs-export.js';
 import Swal from 'sweetalert2';
 
 function calculateAge(birthday) {
@@ -297,6 +298,10 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 <button type="button" id="add-ar-log-btn" class="bg-orange-50 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300 border border-orange-200 dark:border-orange-800 hover:bg-orange-500 hover:text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap">
                     + AR
                 </button>
+                <button type="button" id="export-log-btn" class="bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-500 hover:text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    EXPORT
+                </button>
             </div>
          </div>
 
@@ -320,8 +325,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                             if (!isNaN(isoDate)) displayDate = isoDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'Asia/Manila' }).toUpperCase();
                         }
                         return `
-                        <div class="flex justify-between items-center p-3 rounded-xl border border-blue-100 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors edit-log-btn" data-type="dtr" data-id="${l.id}" data-val="${rawStr}" data-status="${s}">
-                            <span class="text-xs font-black text-royal-blue dark:text-blue-400 capitalize whitespace-nowrap pointer-events-none">${displayDate}</span>
+                        <div class="flex justify-between items-center p-3 rounded-xl border border-blue-100 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors edit-log-btn" data-type="dtr" data-id="${l.id}" data-val="${l.day || rawStr}" data-status="${s}">
+                            <span class="text-xs font-black text-royal-blue dark:text-blue-400 capitalize whitespace-nowrap pointer-events-none">${l.day || displayDate}</span>
                             <span class="text-[11px] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
                             <button class="absolute top-0 right-0 h-full w-10 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform cursor-pointer delete-log-btn" data-type="dtr" data-id="${l.id}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -351,7 +356,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                         }
                         return `
                         <div class="flex justify-between items-center p-3 rounded-xl border border-orange-100 dark:border-orange-900/50 bg-orange-50/50 dark:bg-orange-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors edit-log-btn" data-type="ar" data-id="${l.id}" data-val="${rawStr}" data-status="${s}">
-                            <span class="text-xs font-black text-orange-600 dark:text-orange-400 capitalize whitespace-nowrap pointer-events-none">${displayDate}</span>
+                            <span class="text-xs font-black text-orange-600 dark:text-orange-400 capitalize whitespace-nowrap pointer-events-none">${rawStr || displayDate}</span>
                             <span class="text-[11px] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
                             <button class="absolute top-0 right-0 h-full w-10 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform cursor-pointer delete-log-btn" data-type="ar" data-id="${l.id}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -553,35 +558,106 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             });
         });
 
+        // Philippine Public Holidays 2026 (ISO date strings)
+        const PH_HOLIDAYS = new Set([
+            '2026-01-01','2026-04-02','2026-04-03','2026-04-09',
+            '2026-05-01','2026-06-12','2026-08-24','2026-08-31',
+            '2026-11-01','2026-11-30','2026-12-25','2026-12-30','2026-12-31',
+        ]);
+        const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+        function isWorkday(dateStr) {
+            const d = new Date(dateStr + 'T00:00:00');
+            const dow = d.getDay();
+            return dow !== 0 && dow !== 6 && !PH_HOLIDAYS.has(dateStr);
+        }
+
+        function computePeriodLabel(date) {
+            const day = date.getDate();
+            const m = MONTHS[date.getMonth()];
+            const y = date.getFullYear();
+            const lastDay = new Date(y, date.getMonth() + 1, 0).getDate();
+            return day <= 15 ? `${m} 1-15, ${y}` : `${m} 16-${lastDay}, ${y}`;
+        }
+
         const getNextDTRDate = () => {
-            if (!dtrLogs.length) return new Date().toISOString().split('T')[0];
-            const lastDate = new Date(dtrLogs[0].date);
-            lastDate.setDate(lastDate.getDate() + 1);
-            return lastDate.toISOString().split('T')[0];
+            const today = new Date();
+            if (!dtrLogs.length) return computePeriodLabel(today);
+
+            let maxVal = -1;
+            let maxLabel = '';
+
+            const parseToVal = (label) => {
+                const match = (label || '').toUpperCase().match(/([A-Z]{3})\s+(\d+)-(\d+),\s*(\d{4})/);
+                if (!match) return -1;
+                const mIdx = MONTHS.indexOf(match[1]);
+                const pType = parseInt(match[2]) === 1 ? 0 : 1;
+                const year = parseInt(match[4]);
+                return (year * 100) + (mIdx * 2) + pType;
+            };
+
+            dtrLogs.forEach(l => {
+                const label = l.day || l.date || '';
+                const v = parseToVal(label);
+                if (v > maxVal) { maxVal = v; maxLabel = label; }
+            });
+
+            if (maxVal === -1) return computePeriodLabel(today);
+
+            const match = maxLabel.toUpperCase().match(/([A-Z]{3})\s+(\d+)-(\d+),\s*(\d{4})/);
+            const mIdx = MONTHS.indexOf(match[1]);
+            const p1 = parseInt(match[2]);
+            const year = parseInt(match[4]);
+            
+            if (p1 === 1) {
+                const lastDay = new Date(year, mIdx + 1, 0).getDate();
+                return `${MONTHS[mIdx]} 16-${lastDay}, ${year}`;
+            } else {
+                const nextMIdx = (mIdx + 1) % 12;
+                const nextYear = mIdx === 11 ? year + 1 : year;
+                return `${MONTHS[nextMIdx]} 1-15, ${nextYear}`;
+            }
         };
 
+        /**
+         * Returns the next AR period label (identical logic to DTR).
+         */
         const getNextARPeriod = () => {
-            if (!arLogs.length) {
-                const today = new Date();
-                const m = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][today.getMonth()];
-                return today.getDate() <= 15 ? `${m} 1-15` : `${m} 16-${new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()}`;
+            const today = new Date();
+            if (!arLogs.length) return computePeriodLabel(today);
+
+            let maxVal = -1;
+            let maxLabel = '';
+
+            const parseToVal = (label) => {
+                const match = (label || '').toUpperCase().match(/([A-Z]{3})\s+(\d+)-(\d+),\s*(\d{4})/);
+                if (!match) return -1;
+                const mIdx = MONTHS.indexOf(match[1]);
+                const pType = parseInt(match[2]) === 1 ? 0 : 1;
+                const year = parseInt(match[4]);
+                return (year * 100) + (mIdx * 2) + pType;
+            };
+
+            arLogs.forEach(l => {
+                const v = parseToVal(l.period);
+                if (v > maxVal) { maxVal = v; maxLabel = l.period; }
+            });
+
+            if (maxVal === -1) return computePeriodLabel(today);
+
+            const match = maxLabel.toUpperCase().match(/([A-Z]{3})\s+(\d+)-(\d+),\s*(\d{4})/);
+            const mIdx = MONTHS.indexOf(match[1]);
+            const p1 = parseInt(match[2]);
+            const year = parseInt(match[4]);
+            
+            if (p1 === 1) {
+                const lastDay = new Date(year, mIdx + 1, 0).getDate();
+                return `${MONTHS[mIdx]} 16-${lastDay}, ${year}`;
+            } else {
+                const nextMIdx = (mIdx + 1) % 12;
+                const nextYear = mIdx === 11 ? year + 1 : year;
+                return `${MONTHS[nextMIdx]} 1-15, ${nextYear}`;
             }
-            const lastPeriod = arLogs[0].period || '';
-            const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-            const match = lastPeriod.toUpperCase().match(/([A-Z]{3})\s+(\d+)-(\d+)/);
-            if(match) {
-                let m = match[1], p1 = parseInt(match[2]);
-                let mIdx = months.indexOf(m);
-                if(mIdx !== -1) {
-                    if(p1 === 1) {
-                        return `${m} 16-${new Date(new Date().getFullYear(), mIdx + 1, 0).getDate()}`;
-                    } else {
-                        let nextM = months[(mIdx + 1) % 12];
-                        return `${nextM} 1-15`;
-                    }
-                }
-            }
-            return 'NEW PERIOD';
         };
 
         // Add Logic Auto
@@ -592,7 +668,23 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 const payload = {
                     gip_id: data.id
                 };
-                if (dbType === 'dtr') payload.record_date = autoVal;
+                // For DTR: send a proxy date (1st of period) + the period label as weekday
+                if (dbType === 'dtr') {
+                    // Parse period label to get a record_date
+                    const pMatch = autoVal.toUpperCase().match(/([A-Z]{3})\s+(\d+)-\d+,\s*(\d{4})/);
+                    if (pMatch) {
+                        const mIdx = MONTHS.indexOf(pMatch[1]);
+                        const startDay = parseInt(pMatch[2]);
+                        const year = parseInt(pMatch[3]);
+                        // Use the first workday of the period as record_date
+                        let rd = new Date(year, mIdx, startDay);
+                        while (!isWorkday(rd.toISOString().split('T')[0])) { rd.setDate(rd.getDate() + 1); }
+                        payload.record_date = rd.toISOString().split('T')[0];
+                    } else {
+                        payload.record_date = new Date().toISOString().split('T')[0];
+                    }
+                    payload.weekday = autoVal; // period label stored as weekday
+                }
                 if (dbType === 'ar') payload.period = autoVal;
 
                 const result = await apiPost(`api/logs.php?type=${dbType}`, payload);
@@ -668,7 +760,21 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             if (formValues && (formValues.val !== currentVal || formValues.status !== currentStatus)) {
                 try {
                     const payload = { type: dbType, id: logId, status: formValues.status };
-                    if (dbType === 'dtr') payload.record_date = formValues.val;
+                    if (dbType === 'dtr') {
+                        // Parse period label to get a record_date
+                        const pMatch = formValues.val.toUpperCase().match(/([A-Z]{3})\s+(\d+)-\d+,\s*(\d{4})/);
+                        if (pMatch) {
+                            const mIdx = MONTHS.indexOf(pMatch[1]);
+                            const startDay = parseInt(pMatch[2]);
+                            const year = parseInt(pMatch[3]);
+                            let rd = new Date(year, mIdx, startDay);
+                            while (!isWorkday(rd.toISOString().split('T')[0])) { rd.setDate(rd.getDate() + 1); }
+                            payload.record_date = rd.toISOString().split('T')[0];
+                        } else {
+                            payload.record_date = new Date().toISOString().split('T')[0];
+                        }
+                        payload.weekday = formValues.val;
+                    }
                     if (dbType === 'ar') payload.period = formValues.val;
 
                     const result = await apiPut(`api/logs.php`, payload);
@@ -689,6 +795,69 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         
         const addArBtn = drawerContainer.querySelector('#add-ar-log-btn');
         if (addArBtn) addArBtn.addEventListener('click', () => autoAddLog('ar', getNextARPeriod()));
+
+        const exportLogBtn = drawerContainer.querySelector('#export-log-btn');
+        if (exportLogBtn) {
+            exportLogBtn.addEventListener('click', async () => {
+                const btnBase = "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[11px] gap-2 ";
+                const result = await Swal.fire({
+                    title: '<span class="text-xl font-black text-heading uppercase tracking-tight">Export Logs</span>',
+                    html: `
+                        <div class="font-montserrat text-left">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-4 ps-1">Select the type of log to export for <span class="text-brand font-black">ALL DATA</span></label>
+                            
+                            <div class="grid grid-cols-3 gap-2">
+                                <label class="relative block cursor-pointer">
+                                    <input type="radio" name="swal-export-type" value="dtr" class="peer sr-only" checked>
+                                    <div class="${btnBase} border-gray-100 bg-gray-50 text-gray-400 dark:border-slate-700 dark:bg-slate-800/50 dark:text-gray-500 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 dark:peer-checked:bg-blue-900/20 dark:peer-checked:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-slate-700">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span>DTR</span>
+                                    </div>
+                                </label>
+
+                                <label class="relative block cursor-pointer">
+                                    <input type="radio" name="swal-export-type" value="ar" class="peer sr-only">
+                                    <div class="${btnBase} border-gray-100 bg-gray-50 text-gray-400 dark:border-slate-700 dark:bg-slate-800/50 dark:text-gray-500 peer-checked:border-orange-500 peer-checked:bg-orange-50 peer-checked:text-orange-600 dark:peer-checked:bg-orange-900/20 dark:peer-checked:text-orange-400 hover:bg-orange-50/50 dark:hover:bg-slate-700">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        <span>AR</span>
+                                    </div>
+                                </label>
+
+                                <label class="relative block cursor-pointer">
+                                    <input type="radio" name="swal-export-type" value="both" class="peer sr-only">
+                                    <div class="${btnBase} border-gray-100 bg-gray-50 text-gray-400 dark:border-slate-700 dark:bg-slate-800/50 dark:text-gray-500 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-600 dark:peer-checked:bg-emerald-900/20 dark:peer-checked:text-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-slate-700">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+                                        <span>BOTH</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: '<span class="font-black uppercase tracking-widest cursor-pointer">Generate Export</span>',
+                    cancelButtonText: '<span class="font-black uppercase tracking-widest cursor-pointer">Cancel</span>',
+                    customClass: {
+                        container: 'font-montserrat',
+                        popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100 dark:border-slate-800 dark:bg-slate-900',
+                        confirmButton: 'bg-emerald-600 text-white hover:bg-emerald-700 text-xs px-6 py-2.5 rounded-xl border border-transparent shadow-sm mx-2 cursor-pointer',
+                        cancelButton: 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 text-xs px-6 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 shadow-sm mx-2 cursor-pointer'
+                    },
+                    buttonsStyling: false,
+                    preConfirm: () => {
+                        const selected = document.querySelector('input[name="swal-export-type"]:checked');
+                        return selected ? selected.value : null;
+                    }
+                });
+
+                if (result.isConfirmed && result.value) {
+                    const exportType = result.value;
+                    const year = new Date().getFullYear(); // Just use current year for individual export
+                    
+                    // Call the same Excel generation function used in bulk export!
+                    await generateExcelExport([data], exportType, year);
+                }
+            });
+        }
 
         drawerContainer.querySelectorAll('.edit-log-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {

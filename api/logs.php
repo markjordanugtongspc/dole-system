@@ -74,14 +74,15 @@ if ($method === 'GET') {
 
         if ($type === 'ar') {
             // Get Accomplishment Reports
-            $query = "SELECT ar_id as id, period, date_submitted as date, status, created_at, updated_at 
-                      FROM accomplishment_reports";
+            $query = "SELECT ar.ar_id as id, ar.beneficiary_id, b.gip_id, ar.period, ar.date_submitted as date, ar.status, ar.created_at, ar.updated_at 
+                      FROM accomplishment_reports ar
+                      JOIN beneficiaries b ON ar.beneficiary_id = b.beneficiary_id";
 
             if ($beneficiaryId) {
-                $query .= " WHERE beneficiary_id = :beneficiary_id";
+                $query .= " WHERE ar.beneficiary_id = :beneficiary_id";
             }
 
-            $query .= " ORDER BY date_submitted DESC";
+            $query .= " ORDER BY ar.date_submitted DESC";
 
             $stmt = $pdo->prepare($query);
             if ($beneficiaryId) {
@@ -95,14 +96,15 @@ if ($method === 'GET') {
 
         } elseif ($type === 'dtr') { // dtr
             // Get Daily Time Records
-            $query = "SELECT dtr_id as id, record_date as date, weekday as day, status, created_at, updated_at 
-                      FROM daily_time_records";
+            $query = "SELECT dtr.dtr_id as id, dtr.beneficiary_id, b.gip_id, dtr.record_date as date, dtr.weekday as day, dtr.status, dtr.created_at, dtr.updated_at 
+                      FROM daily_time_records dtr
+                      JOIN beneficiaries b ON dtr.beneficiary_id = b.beneficiary_id";
 
             if ($beneficiaryId) {
-                $query .= " WHERE beneficiary_id = :beneficiary_id";
+                $query .= " WHERE dtr.beneficiary_id = :beneficiary_id";
             }
 
-            $query .= " ORDER BY record_date DESC";
+            $query .= " ORDER BY dtr.record_date DESC";
 
             $stmt = $pdo->prepare($query);
             if ($beneficiaryId) {
@@ -264,7 +266,21 @@ if ($method === 'GET') {
         } elseif ($type === 'dtr') { // dtr
             // Create Daily Time Record
             $recordDate = $data['record_date'] ?? date('Y-m-d');
-            $weekday = $data['weekday'] ?? strtoupper(date('l', strtotime($recordDate)));
+            // weekday now stores the 15-day period label e.g. "APR 1-15, 2026"
+            $weekday = $data['weekday'] ?? $data['period'] ?? '';
+            if (!$weekday) {
+                // Auto-compute period label from the record_date
+                $d = new DateTime($recordDate);
+                $day = (int)$d->format('j');
+                $monthStr = strtoupper($d->format('M'));
+                $year = $d->format('Y');
+                $lastDayOfMonth = (int)$d->format('t');
+                if ($day <= 15) {
+                    $weekday = "{$monthStr} 1-15, {$year}";
+                } else {
+                    $weekday = "{$monthStr} 16-{$lastDayOfMonth}, {$year}";
+                }
+            }
             $status = $data['status'] ?? 'PENDING';
 
             $stmt_check = $pdo->prepare("SELECT dtr_id FROM daily_time_records WHERE beneficiary_id = :beneficiary_id AND record_date = :record_date");
@@ -383,9 +399,21 @@ if ($method === 'GET') {
             if ($status) { $updateFields[] = "status = :status"; $params['status'] = $status; }
             if ($recordDate) { 
                 $updateFields[] = "record_date = :record_date"; 
-                $updateFields[] = "weekday = :weekday";
                 $params['record_date'] = $recordDate; 
-                $params['weekday'] = strtoupper(date('l', strtotime($recordDate)));
+            }
+            if (!empty($data['weekday'])) {
+                $updateFields[] = "weekday = :weekday";
+                $params['weekday'] = strtoupper($data['weekday']);
+            } elseif ($recordDate) {
+                // Auto-compute period label if not provided
+                $d = new DateTime($recordDate);
+                $day = (int)$d->format('j');
+                $monthStr = strtoupper($d->format('M'));
+                $year = $d->format('Y');
+                $lastDayOfMonth = (int)$d->format('t');
+                $newWeekday = ($day <= 15) ? "{$monthStr} 1-15, {$year}" : "{$monthStr} 16-{$lastDayOfMonth}, {$year}";
+                $updateFields[] = "weekday = :weekday";
+                $params['weekday'] = $newWeekday;
             }
             
             if (empty($updateFields)) {

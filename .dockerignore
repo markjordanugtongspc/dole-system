@@ -18,6 +18,10 @@ docker-compose.yml
 docker-compose.override.yml
 .dockerignore
 
+# Local-only DB init files (not needed — using Supabase)
+config/database_schema.sql
+config/sample_data.sql
+
 # IDEs and OS
 .vscode
 .idea

@@ -12,6 +12,7 @@ import {
     enqueueSync,
 } from './db-manager.js';
 import { processQueue } from './sync-manager.js';
+import { showLogsExportModal } from './logs-export.js';
 import Swal from 'sweetalert2';
 
 /**
@@ -53,18 +54,10 @@ const DEFAULT_YEAR_FILTER = 'ALL';
 let filterModeEnabled = (localStorage.getItem(FILTER_MODE_STORAGE_KEY) || 'OFF') === 'ON';
 
 function getPageFromUrl() {
-    const page = Number.parseInt(new URLSearchParams(window.location.search).get('page') || '1', 10);
-    if (Number.isFinite(page) && page > 0) {
-        sessionStorage.setItem(LDN_PAGE_SESSION_KEY, String(page));
-        return page;
+    const urlPage = Number.parseInt(new URLSearchParams(window.location.search).get('page') || '1', 10);
+    if (Number.isFinite(urlPage) && urlPage > 0) {
+        return urlPage;
     }
-
-    const storedPage = Number.parseInt(sessionStorage.getItem(LDN_PAGE_SESSION_KEY) || '1', 10);
-    if (Number.isFinite(storedPage) && storedPage > 1) {
-        syncPageToUrl(storedPage);
-        return storedPage;
-    }
-
     return 1;
 }
 
@@ -384,6 +377,14 @@ export function initLDNPage() {
     initFilterControls();
     initAutoRefresh(); // Start real-time polling
 
+    // Wire the Export Logs button
+    const exportBtn = document.getElementById('ldn-export-logs-btn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            showLogsExportModal(beneficiaries);
+        });
+    }
+
     // Ensure table refreshes immediately after offline queue sync success.
     window.addEventListener('dataSynced', () => {
         loadBeneficiaries(true);
@@ -639,7 +640,16 @@ function generatePageNumbers(current, total) {
         start = Math.max(1, end - maxVisible + 1);
     }
 
-    if (start > 1) html += `<span class="px-2 text-gray-400">...</span>`;
+    // Replace leading "..." with a jump input
+    if (start > 1) {
+        html += `
+            <input type="number" min="1" max="${total}" value="" placeholder="..."
+                class="w-12 h-8 text-center text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-600 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all"
+                title="Jump to page" aria-label="Jump to page"
+                onkeydown="if(event.key==='Enter'){const p=Math.min(${total},Math.max(1,parseInt(this.value)||1));if(p)window.changePage(p);}"
+                onfocus="this.select()">
+        `;
+    }
 
     for (let i = start; i <= end; i++) {
         html += `
@@ -651,7 +661,16 @@ function generatePageNumbers(current, total) {
         `;
     }
 
-    if (end < total) html += `<span class="px-2 text-gray-400">...</span>`;
+    // Replace trailing "..." with a jump input
+    if (end < total) {
+        html += `
+            <input type="number" min="1" max="${total}" value="" placeholder="..."
+                class="w-12 h-8 text-center text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-600 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all"
+                title="Jump to page" aria-label="Jump to page"
+                onkeydown="if(event.key==='Enter'){const p=Math.min(${total},Math.max(1,parseInt(this.value)||1));if(p)window.changePage(p);}"
+                onfocus="this.select()">
+        `;
+    }
 
     return html;
 }

@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     startSyncWorker();
 
     // Page specific initialization
-    if (path.includes('/export/')) {
+    if (path.includes('/export/') && !path.includes('log.php')) {
         initExportPage();
     }
 

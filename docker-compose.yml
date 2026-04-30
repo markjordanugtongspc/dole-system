@@ -27,27 +27,6 @@ services:
           memory: 512M
         reservations:
           memory: 256M
-    depends_on:
-      - db
+    # No local db dependency — connects to Supabase via .env credentials
 
-  db:
-    image: mariadb:11.4
-    container_name: dole-system-db
-    restart: always
-    deploy:
-      resources:
-        limits:
-          memory: 384M
-        reservations:
-          memory: 128M
-    environment:
-      MARIADB_DATABASE: dole_system
-      MARIADB_ROOT_PASSWORD: root_password
-    ports:
-      - "3307:3306" # Connect via Laragon or HeidiSQL on port 3307 locally
-    volumes:
-      - dole_db_data:/var/lib/mysql
-      - ./config/database_schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
-
-volumes:
-  dole_db_data:
+# MariaDB service removed — application now exclusively uses Supabase (PostgreSQL).
