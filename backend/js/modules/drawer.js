@@ -80,84 +80,80 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
     <div class="grid grid-cols-2 gap-4 mt-6 w-full">
         <div class="flex flex-col gap-1 text-left">
-            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ID No.</span>
+            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ID NO.</span>
             <span class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 text-[10px] sm:text-[11px] font-black px-2.5 py-1.5 rounded border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm border-l-4 border-l-gray-400 truncate">${data.id}</span>
         </div>
         <div class="flex flex-col gap-1 text-left overflow-hidden">
             <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1 flex items-center">
-                <span class="sm:hidden">REMARKS</span>
-                <span class="hidden sm:inline">REMARKS / OFFICE</span>
+                REMARKS / OFFICE
             </span>
             <div class="flex items-center flex-wrap gap-1.5 min-h-[30px]">
                 <span class="${getStatusClass(data.remarks)} text-[10px] font-black px-2 py-1 rounded border uppercase tracking-widest shadow-sm border-l-4 ${data.remarks === 'ONGOING' ? 'border-l-green-600' : 'border-l-red-600'}">${data.remarks}</span>
-                <!-- Desktop Only Office Badge (Pill Style) -->
                 <span class="${getOfficeClass(data.office)} hidden sm:inline-block text-[9px] font-black px-2.5 py-1 rounded-full border shadow-sm truncate max-w-[120px] lg:max-w-none" title="${data.office}">${data.office}</span>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Mobile Only Assigned Office Row (Rectangle Style) -->
-    <div class="flex flex-col gap-1 text-left mt-4 sm:hidden">
-        <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ASSIGNED OFFICE</span>
-        <span class="${getOfficeClass(data.office)} text-[10px] font-black px-2.5 py-2 rounded border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm border-l-4 border-l-indigo-500 w-full truncate" title="${data.office}">${data.office}</span>
+<!-- Persistent Section Header with Small Nav Buttons -->
+<div class="flex justify-between items-center mb-4 pb-2 border-b border-default">
+    <h4 id="drawer-section-title" class="text-sm font-bold text-heading uppercase tracking-widest">Personal Profile</h4>
+    <div class="flex gap-2">
+        <button id="drawer-prev-btn" class="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-neutral-secondary-medium text-heading text-[9px] font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm border border-default-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-tertiary cursor-pointer">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+            PREV
+        </button>
+        <button id="drawer-next-btn" class="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-brand text-white text-[9px] font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm shadow-brand-medium/50 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-strong cursor-pointer text-center">
+            NEXT
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+        </button>
     </div>
 </div>
 
-<h4 class="text-sm font-bold text-heading mt-6 mb-4 pb-2 border-b border-default whitespace-nowrap hidden lg:block">Personal Profile</h4>
-<div class="flex flex-col gap-4 text-sm mt-3 px-1">
-    <div class="flex justify-between items-center group">
-        <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Contact No.</span>
-        <span class="${data.contact ? 'font-black text-heading font-mono' : 'font-bold text-gray-300 italic'} truncate text-right">${data.contact || 'NOT PROVIDED'}</span>
-    </div>
-    <div class="flex justify-between items-start group">
-        <span class="text-gray-500 font-medium whitespace-nowrap mr-4 mt-1">Address</span>
-        <span class="font-bold text-heading text-right break-words leading-snug" title="${data.address}">${data.address || 'N/A'}</span>
-    </div>
-    <div class="flex justify-between items-center group">
-        <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Birthday</span>
-        <span class="${data.birthday ? 'font-black text-heading uppercase text-right' : 'font-bold text-gray-300 italic text-right'}">${data.birthday || 'N/A'}</span>
-    </div>
-    <div class="flex justify-between items-center group">
-        <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Age</span>
-        <span class="${(data.age || calculateAge(data.birthday)) ? 'font-black text-heading' : 'font-bold text-gray-300 italic'} text-right">${data.age || calculateAge(data.birthday) || 'N/A'}</span>
-    </div>
-    <div class="flex justify-between items-center group">
-        <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Gender</span>
-        <span class="font-black text-heading uppercase text-right">${data.gender || 'N/A'}</span>
-    </div>
-    <div class="flex justify-between items-center group pt-3 mt-1 border-t border-gray-50 dark:border-slate-800/60">
-        <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Education</span>
-        <div class="flex items-center gap-2 max-w-[60%] justify-end shrink-0 min-w-0">
-            <div class="w-6 h-6 rounded bg-golden-yellow/10 flex items-center justify-center text-golden-yellow border border-golden-yellow/20 shrink-0">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
-            </div>
-            <span class="text-[11px] lg:text-sm font-black text-heading whitespace-nowrap tracking-tight truncate" title="${data.education}">${data.education || 'N/A'}</span>
+<div id="personal-profile-section" class="transition-all duration-300">
+    <div class="flex flex-col gap-4 text-sm mt-3 px-1 mb-8">
+        <div class="flex justify-between items-center group">
+            <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Contact No.</span>
+            <span class="${data.contact ? 'font-black text-heading font-mono' : 'font-bold text-gray-300 italic'} truncate text-right">${data.contact || 'NOT PROVIDED'}</span>
         </div>
-    </div>
-    <div class="flex justify-between items-start group pt-3 mt-1 border-t border-gray-50 dark:border-slate-800/60">
-        <span class="text-gray-500 font-medium whitespace-nowrap mr-4 mt-1">Designated Beneficiary</span>
-        <span class="${data.designatedBeneficiary !== 'N/A' ? 'font-black text-heading' : 'font-bold text-gray-300 italic'} text-right wrap-break-word leading-snug max-w-[60%] uppercase">${data.designatedBeneficiary}</span>
-    </div>
-    <div class="flex justify-between items-center group">
-        <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Relationship to Assured</span>
-        <span class="${data.relationshipToAssured !== 'N/A' ? 'font-black text-[#2e7d32] dark:text-green-400' : 'font-bold text-gray-300 italic'} text-right uppercase">${data.relationshipToAssured}</span>
+        <div class="flex justify-between items-start group">
+            <span class="text-gray-500 font-medium whitespace-nowrap mr-4 mt-1">Address</span>
+            <span class="font-bold text-heading text-right break-words leading-snug" title="${data.address}">${data.address || 'N/A'}</span>
+        </div>
+        <div class="flex justify-between items-center group">
+            <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Birthday</span>
+            <span class="${data.birthday ? 'font-black text-heading uppercase text-right' : 'font-bold text-gray-300 italic text-right'}">${data.birthday || 'N/A'}</span>
+        </div>
+        <div class="flex justify-between items-center group">
+            <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Age</span>
+            <span class="${(data.age || calculateAge(data.birthday)) ? 'font-black text-heading' : 'font-bold text-gray-300 italic'} text-right">${data.age || calculateAge(data.birthday) || 'N/A'}</span>
+        </div>
+        <div class="flex justify-between items-center group">
+            <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Gender</span>
+            <span class="font-black text-heading uppercase text-right">${data.gender || 'N/A'}</span>
+        </div>
+        <div class="flex justify-between items-center group pt-3 mt-1 border-t border-gray-50 dark:border-slate-800/60">
+            <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Education</span>
+            <div class="flex items-center gap-2 max-w-[60%] justify-end shrink-0 min-w-0">
+                <div class="w-6 h-6 rounded bg-golden-yellow/10 flex items-center justify-center text-golden-yellow border border-golden-yellow/20 shrink-0">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                </div>
+                <span class="text-[11px] lg:text-sm font-black text-heading whitespace-nowrap tracking-tight truncate" title="${data.education}">${data.education || 'N/A'}</span>
+            </div>
+        </div>
+        <div class="flex justify-between items-start group pt-3 mt-1 border-t border-gray-50 dark:border-slate-800/60">
+            <span class="text-gray-500 font-medium whitespace-nowrap mr-4 mt-1">Designated Beneficiary</span>
+            <span class="${data.designatedBeneficiary !== 'N/A' ? 'font-black text-heading' : 'font-bold text-gray-300 italic'} text-right wrap-break-word leading-snug max-w-[60%] uppercase">${data.designatedBeneficiary}</span>
+        </div>
+        <div class="flex justify-between items-center group">
+            <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Relationship to Assured</span>
+            <span class="${data.relationshipToAssured !== 'N/A' ? 'font-black text-[#2e7d32] dark:text-green-400' : 'font-bold text-gray-300 italic'} text-right uppercase">${data.relationshipToAssured}</span>
+        </div>
     </div>
 </div>
 
 <!-- Container for right grid from modal -->
-<div class="mt-8 pt-2 border-t border-default relative">
-    <!-- Relocated Navigation Grid -->
-    <div class="grid grid-cols-2 gap-3 pb-6 mb-2 border-b border-gray-100 dark:border-slate-800 relative z-10 w-full">
-        <button id="drawer-prev-btn" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-neutral-secondary-medium text-heading text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm border border-default-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-tertiary cursor-pointer">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
-            PREVIOUS
-        </button>
-        <button id="drawer-next-btn" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-brand text-white text-[10px] sm:text-xs font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm shadow-brand-medium/50 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-strong cursor-pointer text-center">
-            NEXT
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
-        </button>
-    </div>
-
+<div class="relative">
     <!-- Pages Container -->
     <div id="drawer-page-0" class="flex-1 flex flex-col gap-4">
         
@@ -194,11 +190,11 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 <div class="flex justify-between items-start group">
                     <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4">Date</span>
                     <span class="font-black text-[#1b5e20] dark:text-green-400 text-xs text-right whitespace-nowrap">${(() => {
-                        if (!data.absorbDate || String(data.absorbDate).includes('0000-00-00')) return 'N/A';
-                        const d = new Date(data.absorbDate);
-                        if (isNaN(d.getTime()) || d.getFullYear() < 1900) return 'N/A';
-                        return (d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })).toUpperCase();
-                    })()}</span>
+                if (!data.absorbDate || String(data.absorbDate).includes('0000-00-00')) return 'N/A';
+                const d = new Date(data.absorbDate);
+                if (isNaN(d.getTime()) || d.getFullYear() < 1900) return 'N/A';
+                return (d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })).toUpperCase();
+            })()}</span>
                 </div>
                 <div class="flex justify-between items-start group">
                     <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4 mt-0.5">Where</span>
@@ -226,11 +222,11 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 <div class="flex justify-between items-start group">
                     <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4">Date</span>
                     <span class="font-black text-[#b71c1c] dark:text-red-400 text-xs text-right whitespace-nowrap">${(() => {
-                        if (!data.resignedDate || String(data.resignedDate).includes('0000-00-00')) return 'N/A';
-                        const d = new Date(data.resignedDate);
-                        if (isNaN(d.getTime()) || d.getFullYear() < 1900) return 'N/A';
-                        return (d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })).toUpperCase();
-                    })()}</span>
+                if (!data.resignedDate || String(data.resignedDate).includes('0000-00-00')) return 'N/A';
+                const d = new Date(data.resignedDate);
+                if (isNaN(d.getTime()) || d.getFullYear() < 1900) return 'N/A';
+                return (d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })).toUpperCase();
+            })()}</span>
                 </div>
                 <div class="flex justify-between items-start group">
                     <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4 mt-0.5">Reason</span>
@@ -241,54 +237,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         ` : ''}
     </div>
     
-    <div id="drawer-page-1" class="hidden flex-1 flex flex-col gap-4">
-        <h4 class="text-sm font-bold text-heading mb-2 border-b-2 border-brand pb-2 inline-block max-w-max">Required Documents</h4>
-        <div class="flex flex-col gap-3">
-            ${displayDocs.map(doc => {
-                const dbStatus = doc.status.toUpperCase();
-                const uiMapping = {
-                    'VERIFIED': 'COMPLETED',
-                    'DECLINED': 'REJECTED',
-                    'PENDING': 'PENDING'
-                };
-                const status = uiMapping[dbStatus] || dbStatus;
-                
-                const isCompleted = status === 'COMPLETED';
-                const isRejected = status === 'REJECTED';
-                
-                const iconColor = isCompleted ? 'text-green-500' : (isRejected ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
-                const bgColor = isCompleted ? 'bg-green-50/50 dark:bg-green-900/10' : (isRejected ? 'bg-red-50/50 dark:bg-red-900/10' : 'bg-gray-50/50 dark:bg-slate-800/50');
-                const badgeClass = isCompleted 
-                    ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800 hover:bg-green-200 cursor-pointer' 
-                    : (isRejected 
-                        ? 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800 hover:bg-red-200 cursor-pointer'
-                        : 'bg-white text-gray-500 border-gray-200 dark:bg-slate-700 dark:text-gray-400 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-600 cursor-pointer');
-                
-                let iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-                if (isCompleted) {
-                    iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
-                } else if (isRejected) {
-                    iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
-                }
-
-                return `
-                <div class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm transition-all hover:-translate-y-0.5 ${bgColor}">
-                    <div class="flex items-center gap-3 w-full">
-                        <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-slate-800 shadow-sm border border-gray-100 dark:border-slate-700 ${iconColor}">
-                            ${iconSvg}
-                        </div>
-                        <span class="text-xs sm:text-sm font-black ${isCompleted ? 'text-heading' : 'text-gray-500 dark:text-gray-400'} uppercase tracking-tight flex-1">${doc.name}</span>
-                    </div>
-                    <button type="button" class="ml-3 ${badgeClass} text-[10px] font-black px-3 py-1.5 rounded-full border uppercase tracking-widest transition-colors flex-shrink-0 drawer-doc-btn" data-id="${doc.id}" data-name="${doc.name}" data-status="${status} cursosr-pointer">
-                        ${status}
-                    </button>
-                </div>
-                `;
-            }).join('')}
-        </div>
-    </div>
-    
-    <div id="drawer-page-2" class="hidden flex-1 flex flex-col gap-6">
+    <div id="drawer-page-1" class="hidden flex-1 flex flex-col gap-6">
          <div class="flex justify-between items-center border-b-2 border-brand pb-2">
             <h4 class="text-sm font-bold text-heading uppercase tracking-widest">Submission Logs</h4>
             <div class="flex gap-2">
@@ -313,18 +262,18 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 </h5>
                 <div class="space-y-2">
                     ${dtrLogs.length ? dtrLogs.map(l => {
-                        const s = l.status || 'PENDING';
-                        let sColor = s === 'VERIFIED' || s === 'COMPLETED' ? 'text-green-500' : (s === 'REJECTED' || s === 'DECLINED' ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
-                        let rawStr = l.date || l.createdAt;
-                        let displayDate = rawStr;
-                        if (rawStr) {
-                            // If pure ISO date (YYYY-MM-DD), parse as UTC to avoid timezone off-by-one
-                            const isoDate = /^\d{4}-\d{2}-\d{2}$/.test(rawStr)
-                                ? new Date(rawStr + 'T00:00:00Z')
-                                : new Date(rawStr);
-                            if (!isNaN(isoDate)) displayDate = isoDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'Asia/Manila' }).toUpperCase();
-                        }
-                        return `
+                const s = l.status || 'PENDING';
+                let sColor = s === 'VERIFIED' || s === 'COMPLETED' ? 'text-green-500' : (s === 'REJECTED' || s === 'DECLINED' ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
+                let rawStr = l.date || l.createdAt;
+                let displayDate = rawStr;
+                if (rawStr) {
+                    // If pure ISO date (YYYY-MM-DD), parse as UTC to avoid timezone off-by-one
+                    const isoDate = /^\d{4}-\d{2}-\d{2}$/.test(rawStr)
+                        ? new Date(rawStr + 'T00:00:00Z')
+                        : new Date(rawStr);
+                    if (!isNaN(isoDate)) displayDate = isoDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'Asia/Manila' }).toUpperCase();
+                }
+                return `
                         <div class="flex justify-between items-center p-3 rounded-xl border border-blue-100 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors edit-log-btn" data-type="dtr" data-id="${l.id}" data-val="${l.day || rawStr}" data-status="${s}">
                             <span class="text-xs font-black text-royal-blue dark:text-blue-400 capitalize whitespace-nowrap pointer-events-none">${l.day || displayDate}</span>
                             <span class="text-[11px] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
@@ -332,7 +281,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
-                    `;}).join('') : `<p class="text-[11px] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No DTR logs submitted.</p>`}
+                    `;
+            }).join('') : `<p class="text-[11px] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No DTR logs submitted.</p>`}
                 </div>
             </div>
 
@@ -343,18 +293,18 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 </h5>
                 <div class="space-y-2">
                     ${arLogs.length ? arLogs.map(l => {
-                        const s = l.status || 'PENDING';
-                        let sColor = s === 'VERIFIED' || s === 'COMPLETED' ? 'text-green-500' : (s === 'REJECTED' || s === 'DECLINED' ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
-                        let rawStr = l.period || l.createdAt;
-                        let displayDate = rawStr;
-                        if (rawStr) {
-                            // If pure ISO date (YYYY-MM-DD), parse as UTC to avoid timezone off-by-one
-                            const isoDate = /^\d{4}-\d{2}-\d{2}$/.test(rawStr)
-                                ? new Date(rawStr + 'T00:00:00Z')
-                                : new Date(rawStr);
-                            if (!isNaN(isoDate)) displayDate = isoDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'Asia/Manila' }).toUpperCase();
-                        }
-                        return `
+                const s = l.status || 'PENDING';
+                let sColor = s === 'VERIFIED' || s === 'COMPLETED' ? 'text-green-500' : (s === 'REJECTED' || s === 'DECLINED' ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
+                let rawStr = l.period || l.createdAt;
+                let displayDate = rawStr;
+                if (rawStr) {
+                    // If pure ISO date (YYYY-MM-DD), parse as UTC to avoid timezone off-by-one
+                    const isoDate = /^\d{4}-\d{2}-\d{2}$/.test(rawStr)
+                        ? new Date(rawStr + 'T00:00:00Z')
+                        : new Date(rawStr);
+                    if (!isNaN(isoDate)) displayDate = isoDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'Asia/Manila' }).toUpperCase();
+                }
+                return `
                         <div class="flex justify-between items-center p-3 rounded-xl border border-orange-100 dark:border-orange-900/50 bg-orange-50/50 dark:bg-orange-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors edit-log-btn" data-type="ar" data-id="${l.id}" data-val="${rawStr}" data-status="${s}">
                             <span class="text-xs font-black text-orange-600 dark:text-orange-400 capitalize whitespace-nowrap pointer-events-none">${rawStr || displayDate}</span>
                             <span class="text-[11px] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
@@ -362,10 +312,58 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
-                    `;}).join('') : `<p class="text-[11px] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No AR logs submitted.</p>`}
+                    `;
+            }).join('') : `<p class="text-[11px] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No AR logs submitted.</p>`}
                 </div>
             </div>
          </div>
+    </div>
+    
+    <div id="drawer-page-2" class="hidden flex-1 flex flex-col gap-4">
+        <h4 class="text-sm font-bold text-heading mb-2 border-b-2 border-brand pb-2 inline-block max-w-max">Required Documents</h4>
+        <div class="flex flex-col gap-3">
+            ${displayDocs.map(doc => {
+                const dbStatus = doc.status.toUpperCase();
+                const uiMapping = {
+                    'VERIFIED': 'COMPLETED',
+                    'DECLINED': 'REJECTED',
+                    'PENDING': 'PENDING'
+                };
+                const status = uiMapping[dbStatus] || dbStatus;
+
+                const isCompleted = status === 'COMPLETED';
+                const isRejected = status === 'REJECTED';
+
+                const iconColor = isCompleted ? 'text-green-500' : (isRejected ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
+                const bgColor = isCompleted ? 'bg-green-50/50 dark:bg-green-900/10' : (isRejected ? 'bg-red-50/50 dark:bg-red-900/10' : 'bg-gray-50/50 dark:bg-slate-800/50');
+                const badgeClass = isCompleted
+                    ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800 hover:bg-green-200 cursor-pointer'
+                    : (isRejected
+                        ? 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800 hover:bg-red-200 cursor-pointer'
+                        : 'bg-white text-gray-500 border-gray-200 dark:bg-slate-700 dark:text-gray-400 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-600 cursor-pointer');
+
+                let iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                if (isCompleted) {
+                    iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+                } else if (isRejected) {
+                    iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                }
+
+                return `
+                <div class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm transition-all hover:-translate-y-0.5 ${bgColor}">
+                    <div class="flex items-center gap-3 w-full">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-slate-800 shadow-sm border border-gray-100 dark:border-slate-700 ${iconColor}">
+                            ${iconSvg}
+                        </div>
+                        <span class="text-xs sm:text-sm font-black ${isCompleted ? 'text-heading' : 'text-gray-500 dark:text-gray-400'} uppercase tracking-tight flex-1">${doc.name}</span>
+                    </div>
+                    <button type="button" class="ml-3 ${badgeClass} text-[10px] font-black px-3 py-1.5 rounded-full border uppercase tracking-widest transition-colors flex-shrink-0 drawer-doc-btn" data-id="${doc.id}" data-name="${doc.name}" data-status="${status} cursosr-pointer">
+                        ${status}
+                    </button>
+                </div>
+                `;
+            }).join('')}
+        </div>
     </div>
 
     <!-- End of Pages -->
@@ -397,20 +395,20 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
     // Initialize Drawer HTML in body
     let drawerContainer = document.getElementById('beneficiary-drawer-container');
-    if(drawerContainer) {
+    if (drawerContainer) {
         // Destroy existing instance gracefully
         drawerContainer.remove();
         document.documentElement.classList.remove('overflow-hidden');
         document.body.classList.remove('overflow-hidden');
     }
-    
+
     drawerContainer = document.createElement('div');
     drawerContainer.id = 'beneficiary-drawer-container';
     drawerContainer.className = 'fixed top-0 right-0 z-[100] h-screen p-4 sm:p-6 overflow-y-auto transition-transform duration-500 ease-in-out translate-x-full bg-neutral-primary-soft dark:bg-slate-900 w-full sm:w-[550px] lg:w-[650px] shadow-2xl';
     drawerContainer.setAttribute('tabindex', '-1');
     drawerContainer.setAttribute('data-drawer-backdrop', 'true');
     drawerContainer.innerHTML = drawerHtml;
-    
+
     document.body.appendChild(drawerContainer);
     document.documentElement.classList.add('overflow-hidden');
     document.body.classList.add('overflow-hidden');
@@ -450,6 +448,20 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             drawerContainer.querySelectorAll('[id^=drawer-page-]').forEach((p, i) => {
                 p.classList.toggle('hidden', i !== rightGridPage);
             });
+
+            // Update section title dynamically
+            const sectionTitle = drawerContainer.querySelector('#drawer-section-title');
+            if (sectionTitle) {
+                const titles = ['Personal Profile', 'Submission Logs', 'Required Documents'];
+                sectionTitle.textContent = titles[rightGridPage] || 'Details';
+            }
+
+            // Toggle Personal Profile Section visibility (only on Page 0)
+            const profileSection = drawerContainer.querySelector('#personal-profile-section');
+            if (profileSection) {
+                profileSection.classList.toggle('hidden', rightGridPage !== 0);
+            }
+
             prevBtn.disabled = rightGridPage === 0;
             nextBtn.disabled = rightGridPage === maxPage;
 
@@ -458,12 +470,12 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         };
 
         prevBtn.addEventListener('click', () => {
-            if(rightGridPage > 0) rightGridPage--;
+            if (rightGridPage > 0) rightGridPage--;
             updateNav();
         });
 
         nextBtn.addEventListener('click', () => {
-            if(rightGridPage < maxPage) rightGridPage++;
+            if (rightGridPage < maxPage) rightGridPage++;
             updateNav();
         });
 
@@ -474,9 +486,9 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             btn.addEventListener('click', async () => {
                 const docName = btn.dataset.name;
                 const currentStatus = btn.dataset.status;
-                
+
                 const btnBase = "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[9px] gap-2 transition-all duration-300 ";
-                
+
                 const result = await Swal.fire({
                     title: '<span class="text-xl font-black text-heading uppercase tracking-tight">Update Document</span>',
                     html: `
@@ -546,25 +558,25 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
                         const json = result.success ? result.data : { success: false, error: result.error };
 
-            if (json.success) {
-                Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Status updated!', showConfirmButton: false, timer: 1500 });
-                // Refresh data from source (Supabase/MySQL) to ensure everything is in sync
-                if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
-            } else {
+                        if (json.success) {
+                            Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Status updated!', showConfirmButton: false, timer: 1500 });
+                            // Refresh data from source (Supabase/MySQL) to ensure everything is in sync
+                            if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
+                        } else {
                             Swal.fire('Error', json.error || 'Failed to update', 'error');
                         }
-                    } catch(e) { Swal.fire('Error', e.message, 'error'); }
+                    } catch (e) { Swal.fire('Error', e.message, 'error'); }
                 }
             });
         });
 
         // Philippine Public Holidays 2026 (ISO date strings)
         const PH_HOLIDAYS = new Set([
-            '2026-01-01','2026-04-02','2026-04-03','2026-04-09',
-            '2026-05-01','2026-06-12','2026-08-24','2026-08-31',
-            '2026-11-01','2026-11-30','2026-12-25','2026-12-30','2026-12-31',
+            '2026-01-01', '2026-04-02', '2026-04-03', '2026-04-09',
+            '2026-05-01', '2026-06-12', '2026-08-24', '2026-08-31',
+            '2026-11-01', '2026-11-30', '2026-12-25', '2026-12-30', '2026-12-31',
         ]);
-        const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+        const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
         function isWorkday(dateStr) {
             const d = new Date(dateStr + 'T00:00:00');
@@ -608,7 +620,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             const mIdx = MONTHS.indexOf(match[1]);
             const p1 = parseInt(match[2]);
             const year = parseInt(match[4]);
-            
+
             if (p1 === 1) {
                 const lastDay = new Date(year, mIdx + 1, 0).getDate();
                 return `${MONTHS[mIdx]} 16-${lastDay}, ${year}`;
@@ -649,7 +661,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             const mIdx = MONTHS.indexOf(match[1]);
             const p1 = parseInt(match[2]);
             const year = parseInt(match[4]);
-            
+
             if (p1 === 1) {
                 const lastDay = new Date(year, mIdx + 1, 0).getDate();
                 return `${MONTHS[mIdx]} 16-${lastDay}, ${year}`;
@@ -689,25 +701,25 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
                 const result = await apiPost(`api/logs.php?type=${dbType}`, payload);
                 const json = result.success ? result.data : { success: false, error: result.error };
-                
+
                 if (json.success) {
                     Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Auto-Added!', showConfirmButton: false, timer: 1500 });
                     if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
                 } else {
                     Swal.fire('Error', 'Failed to add log.', 'error');
                 }
-            } catch(e) { Swal.fire('Error', e.message, 'error'); }
+            } catch (e) { Swal.fire('Error', e.message, 'error'); }
         };
 
         // Edit Log Logic
         const promptEditLog = async (typeStr, dbType, logId, currentVal, currentStatus) => {
             const labelStr = dbType === 'dtr' ? 'Record Date' : 'Period';
             const isD = isDarkMode();
-            
+
             const btnBase = "flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[10px] sm:text-xs gap-2 ";
             const checkIcon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
             const xIcon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
-            
+
             const { value: formValues } = await Swal.fire({
                 title: `<span class="text-xl font-black text-heading uppercase tracking-tight">Edit ${typeStr} Log</span>`,
                 html: `
@@ -749,11 +761,11 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 },
                 buttonsStyling: false,
                 preConfirm: () => {
-                     const selectedStatus = document.querySelector('input[name="swal-log-status"]:checked');
-                     return {
-                         val: document.getElementById('swal-log-val').value.trim().toUpperCase(),
-                         status: selectedStatus ? selectedStatus.value : 'PENDING'
-                     }
+                    const selectedStatus = document.querySelector('input[name="swal-log-status"]:checked');
+                    return {
+                        val: document.getElementById('swal-log-val').value.trim().toUpperCase(),
+                        status: selectedStatus ? selectedStatus.value : 'PENDING'
+                    }
                 }
             });
 
@@ -779,20 +791,20 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
                     const result = await apiPut(`api/logs.php`, payload);
                     const json = result.success ? result.data : { success: false, error: result.error };
-                    
+
                     if (json.success) {
                         Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Log Updated!', showConfirmButton: false, timer: 1500 });
                         if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
                     } else {
                         Swal.fire('Error', json.error || 'Failed to update log.', 'error');
                     }
-                } catch(e) { Swal.fire('Error', e.message, 'error'); }
+                } catch (e) { Swal.fire('Error', e.message, 'error'); }
             }
         };
 
         const addDtrBtn = drawerContainer.querySelector('#add-dtr-log-btn');
         if (addDtrBtn) addDtrBtn.addEventListener('click', () => autoAddLog('dtr', getNextDTRDate()));
-        
+
         const addArBtn = drawerContainer.querySelector('#add-ar-log-btn');
         if (addArBtn) addArBtn.addEventListener('click', () => autoAddLog('ar', getNextARPeriod()));
 
@@ -801,7 +813,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             exportLogBtn.addEventListener('click', async () => {
                 const btnBase = "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[11px] gap-2 ";
                 const result = await Swal.fire({
-                    title: '<span class="text-xl font-black text-heading uppercase tracking-tight">Export Logs</span>',
+                    title: '<span class="text-xl font-black text-heading uppercase tracking-tight">Export DTR/AR',
                     html: `
                         <div class="font-montserrat text-left">
                             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-4 ps-1">Select the type of log to export for <span class="text-brand font-black">ALL DATA</span></label>
@@ -852,7 +864,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 if (result.isConfirmed && result.value) {
                     const exportType = result.value;
                     const year = new Date().getFullYear(); // Just use current year for individual export
-                    
+
                     // Call the same Excel generation function used in bulk export!
                     await generateExcelExport([data], exportType, year);
                 }
@@ -875,7 +887,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             btn.addEventListener('click', async () => {
                 const logId = btn.dataset.id;
                 const logType = btn.dataset.type;
-                
+
                 const result = await Swal.fire({
                     title: '<span class="text-xl font-black text-philippine-red uppercase tracking-tight">Delete item?</span>',
                     text: 'This action cannot be undone.',
@@ -900,13 +912,13 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                         });
                         const json = result.success ? result.data : { success: false, error: result.error };
 
-                        if(json.success) {
+                        if (json.success) {
                             Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Deleted', showConfirmButton: false, timer: 1500 });
                             if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
                         } else {
                             Swal.fire('Error', 'Failed to delete data.', 'error');
                         }
-                    } catch(e) { Swal.fire('Error', e.message, 'error'); }
+                    } catch (e) { Swal.fire('Error', e.message, 'error'); }
                 }
             });
         });

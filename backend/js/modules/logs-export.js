@@ -27,7 +27,7 @@ function isWorkday(dateStr) {
  * e.g. "JAN 1-15, 2026", "JAN 16-31, 2026", ...
  */
 function generateAllPeriods(year = new Date().getFullYear()) {
-    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
     const periods = [];
     for (let m = 0; m < 12; m++) {
         const lastDay = new Date(year, m + 1, 0).getDate();
@@ -49,7 +49,7 @@ function matchPeriod(log, periodLabel, type) {
         // periodLabel = "APR 1-15, 2026"
         const parts = periodLabel.match(/([A-Z]+)\s+(\d+)-(\d+),\s+(\d+)/i);
         if (!parts) return false;
-        const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
         const mIdx = months.indexOf(parts[1].toUpperCase());
         if (mIdx === -1) return false;
         const year = parseInt(parts[4]);
@@ -127,7 +127,7 @@ export async function showLogsExportModal(beneficiaries) {
     const totalBeneficiaries = beneficiaries.length;
 
     const result = await Swal.fire({
-        title: '<span class="text-xl font-black text-heading uppercase tracking-tight">Export Logs</span>',
+        title: '<span class="text-xl font-black text-heading uppercase tracking-tight">Export DTR/AR',
         html: `
             <div class="font-montserrat text-left">
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 ps-1">
@@ -264,7 +264,7 @@ export async function generateExcelExport(beneficiaries, type, year) {
         // Helper: fetch all logs for a given type (no gip_id = all)
         async function fetchAllLogs(logType) {
             const res = await fetch(`${basePath}api/logs.php?type=${logType}`, {
-                headers: { 'X-User-Id': (() => { try { return JSON.parse(localStorage.getItem('user'))?.id || ''; } catch(e) { return ''; } })() }
+                headers: { 'X-User-Id': (() => { try { return JSON.parse(localStorage.getItem('user'))?.id || ''; } catch (e) { return ''; } })() }
             });
             const json = await res.json();
             return json.success ? (json.logs || []) : [];

@@ -1,6 +1,7 @@
 @import url('./loading.css');
-/* Google Fonts - Montserrat */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+/* Google Fonts - Montserrat & Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 @plugin "flowbite/plugin";
 @source "../../node_modules/flowbite";
@@ -15,6 +16,11 @@
     --color-brand-strong: #002d86;
     --color-philippine-red: #CE1126;
     --color-golden-yellow: #FCD116;
+
+    /* Font Families */
+    --font-montserrat: 'Montserrat', sans-serif;
+    --font-poppins: 'Poppins', sans-serif;
+    --font-sans: 'Poppins', sans-serif;
 
     /* Theme Tokens mapped to dynamic variables */
     --color-neutral-primary-soft: var(--bg-soft);
@@ -86,8 +92,34 @@
     }
 }
 
+@layer base {
+    h1, h2, h3, h4, h5, h6, button {
+        font-family: 'Montserrat', sans-serif;
+        text-transform: uppercase;
+    }
+    
+    p, span {
+        font-family: 'Poppins', sans-serif;
+    }
+}
+
+/* Exclude specific elements from global uppercase force */
+.settings-body h1, 
+.settings-body h2, 
+.settings-body h3, 
+.settings-body h4, 
+.settings-body h5, 
+.settings-body h6, 
+.settings-body button,
+#profileDropdownButton,
+#profileDropdownButton p,
+#profileDropdownButton span,
+#sidebar-theme-label {
+    text-transform: none !important;
+}
+
 body {
-    font-family: 'Montserrat', 'Gotham', 'Century Gothic', sans-serif;
+    font-family: 'Poppins', sans-serif;
     color: var(--text-body-color);
     background-color: var(--bg-soft);
 }

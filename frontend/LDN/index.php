@@ -109,8 +109,10 @@ require_once __DIR__ . '/../../config/vite.php';
 
             <!-- Page Header with Toggle & Add Button -->
             <div class="mb-6 flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2 transition-all duration-200 cursor-pointer select-none" id="ldn-header-container">
-                    <h1 class="text-xl sm:text-3xl font-black text-heading mb-0 sm:mb-2 leading-tight" id="ldn-header-text">
+                <div class="flex items-center gap-2 transition-all duration-200 cursor-pointer select-none"
+                    id="ldn-header-container">
+                    <h1 class="text-xl sm:text-3xl font-black text-heading mb-0 sm:mb-2 leading-tight"
+                        id="ldn-header-text">
                         <span class="sm:hidden">LDN - GIP</span>
                         <span class="hidden sm:inline">Lanao Del Norte - GIP</span>
                     </h1>
@@ -125,8 +127,7 @@ require_once __DIR__ . '/../../config/vite.php';
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button type="button" id="ldn-export-logs-btn"
-                        class="flex items-center gap-2 px-3 py-2 sm:px-5 sm:py-2.5
+                    <button type="button" id="ldn-export-logs-btn" class="flex items-center gap-2 px-3 py-2 sm:px-5 sm:py-2.5
                             bg-white text-emerald-700
                             hover:bg-emerald-600 hover:text-white
                             border border-emerald-200
@@ -136,13 +137,13 @@ require_once __DIR__ . '/../../config/vite.php';
                             font-black rounded-xl transition-all duration-300 shadow-sm
                             hover:scale-105 active:scale-95 cursor-pointer shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <span class="text-[10px] sm:text-sm uppercase">Export Logs</span>
+                        <span class="text-[10px] sm:text-sm uppercase">Export DTR/AR
                     </button>
 
-                    <button type="button" onclick="showAddDataModal()"
-                        class="
+                    <button type="button" onclick="showAddDataModal()" class="
                             /* Light mode styles */
                             flex items-center gap-2 px-3 py-2 sm:px-5 sm:py-2.5
                             bg-white text-[#2e7d32]
@@ -172,8 +173,7 @@ require_once __DIR__ . '/../../config/vite.php';
             <div class="relative bg-white shadow-xs rounded-base border border-default">
 
                 <!-- Modern Search Bar -->
-                <div
-                    class="p-3 sm:p-5 bg-white border-b border-gray-100 flex items-center justify-between gap-2.5">
+                <div class="p-3 sm:p-5 bg-white border-b border-gray-100 flex items-center justify-between gap-2.5">
                     <div class="relative flex-1 sm:max-w-md group">
                         <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none">
                             <svg class="w-5 h-5 text-gray-400 group-focus-within:text-royal-blue transition-colors duration-300"
@@ -188,9 +188,11 @@ require_once __DIR__ . '/../../config/vite.php';
 
                         <!-- Clear Search Button -->
                         <div class="absolute inset-y-0 end-0 flex items-center pe-2">
-                            <button type="button" id="clear-search-btn" class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-full outline-none transition-colors duration-300 hidden cursor-pointer">
+                            <button type="button" id="clear-search-btn"
+                                class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-full outline-none transition-colors duration-300 hidden cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
                             </button>
                         </div>
@@ -202,30 +204,38 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div class="relative">
                             <button id="filter-dropdown-button" data-dropdown-toggle="filter-dropdown"
                                 class="flex items-center justify-center p-2.5 text-gray-500 rounded-full hover:bg-blue-50 hover:text-royal-blue transition-all duration-300 border border-default hover:border-blue-100 group shadow-sm cursor-pointer">
-                                <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
                                     <!-- Funnel Icon -->
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                 </svg>
                             </button>
                             <!-- Filter Dropdown Menu -->
                             <div id="filter-dropdown"
                                 class="z-50 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
                                 <div class="px-4 py-3 bg-blue-50/50 rounded-t-xl">
-                                    <span class="block text-[10px] font-black text-royal-blue uppercase tracking-wider">Filter By</span>
+                                    <span
+                                        class="block text-[10px] font-black text-royal-blue uppercase tracking-wider">Filter
+                                        By</span>
                                 </div>
                                 <div class="p-4">
                                     <!-- Year select -->
                                     <div class="mb-3">
-                                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Year</label>
-                                        <select id="filter-year" class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
+                                        <label
+                                            class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Year</label>
+                                        <select id="filter-year"
+                                            class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
                                             <option value="ALL">All Years</option>
                                             <!-- Dynamically populated -->
                                         </select>
                                     </div>
                                     <!-- Status select -->
                                     <div class="mb-4">
-                                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Status</label>
-                                        <select id="filter-status" class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
+                                        <label
+                                            class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Status</label>
+                                        <select id="filter-status"
+                                            class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
                                             <option value="ALL">All Status</option>
                                             <option value="ONGOING">Ongoing</option>
                                             <option value="EXPIRED">Expired</option>
@@ -233,7 +243,8 @@ require_once __DIR__ . '/../../config/vite.php';
                                             <option value="ABSORBED">Absorbed</option>
                                         </select>
                                     </div>
-                                    <button id="apply-filters-button" type="button" aria-pressed="false" class="w-full bg-blue-700 hover:bg-royal-blue text-white font-bold py-2 px-4 rounded-lg text-xs transition-colors cursor-pointer active:scale-95 shadow-md">
+                                    <button id="apply-filters-button" type="button" aria-pressed="false"
+                                        class="w-full bg-blue-700 hover:bg-royal-blue text-white font-bold py-2 px-4 rounded-lg text-xs transition-colors cursor-pointer active:scale-95 shadow-md">
                                         Filter Mode: OFF
                                     </button>
                                 </div>
@@ -247,14 +258,16 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <svg class="w-5 h-5 transition-transform group-hover:rotate-180" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <!-- Sort Asc/Desc Icon -->
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                                 </svg>
                             </button>
                             <!-- Sort Dropdown Menu -->
                             <div id="sort-dropdown"
                                 class="z-50 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
                                 <div class="px-4 py-3 bg-orange-50/50 rounded-t-xl">
-                                    <span class="block text-[10px] font-black text-orange-600 uppercase tracking-wider">Sort
+                                    <span
+                                        class="block text-[10px] font-black text-orange-600 uppercase tracking-wider">Sort
                                         Beneficiaries</span>
                                 </div>
                                 <ul class="py-2 text-xs font-bold text-gray-700" aria-labelledby="sort-dropdown-button">
@@ -321,7 +334,8 @@ require_once __DIR__ . '/../../config/vite.php';
                 </div>
 
                 <!-- Modern Pagination Footer -->
-                <div id="pagination-controls" class="px-4 py-3 bg-white border-t border-gray-100 flex items-center justify-between font-montserrat">
+                <div id="pagination-controls"
+                    class="px-4 py-3 bg-white border-t border-gray-100 flex items-center justify-between font-montserrat">
                     <!-- Pagination will be injected by LDNgip.js -->
                 </div>
             </div>
