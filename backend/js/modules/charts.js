@@ -105,6 +105,9 @@ const MUNICIPALITY_TARGETS = {
  * Initialize all dashboard charts
  */
 export async function initCharts(forceRefresh = false) {
+    // Skip silently when user is not authenticated — charts only render on dashboard
+    if (localStorage.getItem('isLoggedIn') !== 'true') return;
+
     let rawData = [];
 
     if (forceRefresh) {
@@ -120,12 +123,12 @@ export async function initCharts(forceRefresh = false) {
             if (result.success && result.data?.success && result.data?.beneficiaries) {
                 rawData = result.data.beneficiaries;
             } else {
-                console.error('[CHARTS] API Fetch Failed:', result.error || result.data?.error);
+                console.debug('[CHARTS] Skipping chart render:', result.data?.error || result.error);
                 return;
             }
-            cachedRawData = rawData; 
+            cachedRawData = rawData;
         } catch (error) {
-            console.error('[CHARTS] Fatal Error:', error);
+            console.debug('[CHARTS] Chart init skipped:', error?.message);
             return;
         }
     }

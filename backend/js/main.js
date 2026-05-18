@@ -10,7 +10,7 @@ import Datepicker from 'flowbite-datepicker/Datepicker';
 import DateRangePicker from 'flowbite-datepicker/DateRangePicker';
 import { initLoginHandler, initLogoutHandler, initSmartLoader, initMobileSplash } from './modules/auth.js';
 import { initCharts } from './modules/charts.js';
-import { initLDNPage } from './modules/ldngip.js';
+import { initLDNPage, loadBeneficiaries } from './modules/ldngip.js';
 import { initModalHandler, updateUIProfile } from './modules/modal.js';
 import { initExportPage } from './modules/export.js';
 import { getBasePath } from './modules/auth.js';
@@ -54,6 +54,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Page specific initialization
     if (path.includes('/export/') && !path.includes('log.php')) {
         initExportPage();
+    }
+
+    // Background preload: warm up IndexedDB cache while the page-load animation plays.
+    // Runs on dashboard/non-LDN pages so the LDN list is instant on next navigation.
+    const isLDNPage = document.getElementById('beneficiary-table-body') !== null;
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (!isLDNPage && isLoggedIn) {
+        // Defer so it never blocks the current page's render
+        setTimeout(() => loadBeneficiaries(), 1500);
     }
 
     // Add password toggle functionality

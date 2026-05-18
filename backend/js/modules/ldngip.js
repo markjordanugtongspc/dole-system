@@ -294,7 +294,7 @@ function populateYearFilter() {
  * 2. Fetch fresh data from remote API in background
  * 3. If data changed, update local cache and re-render
  */
-async function loadBeneficiaries(forceRemoteRefresh = false) {
+export async function loadBeneficiaries(forceRemoteRefresh = false) {
     // ── STEP 1: Serve from local cache immediately ───────────────────────────
     const localData = await getLocalBeneficiaries();
     if (localData.length > 0) {
@@ -338,42 +338,51 @@ async function loadBeneficiaries(forceRemoteRefresh = false) {
         // [OPTIMIZATION] Fetch directly from Supabase if available for maximum speed
         if (isSupabaseMode() && supabase) {
             const now = Date.now();
-            if (!forceRefresh && (now - lastSupabaseFetchTime < FETCH_THROTTLE_MS)) {
+            if (!forceRemoteRefresh && (now - lastSupabaseFetchTime < FETCH_THROTTLE_MS)) {
                 console.log('[Offline-First] Throttling Supabase fetch (using local cache)');
             } else {
                 console.log('[Offline-First] Fetching directly from Supabase (Optimized)...');
-                
-                // Fetch mappings if not already loaded
+
+                // Fetch mappings and offices lookup if not already loaded
+                let officeMap = {};
                 if (Object.keys(genderMap).length === 0) {
                     try {
-                        const [{ data: gData }, { data: sData }] = await Promise.all([
+                        const [{ data: gData }, { data: sData }, { data: oData }] = await Promise.all([
                             supabase.from('genders').select('gender_id, gender_name'),
-                            supabase.from('status_types').select('status_id, status_name')
+                            supabase.from('status_types').select('status_id, status_name'),
+                            // select('*') avoids 400 errors when schema column names differ (id vs office_id, office vs office_name)
+                            supabase.from('offices').select('*').limit(500)
                         ]);
                         if (gData) gData.forEach(g => genderMap[g.gender_id] = g.gender_name);
                         if (sData) sData.forEach(s => statusMap[s.status_id] = s.status_name);
+                        // Build office lookup keyed by every id-like column, valued by every name-like column
+                        if (oData) oData.forEach(o => {
+                            const name = o.office_name || o.office || o.name || '';
+                            const key = o.id ?? o.office_id;
+                            if (key != null) officeMap[key] = name;
+                        });
                     } catch (e) { console.warn('Mapping fetch failed:', e); }
                 }
 
                 const { data, error } = await supabase
                     .from('beneficiaries')
                     .select(`
-                        gip_id, 
-                        full_name, 
-                        contact_number, 
-                        address, 
-                        birthday, 
-                        age, 
-                        education, 
-                        start_date, 
-                        end_date, 
-                        series_number, 
-                        designation, 
-                        replacement_notes, 
-                        is_archived, 
+                        gip_id,
+                        full_name,
+                        contact_number,
+                        address,
+                        birthday,
+                        age,
+                        education,
+                        start_date,
+                        end_date,
+                        series_number,
+                        designation,
+                        replacement_notes,
+                        is_archived,
                         created_at,
                         gender_id,
-                        office_name,
+                        office_id,
                         status_id
                     `)
                     .eq('is_archived', false)
@@ -393,7 +402,7 @@ async function loadBeneficiaries(forceRemoteRefresh = false) {
                         startDate: b.start_date,
                         endDate: b.end_date,
                         seriesNo: b.series_number,
-                        office: b.office_name || 'N/A',
+                        office: (b.office_id && officeMap[b.office_id]) || 'N/A',
                         designation: b.designation,
                         replacement: b.replacement_notes,
                         remarks: statusMap[b.status_id] || 'UNKNOWN',
