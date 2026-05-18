@@ -44,9 +44,15 @@ let currentPage = getPageFromUrl();
 const itemsPerPage = 10;
 let filteredDataGlobal = null; // Store current filtered state for pagination
 let isInitialDataHydrating = true;
+let lastSupabaseFetchTime = 0;
+const FETCH_THROTTLE_MS = 2 * 60 * 1000; // 2 minutes
+let genderMap = {};
+let statusMap = {};
+
 
 let currentStatusFilter = localStorage.getItem('ldn_status_filter') || 'ONGOING';
 let currentYearFilter = localStorage.getItem('ldn_year_filter') || 'ALL';
+let currentOfficeFilter = localStorage.getItem('ldn_office_filter') || 'ALL';
 const FILTER_MODE_COOKIE = 'ldn_filter_mode';
 const FILTER_MODE_STORAGE_KEY = 'ldn_filter_mode';
 const DEFAULT_STATUS_FILTER = 'ONGOING';
@@ -105,6 +111,10 @@ function getFilteredBeneficiaries() {
                 if (isNaN(d.getTime())) return false;
                 return d.getFullYear().toString() === currentYearFilter;
             });
+        }
+
+        if (currentOfficeFilter !== 'ALL') {
+            result = result.filter(b => (b.office || '').toUpperCase().includes(currentOfficeFilter.toUpperCase()));
         }
     } else {
         // Default mode: always show latest ONGOING rows.
@@ -324,13 +334,85 @@ async function loadBeneficiaries(forceRemoteRefresh = false) {
     // ── STEP 3: Background refresh from remote API ───────────────────────────
     try {
         let remoteData = [];
-        // [HYBRID-BRIDGE] Use authorized PHP API to bypass RLS issues in Production
-        const result = await apiGet('api/beneficiaries.php');
-        if (result.success && result.data?.success && result.data?.beneficiaries) {
-            remoteData = result.data.beneficiaries;
-        } else {
-            console.error('[GIP] API Fetch Failed:', result.error || result.data?.error);
-            throw new Error(result.error || result.data?.error || 'Fetch failed from API');
+        
+        // [OPTIMIZATION] Fetch directly from Supabase if available for maximum speed
+        if (isSupabaseMode() && supabase) {
+            const now = Date.now();
+            if (!forceRefresh && (now - lastSupabaseFetchTime < FETCH_THROTTLE_MS)) {
+                console.log('[Offline-First] Throttling Supabase fetch (using local cache)');
+            } else {
+                console.log('[Offline-First] Fetching directly from Supabase (Optimized)...');
+                
+                // Fetch mappings if not already loaded
+                if (Object.keys(genderMap).length === 0) {
+                    try {
+                        const [{ data: gData }, { data: sData }] = await Promise.all([
+                            supabase.from('genders').select('gender_id, gender_name'),
+                            supabase.from('status_types').select('status_id, status_name')
+                        ]);
+                        if (gData) gData.forEach(g => genderMap[g.gender_id] = g.gender_name);
+                        if (sData) sData.forEach(s => statusMap[s.status_id] = s.status_name);
+                    } catch (e) { console.warn('Mapping fetch failed:', e); }
+                }
+
+                const { data, error } = await supabase
+                    .from('beneficiaries')
+                    .select(`
+                        gip_id, 
+                        full_name, 
+                        contact_number, 
+                        address, 
+                        birthday, 
+                        age, 
+                        education, 
+                        start_date, 
+                        end_date, 
+                        series_number, 
+                        designation, 
+                        replacement_notes, 
+                        is_archived, 
+                        created_at,
+                        gender_id,
+                        office_name,
+                        status_id
+                    `)
+                    .eq('is_archived', false)
+                    .order('created_at', { ascending: false });
+
+                if (!error && data) {
+                    lastSupabaseFetchTime = now;
+                    remoteData = data.map(b => ({
+                        id: b.gip_id,
+                        name: b.full_name,
+                        contact: b.contact_number,
+                        address: b.address,
+                        birthday: b.birthday,
+                        age: b.age,
+                        gender: genderMap[b.gender_id] || (b.gender_id == 1 ? 'Male' : (b.gender_id == 2 ? 'Female' : 'N/A')),
+                        education: b.education,
+                        startDate: b.start_date,
+                        endDate: b.end_date,
+                        seriesNo: b.series_number,
+                        office: b.office_name || 'N/A',
+                        designation: b.designation,
+                        replacement: b.replacement_notes,
+                        remarks: statusMap[b.status_id] || 'UNKNOWN',
+                        createdAt: b.created_at
+                    }));
+                } else if (error) {
+                    console.warn('[Offline-First] Supabase direct fetch failed, falling back to PHP Bridge:', error.message);
+                }
+            }
+        }
+
+        // Fallback to PHP Bridge if direct fetch failed or not in Supabase mode
+        if (remoteData.length === 0) {
+            const result = await apiGet('api/beneficiaries.php');
+            if (result.success && result.data?.success && result.data?.beneficiaries) {
+                remoteData = result.data.beneficiaries;
+            } else {
+                throw new Error(result.error || 'Fetch failed from API');
+            }
         }
 
         // Only update if something actually changed
@@ -370,12 +452,201 @@ function syncExpiredStatusesLocally(dataArray) {
     });
 }
 
+function initOfficeFilter() {
+    const dropdown = document.getElementById('office-filter-dropdown');
+    if (!dropdown) return;
+
+    let currentView = 'OFFICES';
+    let selectedOffice = null;
+    let cachedOffices = [];
+
+    const fetchOffices = async () => {
+        if (cachedOffices.length > 0) return cachedOffices;
+        try {
+            const res = await apiGet('api/beneficiaries.php?get_offices_advanced=1');
+            if (res.success && res.data?.success && Array.isArray(res.data.offices)) {
+                cachedOffices = res.data.offices;
+            }
+        } catch (err) { console.error('Filter office fetch failed:', err); }
+        return cachedOffices;
+    };
+
+    const render = async (view = 'OFFICES', office = null, filter = '') => {
+        currentView = view;
+        selectedOffice = office;
+
+        if (view === 'OFFICES') {
+            const offices = await fetchOffices();
+            const filteredOffices = offices.filter(o => o.office.toLowerCase().includes(filter.toLowerCase()));
+
+            dropdown.innerHTML = `
+                <div class="px-4 py-3 bg-blue-50/50 rounded-t-xl border-b border-gray-100 flex items-center justify-between">
+                    <span class="block text-[10px] font-black text-royal-blue uppercase tracking-wider">OFFICE CODE</span>
+                </div>
+                <div class="p-2">
+                    <div class="relative mb-2">
+                        <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-400">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                        <input type="text" id="office-filter-search" placeholder="Search offices..." 
+                            class="w-full pl-8 pr-3 py-1.5 text-[10px] font-bold bg-gray-50 border border-gray-100 focus:ring-blue-500 focus:border-blue-500 rounded-lg outline-none"
+                            value="${filter}">
+                    </div>
+                    <ul class="max-h-60 overflow-y-auto py-1 text-xs font-bold text-gray-700 scrollbar-hide">
+                        ${filteredOffices.length > 0 ? filteredOffices.map(o => {
+                            const hasLocations = parseInt(o.location_count || 0) > 0;
+                            return `
+                                <li class="mb-0.5">
+                                    <button class="office-filter-opt flex items-center justify-between w-full px-4 py-2 rounded-lg hover:bg-blue-50 hover:text-royal-blue transition-colors group ${hasLocations ? 'cursor-pointer' : 'cursor-default opacity-60'}" 
+                                        data-id="${o.id}" data-name="${o.office}" data-has-locations="${hasLocations}">
+                                        <span class="truncate">${o.office}</span>
+                                        ${hasLocations ? `<svg class="w-3 h-3 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>` : ''}
+                                    </button>
+                                </li>
+                            `;
+                        }).join('') : '<li class="px-4 py-3 text-center text-gray-400 italic">No offices found.</li>'}
+                    </ul>
+                </div>
+            `;
+
+            const search = dropdown.querySelector('#office-filter-search');
+            search.addEventListener('input', () => render('OFFICES', null, search.value));
+            search.addEventListener('click', e => e.stopPropagation());
+            setTimeout(() => search.focus(), 50);
+
+            dropdown.querySelectorAll('.office-filter-opt').forEach(btn => {
+                if (btn.dataset.hasLocations === 'true') {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        render('LOCATIONS', { id: btn.dataset.id, name: btn.dataset.name });
+                    });
+                }
+            });
+        } else {
+            dropdown.innerHTML = `
+                <div class="px-4 py-3 bg-blue-50/50 rounded-t-xl border-b border-gray-100 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                         <div class="p-1 rounded-md bg-green-500/10 text-green-600">
+                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                        <span class="block text-[10px] font-black text-royal-blue uppercase tracking-wider">OFFICE LOCATION</span>
+                    </div>
+                    <button id="back-to-offices-filter" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all cursor-pointer shadow-sm active:scale-90 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"/></svg>
+                    </button>
+                </div>
+                <div class="p-2">
+                    <div class="relative mb-2">
+                        <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-400">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                        <input type="text" id="loc-filter-search" placeholder="Search in ${office.name}..." 
+                            class="w-full pl-8 pr-3 py-1.5 text-[10px] font-bold bg-gray-50 border border-gray-100 focus:ring-blue-500 focus:border-blue-500 rounded-lg outline-none">
+                    </div>
+                    <ul id="loc-filter-list" class="max-h-60 overflow-y-auto py-1 text-xs font-bold text-gray-700 scrollbar-hide">
+                        <li class="px-4 py-4 text-center text-gray-400 animate-pulse">Fetching...</li>
+                    </ul>
+                </div>
+            `;
+
+            const locList = dropdown.querySelector('#loc-filter-list');
+            const search = dropdown.querySelector('#loc-filter-search');
+            
+            let locations = [];
+            try {
+                const res = await apiGet(`api/beneficiaries.php?get_office_locations=1&office_id=${office.id}`);
+                if (res.success && res.data?.success && Array.isArray(res.data.locations)) locations = res.data.locations;
+            } catch (err) { console.error('Filter locations fetch failed:', err); }
+
+            const renderLocs = (f = '') => {
+                const filtered = locations.filter(l => l.location.toLowerCase().includes(f.toLowerCase()));
+                locList.innerHTML = filtered.length > 0 ? filtered.map(l => `
+                    <li class="mb-0.5">
+                        <button class="loc-filter-opt group/loc flex items-center w-full px-4 py-2 rounded-lg hover:bg-blue-50 hover:text-royal-blue transition-colors cursor-pointer" data-location="${l.location}">
+                            <div class="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover/loc:bg-blue-500 mr-3 shrink-0"></div>
+                            <span class="truncate">${l.location}</span>
+                        </button>
+                    </li>
+                `).join('') : '<li class="px-4 py-3 text-center text-gray-400 italic">No locations found.</li>';
+
+                locList.querySelectorAll('.loc-filter-opt').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        window.setOfficeFilter(`${office.name} - ${btn.dataset.location}`);
+                    });
+                });
+            };
+
+            renderLocs();
+            setTimeout(() => search.focus(), 50);
+            search.addEventListener('input', () => renderLocs(search.value));
+            search.addEventListener('click', e => e.stopPropagation());
+            dropdown.querySelector('#back-to-offices-filter').addEventListener('click', e => {
+                e.stopPropagation();
+                render('OFFICES');
+            });
+        }
+    };
+
+    // Initial render
+    render();
+    syncHeaderWithFilter();
+}
+
+function syncHeaderWithFilter() {
+    const headerPrefix = document.getElementById('ldn-header-prefix');
+    const clearBtn = document.getElementById('clear-office-filter-btn');
+    if (!headerPrefix) return;
+
+    if (currentOfficeFilter === 'ALL') {
+        headerPrefix.textContent = 'Lanao Del Norte';
+        if (clearBtn) clearBtn.classList.add('hidden');
+    } else {
+        headerPrefix.textContent = currentOfficeFilter;
+        if (clearBtn) {
+            clearBtn.classList.remove('hidden');
+            clearBtn.classList.add('flex');
+        }
+    }
+}
+
+window.setOfficeFilter = (officeName) => {
+    currentOfficeFilter = officeName;
+    localStorage.setItem('ldn_office_filter', officeName);
+    
+    // Enable filter mode if it wasn't
+    if (!filterModeEnabled) {
+        persistFilterMode(true);
+        updateFilterUI();
+        updateFilterInputsAvailability();
+        updateFilterToggleButtonUI();
+    }
+
+    syncHeaderWithFilter();
+    currentPage = 1;
+    renderTable();
+    
+    // Hide dropdowns
+    const dropdown = document.getElementById('office-filter-dropdown');
+    const sortDropdown = document.getElementById('sort-dropdown');
+    if (dropdown) dropdown.classList.add('hidden');
+    if (sortDropdown) sortDropdown.classList.add('hidden');
+};
+
+window.clearOfficeFilter = () => {
+    window.setOfficeFilter('ALL');
+};
+
+export function initLDNHeader() {
+    // Already handled in syncHeaderWithFilter but kept for compatibility
+}
+
 export function initLDNPage() {
     loadBeneficiaries(); // Load from database
     initLDNHeader();
     initSearch();
     initFilterControls();
-    // initAutoRefresh(); // Removed as per user request to rely on Supabase Realtime instead
+    initOfficeFilter(); // New office filter logic
+    initRealtimeSubscription(); // Instant updates from Supabase
 
     // Wire the Export Logs button
     const exportBtn = document.getElementById('ldn-export-logs-btn');
@@ -389,6 +660,57 @@ export function initLDNPage() {
     window.addEventListener('dataSynced', () => {
         loadBeneficiaries(true);
     });
+}
+
+/**
+ * Initialize Supabase Realtime Subscription
+ * Replaces polling with instant event-based updates
+ */
+function initRealtimeSubscription() {
+    if (!isSupabaseMode() || !supabase) return;
+
+    console.log('[Supabase Realtime] Subscribing to beneficiaries...');
+
+    const channel = supabase
+        .channel('beneficiaries_changes')
+        .on('postgres_changes', { 
+            event: '*', 
+            schema: 'public', 
+            table: 'beneficiaries' 
+        }, async (payload) => {
+            console.log('[Supabase Realtime] Change detected:', payload.eventType);
+            
+            // Re-fetch to synchronize the entire list
+            await loadBeneficiaries(true); 
+
+            if (payload.eventType === 'INSERT') {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'New Beneficiary Added',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            } else if (payload.eventType === 'UPDATE') {
+                if (payload.new.is_archived === true && payload.old.is_archived === false) return;
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'info',
+                    title: 'Record Updated',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+        })
+        .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+                console.log('[Supabase Realtime] Listening for live changes! ⚡');
+            }
+        });
 }
 
 function initFilterControls() {
@@ -880,37 +1202,6 @@ export async function archiveRecord(id) {
             text: error.message
         });
         return false;
-    }
-}
-
-function initLDNHeader() {
-    const headerContainer = document.getElementById('ldn-header-container');
-    const headerText = document.getElementById('ldn-header-text');
-    const headerIcon = document.getElementById('ldn-header-icon');
-
-    if (headerContainer && headerText && headerIcon) {
-        headerContainer.addEventListener('click', () => {
-            // Skip toggle if on mobile (icon is hidden and text is auto-shortened via CSS)
-            if (window.innerWidth < 640) return;
-
-            const currentText = headerText.innerText.trim();
-            const longText = "Lanao Del Norte - GIP";
-            const shortText = "LDN - GIP";
-
-            // If we have spans (from the recent HTML update), target the text content properly
-            const isShort = headerText.querySelector('.sm\\:hidden')?.offsetParent !== null;
-            
-            if (currentText.includes(longText)) {
-                headerText.innerHTML = shortText;
-                headerIcon.classList.add('rotate-180');
-            } else {
-                headerText.innerHTML = longText;
-                headerIcon.classList.remove('rotate-180');
-            }
-        });
-
-        headerContainer.classList.add('cursor-pointer', 'select-none', 'transition-all', 'duration-200');
-        headerIcon.classList.add('transition-transform', 'duration-200');
     }
 }
 

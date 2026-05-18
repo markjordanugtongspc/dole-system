@@ -111,10 +111,10 @@ require_once __DIR__ . '/../../config/vite.php';
             <div class="mb-6 flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2 transition-all duration-200 cursor-pointer select-none"
                     id="ldn-header-container">
-                    <h1 class="text-xl sm:text-3xl font-black text-heading mb-0 sm:mb-2 leading-tight"
-                        id="ldn-header-text">
-                        <span class="sm:hidden">LDN - GIP</span>
-                        <span class="hidden sm:inline">Lanao Del Norte - GIP</span>
+                    <h1 class="text-xl sm:text-3xl font-black text-heading mb-0 sm:mb-2 leading-tight flex items-center gap-2"
+                        id="ldn-header-wrapper">
+                        <span id="ldn-header-prefix" class="truncate">Lanao Del Norte</span>
+                        <span class="text-brand shrink-0">- GIP</span>
                     </h1>
                     <div id="ldn-header-icon" class="mb-1 text-royal-blue hidden sm:block">
                         <!-- Clickable SVG Icon -->
@@ -252,7 +252,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         </div>
 
                         <!-- Sort actions -->
-                        <div class="relative shrink-0">
+                        <div class="relative shrink-0 flex items-center gap-2">
                             <button id="sort-dropdown-button" data-dropdown-toggle="sort-dropdown"
                                 class="flex items-center justify-center p-2.5 text-gray-500 rounded-full hover:bg-orange-50 hover:text-orange-600 transition-all duration-300 border border-default hover:border-orange-100 group shadow-sm cursor-pointer">
                                 <svg class="w-5 h-5 transition-transform group-hover:rotate-180" fill="none"
@@ -262,6 +262,19 @@ require_once __DIR__ . '/../../config/vite.php';
                                         d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                                 </svg>
                             </button>
+
+                            <!-- Clear Filter Button -->
+                            <button id="clear-office-filter-btn" onclick="clearOfficeFilter()"
+                                data-tooltip-target="tooltip-clear-filter"
+                                class="hidden items-center justify-center p-2.5 text-red-500 rounded-full hover:bg-red-50 transition-all duration-300 border border-red-100 hover:border-red-200 group shadow-sm cursor-pointer active:scale-95">
+                                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                            <div id="tooltip-clear-filter" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-xs font-bold text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
+                                Clear Office Filter
+                                <div class="tooltip-arrow" data-popper-arrow></div>
+                            </div>
                             <!-- Sort Dropdown Menu -->
                             <div id="sort-dropdown"
                                 class="z-50 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
@@ -277,9 +290,20 @@ require_once __DIR__ . '/../../config/vite.php';
                                     <li><button onclick="sortData('name_desc')"
                                             class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Name
                                             (Z-A)</button></li>
+                                    <li>
+                                        <button id="office-filter-trigger" data-dropdown-toggle="office-filter-dropdown" data-dropdown-placement="right-start"
+                                            class="flex items-center justify-between w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer group">
+                                            <span>Filter by Office</span>
+                                            <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                                        </button>
+                                    </li>
+                                    <!-- Office Filter Sub-Dropdown -->
+                                    <div id="office-filter-dropdown" class="z-[60] hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-64 border border-gray-100 font-montserrat">
+                                        <!-- Content populated by ldngip.js -->
+                                    </div>
+                                    <div class="border-t border-gray-50 my-1"></div>
                                     <li><button onclick="sortData('office')"
-                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Office
-                                            / Assignment</button></li>
+                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Sort by Office</button></li>
                                     <li><button onclick="sortData('remarks')"
                                             class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Remarks
                                             Status</button></li>

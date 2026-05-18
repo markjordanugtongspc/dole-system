@@ -1,6 +1,7 @@
 import { isDarkMode } from './darkmode.js';
-import { getBasePath } from './auth.js';
+import { getBasePath, isSupabaseMode } from './auth.js';
 import { apiGet, apiRequest } from './ajax-manager.js';
+import { supabase } from './supabase-client.js';
 import Swal from 'sweetalert2';
 import { ASSURED_RELATIONSHIPS, COMMON_COURSES, COMMON_NATURE_OF_WORK } from './modal.js';
 
@@ -8,7 +9,6 @@ export function showEditBeneficiaryDrawer(data) {
     const dk = isDarkMode();
     const inputClass = `w-full bg-transparent border-b-2 ${dk ? 'border-slate-700 text-white focus:border-brand placeholder-slate-600' : 'border-gray-200 text-gray-900 focus:border-brand placeholder-gray-300'} px-1 py-1 text-sm font-black outline-none transition-all focus:ring-0`;
     const headingInputClass = `w-full bg-transparent border-none ${dk ? 'text-white' : 'text-royal-blue'} px-0 py-0 text-xl sm:text-2xl font-black leading-tight tracking-tight focus:ring-0 outline-none placeholder-gray-300 resize-none overflow-hidden`;
-    const officeDefaults = ['DOLE Field Office', 'LGU', 'DEPED', 'DICT', 'PCA'];
 
     function calculateAge(birthday) {
         if (!birthday) return '';
@@ -66,13 +66,13 @@ export function showEditBeneficiaryDrawer(data) {
              </div>
         </div>
 
-        <div class="flex flex-col gap-1 text-left">
+        <div class="flex flex-col gap-1 text-left relative">
             <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ASSIGNED OFFICE</span>
             <input type="text" name="office" id="edit-office-input" value="${data.office || ''}" 
                 class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-[10px] sm:text-[11px] font-black px-2.5 py-2.5 rounded-lg border border-indigo-200 dark:border-indigo-800/60 uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full placeholder-indigo-300 dark:placeholder-indigo-700 h-[42px]"
                 placeholder="e.g. DOLE Field Office">
-            <div id="edit-office-suggestions-box" class="hidden absolute mt-[60px] z-[60] bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg max-h-40 overflow-y-auto w-full sm:w-[50%] right-0">
-                ${officeDefaults.map(o => `<button type="button" class="edit-office-option w-full text-left px-3 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer"><span class="option-text">${o}</span></button>`).join('')}
+            <div id="edit-office-suggestions-box" class="hidden absolute mt-[45px] left-0 right-0 z-[100] bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl shadow-2xl min-w-[280px] overflow-hidden backdrop-blur-xl">
+                <!-- Content injected via JS -->
             </div>
         </div>
     </div>
@@ -163,7 +163,7 @@ export function showEditBeneficiaryDrawer(data) {
             <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest pl-1">Designation / Role</span>
             <input type="text" name="designation" id="edit-designation-input" value="${data.designation || ''}" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white px-3 py-2.5 text-xs font-black outline-none focus:ring-2 focus:ring-brand rounded-lg shadow-sm" placeholder="Nature of Work...">
             <div id="edit-designation-suggestions-box" class="hidden mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                ${COMMON_NATURE_OF_WORK.map(w => `<button type="button" class="edit-designation-option w-full text-left px-3 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer"><span class="option-text">${w}</span></button>`).join('')}
+                <!-- Suggestions will be injected here -->
             </div>
         </div>
         
@@ -253,26 +253,24 @@ export function showEditBeneficiaryDrawer(data) {
         }
     }, 10);
 
-    // Fetch offices for suggestions from database
-    (async () => {
-        try {
-            const res = await apiRequest('api/beneficiaries.php?get_offices=1');
-            if (res.success && res.data.offices) {
-                const box = drawerContainer.querySelector('#edit-office-suggestions-box');
-                if (box) {
-                    const defaultOffices = ['DOLE Field Office', 'LGU', 'DEPED', 'DICT', 'PCA'];
-                    const allOffices = [...new Set([...defaultOffices, ...res.data.offices])];
-                    box.innerHTML = allOffices.map(o => `
-                        <button type="button" class="edit-office-option w-full text-left px-3 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer">
-                            <span class="option-text">${o}</span>
-                        </button>
-                    `).join('');
-                }
-            }
-        } catch (err) {
-            console.error('Error fetching office suggestions:', err);
-        }
-    })();
+    // [DYNAMIC] Suggestions for Education and Designation
+    const educationBox = drawerContainer.querySelector('#edit-education-suggestions-box');
+    if (educationBox) {
+        educationBox.innerHTML = COMMON_COURSES.map(c => `
+            <button type="button" class="edit-education-option w-full text-left px-3 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer">
+                <span class="option-text">${c.name}</span>
+            </button>
+        `).join('');
+    }
+
+    const designationBox = drawerContainer.querySelector('#edit-designation-suggestions-box');
+    if (designationBox) {
+        designationBox.innerHTML = COMMON_NATURE_OF_WORK.map(w => `
+            <button type="button" class="edit-designation-option w-full text-left px-3 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer">
+                <span class="option-text">${w}</span>
+            </button>
+        `).join('');
+    }
 
     import('flowbite').then(({ Drawer }) => {
         const drawer = new Drawer(drawerContainer, {
@@ -563,7 +561,221 @@ export function showEditBeneficiaryDrawer(data) {
 
         setupSuggestionBox('#edit-education-input', '#edit-education-suggestions-box', '.edit-education-option');
         setupSuggestionBox('#edit-designation-input', '#edit-designation-suggestions-box', '.edit-designation-option');
-        setupSuggestionBox('#edit-office-input', '#edit-office-suggestions-box', '.edit-office-option');
+        
+        // --- ENHANCED OFFICE SELECTOR ---
+        const setupOfficeSelectorEdit = () => {
+            const officeInput = drawerContainer.querySelector('#edit-office-input');
+            const officeContainer = drawerContainer.querySelector('#edit-office-suggestions-box');
+            if (!officeInput || !officeContainer) return;
+
+            // Move the box down slightly to clear the input padding/border
+            officeContainer.classList.add('mt-[52px]');
+
+            let currentView = 'OFFICES';
+            let selectedOffice = null;
+            let cachedOffices = [];
+
+            const t = {
+                textLabel: dk ? 'text-slate-400' : 'text-slate-500',
+                textHeading: dk ? 'text-white' : 'text-royal-blue',
+                borderDivide: dk ? 'border-slate-800' : 'border-slate-100',
+                courseHover: dk ? 'hover:bg-slate-800/80' : 'hover:bg-blue-50',
+                textCourseOpt: dk ? 'text-slate-300' : 'text-slate-700'
+            };
+
+            const fetchOffices = async () => {
+                const cacheKey = 'dole_offices_cache';
+                
+                const syncBackground = async () => {
+                    let freshData = [];
+                    try {
+                        const res = await apiGet('api/beneficiaries.php?get_offices_advanced=1');
+                        if (res.success && res.data?.success && Array.isArray(res.data.offices)) freshData = res.data.offices;
+                    } catch (err) { console.error('Office fetch failed:', err); }
+
+                    if (freshData.length > 0) {
+                        cachedOffices = freshData;
+                        localStorage.setItem(cacheKey, JSON.stringify({ data: freshData, timestamp: Date.now() }));
+                    }
+                    return freshData;
+                };
+
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) {
+                    try {
+                        const { data, timestamp } = JSON.parse(cached);
+                        cachedOffices = data;
+                        // If older than 30 mins, sync in background but don't wait
+                        if (Date.now() - timestamp > 30 * 60 * 1000) {
+                            syncBackground().then(() => {
+                                // Optional: re-render if we are still on the OFFICES view
+                                if (currentView === 'OFFICES') render('OFFICES', selectedOffice, officeInput.value);
+                            });
+                        }
+                        return data;
+                    } catch (e) { localStorage.removeItem(cacheKey); }
+                }
+
+                // If no cache, we MUST await
+                if (cachedOffices.length === 0) {
+                    return await syncBackground();
+                }
+                return cachedOffices;
+            };
+
+            const render = async (view = 'OFFICES', office = null, filter = '') => {
+                currentView = view;
+                selectedOffice = office;
+                
+                if (view === 'OFFICES') {
+                    const offices = await fetchOffices();
+                    const filteredOffices = offices.filter(o => o.office.toLowerCase().includes(filter.toLowerCase()));
+                    
+                    officeContainer.innerHTML = `
+                        <div class="px-2.5 py-1.5 text-[7px] font-black uppercase tracking-widest ${t.textLabel} opacity-70 border-b ${t.borderDivide} mb-1">OFFICE CODE</div>
+                        <div class="max-h-64 overflow-y-auto scrollbar-hide">
+                            ${filteredOffices.length > 0 ? filteredOffices.map(o => {
+                                const hasLocations = parseInt(o.location_count || 0) > 0;
+                                return `
+                                    <div class="office-code-option group/opt px-3 py-2 text-[9px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg ${hasLocations ? 'cursor-pointer' : 'cursor-default opacity-60'} transition-all flex items-center justify-between group active:scale-[0.98] mx-1 mb-0.5" 
+                                        data-id="${o.id}" data-name="${o.office}" data-has-locations="${hasLocations}">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-2 h-2 rounded-md bg-blue-500/10 group-hover/opt:bg-blue-500/20 flex items-center justify-center transition-colors">
+                                                <div class="w-1 h-1 rounded-full bg-blue-500/40 group-hover/opt:bg-blue-500 transition-colors"></div>
+                                            </div>
+                                            <span class="option-text">${o.office}</span>
+                                        </div>
+                                        ${hasLocations ? `<svg class="w-3 h-3 text-slate-300 group-hover/opt:text-blue-500 group-hover/opt:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>` : ''}
+                                    </div>
+                                `;
+                            }).join('') : `<div class="px-3 py-6 text-center text-[9px] font-bold ${t.textLabel} opacity-60">No matching offices.</div>`}
+                        </div>
+                    `;
+
+                    officeContainer.querySelectorAll('.office-code-option').forEach(opt => {
+                        opt.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (opt.dataset.hasLocations === 'true') {
+                                render('LOCATIONS', { id: opt.dataset.id, name: opt.dataset.name });
+                            } else {
+                                officeInput.value = opt.dataset.name;
+                                officeContainer.classList.add('hidden');
+                                officeInput.dispatchEvent(new Event('change'));
+                            }
+                        });
+                    });
+                } else {
+                    officeContainer.innerHTML = `
+                        <div class="flex items-center justify-between px-3 py-2 border-b ${t.borderDivide} bg-slate-50/95 dark:bg-slate-900 sticky top-0 backdrop-blur-sm z-10 rounded-t-xl">
+                            <div class="flex items-center gap-2">
+                                <div class="p-1 rounded-md bg-green-500/10 text-green-600">
+                                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </div>
+                                <div class="text-[7px] font-black uppercase tracking-widest ${t.textLabel} opacity-70">OFFICE LOCATION</div>
+                            </div>
+                            <button type="button" id="back-to-offices-edit" class="p-1.5 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-100 transition-all cursor-pointer shadow-sm active:scale-90 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"/></svg>
+                            </button>
+                        </div>
+                        <div class="p-2 border-b ${t.borderDivide}">
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                </div>
+                                <input type="text" id="location-search-edit" placeholder="Search in ${office.name}..." 
+                                    class="w-full pl-8 pr-3 py-1.5 text-[9px] font-bold bg-slate-100/50 dark:bg-slate-800/50 border-transparent focus:border-blue-500 focus:ring-0 rounded-lg transition-all"
+                                    value="${filter.includes(' - ') ? filter.split(' - ')[1] : ''}">
+                            </div>
+                        </div>
+                        <div id="loc-list-edit" class="max-h-64 overflow-y-auto scrollbar-hide p-1">
+                            <div class="px-3 py-4 text-center text-[9px] font-bold ${t.textLabel} animate-pulse">Fetching...</div>
+                        </div>
+                    `;
+
+                    const locList = officeContainer.querySelector('#loc-list-edit');
+                    const search = officeContainer.querySelector('#location-search-edit');
+                    const locCacheKey = `dole_locs_cache_${office.id}`;
+                    let locations = [];
+                    
+                    // [SPEED-OPTIMIZATION] Try local cache first
+                    const locCached = localStorage.getItem(locCacheKey);
+                    if (locCached) {
+                        try {
+                            const { data, timestamp } = JSON.parse(locCached);
+                            locations = data;
+                            // If cache is fresh, don't even show "Fetching..."
+                            if (Date.now() - timestamp < 60 * 60 * 1000) {
+                                // Already have fresh data
+                            }
+                        } catch (e) { localStorage.removeItem(locCacheKey); }
+                    }
+
+                    const fetchFreshLocs = async () => {
+                        let freshLocs = [];
+                        if (supabase && isSupabaseMode()) {
+                            const { data, error } = await supabase.from('office_locations').select('location').eq('office_id', office.id).order('location');
+                            if (!error && data) freshLocs = data;
+                        }
+                        if (freshLocs.length === 0) {
+                            try {
+                                const res = await apiGet(`api/beneficiaries.php?get_office_locations=1&office_id=${office.id}`);
+                                if (res.success && res.data?.success && Array.isArray(res.data.locations)) freshLocs = res.data.locations;
+                            } catch (err) { console.error('Office locations fetch failed:', err); }
+                        }
+
+                        if (freshLocs.length > 0) {
+                            locations = freshLocs;
+                            localStorage.setItem(locCacheKey, JSON.stringify({ data: freshLocs, timestamp: Date.now() }));
+                            renderLocs(search.value);
+                        }
+                    };
+
+                    const renderLocs = (f = '') => {
+                        const filtered = locations.filter(l => l.location.toLowerCase().includes(f.toLowerCase()));
+                        locList.innerHTML = filtered.length > 0 ? filtered.map(l => `
+                            <div class="location-option-edit group/loc px-3 py-1.5 text-[9px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg cursor-pointer transition-all flex items-center gap-3 active:scale-[0.98] mb-0.5" data-location="${l.location}">
+                                <div class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 group-hover/loc:bg-blue-500 transition-all"></div>
+                                <span class="option-text truncate">${l.location}</span>
+                            </div>
+                        `).join('') : (locations.length === 0 ? `<div class="px-3 py-4 text-center text-[9px] font-bold ${t.textLabel} animate-pulse">Fetching...</div>` : `<div class="px-3 py-8 text-center text-[9px] font-bold ${t.textLabel} opacity-60">No matching locations.</div>`);
+
+                        locList.querySelectorAll('.location-option-edit').forEach(opt => {
+                            opt.addEventListener('click', () => {
+                                officeInput.value = `${office.name} - ${opt.dataset.location}`;
+                                officeContainer.classList.add('hidden');
+                                officeInput.dispatchEvent(new Event('change'));
+                            });
+                        });
+                    };
+
+                    renderLocs(search.value);
+                    fetchFreshLocs(); // Always trigger a background sync
+                    setTimeout(() => search.focus(), 50);
+                    search.addEventListener('input', () => renderLocs(search.value));
+                    search.addEventListener('click', e => e.stopPropagation());
+                    officeContainer.querySelector('#back-to-offices-edit').addEventListener('click', e => {
+                        e.stopPropagation();
+                        render('OFFICES');
+                    });
+                }
+            };
+
+            officeInput.addEventListener('focus', () => {
+                officeContainer.classList.remove('hidden');
+                render(currentView, selectedOffice, officeInput.value);
+            });
+
+            officeInput.addEventListener('input', () => {
+                if (currentView === 'OFFICES') render('OFFICES', null, officeInput.value);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!officeInput.contains(e.target) && !officeContainer.contains(e.target)) {
+                    officeContainer.classList.add('hidden');
+                }
+            });
+        };
+        setupOfficeSelectorEdit();
 
         // Replacement User Search Logic
         const repInput = drawerContainer.querySelector('#edit-replacement-input');

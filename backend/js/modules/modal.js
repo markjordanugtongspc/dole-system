@@ -9,6 +9,7 @@ import { showEditBeneficiaryDrawer } from './edit_drawer.js';
 
 export function initModalHandler() {
     // Expose the functions to the global window object
+    window.showAddDataModal = showAddDataModal;
     /**
      * SHARED UTILITIES
      */
@@ -419,10 +420,7 @@ export function showExportConfigModal(callback) {
                             <div class="relative group">
                                 <select id="export-office" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
                                     <option value="ALL" ${currentFilters.office === 'ALL' ? 'selected' : ''}>ALL OFFICES</option>
-                                    <option value="DOLE" ${currentFilters.office === 'DOLE' ? 'selected' : ''}>DOLE LDNPFO</option>
-                                    <option value="LGU" ${currentFilters.office === 'LGU' ? 'selected' : ''}>LGU / LOCAL GOVT</option>
-                                    <option value="DICT" ${currentFilters.office === 'DICT' ? 'selected' : ''}>DICT</option>
-                                    <option value="DEPED" ${currentFilters.office === 'DEPED' ? 'selected' : ''}>DEPED</option>
+                                    <!-- Options will be populated dynamically -->
                                 </select>
                                 <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
@@ -564,6 +562,29 @@ export function showExportConfigModal(callback) {
         },
         didOpen: (popup) => {
             const form = popup.querySelector('#export-config-form');
+            const officeSelect = form.querySelector('#export-office');
+            
+            if (officeSelect) {
+                (async () => {
+                    let offices = [];
+                    if (window.supabase && typeof window.isSupabaseMode === 'function' && window.isSupabaseMode()) {
+                        const { data, error } = await window.supabase.from('offices').select('office').order('office');
+                        if (!error && data) offices = data.map(o => o.office);
+                    }
+                    if (offices.length === 0) {
+                        try {
+                            const res = await window.apiGet('api/beneficiaries.php?get_offices=1');
+                            if (res.success && res.data?.success) offices = res.data.offices.map(o => typeof o === 'string' ? o : o.office);
+                        } catch(e){}
+                    }
+                    const currentOffice = currentFilters.office || 'ALL';
+                    let html = `<option value="ALL" ${currentOffice === 'ALL' ? 'selected' : ''}>ALL OFFICES</option>`;
+                    offices.forEach(o => {
+                        html += `<option value="${o}" ${currentOffice === o ? 'selected' : ''}>${o}</option>`;
+                    });
+                    officeSelect.innerHTML = html;
+                })();
+            }
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -842,6 +863,10 @@ export function showAddDataModal(data = null) {
                             <div class="group">
                                 <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Age</label>
                                 <input type="text" name="age" value="${data?.age || ''}" id="age-display" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-black ${t.textAge} outline-none font-mono focus:ring-4 ${t.focusGreen}" placeholder="Auto/Manual">
+                                <div id="age-warning" class="hidden mt-1 text-[10px] font-bold items-center gap-1.5 animate-pulse">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                    <span>Age must be between 18 and 29 years old</span>
+                                </div>
                             </div>
                         </div>
 
@@ -949,19 +974,8 @@ export function showAddDataModal(data = null) {
                                         <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                     </div>
                                     <div id="office-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
-                                        <!-- OFFICE CATEGORY MAP: edit this block for quick manual category adjustments -->
-                                        <div class="px-2.5 py-1 text-[8px] font-black uppercase tracking-widest ${t.textLabel} opacity-70">Public Sector</div>
-                                        ${['DOLE', 'LGU', 'DEPED'].map(office => `
-                                            <div class="office-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
-                                                <span class="option-text">${office}</span>
-                                            </div>
-                                        `).join('')}
-                                        <div class="px-2.5 py-1 mt-1 text-[8px] font-black uppercase tracking-widest ${t.textLabel} opacity-70">Private Sector</div>
-                                        ${['DICT', 'PCA'].map(office => `
-                                            <div class="office-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
-                                                <span class="option-text">${office}</span>
-                                            </div>
-                                        `).join('')}
+                                        <!-- Will be populated by JS -->
+                                        <div class="px-3 py-4 text-center text-[10px] font-bold ${t.textLabel} animate-pulse">Loading offices...</div>
                                     </div>
                                 </div>
                             </div>
@@ -1059,7 +1073,7 @@ export function showAddDataModal(data = null) {
                     <span>CANCEL</span>
                 </button>
 
-                <button type="submit" form="add-beneficiary-form"
+                <button type="submit" form="add-beneficiary-form" id="submit-beneficiary-btn"
                     class="group flex items-center justify-center gap-2.5 px-4 lg:px-6 py-3 lg:py-3.5 ${t.bgSaveBtn} text-white font-black rounded-xl transition-all duration-300 shadow-lg ${t.saveShadow} cursor-pointer text-[10px] lg:text-[12px] transform active:scale-[0.98] uppercase tracking-wider whitespace-nowrap order-2 lg:order-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                     <span>${isEdit ? 'UPDATE RECORD' : 'SAVE RECORD'}</span>
@@ -1145,11 +1159,54 @@ export function showAddDataModal(data = null) {
 
             const bdayInput = popup.querySelector('#birthday-input');
             const ageDisplay = popup.querySelector('#age-display');
+            const ageWarning = popup.querySelector('#age-warning');
+            const submitBtn = popup.querySelector('#submit-beneficiary-btn');
+
+            const validateAge = (age) => {
+                if (!age) {
+                    if (ageWarning) ageWarning.classList.add('hidden');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'grayscale');
+                        submitBtn.classList.add('cursor-pointer');
+                    }
+                    return true;
+                }
+                
+                const ageNum = parseInt(age);
+                const isValid = !isNaN(ageNum) && ageNum >= 18 && ageNum <= 29;
+                
+                if (ageWarning) {
+                    ageWarning.className = `mt-1 text-[10px] font-bold ${!isValid ? 'flex' : 'hidden'} items-center gap-1.5 animate-pulse ${isDarkMode() ? 'text-red-400' : 'text-red-600'}`;
+                }
+                
+                if (submitBtn) {
+                    if (!isValid) {
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
+                        submitBtn.classList.remove('cursor-pointer', 'active:scale-[0.98]');
+                    } else {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'grayscale');
+                        submitBtn.classList.add('cursor-pointer', 'active:scale-[0.98]');
+                    }
+                }
+                return isValid;
+            };
+
+            if (ageDisplay) {
+                ageDisplay.addEventListener('input', (e) => {
+                    validateAge(e.target.value);
+                });
+                // Initial check for pre-filled data
+                if (ageDisplay.value) validateAge(ageDisplay.value);
+            }
 
             if (bdayInput) {
                 setupInputDateBehavior(bdayInput, (date) => {
                     if (ageDisplay) {
                         ageDisplay.value = window.calculateAge(date);
+                        validateAge(ageDisplay.value);
                         ageDisplay.classList.add('animate-pulse');
                         setTimeout(() => ageDisplay.classList.remove('animate-pulse'), 400);
                     }
@@ -1335,7 +1392,8 @@ export function showAddDataModal(data = null) {
                     }, 250);
                 });
                 document.addEventListener('click', (e) => {
-                    if (!replacementSearchInput.contains(e.target) && !replacementSuggestions.contains(e.target)) {
+                    if (replacementSearchInput && replacementSuggestions && 
+                        !replacementSearchInput.contains(e.target) && !replacementSuggestions.contains(e.target)) {
                         replacementSuggestions.classList.add('hidden');
                     }
                 });
@@ -1508,58 +1566,221 @@ export function showAddDataModal(data = null) {
             // Setup Suggestions
             setupSuggestions('education-input', 'course-suggestions', 'course-option');
             setupSuggestions('designation-input', 'work-suggestions', 'work-option');
-            setupSuggestions('office-input', 'office-suggestions', 'office-option');
+            // setupSuggestions('office-input', 'office-suggestions', 'office-option'); // Replaced by setupOfficeSelector below
 
-            // Office groups with dynamic Supabase/API offices merged in.
-            const OFFICE_CATEGORY_MAP = {
-                // PUBLIC SECTOR BUCKET
-                publicSector: ['DOLE', 'LGU', 'DEPED'],
-                // PRIVATE SECTOR BUCKET
-                privateSector: ['DICT', 'PCA']
-            };
-
-            const renderOfficeSuggestions = (dbOffices = []) => {
+            // Specialized Office Selector with Drill-down (Supabase)
+            const setupOfficeSelector = () => {
+                const officeInput = popup.querySelector('#office-input');
                 const officeContainer = popup.querySelector('#office-suggestions');
-                if (!officeContainer) return;
+                if (!officeInput || !officeContainer) return;
 
-                const canonical = (v) => String(v || '').trim().toUpperCase();
-                const publicSet = new Set(OFFICE_CATEGORY_MAP.publicSector.map(canonical));
-                const privateSet = new Set(OFFICE_CATEGORY_MAP.privateSector.map(canonical));
-                const allKnown = new Set([...publicSet, ...privateSet]);
+                let currentView = 'OFFICES'; // OFFICES or LOCATIONS
+                let selectedOffice = null;
+                let cachedOffices = [];
 
-                const dbNormalized = [...new Set((dbOffices || []).map(canonical).filter(Boolean))];
-                const uncategorized = dbNormalized.filter((o) => !allKnown.has(o));
+                const fetchOffices = async () => {
+                    const cacheKey = 'dole_offices_cache';
+                    
+                    const syncBackground = async () => {
+                        let freshData = [];
+                        try {
+                            const res = await apiGet('api/beneficiaries.php?get_offices_advanced=1');
+                            if (res.success && res.data?.success && Array.isArray(res.data.offices)) freshData = res.data.offices;
+                        } catch (err) { console.error('Office fetch failed:', err); }
+                        if (freshData.length > 0) {
+                            cachedOffices = freshData;
+                            localStorage.setItem(cacheKey, JSON.stringify({ data: freshData, timestamp: Date.now() }));
+                        }
+                        return freshData;
+                    };
 
-                const renderGroup = (title, list) => {
-                    if (!list.length) return '';
-                    return `
-                        <div class="px-2.5 py-1 text-[8px] font-black uppercase tracking-widest ${t.textLabel} opacity-70">${title}</div>
-                        ${list.map((office) => `
-                            <div class="office-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
-                                <span class="option-text">${office}</span>
-                            </div>
-                        `).join('')}
-                    `;
+                    const cached = localStorage.getItem(cacheKey);
+                    if (cached) {
+                        try {
+                            const { data, timestamp } = JSON.parse(cached);
+                            cachedOffices = data;
+                            // If older than 30 mins, sync in background but don't wait
+                            if (Date.now() - timestamp > 30 * 60 * 1000) {
+                                syncBackground().then(() => {
+                                    if (currentView === 'OFFICES') render('OFFICES', selectedOffice, officeInput.value);
+                                });
+                            }
+                            return data;
+                        } catch (e) { localStorage.removeItem(cacheKey); }
+                    }
+
+                    // If no cache, we MUST await
+                    if (cachedOffices.length === 0) {
+                        return await syncBackground();
+                    }
+                    return cachedOffices;
                 };
 
-                officeContainer.innerHTML = [
-                    renderGroup('Public Sector', [...publicSet]),
-                    renderGroup('Private Sector', [...privateSet]),
-                    renderGroup('Other Offices', uncategorized)
-                ].join('');
+                const render = async (view = 'OFFICES', office = null, filter = '') => {
+                    currentView = view;
+                    selectedOffice = office;
+                    
+                    if (view === 'OFFICES') {
+                        const offices = await fetchOffices();
+                        const filteredOffices = offices.filter(o => o.office.toLowerCase().includes(filter.toLowerCase()));
+                        
+                        officeContainer.innerHTML = `
+                            <div class="px-2.5 py-1.5 text-[7px] font-black uppercase tracking-widest ${t.textLabel} opacity-70 border-b ${t.borderDivide} mb-1">OFFICE CODE</div>
+                            <div class="max-h-64 overflow-y-auto scrollbar-hide">
+                                ${filteredOffices.length > 0 ? filteredOffices.map(o => {
+                                    const hasLocations = parseInt(o.location_count || 0) > 0;
+                                    return `
+                                        <div class="office-code-option group/opt px-3 py-2 text-[9px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg ${hasLocations ? 'cursor-pointer' : 'cursor-default opacity-60'} transition-all flex items-center justify-between group active:scale-[0.98] mx-1 mb-0.5" 
+                                            data-id="${o.id}" data-name="${o.office}" data-has-locations="${hasLocations}">
+                                            <div class="flex items-center gap-2.5">
+                                                <div class="w-2 h-2 rounded-md bg-blue-500/10 group-hover/opt:bg-blue-500/20 flex items-center justify-center transition-colors">
+                                                    <div class="w-1 h-1 rounded-full bg-blue-500/40 group-hover/opt:bg-blue-500 transition-colors"></div>
+                                                </div>
+                                                <span class="option-text">${o.office}</span>
+                                            </div>
+                                            ${hasLocations ? `<svg class="w-3 h-3 text-slate-300 group-hover/opt:text-blue-500 group-hover/opt:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>` : ''}
+                                        </div>
+                                    `;
+                                }).join('') : `<div class="px-3 py-6 text-center text-[9px] font-bold ${t.textLabel} opacity-60">No matching offices.</div>`}
+                            </div>
+                        `;
+
+                        officeContainer.querySelectorAll('.office-code-option').forEach(opt => {
+                            opt.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                if (opt.dataset.hasLocations === 'true') {
+                                    render('LOCATIONS', { id: opt.dataset.id, name: opt.dataset.name });
+                                } else {
+                                    officeInput.value = opt.dataset.name;
+                                    officeContainer.classList.add('hidden');
+                                    officeInput.dispatchEvent(new Event('change'));
+                                }
+                            });
+                        });
+                    } else {
+                        // LOCATIONS VIEW
+                        officeContainer.innerHTML = `
+                            <div class="flex items-center justify-between px-3 py-2 border-b ${t.borderDivide} bg-slate-50/95 dark:bg-slate-800/95 sticky top-0 backdrop-blur-sm z-10 rounded-t-xl">
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1 rounded-md bg-green-500/10 text-green-600 dark:text-green-400">
+                                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    </div>
+                                    <div class="text-[7px] font-black uppercase tracking-widest ${t.textLabel} opacity-70">OFFICE LOCATION</div>
+                                </div>
+                                <button type="button" id="back-to-offices" class="p-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all cursor-pointer shadow-sm active:scale-90 flex items-center justify-center">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"/></svg>
+                                </button>
+                            </div>
+                            
+                            <div class="p-2 border-b ${t.borderDivide}">
+                                <div class="relative group">
+                                    <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                    </div>
+                                    <input type="text" id="location-search-internal" placeholder="Search in ${office.name}..." 
+                                        class="w-full pl-8 pr-3 py-1.5 text-[9px] font-bold bg-slate-100/50 dark:bg-slate-900/50 border-transparent focus:border-blue-500 focus:ring-0 rounded-lg transition-all"
+                                        value="${filter.includes(' - ') ? filter.split(' - ')[1] : ''}">
+                                </div>
+                            </div>
+
+                            <div id="locations-list-container" class="max-h-64 overflow-y-auto scrollbar-hide p-1">
+                                <div class="px-3 py-4 text-center text-[9px] font-bold ${t.textLabel} animate-pulse flex items-center justify-center gap-2">
+                                    <svg class="w-3.5 h-3.5 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    Fetching...
+                                </div>
+                            </div>
+                        `;
+
+                        const locationsListContainer = officeContainer.querySelector('#locations-list-container');
+                        const internalSearch = officeContainer.querySelector('#location-search-internal');
+                        
+                        const locCacheKey = `dole_locs_cache_${office.id}`;
+                        let locations = [];
+                        
+                        // [SPEED-OPTIMIZATION] Try local cache first
+                        const locCached = localStorage.getItem(locCacheKey);
+                        if (locCached) {
+                            try {
+                                const { data, timestamp } = JSON.parse(locCached);
+                                locations = data;
+                            } catch (e) { localStorage.removeItem(locCacheKey); }
+                        }
+
+                        const fetchFreshLocs = async () => {
+                            let freshLocs = [];
+                            if (supabase && isSupabaseMode()) {
+                                const { data, error } = await supabase.from('office_locations').select('location').eq('office_id', office.id).order('location');
+                                if (!error && data) freshLocs = data;
+                            }
+                            
+                            if (freshLocs.length === 0) {
+                                try {
+                                    const res = await apiGet(`api/beneficiaries.php?get_office_locations=1&office_id=${office.id}`);
+                                    if (res.success && res.data?.success && Array.isArray(res.data.locations)) freshLocs = res.data.locations;
+                                } catch (err) { console.error('Office locations fetch failed:', err); }
+                            }
+
+                            if (freshLocs.length > 0) {
+                                locations = freshLocs;
+                                localStorage.setItem(locCacheKey, JSON.stringify({ data: freshLocs, timestamp: Date.now() }));
+                                renderLocations(internalSearch.value);
+                            }
+                        };
+
+                        const renderLocations = (locFilter = '') => {
+                            const filtered = locations.filter(l => l.location.toLowerCase().includes(locFilter.toLowerCase()));
+                            locationsListContainer.innerHTML = filtered.length > 0 ? filtered.map(l => `
+                                <div class="location-option group/loc px-3 py-1.5 text-[9px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg cursor-pointer transition-all flex items-center gap-3 active:scale-[0.98] mb-0.5" data-location="${l.location}">
+                                    <div class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 group-hover/loc:bg-blue-500 transition-all"></div>
+                                    <span class="option-text truncate">${l.location}</span>
+                                </div>
+                            `).join('') : (locations.length === 0 ? `<div class="px-3 py-4 text-center text-[9px] font-bold ${t.textLabel} animate-pulse flex items-center justify-center gap-2"><svg class="w-3.5 h-3.5 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Fetching...</div>` : `<div class="px-3 py-8 text-center text-[9px] font-bold ${t.textLabel} opacity-60">No matching locations.</div>`);
+
+                            locationsListContainer.querySelectorAll('.location-option').forEach(opt => {
+                                opt.addEventListener('click', (e) => {
+                                    const location = opt.dataset.location;
+                                    officeInput.value = `${office.name} - ${location}`;
+                                    officeContainer.classList.add('hidden');
+                                    officeInput.dispatchEvent(new Event('change'));
+                                });
+                            });
+                        };
+
+                        renderLocations(internalSearch.value);
+                        fetchFreshLocs(); // Always trigger a background sync
+                        setTimeout(() => internalSearch.focus(), 50);
+                        internalSearch.addEventListener('input', () => renderLocations(internalSearch.value));
+                        internalSearch.addEventListener('click', (e) => e.stopPropagation());
+
+                        officeContainer.querySelector('#back-to-offices').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            render('OFFICES');
+                        });
+                    }
+                };
+
+                officeInput.addEventListener('focus', () => {
+                    officeContainer.classList.remove('hidden');
+                    render(currentView, selectedOffice, officeInput.value);
+                });
+
+                officeInput.addEventListener('input', () => {
+                    officeContainer.classList.remove('hidden');
+                    render(currentView, selectedOffice, officeInput.value);
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!officeInput.contains(e.target) && !officeContainer.contains(e.target)) {
+                        officeContainer.classList.add('hidden');
+                        if (!officeInput.value) {
+                            currentView = 'OFFICES';
+                            selectedOffice = null;
+                        }
+                    }
+                });
             };
 
-            renderOfficeSuggestions();
-            (async () => {
-                try {
-                    const officeRes = await apiGet('api/beneficiaries.php?get_offices=1');
-                    if (officeRes.success && officeRes.data?.success && Array.isArray(officeRes.data.offices)) {
-                        renderOfficeSuggestions(officeRes.data.offices);
-                    }
-                } catch (officeErr) {
-                    console.error('Office suggestion sync failed:', officeErr);
-                }
-            })();
+            setupOfficeSelector();
 
             function setupSuggestions(inputId, containerId, optionClass) {
                 const input = popup.querySelector(`#${inputId}`);
@@ -1692,6 +1913,21 @@ export function showAddDataModal(data = null) {
                     if (!startDate) markError('startDate');
                     if (!endDate) markError('endDate');
                     // Designation is optional; default to N/A when blank.
+
+                    // Strict Age Validation on Submit
+                    const ageVal = formData.get('age');
+                    const ageNum = parseInt(ageVal);
+                    if (!ageVal || isNaN(ageNum) || ageNum < 18 || ageNum > 29) {
+                        hasError = true;
+                        if (ageWarning) {
+                            ageWarning.className = `mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse ${typeof isDarkMode === 'function' && isDarkMode() ? 'text-red-400' : 'text-red-600'}`;
+                        }
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
+                            submitBtn.classList.remove('cursor-pointer', 'active:scale-[0.98]');
+                        }
+                    }
 
                     if (hasError) {
                         return;

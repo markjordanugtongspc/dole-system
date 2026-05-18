@@ -124,57 +124,121 @@ try {
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-/**
- * GET: Retrieve beneficiaries
- */
+// [GLOBAL] Shared Schema Detection Logic
+try {
+    $ageExpr = $isSupabase
+        ? "COALESCE(b.age, EXTRACT(YEAR FROM AGE(CURRENT_DATE, b.birthday)))"
+        : "COALESCE(b.age, TIMESTAMPDIFF(YEAR, b.birthday, CURDATE()))";
+    $startDateFmtExpr = $isSupabase
+        ? "TO_CHAR(b.start_date, 'MM/DD/YYYY')"
+        : "DATE_FORMAT(b.start_date, '%m/%d/%Y')";
+    $endDateFmtExpr = $isSupabase
+        ? "TO_CHAR(b.end_date, 'MM/DD/YYYY')"
+        : "DATE_FORMAT(b.end_date, '%m/%d/%Y')";
+    $absorbWhereExpr = $isSupabase ? 'al."where"' : 'al.`where`';
+    $absorbPositionExpr = $isSupabase ? 'al."position"' : 'al.`position`';
+    $absorbAgencyExpr = $isSupabase ? 'al."agency"' : 'al.`agency`';
+
+    // Postgres lowercases unquoted identifiers, so preserve camelCase keys for JS consumers.
+    $aliasStartDate = $isSupabase ? '"startDate"' : 'startDate';
+    $aliasEndDate = $isSupabase ? '"endDate"' : 'endDate';
+    $aliasStartDateFormatted = $isSupabase ? '"startDateFormatted"' : 'startDateFormatted';
+    $aliasEndDateFormatted = $isSupabase ? '"endDateFormatted"' : 'endDateFormatted';
+    $aliasSeriesNo = $isSupabase ? '"seriesNo"' : 'seriesNo';
+    $aliasAbsorbDate = $isSupabase ? '"absorbDate"' : 'absorbDate';
+    $aliasResignedDate = $isSupabase ? '"resignedDate"' : 'resignedDate';
+    $aliasIsArchived = $isSupabase ? '"isArchived"' : 'isArchived';
+    $aliasCreatedAt = $isSupabase ? '"createdAt"' : 'createdAt';
+    $aliasUpdatedAt = $isSupabase ? '"updatedAt"' : 'updatedAt';
+    $aliasDesignatedBeneficiary = $isSupabase ? '"designatedBeneficiary"' : 'designatedBeneficiary';
+    $aliasRelationshipToAssured = $isSupabase ? '"relationshipToAssured"' : 'relationshipToAssured';
+    $designatedBeneficiaryExpr = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'designated_beneficiary') ? 'b.designated_beneficiary' : 'NULL';
+    $relationshipToAssuredExpr = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'relationship_to_assured') ? 'b.relationship_to_assured' : 'NULL';
+
+    // [HYBRID] Support both 'office_id/office_name' (MySQL) and 'id/office' (PostgreSQL/Supabase)
+    $hasOfficeIdInBeneficiaries = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'office_id');
+    $hasOfficeIdInOffices = tableHasColumn($pdo, $isSupabase, 'offices', 'office_id');
+    $hasOfficeNameInOffices = tableHasColumn($pdo, $isSupabase, 'offices', 'office_name');
+    $hasOfficeNameInBeneficiaries = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'office_name');
+    
+    $beneficiaryOfficeIdExpr = $hasOfficeIdInBeneficiaries ? 'b.office_id' : 'NULL';
+    $beneficiaryOfficeNameExpr = $hasOfficeNameInBeneficiaries ? 'b.office_name' : 'NULL';
+    $officeJoinIdExpr = $hasOfficeIdInOffices ? 'o.office_id' : 'o.id';
+    $officeNameColExpr = $hasOfficeNameInOffices ? 'o.office_name' : 'o.office';
+    $officeIdCol = $hasOfficeIdInOffices ? 'office_id' : 'id';
+    $officeSearchCol = $hasOfficeNameInOffices ? 'office_name' : 'office';
+    $hasOfficeCode = tableHasColumn($pdo, $isSupabase, 'offices', 'office_code');
+    
+    $officeJoinCondition = $hasOfficeIdInBeneficiaries 
+        ? "b.office_id = $officeJoinIdExpr" 
+        : "1=0"; // Cannot join if foreign key is missing
+
+} catch (Throwable $e) {
+    debugLog('beneficiaries.schema.init.error', ['msg' => $e->getMessage()]);
+}
+
 if ($method === 'GET') {
     $id = $_GET['id'] ?? null;
     $showArchived = isset($_GET['archived']) && $_GET['archived'] === 'true';
 
     try {
-        $ageExpr = $isSupabase
-            ? "COALESCE(b.age, EXTRACT(YEAR FROM AGE(CURRENT_DATE, b.birthday)))"
-            : "COALESCE(b.age, TIMESTAMPDIFF(YEAR, b.birthday, CURDATE()))";
-        $startDateFmtExpr = $isSupabase
-            ? "TO_CHAR(b.start_date, 'MM/DD/YYYY')"
-            : "DATE_FORMAT(b.start_date, '%m/%d/%Y')";
-        $endDateFmtExpr = $isSupabase
-            ? "TO_CHAR(b.end_date, 'MM/DD/YYYY')"
-            : "DATE_FORMAT(b.end_date, '%m/%d/%Y')";
-        $absorbWhereExpr = $isSupabase ? 'al."where"' : 'al.`where`';
-        $absorbPositionExpr = $isSupabase ? 'al."position"' : 'al.`position`';
-        $absorbAgencyExpr = $isSupabase ? 'al."agency"' : 'al.`agency`';
-
-        // Postgres lowercases unquoted identifiers, so preserve camelCase keys for JS consumers.
-        $aliasStartDate = $isSupabase ? '"startDate"' : 'startDate';
-        $aliasEndDate = $isSupabase ? '"endDate"' : 'endDate';
-        $aliasStartDateFormatted = $isSupabase ? '"startDateFormatted"' : 'startDateFormatted';
-        $aliasEndDateFormatted = $isSupabase ? '"endDateFormatted"' : 'endDateFormatted';
-        $aliasSeriesNo = $isSupabase ? '"seriesNo"' : 'seriesNo';
-        $aliasAbsorbDate = $isSupabase ? '"absorbDate"' : 'absorbDate';
-        $aliasResignedDate = $isSupabase ? '"resignedDate"' : 'resignedDate';
-        $aliasIsArchived = $isSupabase ? '"isArchived"' : 'isArchived';
-        $aliasCreatedAt = $isSupabase ? '"createdAt"' : 'createdAt';
-        $aliasUpdatedAt = $isSupabase ? '"updatedAt"' : 'updatedAt';
-        $aliasDesignatedBeneficiary = $isSupabase ? '"designatedBeneficiary"' : 'designatedBeneficiary';
-        $aliasRelationshipToAssured = $isSupabase ? '"relationshipToAssured"' : 'relationshipToAssured';
-        $designatedBeneficiaryExpr = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'designated_beneficiary') ? 'b.designated_beneficiary' : 'NULL';
-        $relationshipToAssuredExpr = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'relationship_to_assured') ? 'b.relationship_to_assured' : 'NULL';
-
         if (isset($_GET['get_offices'])) {
+            $beneficiaryUnion = $hasOfficeNameInBeneficiaries 
+                ? "UNION SELECT office_name FROM beneficiaries WHERE office_name IS NOT NULL" 
+                : "";
+                
+            $officeNameColForSubquery = $hasOfficeNameInOffices ? 'office_name' : 'office';
+                
             // Get all unique office names from both the dedicated table and direct column
             $stmt = $pdo->prepare("
                 SELECT DISTINCT office_name FROM (
-                    SELECT office_name FROM offices
-                    UNION
-                    SELECT office_name FROM beneficiaries WHERE office_name IS NOT NULL
+                    SELECT $officeNameColForSubquery as office_name FROM offices
+                    $beneficiaryUnion
                 ) as combined_offices
-                WHERE office_name != ''
+                WHERE office_name != '' AND office_name IS NOT NULL
                 ORDER BY office_name ASC
             ");
             $stmt->execute();
             $offices = $stmt->fetchAll(PDO::FETCH_COLUMN);
             echo json_encode(['success' => true, 'offices' => $offices]);
+            exit();
+        }
+
+        if (isset($_GET['get_offices_advanced'])) {
+            $idCol = tableHasColumn($pdo, $isSupabase, 'offices', 'id') ? 'id' : 'office_id';
+            $officeCol = tableHasColumn($pdo, $isSupabase, 'offices', 'office') ? 'office' : 'office_name';
+            
+            // Get offices with a count of their locations to help frontend decide if drill-down is needed
+            $stmt = $pdo->prepare("
+                SELECT o.$idCol as id, o.$officeCol as office, 
+                       (SELECT COUNT(*) FROM office_locations ol WHERE ol.office_id = o.$idCol) as location_count
+                FROM offices o
+                ORDER BY o.$officeCol ASC
+            ");
+            $stmt->execute();
+            $offices = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode(['success' => true, 'offices' => $offices]);
+            exit();
+        }
+
+        if (isset($_GET['get_office_locations'])) {
+            $officeId = (int)($_GET['office_id'] ?? 0);
+            
+            if (tableHasColumn($pdo, $isSupabase, 'office_locations', 'location')) {
+                $idCol = tableHasColumn($pdo, $isSupabase, 'office_locations', 'id') ? 'id' : 'location_id';
+                $stmt = $pdo->prepare("
+                    SELECT $idCol as id, location 
+                    FROM office_locations 
+                    WHERE office_id = :office_id 
+                    ORDER BY location ASC
+                ");
+                $stmt->bindValue(':office_id', $officeId, PDO::PARAM_INT);
+                $stmt->execute();
+                $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                $locations = [];
+            }
+            echo json_encode(['success' => true, 'locations' => $locations]);
             exit();
         }
 
@@ -278,7 +342,7 @@ if ($method === 'GET') {
                     {$startDateFmtExpr} as {$aliasStartDateFormatted},
                     {$endDateFmtExpr} as {$aliasEndDateFormatted},
                     b.series_number as {$aliasSeriesNo},
-                    COALESCE(o.office_name, b.office_name) as office,
+                    COALESCE($officeNameColExpr, $beneficiaryOfficeNameExpr) as office,
                     b.designation,
                     b.replacement_notes as replacement,
                     s.status_name as remarks,
@@ -295,7 +359,7 @@ if ($method === 'GET') {
                     b.updated_at as {$aliasUpdatedAt}
                 FROM beneficiaries b
                 LEFT JOIN genders g ON b.gender_id = g.gender_id
-                LEFT JOIN offices o ON b.office_id = o.office_id
+                LEFT JOIN offices o ON $officeJoinCondition
                 LEFT JOIN status_types s ON b.status_id = s.status_id
                 LEFT JOIN absorption_logs al ON b.absorption_log_id = al.log_id
                 LEFT JOIN users u ON al.logged_by = u.user_id
@@ -341,7 +405,7 @@ if ($method === 'GET') {
                     {$startDateFmtExpr} as {$aliasStartDateFormatted},
                     {$endDateFmtExpr} as {$aliasEndDateFormatted},
                     b.series_number as {$aliasSeriesNo},
-                    COALESCE(o.office_name, b.office_name) as office,
+                    COALESCE($officeNameColExpr, $beneficiaryOfficeNameExpr) as office,
                     b.designation,
                     b.replacement_notes as replacement,
                     s.status_name as remarks,
@@ -357,7 +421,7 @@ if ($method === 'GET') {
                     b.created_at as {$aliasCreatedAt}
                 FROM beneficiaries b
                 LEFT JOIN genders g ON b.gender_id = g.gender_id
-                LEFT JOIN offices o ON b.office_id = o.office_id
+                LEFT JOIN offices o ON $officeJoinCondition
                 LEFT JOIN status_types s ON b.status_id = s.status_id
                 LEFT JOIN absorption_logs al ON b.absorption_log_id = al.log_id
                 LEFT JOIN users u ON al.logged_by = u.user_id
@@ -426,12 +490,24 @@ if ($method === 'GET') {
 
         $officeId = null;
         if (!empty($data['office'])) {
-            $stmt = $pdo->prepare("SELECT office_id FROM offices WHERE office_name LIKE :office_name OR office_code = :office_code");
-            $stmt->execute([
-                'office_name' => '%' . $data['office'] . '%',
-                'office_code' => $data['office']
-            ]);
+            $hasOfficeCode = tableHasColumn($pdo, $isSupabase, 'offices', 'office_code');
+            
+            $sql = "SELECT $officeIdCol FROM offices WHERE $officeSearchCol LIKE :office_name";
+            if ($hasOfficeCode) $sql .= " OR office_code = :office_code";
+            
+            $stmt = $pdo->prepare($sql);
+            $params = ['office_name' => '%' . $data['office'] . '%'];
+            if ($hasOfficeCode) $params['office_code'] = $data['office'];
+            
+            $stmt->execute($params);
             $officeId = $stmt->fetchColumn() ?: null;
+
+            // [HYBRID-FIX] If office still not found, it's a new office! Create it.
+            if (!$officeId && !empty($data['office'])) {
+                $stmt = $pdo->prepare("INSERT INTO offices ($officeSearchCol) VALUES (:name) " . ($isSupabase ? "RETURNING $officeIdCol" : ""));
+                $stmt->execute(['name' => $data['office']]);
+                $officeId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
+            }
         }
 
         $resolvedStatus = resolveStatusId($pdo, $data['remarks'] ?? null, $data['endDate'] ?? null);
@@ -510,20 +586,35 @@ if ($method === 'GET') {
         $beneficiaryExtraValues = ($hasDesignatedBeneficiary ? ", :designated_beneficiary" : "") .
             ($hasRelationshipToAssured ? ", :relationship_to_assured" : "");
 
+        $officeCols = [];
+        $officeVals = [];
+        if ($hasOfficeIdInBeneficiaries) {
+            $officeCols[] = "office_id";
+            $officeVals[] = ":office_id";
+        }
+        if ($hasOfficeNameInBeneficiaries) {
+            $officeCols[] = "office_name";
+            $officeVals[] = ":office_name";
+        }
+        $officeColsStr = empty($officeCols) ? "" : ", " . implode(", ", $officeCols);
+        $officeValsStr = empty($officeVals) ? "" : ", " . implode(", ", $officeVals);
+
         // Insert beneficiary with RETURNING beneficiary_id
         if ($isSupabase) {
             $stmt = $pdo->prepare("
                 INSERT INTO beneficiaries (
                     gip_id, full_name, contact_number, address, birthday, age,
                     gender_id, education, start_date, end_date, series_number,
-                    office_id, office_name, designation, replacement_notes, status_id, absorption_log_id, resigned_log_id
+                    designation, replacement_notes, status_id, absorption_log_id, resigned_log_id
+                    " . $officeColsStr . "
                     " . $beneficiaryExtraColumns . "
                     " . ($hasCreatedBy ? ", created_by" : "") . "
                     " . ($hasUpdatedBy ? ", updated_by" : "") . "
                 ) VALUES (
                     :gip_id, :name, :contact, :address, :birthday, :age,
                     :gender_id, :education, :start_date, :end_date, :series_no,
-                    :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id, :resigned_log_id
+                    :designation, :replacement, :status_id, :absorption_log_id, :resigned_log_id
+                    " . $officeValsStr . "
                     " . $beneficiaryExtraValues . "
                     " . ($hasCreatedBy ? ", :created_by" : "") . "
                     " . ($hasUpdatedBy ? ", :updated_by" : "") . "
@@ -534,14 +625,16 @@ if ($method === 'GET') {
                 INSERT INTO beneficiaries (
                     gip_id, full_name, contact_number, address, birthday, age,
                     gender_id, education, start_date, end_date, series_number,
-                    office_id, office_name, designation, replacement_notes, status_id, absorption_log_id, resigned_log_id
+                    designation, replacement_notes, status_id, absorption_log_id, resigned_log_id
+                    " . $officeColsStr . "
                     " . $beneficiaryExtraColumns . "
                     " . ($hasCreatedBy ? ", created_by" : "") . "
                     " . ($hasUpdatedBy ? ", updated_by" : "") . "
                 ) VALUES (
                     :gip_id, :name, :contact, :address, :birthday, :age,
                     :gender_id, :education, :start_date, :end_date, :series_no,
-                    :office_id, :office_name, :designation, :replacement, :status_id, :absorption_log_id, :resigned_log_id
+                    :designation, :replacement, :status_id, :absorption_log_id, :resigned_log_id
+                    " . $officeValsStr . "
                     " . $beneficiaryExtraValues . "
                     " . ($hasCreatedBy ? ", :created_by" : "") . "
                     " . ($hasUpdatedBy ? ", :updated_by" : "") . "
@@ -566,14 +659,14 @@ if ($method === 'GET') {
                 'start_date' => !empty($data['startDate']) ? $data['startDate'] : null,
                 'end_date' => !empty($data['endDate']) ? $data['endDate'] : null,
                 'series_no' => $data['seriesNo'] ?? null,
-                'office_id' => $officeId,
-                'office_name' => $data['office'] ?? null,
                 'designation' => $data['designation'],
                 'replacement' => (isset($data['replacement']) && trim($data['replacement']) !== '') ? trim($data['replacement']) : null,
                 'status_id' => $statusId,
                 'absorption_log_id' => $absorptionLogId,
                 'resigned_log_id' => $resignedLogId
             ];
+            if ($hasOfficeIdInBeneficiaries) $params['office_id'] = $officeId;
+            if ($hasOfficeNameInBeneficiaries) $params['office_name'] = $data['office'] ?? null;
             if ($hasDesignatedBeneficiary) $params['designated_beneficiary'] = ($data['designatedBeneficiary'] ?? '') !== '' ? $data['designatedBeneficiary'] : null;
             if ($hasRelationshipToAssured) $params['relationship_to_assured'] = ($data['relationshipToAssured'] ?? '') !== '' ? $data['relationshipToAssured'] : null;
             if ($hasCreatedBy) $params['created_by'] = $current_user_id;
@@ -639,12 +732,24 @@ if ($method === 'GET') {
 
         $officeId = null;
         if (!empty($data['office'])) {
-            $stmt = $pdo->prepare("SELECT office_id FROM offices WHERE office_name LIKE :office_name OR office_code = :office_code");
-            $stmt->execute([
-                'office_name' => '%' . $data['office'] . '%',
-                'office_code' => $data['office']
-            ]);
+            $hasOfficeCode = tableHasColumn($pdo, $isSupabase, 'offices', 'office_code');
+            
+            $sql = "SELECT $officeIdCol FROM offices WHERE $officeSearchCol LIKE :office_name";
+            if ($hasOfficeCode) $sql .= " OR office_code = :office_code";
+            
+            $stmt = $pdo->prepare($sql);
+            $params = ['office_name' => '%' . $data['office'] . '%'];
+            if ($hasOfficeCode) $params['office_code'] = $data['office'];
+            
+            $stmt->execute($params);
             $officeId = $stmt->fetchColumn() ?: null;
+
+            // [HYBRID-FIX] If office still not found, it's a new office! Create it.
+            if (!$officeId && !empty($data['office'])) {
+                $stmt = $pdo->prepare("INSERT INTO offices ($officeSearchCol) VALUES (:name) " . ($isSupabase ? "RETURNING $officeIdCol" : ""));
+                $stmt->execute(['name' => $data['office']]);
+                $officeId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
+            }
         }
 
         $resolvedStatus = resolveStatusId($pdo, $data['remarks'] ?? null, $data['endDate'] ?? null);
@@ -761,6 +866,11 @@ if ($method === 'GET') {
         $hasRelationshipToAssured = tableHasColumn($pdo, $isSupabase, 'beneficiaries', 'relationship_to_assured');
         $beneficiaryExtraSet = ($hasDesignatedBeneficiary ? ", designated_beneficiary = :designated_beneficiary" : "") .
             ($hasRelationshipToAssured ? ", relationship_to_assured = :relationship_to_assured" : "");
+        $officeSets = [];
+        if ($hasOfficeIdInBeneficiaries) $officeSets[] = "office_id = :office_id";
+        if ($hasOfficeNameInBeneficiaries) $officeSets[] = "office_name = :office_name";
+        $officeSetStr = empty($officeSets) ? "" : implode(", ", $officeSets) . ",";
+
         $stmt = $pdo->prepare("
             UPDATE beneficiaries SET
                 gip_id = :new_gip_id,
@@ -774,8 +884,7 @@ if ($method === 'GET') {
                 start_date = :start_date,
                 end_date = :end_date,
                 series_number = :series_no,
-                office_id = :office_id,
-                office_name = :office_name,
+                " . $officeSetStr . "
                 designation = :designation,
                 replacement_notes = :replacement,
                 status_id = :status_id,
@@ -799,14 +908,14 @@ if ($method === 'GET') {
             'start_date' => !empty($data['startDate']) ? $data['startDate'] : null,
             'end_date' => !empty($data['endDate']) ? $data['endDate'] : null,
             'series_no' => $data['seriesNo'] ?? null,
-            'office_id' => $officeId,
-            'office_name' => $data['office'] ?? null,
             'designation' => $data['designation'],
             'replacement' => (isset($data['replacement']) && trim($data['replacement']) !== '') ? trim($data['replacement']) : null,
             'status_id' => $statusId,
             'absorption_log_id' => $absorptionLogId,
             'resigned_log_id' => $resignedLogId
         ];
+        if ($hasOfficeIdInBeneficiaries) $params['office_id'] = $officeId;
+        if ($hasOfficeNameInBeneficiaries) $params['office_name'] = $data['office'] ?? null;
         if ($hasDesignatedBeneficiary) $params['designated_beneficiary'] = ($data['designatedBeneficiary'] ?? '') !== '' ? $data['designatedBeneficiary'] : null;
         if ($hasRelationshipToAssured) $params['relationship_to_assured'] = ($data['relationshipToAssured'] ?? '') !== '' ? $data['relationshipToAssured'] : null;
         if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
