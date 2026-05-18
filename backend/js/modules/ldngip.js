@@ -921,7 +921,7 @@ function renderPagination(totalItems, totalPages, activePage = currentPage) {
     if (totalItems <= itemsPerPage) {
         container.innerHTML = `
             <span class="text-xs font-bold text-gray-500">Showing all ${totalItems} results</span>
-            <div class="flex items-center gap-1"></div>
+            <div></div>
         `;
         return;
     }
@@ -930,70 +930,72 @@ function renderPagination(totalItems, totalPages, activePage = currentPage) {
     const endIdx = Math.min(activePage * itemsPerPage, totalItems);
 
     container.innerHTML = `
-        <span class="text-xs font-bold text-gray-500 px-2 py-1">
-            Showing <span class="text-royal-blue">${startIdx}-${endIdx}</span> of <span class="text-royal-blue">${totalItems}</span>
+        <span class="text-xs font-bold text-gray-500 shrink-0">
+            Showing <span class="text-royal-blue">${startIdx}–${endIdx}</span> of <span class="text-royal-blue">${totalItems}</span>
         </span>
-        <div class="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-100">
-            <!-- Previous Button -->
-            <button onclick="changePage(${activePage - 1})" ${activePage === 1 ? 'disabled' : ''} 
-                class="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:text-royal-blue hover:border-royal-blue/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer">
+        <div class="flex items-center gap-1 flex-wrap justify-end">
+            <!-- Previous -->
+            <button onclick="changePage(${activePage - 1})" ${activePage === 1 ? 'disabled' : ''}
+                class="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:text-royal-blue hover:border-royal-blue/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
             </button>
-            
+
             ${generatePageNumbers(activePage, totalPages)}
 
-            <!-- Next Button -->
-            <button onclick="changePage(${activePage + 1})" ${activePage === totalPages ? 'disabled' : ''} 
-                class="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:text-royal-blue hover:border-royal-blue/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer">
+            <!-- Next -->
+            <button onclick="changePage(${activePage + 1})" ${activePage === totalPages ? 'disabled' : ''}
+                class="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:text-royal-blue hover:border-royal-blue/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </button>
+
+            <!-- Go To -->
+            <div class="flex items-center gap-1 ml-1 shrink-0">
+                <span class="text-[10px] sm:text-xs font-bold text-gray-400 hidden sm:inline">Go to</span>
+                <input type="number" id="goto-page-input" min="1" max="${totalPages}" value="${activePage}"
+                    class="w-11 h-8 text-center text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-700 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all"
+                    aria-label="Go to page"
+                    onkeydown="if(event.key==='Enter'){const p=Math.min(${totalPages},Math.max(1,parseInt(this.value)||1));window.changePage(p);}"
+                    onfocus="this.select()">
+                <button
+                    onclick="const inp=document.getElementById('goto-page-input');const p=Math.min(${totalPages},Math.max(1,parseInt(inp.value)||1));window.changePage(p);"
+                    class="h-8 px-3 text-xs font-black bg-royal-blue text-white rounded-lg hover:bg-blue-700 active:scale-95 transition-all cursor-pointer shrink-0">
+                    Go
+                </button>
+            </div>
         </div>
     `;
 }
 
 function generatePageNumbers(current, total) {
+    // Show all pages when there are 10 or fewer; otherwise use smart truncation
+    const SHOW_ALL_THRESHOLD = 10;
+    let pages = [];
+
+    if (total <= SHOW_ALL_THRESHOLD) {
+        pages = Array.from({ length: total }, (_, i) => i + 1);
+    } else {
+        // Always include first, last, current, and two neighbours
+        const WING = 2;
+        const set = new Set([1, total]);
+        for (let i = Math.max(1, current - WING); i <= Math.min(total, current + WING); i++) set.add(i);
+        pages = [...set].sort((a, b) => a - b);
+    }
+
     let html = '';
-    const maxVisible = 3;
-    
-    let start = Math.max(1, current - 1);
-    let end = Math.min(total, start + maxVisible - 1);
-    
-    if (end - start + 1 < maxVisible) {
-        start = Math.max(1, end - maxVisible + 1);
-    }
-
-    // Replace leading "..." with a jump input
-    if (start > 1) {
+    let prev = 0;
+    for (const p of pages) {
+        if (prev && p - prev > 1) {
+            // Gap — render a static ellipsis
+            html += `<span class="min-w-[28px] h-8 flex items-center justify-center text-xs font-bold text-gray-400 select-none">…</span>`;
+        }
         html += `
-            <input type="number" min="1" max="${total}" value="" placeholder="..."
-                class="w-12 h-8 text-center text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-600 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all"
-                title="Jump to page" aria-label="Jump to page"
-                onkeydown="if(event.key==='Enter'){const p=Math.min(${total},Math.max(1,parseInt(this.value)||1));if(p)window.changePage(p);}"
-                onfocus="this.select()">
-        `;
-    }
-
-    for (let i = start; i <= end; i++) {
-        html += `
-            <button onclick="changePage(${i})" 
+            <button onclick="changePage(${p})"
                 class="min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-black transition-all cursor-pointer
-                ${i === current ? 'bg-royal-blue text-white shadow-md shadow-royal-blue/20' : 'bg-white text-gray-600 hover:bg-royal-blue/10 hover:text-royal-blue border border-gray-100'}">
-                ${i}
-            </button>
-        `;
+                ${p === current ? 'bg-royal-blue text-white shadow-md shadow-royal-blue/20' : 'bg-white text-gray-600 hover:bg-royal-blue/10 hover:text-royal-blue border border-gray-100'}">
+                ${p}
+            </button>`;
+        prev = p;
     }
-
-    // Replace trailing "..." with a jump input
-    if (end < total) {
-        html += `
-            <input type="number" min="1" max="${total}" value="" placeholder="..."
-                class="w-12 h-8 text-center text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-600 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all"
-                title="Jump to page" aria-label="Jump to page"
-                onkeydown="if(event.key==='Enter'){const p=Math.min(${total},Math.max(1,parseInt(this.value)||1));if(p)window.changePage(p);}"
-                onfocus="this.select()">
-        `;
-    }
-
     return html;
 }
 
@@ -1026,9 +1028,9 @@ export function sortData(criteria, saveToStorage = true) {
     if (!filterModeEnabled) {
         if (saveToStorage) {
             localStorage.setItem('ldn_sort_preference', criteria);
+            currentPage = 1;
+            syncPageToUrl(currentPage);
         }
-        currentPage = 1;
-        syncPageToUrl(currentPage);
         renderTable(sortDatasetByCriteria(getFilteredBeneficiaries(), criteria));
 
         const dropdown = document.getElementById('sort-dropdown');
@@ -1040,6 +1042,8 @@ export function sortData(criteria, saveToStorage = true) {
 
     if (saveToStorage) {
         localStorage.setItem('ldn_sort_preference', criteria);
+        currentPage = 1;
+        syncPageToUrl(currentPage);
     }
 
     switch (criteria) {
@@ -1073,9 +1077,7 @@ export function sortData(criteria, saveToStorage = true) {
             beneficiaries.sort((a, b) => (a.address || '').localeCompare(b.address || ''));
             break;
     }
-    
-    currentPage = 1;
-    syncPageToUrl(currentPage);
+
     renderTable();
 
     // Auto-hide the dropdown menu
