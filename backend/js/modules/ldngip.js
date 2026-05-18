@@ -952,7 +952,7 @@ function renderPagination(totalItems, totalPages, activePage = currentPage) {
             <div class="flex items-center gap-1 ml-1 shrink-0">
                 <span class="text-[10px] sm:text-xs font-bold text-gray-400 hidden sm:inline">Go to</span>
                 <input type="number" id="goto-page-input" min="1" max="${totalPages}" value="${activePage}"
-                    class="w-11 h-8 text-center text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-700 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all"
+                    class="w-16 h-8 text-center text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-700 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all"
                     aria-label="Go to page"
                     onkeydown="if(event.key==='Enter'){const p=Math.min(${totalPages},Math.max(1,parseInt(this.value)||1));window.changePage(p);}"
                     onfocus="this.select()">
@@ -967,17 +967,18 @@ function renderPagination(totalItems, totalPages, activePage = currentPage) {
 }
 
 function generatePageNumbers(current, total) {
-    // Show all pages when there are 10 or fewer; otherwise use smart truncation
-    const SHOW_ALL_THRESHOLD = 10;
+    // Last page is always rendered separately so there's always a visual "+1" at the end.
+    // For small sets (≤ 5 pages): show pages 1 → (total-1) as the main window.
+    // For larger sets: smart truncation (first page + 2-neighbour window around current), excluding last.
+    const SHOW_ALL_THRESHOLD = 5;
+    const WING = 2;
     let pages = [];
 
     if (total <= SHOW_ALL_THRESHOLD) {
-        pages = Array.from({ length: total }, (_, i) => i + 1);
+        pages = Array.from({ length: total - 1 }, (_, i) => i + 1);
     } else {
-        // Always include first, last, current, and two neighbours
-        const WING = 2;
-        const set = new Set([1, total]);
-        for (let i = Math.max(1, current - WING); i <= Math.min(total, current + WING); i++) set.add(i);
+        const set = new Set([1]);
+        for (let i = Math.max(1, current - WING); i <= Math.min(total - 1, current + WING); i++) set.add(i);
         pages = [...set].sort((a, b) => a - b);
     }
 
@@ -985,7 +986,6 @@ function generatePageNumbers(current, total) {
     let prev = 0;
     for (const p of pages) {
         if (prev && p - prev > 1) {
-            // Gap — render a static ellipsis
             html += `<span class="min-w-[28px] h-8 flex items-center justify-center text-xs font-bold text-gray-400 select-none">…</span>`;
         }
         html += `
@@ -996,6 +996,20 @@ function generatePageNumbers(current, total) {
             </button>`;
         prev = p;
     }
+
+    // Always render the last page separately
+    if (total > 1) {
+        if (prev && total - prev > 1) {
+            html += `<span class="min-w-[28px] h-8 flex items-center justify-center text-xs font-bold text-gray-400 select-none">…</span>`;
+        }
+        html += `
+            <button onclick="changePage(${total})"
+                class="min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-black transition-all cursor-pointer
+                ${total === current ? 'bg-royal-blue text-white shadow-md shadow-royal-blue/20' : 'bg-white text-gray-600 hover:bg-royal-blue/10 hover:text-royal-blue border border-gray-100'}">
+                ${total}
+            </button>`;
+    }
+
     return html;
 }
 

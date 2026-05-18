@@ -28,7 +28,7 @@
     ]
   },
   "backend/js/main.js": {
-    "file": "assets/main-B6K27Tzr.js",
+    "file": "assets/main-BLJODhrv.js",
     "name": "main",
     "src": "backend/js/main.js",
     "isEntry": true,
@@ -61,7 +61,7 @@
     "isDynamicEntry": true
   },
   "style.css": {
-    "file": "assets/style-Dx3Hzmgl.css",
+    "file": "assets/style-BEh9Rngy.css",
     "src": "style.css"
   }
 }
