@@ -59,27 +59,21 @@ export function initModalHandler() {
         }
 
         const cacheKey = `logs_cache_${beneficiaryId}`;
-        let hasDisplayedCache = false;
-        
+
+        // STEP 1: Open drawer IMMEDIATELY — use cache if available, else empty logs
+        const cachedLogs = (window.__doleDB?.getSecureCache)
+            ? await window.__doleDB.getSecureCache(cacheKey)
+            : null;
+        const hadCache = !!cachedLogs;
+
+        beneficiaryData.arLogs = cachedLogs?.arLogs || [];
+        beneficiaryData.dtrLogs = cachedLogs?.dtrLogs || [];
+        beneficiaryData.docs = cachedLogs?.docs || [];
+        showBeneficiaryDrawer(beneficiaryData, page);
+
+        // STEP 2: Background network fetch (does not block drawer open)
         try {
-            // STEP 1: Fast Cache Rendering (0 second delay)
-            if (window.__doleDB && window.__doleDB.getSecureCache) {
-                const cachedLogs = await window.__doleDB.getSecureCache(cacheKey);
-                if (cachedLogs) {
-                    beneficiaryData.arLogs = cachedLogs.arLogs || [];
-                    beneficiaryData.dtrLogs = cachedLogs.dtrLogs || [];
-                    beneficiaryData.docs = cachedLogs.docs || [];
-                    showBeneficiaryDrawer(beneficiaryData, page);
-                    hasDisplayedCache = true;
-                }
-            }
-
-            // STEP 2: Background network fetch
-            let fetchedArLogs = [];
-            let fetchedDtrLogs = [];
-            let fetchedDocs = [];
-
-            // [HYBRID-BRIDGE] Use authorized PHP API for logs/docs to bypass RLS and correct table names
+            // [HYBRID-BRIDGE] Use authorized PHP API for logs/docs to bypass RLS
             const [arRes, dtrRes, docRes, absRes] = await Promise.all([
                 apiGet(`api/logs.php?type=ar&gip_id=${encodeURIComponent(beneficiaryId)}`),
                 apiGet(`api/logs.php?type=dtr&gip_id=${encodeURIComponent(beneficiaryId)}`),
@@ -87,12 +81,11 @@ export function initModalHandler() {
                 apiGet(`api/logs.php?type=absorption&gip_id=${encodeURIComponent(beneficiaryId)}`)
             ]);
 
-            fetchedArLogs = (arRes.success && arRes.data?.success) ? arRes.data.logs : [];
-            fetchedDtrLogs = (dtrRes.success && dtrRes.data?.success) ? dtrRes.data.logs : [];
-            fetchedDocs = (docRes.success && docRes.data?.success) ? docRes.data.logs : [];
+            const fetchedArLogs = (arRes.success && arRes.data?.success) ? arRes.data.logs : [];
+            const fetchedDtrLogs = (dtrRes.success && dtrRes.data?.success) ? dtrRes.data.logs : [];
+            const fetchedDocs = (docRes.success && docRes.data?.success) ? docRes.data.logs : [];
             const absorptionLogs = (absRes.success && absRes.data?.success) ? absRes.data.logs : [];
-            
-            // Map absorption data to the beneficiary object for the drawer if needed
+
             if (absorptionLogs.length > 0) {
                 const latest = absorptionLogs[0];
                 beneficiaryData.absorbDate = latest.absorption_datetime;
@@ -101,42 +94,28 @@ export function initModalHandler() {
                 beneficiaryData.absorb_agency = latest.agency || latest.absorb_agency;
             }
 
-            // STEP 3: Save to secure cache
-            const newLogsData = {
-                arLogs: fetchedArLogs,
-                dtrLogs: fetchedDtrLogs,
-                docs: fetchedDocs
-            };
-
-            if (window.__doleDB && window.__doleDB.setSecureCache) {
-                await window.__doleDB.setSecureCache(cacheKey, newLogsData);
+            // Save fresh data to cache
+            if (window.__doleDB?.setSecureCache) {
+                await window.__doleDB.setSecureCache(cacheKey, {
+                    arLogs: fetchedArLogs,
+                    dtrLogs: fetchedDtrLogs,
+                    docs: fetchedDocs
+                });
             }
 
-            // STEP 4: Render UI 
-            beneficiaryData.arLogs = fetchedArLogs;
-            beneficiaryData.dtrLogs = fetchedDtrLogs;
-            beneficiaryData.docs = fetchedDocs;
-            
-            if (!hasDisplayedCache) {
-                // First time visiting this user, show drawer now
-                showBeneficiaryDrawer(beneficiaryData, page);
-            } else {
-                // Drawer is already open with cached data. 
-                // Silently update if it is still physically on the screen
+            // STEP 3: Re-render only if drawer was opened without data (first visit)
+            // When cache existed, the drawer is already showing data — skip re-render to prevent double open
+            if (!hadCache) {
                 const drawerContainer = document.getElementById('beneficiary-drawer-container');
-                if (drawerContainer) {
-                    // This cleanly overwrites the old drawer with fresh network data
-                    showBeneficiaryDrawer(beneficiaryData, page);
+                if (drawerContainer && drawerContainer.dataset.beneficiaryId === String(beneficiaryId)) {
+                    beneficiaryData.arLogs = fetchedArLogs;
+                    beneficiaryData.dtrLogs = fetchedDtrLogs;
+                    beneficiaryData.docs = fetchedDocs;
+                    showBeneficiaryDrawer({ ...beneficiaryData, _noAnimation: true }, page);
                 }
             }
         } catch (error) {
             console.error('Error fetching logs/docs:', error);
-            if (!hasDisplayedCache) {
-                beneficiaryData.arLogs = [];
-                beneficiaryData.dtrLogs = [];
-                beneficiaryData.docs = [];
-                showBeneficiaryDrawer(beneficiaryData, page);
-            }
         }
     };
     window.showAddDataModal = function (data) {
@@ -821,9 +800,9 @@ export function showAddDataModal(data = null) {
                 ` : ''}
             </div>
 
-            <form id="add-beneficiary-form" class="grid grid-cols-1 lg:grid-cols-2 gap-5" data-is-edit="${isEdit}">
+            <form id="add-beneficiary-form" class="grid grid-cols-1 lg:grid-cols-2 gap-6" data-is-edit="${isEdit}">
                 <!-- LEFT COLUMN: Personal Info Card -->
-                <div class="${t.bgCard} rounded-xl p-3 sm:p-4 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
+                <div class="${t.bgCard} rounded-xl p-4 sm:p-5 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
                     <div class="flex items-center gap-2 mb-1">
                         <div class="w-1 h-5 ${t.dotGreen} rounded-full"></div>
                         <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest dark:text-white!">Personal & Educational Information</p>
@@ -946,7 +925,7 @@ export function showAddDataModal(data = null) {
                 </div>
 
                 <!-- RIGHT COLUMN: Work Details Card -->
-                <div class="${t.bgCard} rounded-xl p-3 sm:p-4 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
+                <div class="${t.bgCard} rounded-xl p-4 sm:p-5 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
                     <div class="flex items-center gap-2 mb-1">
                         <div class="w-1 h-5 ${t.dotBlue} rounded-full"></div>
                         <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest">Work & Administrative Data</p>
@@ -1084,10 +1063,10 @@ export function showAddDataModal(data = null) {
 
     Swal.fire({
         html: formContent,
-        width: window.innerWidth < 1024 ? '96vw' : '1000px',
+        width: window.innerWidth < 640 ? '96vw' : window.innerWidth < 1024 ? '90vw' : '1120px',
         showConfirmButton: false,
         showCloseButton: false,
-        padding: window.innerWidth < 1024 ? '0.75rem' : '2rem',
+        padding: window.innerWidth < 640 ? '0.75rem' : window.innerWidth < 1024 ? '1.25rem' : '2rem',
         customClass: {
             container: 'font-montserrat',
             popup: 'rounded-2xl ldn-modal-popup'

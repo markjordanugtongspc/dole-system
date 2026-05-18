@@ -1,6 +1,6 @@
 import { getBasePath } from './auth.js';
 import { createNotification } from './notifications.js';
-import { pollingManager, apiGet, apiPatch, showToast, reinitFlowbite, generateChecksum } from './ajax-manager.js';
+import { apiGet, apiPatch, reinitFlowbite, generateChecksum } from './ajax-manager.js';
 import { supabase } from './supabase-client.js';
 import { isSupabaseMode } from './auth.js';
 import {
@@ -38,7 +38,7 @@ function translateDateToShortMonth(dateStr) {
 
 // Beneficiaries data loaded from database
 let beneficiaries = [];
-let lastDataChecksum = null; // For detecting data changes
+let lastDataChecksum = null;
 const LDN_PAGE_SESSION_KEY = 'ldn_current_page';
 let currentPage = getPageFromUrl();
 const itemsPerPage = 10;
@@ -727,92 +727,6 @@ function initFilterControls() {
     if (yearSelect) yearSelect.addEventListener('change', applyFilters);
 }
 
-/**
- * Initialize auto-refresh polling for real-time data sync
- */
-function initAutoRefresh() {
-    const ldnTable = document.getElementById('beneficiary-table-body');
-
-    // Only start polling if we're on the LDN page
-    if (!ldnTable) return;
-
-    pollingManager.start('beneficiaries', async () => {
-        // PREVENT CONFLICT: If bulk add is active OR was recently used (30s grace period)
-        // This stops sync/toasts from closing your modals during delicate sessions
-        const isBulkInUse = window.BulkApp && (
-            window.BulkApp.isActive || 
-            (Date.now() - (window.BulkApp.lastInteractionTime || 0) < 30000)
-        );
-
-        if (isBulkInUse) {
-            return;
-        }
-
-        let newData = [];
-        if (isSupabaseMode() && supabase) {
-            const { data, error } = await supabase
-                .from('beneficiaries')
-                .select('gip_id, full_name, contact_number, address, birthday, age, education, start_date, end_date, series_number, office_name, designation, replacement_notes, is_archived, created_at, genders(gender_name), offices(office_name), status_types(status_name), absorption_logs(absorption_datetime, "where", "position", "agency")')
-                .eq('is_archived', false)
-                .order('full_name', { ascending: true })
-                .order('created_at', { ascending: true });
-
-            if (!error && data) {
-                newData = data.map(b => ({
-                    id: b.gip_id,
-                    name: b.full_name,
-                    contact: b.contact_number,
-                    address: b.address,
-                    birthday: b.birthday,
-                    age: b.age || (b.birthday ? new Date().getFullYear() - new Date(b.birthday).getFullYear() : 0),
-                    gender: b.genders ? b.genders.gender_name : null,
-                    education: b.education,
-                    startDate: b.start_date,
-                    endDate: b.end_date,
-                    startDateFormatted: b.start_date ? new Date(b.start_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : null,
-                    endDateFormatted: b.end_date ? new Date(b.end_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : null,
-                    seriesNo: b.series_number,
-                    office: (b.offices ? b.offices.office_name : b.office_name) || null,
-                    designation: b.designation,
-                    replacement: b.replacement_notes,
-                    remarks: b.status_types ? b.status_types.status_name : null,
-                    absorbDate: b.absorption_logs ? b.absorption_logs.absorption_datetime : null,
-                    absorb_where: b.absorption_logs ? b.absorption_logs.where : null,
-                    absorb_position: b.absorption_logs ? b.absorption_logs.position : null,
-                    absorb_agency: b.absorption_logs ? b.absorption_logs.agency : null,
-                    absorb_by: b.absorption_logs && b.absorption_logs.users ? b.absorption_logs.users.username : null,
-                    isArchived: b.is_archived,
-                    createdAt: b.created_at
-                }));
-            }
-        } else {
-            const result = await apiGet('api/beneficiaries.php');
-            if (result.success && result.data && result.data.beneficiaries) {
-                newData = result.data.beneficiaries;
-            }
-        }
-
-        if (newData.length > 0) {
-            syncExpiredStatusesLocally(newData);
-            const newChecksum = generateChecksum(newData);
-
-            // Only update if data actually changed
-            if (!lastDataChecksum || newChecksum !== lastDataChecksum) {
-                beneficiaries = newData;
-                renderTable();
-                reinitFlowbite();
-
-                showToast(
-                    'Data Synced',
-                    'Beneficiary list has been updated',
-                    'info'
-                );
-            }
-
-            lastDataChecksum = newChecksum;
-        }
-    }, 10000); // Poll every 10 seconds
-}
 
 export function renderTable(dataToRender = null) {
     if (!dataToRender) {
@@ -952,7 +866,7 @@ function renderPagination(totalItems, totalPages, activePage = currentPage) {
             <div class="flex items-center gap-1 ml-1 shrink-0">
                 <span class="text-[10px] sm:text-xs font-bold text-gray-400 hidden sm:inline">Go to</span>
                 <input type="number" id="goto-page-input" min="1" max="${totalPages}" placeholder="—"
-                    class="w-20 h-8 text-center text-xs font-black rounded-lg border-2 border-gray-300 bg-gray-50 text-gray-800 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all shadow-sm"
+                    class="w-14 h-8 text-center text-xs font-black rounded-lg border-2 border-gray-300 bg-gray-50 text-gray-800 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all shadow-sm"
                     aria-label="Go to page"
                     onkeydown="if(event.key==='Enter'){const v=parseInt(this.value);if(v){window.changePage(Math.min(${totalPages},Math.max(1,v)));this.value='';this.blur();}}"
                     >

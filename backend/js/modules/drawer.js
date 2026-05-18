@@ -394,46 +394,63 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
     `;
 
     // Initialize Drawer HTML in body
+    const noAnimation = Boolean(data._noAnimation);
     let drawerContainer = document.getElementById('beneficiary-drawer-container');
-    if (drawerContainer) {
-        // Destroy existing instance gracefully
-        drawerContainer.remove();
-        document.documentElement.classList.remove('overflow-hidden');
-        document.body.classList.remove('overflow-hidden');
+    const isReuse = noAnimation && !!drawerContainer && drawerContainer.dataset.beneficiaryId === String(data.id || '');
+
+    if (isReuse) {
+        // In-place refresh: preserve the visible container, just swap content
+        const scrollTop = drawerContainer.scrollTop;
+        drawerContainer.innerHTML = drawerHtml;
+        drawerContainer.scrollTop = scrollTop;
+    } else {
+        if (drawerContainer) {
+            // Destroy existing instance gracefully
+            drawerContainer.remove();
+            document.documentElement.classList.remove('overflow-hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        drawerContainer = document.createElement('div');
+        drawerContainer.id = 'beneficiary-drawer-container';
+        drawerContainer.className = 'fixed top-0 right-0 z-[100] h-screen p-4 sm:p-6 overflow-y-auto transition-transform duration-500 ease-in-out translate-x-full bg-neutral-primary-soft dark:bg-slate-900 w-full sm:w-[550px] lg:w-[650px] shadow-2xl';
+        drawerContainer.setAttribute('tabindex', '-1');
+        drawerContainer.setAttribute('data-drawer-backdrop', 'true');
+        drawerContainer.innerHTML = drawerHtml;
+
+        document.body.appendChild(drawerContainer);
+        document.documentElement.classList.add('overflow-hidden');
+        document.body.classList.add('overflow-hidden');
     }
 
-    drawerContainer = document.createElement('div');
-    drawerContainer.id = 'beneficiary-drawer-container';
-    drawerContainer.className = 'fixed top-0 right-0 z-[100] h-screen p-4 sm:p-6 overflow-y-auto transition-transform duration-500 ease-in-out translate-x-full bg-neutral-primary-soft dark:bg-slate-900 w-full sm:w-[550px] lg:w-[650px] shadow-2xl';
-    drawerContainer.setAttribute('tabindex', '-1');
-    drawerContainer.setAttribute('data-drawer-backdrop', 'true');
-    drawerContainer.innerHTML = drawerHtml;
-
-    document.body.appendChild(drawerContainer);
-    document.documentElement.classList.add('overflow-hidden');
-    document.body.classList.add('overflow-hidden');
+    drawerContainer.dataset.beneficiaryId = String(data.id || '');
 
     import('flowbite').then(({ Drawer }) => {
-        const options = {
-            placement: 'right',
-            backdrop: true,
-            bodyScrolling: false,
-            edge: false,
-            edgeOffset: '',
-            backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-50',
-            onHide: () => {
-                document.documentElement.classList.remove('overflow-hidden');
-                document.body.classList.remove('overflow-hidden');
-                setTimeout(() => {
-                    if (drawerContainer && drawerContainer.parentNode) {
-                        drawerContainer.remove();
-                    }
-                }, 300); // Wait for transition
-            }
-        };
+        let drawer = isReuse ? drawerContainer.__drawerInstance : null;
 
-        const drawer = new Drawer(drawerContainer, options);
-        drawer.show();
+        if (!drawer) {
+            const options = {
+                placement: 'right',
+                backdrop: true,
+                bodyScrolling: false,
+                edge: false,
+                edgeOffset: '',
+                backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-50',
+                onHide: () => {
+                    document.documentElement.classList.remove('overflow-hidden');
+                    document.body.classList.remove('overflow-hidden');
+                    setTimeout(() => {
+                        if (drawerContainer && drawerContainer.parentNode) {
+                            drawerContainer.remove();
+                        }
+                    }, 300); // Wait for transition
+                }
+            };
+
+            drawer = new Drawer(drawerContainer, options);
+            drawerContainer.__drawerInstance = drawer;
+            drawer.show();
+        }
 
         // Bind events inside drawer
         const closeBtn = drawerContainer.querySelector('#close-drawer-btn');
@@ -449,11 +466,10 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 p.classList.toggle('hidden', i !== rightGridPage);
             });
 
-            // Update section title dynamically
+            // Show title only on Personal Profile page
             const sectionTitle = drawerContainer.querySelector('#drawer-section-title');
             if (sectionTitle) {
-                const titles = ['Personal Profile', 'Submission Logs', 'Required Documents'];
-                sectionTitle.textContent = titles[rightGridPage] || 'Details';
+                sectionTitle.classList.toggle('invisible', rightGridPage !== 0);
             }
 
             // Toggle Personal Profile Section visibility (only on Page 0)
