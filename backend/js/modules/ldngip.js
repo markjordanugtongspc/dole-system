@@ -951,13 +951,13 @@ function renderPagination(totalItems, totalPages, activePage = currentPage) {
             <!-- Go To -->
             <div class="flex items-center gap-1 ml-1 shrink-0">
                 <span class="text-[10px] sm:text-xs font-bold text-gray-400 hidden sm:inline">Go to</span>
-                <input type="number" id="goto-page-input" min="1" max="${totalPages}" value="${activePage}"
-                    class="w-16 h-8 text-center text-xs font-black rounded-lg border border-gray-200 bg-white text-gray-700 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all"
+                <input type="number" id="goto-page-input" min="1" max="${totalPages}" placeholder="—"
+                    class="w-20 h-8 text-center text-xs font-black rounded-lg border-2 border-gray-300 bg-gray-50 text-gray-800 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all shadow-sm"
                     aria-label="Go to page"
-                    onkeydown="if(event.key==='Enter'){const p=Math.min(${totalPages},Math.max(1,parseInt(this.value)||1));window.changePage(p);}"
-                    onfocus="this.select()">
+                    onkeydown="if(event.key==='Enter'){const v=parseInt(this.value);if(v){window.changePage(Math.min(${totalPages},Math.max(1,v)));this.value='';this.blur();}}"
+                    >
                 <button
-                    onclick="const inp=document.getElementById('goto-page-input');const p=Math.min(${totalPages},Math.max(1,parseInt(inp.value)||1));window.changePage(p);"
+                    onclick="const inp=document.getElementById('goto-page-input');const v=parseInt(inp.value);if(v){window.changePage(Math.min(${totalPages},Math.max(1,v)));inp.value='';inp.blur();}"
                     class="h-8 px-3 text-xs font-black bg-royal-blue text-white rounded-lg hover:bg-blue-700 active:scale-95 transition-all cursor-pointer shrink-0">
                     Go
                 </button>
@@ -967,49 +967,26 @@ function renderPagination(totalItems, totalPages, activePage = currentPage) {
 }
 
 function generatePageNumbers(current, total) {
-    // Last page is always rendered separately so there's always a visual "+1" at the end.
-    // For small sets (≤ 5 pages): show pages 1 → (total-1) as the main window.
-    // For larger sets: smart truncation (first page + 2-neighbour window around current), excluding last.
-    const SHOW_ALL_THRESHOLD = 5;
-    const WING = 2;
-    let pages = [];
+    // Sliding window of 4 — no pinned last page, no ellipsis.
+    const WINDOW = 4;
+    const count = Math.min(WINDOW, total);
 
-    if (total <= SHOW_ALL_THRESHOLD) {
-        pages = Array.from({ length: total - 1 }, (_, i) => i + 1);
-    } else {
-        const set = new Set([1]);
-        for (let i = Math.max(1, current - WING); i <= Math.min(total - 1, current + WING); i++) set.add(i);
-        pages = [...set].sort((a, b) => a - b);
+    let start = Math.max(1, current - 1);
+    let end = start + count - 1;
+    if (end > total) {
+        end = total;
+        start = Math.max(1, end - count + 1);
     }
 
     let html = '';
-    let prev = 0;
-    for (const p of pages) {
-        if (prev && p - prev > 1) {
-            html += `<span class="min-w-[28px] h-8 flex items-center justify-center text-xs font-bold text-gray-400 select-none">…</span>`;
-        }
+    for (let p = start; p <= end; p++) {
         html += `
             <button onclick="changePage(${p})"
                 class="min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-black transition-all cursor-pointer
                 ${p === current ? 'bg-royal-blue text-white shadow-md shadow-royal-blue/20' : 'bg-white text-gray-600 hover:bg-royal-blue/10 hover:text-royal-blue border border-gray-100'}">
                 ${p}
             </button>`;
-        prev = p;
     }
-
-    // Always render the last page separately
-    if (total > 1) {
-        if (prev && total - prev > 1) {
-            html += `<span class="min-w-[28px] h-8 flex items-center justify-center text-xs font-bold text-gray-400 select-none">…</span>`;
-        }
-        html += `
-            <button onclick="changePage(${total})"
-                class="min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-black transition-all cursor-pointer
-                ${total === current ? 'bg-royal-blue text-white shadow-md shadow-royal-blue/20' : 'bg-white text-gray-600 hover:bg-royal-blue/10 hover:text-royal-blue border border-gray-100'}">
-                ${total}
-            </button>`;
-    }
-
     return html;
 }
 
