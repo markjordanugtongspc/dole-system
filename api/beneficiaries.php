@@ -114,6 +114,83 @@ try {
         ];
     }
 
+    /**
+     * Resolve office_id from POST/PUT payload.
+     * If $data['officeId'] is present (pre-resolved by the frontend), use it directly.
+     * Otherwise: strip any " - LOCATION" suffix, do exact → LIKE → create fallback.
+     * Also auto-creates the office_locations row when $data['locationName'] is provided.
+     */
+    function resolveOfficeId(PDO $pdo, array $data, bool $isSupabase, string $officeIdCol, string $officeSearchCol): ?int {
+        if (!empty($data['officeId'])) {
+            $id = (int)$data['officeId'];
+            ensureOfficeLocation($pdo, $id, $data['locationName'] ?? null, $isSupabase);
+            return $id;
+        }
+
+        if (empty($data['office'])) return null;
+
+        // Split "OFFICE - LOCATION" → officeNameOnly="OFFICE", locationFromString="LOCATION".
+        // The frontend sends the full display string (e.g. "LGU - TEST"); we must extract both parts.
+        $raw = trim($data['office']);
+        $locationFromString = null;
+        if (strpos($raw, ' - ') !== false) {
+            $parts = explode(' - ', $raw, 2);
+            $officeNameOnly = trim($parts[0]);
+            $locationFromString = trim($parts[1]);
+        } else {
+            $officeNameOnly = $raw;
+        }
+        // Prefer an explicit locationName from payload; fall back to what we parsed from the string.
+        $effectiveLocationName = !empty($data['locationName']) ? trim($data['locationName']) : $locationFromString;
+
+        // Exact match first
+        $stmt = $pdo->prepare("SELECT $officeIdCol FROM offices WHERE $officeSearchCol = :name LIMIT 1");
+        $stmt->execute(['name' => $officeNameOnly]);
+        $officeId = $stmt->fetchColumn() ?: null;
+
+        // LIKE fallback
+        if (!$officeId) {
+            $stmt = $pdo->prepare("SELECT $officeIdCol FROM offices WHERE $officeSearchCol LIKE :name LIMIT 1");
+            $stmt->execute(['name' => '%' . $officeNameOnly . '%']);
+            $officeId = $stmt->fetchColumn() ?: null;
+        }
+
+        // Create new office if still not found
+        if (!$officeId) {
+            $stmt = $pdo->prepare("INSERT INTO offices ($officeSearchCol) VALUES (:name)" . ($isSupabase ? " RETURNING $officeIdCol" : ""));
+            $stmt->execute(['name' => $officeNameOnly]);
+            $officeId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
+        }
+
+        if ($officeId) {
+            ensureOfficeLocation($pdo, (int)$officeId, $effectiveLocationName, $isSupabase);
+        }
+
+        return $officeId ? (int)$officeId : null;
+    }
+
+    /**
+     * Upsert an office_locations row (no-op if already exists).
+     * Non-fatal: a failure here never blocks the beneficiary save.
+     */
+    function ensureOfficeLocation(PDO $pdo, int $officeId, ?string $locationName, bool $isSupabase): void {
+        if (!$locationName || trim($locationName) === '') return;
+        $locationName = trim($locationName);
+        try {
+            $locCol   = tableHasColumn($pdo, $isSupabase, 'office_locations', 'location')    ? 'location'    : 'name';
+            $locIdCol = tableHasColumn($pdo, $isSupabase, 'office_locations', 'id')           ? 'id'          : 'location_id';
+
+            $check = $pdo->prepare("SELECT $locIdCol FROM office_locations WHERE office_id = :oid AND $locCol = :loc LIMIT 1");
+            $check->execute(['oid' => $officeId, 'loc' => $locationName]);
+            if (!$check->fetchColumn()) {
+                $insert = $pdo->prepare("INSERT INTO office_locations (office_id, $locCol) VALUES (:oid, :loc)");
+                $insert->execute(['oid' => $officeId, 'loc' => $locationName]);
+            }
+        } catch (Throwable $e) {
+            debugLog('office_location.ensure.error', ['msg' => $e->getMessage()]);
+        }
+    }
+
     // DB connection is established, session is started.
     // We already have $current_user_id.
 } catch (PDOException $e) {
@@ -406,6 +483,7 @@ if ($method === 'GET') {
                     {$endDateFmtExpr} as {$aliasEndDateFormatted},
                     b.series_number as {$aliasSeriesNo},
                     COALESCE($officeNameColExpr, $beneficiaryOfficeNameExpr) as office,
+                    {$beneficiaryOfficeIdExpr} as officeId,
                     b.designation,
                     b.replacement_notes as replacement,
                     s.status_name as remarks,
@@ -488,27 +566,7 @@ if ($method === 'GET') {
             $genderId = $stmt->fetchColumn() ?: null;
         }
 
-        $officeId = null;
-        if (!empty($data['office'])) {
-            $hasOfficeCode = tableHasColumn($pdo, $isSupabase, 'offices', 'office_code');
-            
-            $sql = "SELECT $officeIdCol FROM offices WHERE $officeSearchCol LIKE :office_name";
-            if ($hasOfficeCode) $sql .= " OR office_code = :office_code";
-            
-            $stmt = $pdo->prepare($sql);
-            $params = ['office_name' => '%' . $data['office'] . '%'];
-            if ($hasOfficeCode) $params['office_code'] = $data['office'];
-            
-            $stmt->execute($params);
-            $officeId = $stmt->fetchColumn() ?: null;
-
-            // [HYBRID-FIX] If office still not found, it's a new office! Create it.
-            if (!$officeId && !empty($data['office'])) {
-                $stmt = $pdo->prepare("INSERT INTO offices ($officeSearchCol) VALUES (:name) " . ($isSupabase ? "RETURNING $officeIdCol" : ""));
-                $stmt->execute(['name' => $data['office']]);
-                $officeId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
-            }
-        }
+        $officeId = resolveOfficeId($pdo, $data, $isSupabase, $officeIdCol, $officeSearchCol);
 
         $resolvedStatus = resolveStatusId($pdo, $data['remarks'] ?? null, $data['endDate'] ?? null);
         $statusId = $resolvedStatus['status_id'];
@@ -730,27 +788,7 @@ if ($method === 'GET') {
             $genderId = $stmt->fetchColumn() ?: null;
         }
 
-        $officeId = null;
-        if (!empty($data['office'])) {
-            $hasOfficeCode = tableHasColumn($pdo, $isSupabase, 'offices', 'office_code');
-            
-            $sql = "SELECT $officeIdCol FROM offices WHERE $officeSearchCol LIKE :office_name";
-            if ($hasOfficeCode) $sql .= " OR office_code = :office_code";
-            
-            $stmt = $pdo->prepare($sql);
-            $params = ['office_name' => '%' . $data['office'] . '%'];
-            if ($hasOfficeCode) $params['office_code'] = $data['office'];
-            
-            $stmt->execute($params);
-            $officeId = $stmt->fetchColumn() ?: null;
-
-            // [HYBRID-FIX] If office still not found, it's a new office! Create it.
-            if (!$officeId && !empty($data['office'])) {
-                $stmt = $pdo->prepare("INSERT INTO offices ($officeSearchCol) VALUES (:name) " . ($isSupabase ? "RETURNING $officeIdCol" : ""));
-                $stmt->execute(['name' => $data['office']]);
-                $officeId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
-            }
-        }
+        $officeId = resolveOfficeId($pdo, $data, $isSupabase, $officeIdCol, $officeSearchCol);
 
         $resolvedStatus = resolveStatusId($pdo, $data['remarks'] ?? null, $data['endDate'] ?? null);
         $statusId = $resolvedStatus['status_id'];

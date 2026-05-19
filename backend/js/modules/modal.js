@@ -103,9 +103,16 @@ export function initModalHandler() {
                 });
             }
 
-            // STEP 3: Re-render only if drawer was opened without data (first visit)
-            // When cache existed, the drawer is already showing data — skip re-render to prevent double open
-            if (!hadCache) {
+            // STEP 3: Re-render when the fetched data differs from what is currently displayed.
+            // Covers first visit (no cache) AND post-mutation refresh (cache now stale).
+            // _noAnimation does an in-place innerHTML swap, so the update is instant and smooth.
+            const displayed = JSON.stringify({
+                ar: cachedLogs?.arLogs || [],
+                dtr: cachedLogs?.dtrLogs || [],
+                docs: cachedLogs?.docs || []
+            });
+            const fresh = JSON.stringify({ ar: fetchedArLogs, dtr: fetchedDtrLogs, docs: fetchedDocs });
+            if (!hadCache || displayed !== fresh) {
                 const drawerContainer = document.getElementById('beneficiary-drawer-container');
                 if (drawerContainer && drawerContainer.dataset.beneficiaryId === String(beneficiaryId)) {
                     beneficiaryData.arLogs = fetchedArLogs;
@@ -1559,13 +1566,37 @@ export function showAddDataModal(data = null) {
 
                 const fetchOffices = async () => {
                     const cacheKey = 'dole_offices_cache';
-                    
+
+                    // Fetch fresh from Supabase SDK (primary) or PHP bridge (fallback).
                     const syncBackground = async () => {
                         let freshData = [];
                         try {
-                            const res = await apiGet('api/beneficiaries.php?get_offices_advanced=1');
-                            if (res.success && res.data?.success && Array.isArray(res.data.offices)) freshData = res.data.offices;
-                        } catch (err) { console.error('Office fetch failed:', err); }
+                            if (supabase && isSupabaseMode()) {
+                                // Parallel fetch: offices + location counts
+                                const [{ data: offData, error: offErr }, { data: locData }] = await Promise.all([
+                                    supabase.from('offices').select('*').order('office'),
+                                    supabase.from('office_locations').select('office_id')
+                                ]);
+                                if (!offErr && offData?.length) {
+                                    const countMap = {};
+                                    if (locData) locData.forEach(l => { countMap[l.office_id] = (countMap[l.office_id] || 0) + 1; });
+                                    freshData = offData.map(o => ({
+                                        id:             o.id ?? o.office_id,
+                                        office:         o.office || o.office_name || '',
+                                        location_count: countMap[o.id ?? o.office_id] || 0
+                                    })).filter(o => o.office);
+                                }
+                            }
+                        } catch (err) { /* fall through to PHP */ }
+
+                        // PHP bridge fallback
+                        if (!freshData.length) {
+                            try {
+                                const res = await apiGet('api/beneficiaries.php?get_offices_advanced=1');
+                                if (res.success && res.data?.success && Array.isArray(res.data.offices)) freshData = res.data.offices;
+                            } catch (err) { console.error('Office fetch failed:', err); }
+                        }
+
                         if (freshData.length > 0) {
                             cachedOffices = freshData;
                             localStorage.setItem(cacheKey, JSON.stringify({ data: freshData, timestamp: Date.now() }));
@@ -1578,8 +1609,8 @@ export function showAddDataModal(data = null) {
                         try {
                             const { data, timestamp } = JSON.parse(cached);
                             cachedOffices = data;
-                            // If older than 30 mins, sync in background but don't wait
-                            if (Date.now() - timestamp > 30 * 60 * 1000) {
+                            // Refresh in background if older than 5 minutes
+                            if (Date.now() - timestamp > 5 * 60 * 1000) {
                                 syncBackground().then(() => {
                                     if (currentView === 'OFFICES') render('OFFICES', selectedOffice, officeInput.value);
                                 });
@@ -1588,10 +1619,7 @@ export function showAddDataModal(data = null) {
                         } catch (e) { localStorage.removeItem(cacheKey); }
                     }
 
-                    // If no cache, we MUST await
-                    if (cachedOffices.length === 0) {
-                        return await syncBackground();
-                    }
+                    if (cachedOffices.length === 0) return await syncBackground();
                     return cachedOffices;
                 };
 
@@ -1620,9 +1648,69 @@ export function showAddDataModal(data = null) {
                                             ${hasLocations ? `<svg class="w-3 h-3 text-slate-300 group-hover/opt:text-blue-500 group-hover/opt:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>` : ''}
                                         </div>
                                     `;
-                                }).join('') : `<div class="px-3 py-6 text-center text-[9px] font-bold ${t.textLabel} opacity-60">No matching offices.</div>`}
+                                }).join('') : `
+                                    <div class="px-3 py-2 text-center text-[9px] font-bold ${t.textLabel} opacity-60 whitespace-nowrap">No matching offices.</div>
+                                    ${filter.trim() ? `
+                                    <div class="px-2 pb-2 flex flex-col gap-1.5">
+                                        <div class="text-[7px] font-black uppercase tracking-widest ${t.textLabel} opacity-50 px-1">New office: "${filter.trim()}"</div>
+                                        <div id="add-office-location-row-modal" class="hidden gap-1.5 items-center">
+                                            <input type="text" id="new-office-loc-input-modal" placeholder="Location name..." class="flex-1 min-w-0 px-2.5 py-1.5 text-[9px] font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                                            <button type="button" id="confirm-office-with-loc-modal" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-blue-500 text-white text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all active:scale-95 cursor-pointer whitespace-nowrap">
+                                                Confirm
+                                            </button>
+                                        </div>
+                                        <div class="flex gap-1.5">
+                                            <button type="button" id="add-office-with-loc-btn-modal" class="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 text-[9px] font-black uppercase tracking-widest hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap">
+                                                <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                                Add location
+                                            </button>
+                                            <button type="button" id="skip-office-loc-btn-modal" class="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-slate-700 transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap">
+                                                <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                Skip
+                                            </button>
+                                        </div>
+                                    </div>` : ''}
+                                `}
                             </div>
                         `;
+
+                        const newOfficeName = filter.trim();
+                        const locRowM = officeContainer.querySelector('#add-office-location-row-modal');
+                        const locInputM = officeContainer.querySelector('#new-office-loc-input-modal');
+                        const confirmBtnM = officeContainer.querySelector('#confirm-office-with-loc-modal');
+                        const addLocBtnM = officeContainer.querySelector('#add-office-with-loc-btn-modal');
+                        const skipBtnM = officeContainer.querySelector('#skip-office-loc-btn-modal');
+
+                        if (addLocBtnM && locRowM) {
+                            addLocBtnM.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                locRowM.classList.remove('hidden');
+                                locRowM.classList.add('flex');
+                                setTimeout(() => locInputM?.focus(), 50);
+                            });
+                        }
+                        if (confirmBtnM && locInputM) {
+                            const doConfirmM = (e) => {
+                                e.stopPropagation();
+                                const loc = locInputM.value.trim();
+                                officeInput.value = loc ? `${newOfficeName} - ${loc}` : newOfficeName;
+                                officeInput.dataset.locationName = loc || '';
+                                officeContainer.classList.add('hidden');
+                                officeInput.dispatchEvent(new Event('change'));
+                            };
+                            confirmBtnM.addEventListener('click', doConfirmM);
+                            locInputM.addEventListener('keydown', (e) => { if (e.key === 'Enter') doConfirmM(e); });
+                            locInputM.addEventListener('click', (e) => e.stopPropagation());
+                        }
+                        if (skipBtnM) {
+                            skipBtnM.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                officeInput.value = newOfficeName;
+                                officeInput.dataset.locationName = '';
+                                officeContainer.classList.add('hidden');
+                                officeInput.dispatchEvent(new Event('change'));
+                            });
+                        }
 
                         officeContainer.querySelectorAll('.office-code-option').forEach(opt => {
                             opt.addEventListener('click', (e) => {
@@ -1630,7 +1718,10 @@ export function showAddDataModal(data = null) {
                                 if (opt.dataset.hasLocations === 'true') {
                                     render('LOCATIONS', { id: opt.dataset.id, name: opt.dataset.name });
                                 } else {
+                                    // Office with no locations — select it directly and track its id.
                                     officeInput.value = opt.dataset.name;
+                                    officeInput.dataset.officeId = opt.dataset.id;
+                                    delete officeInput.dataset.locationName;
                                     officeContainer.classList.add('hidden');
                                     officeInput.dispatchEvent(new Event('change'));
                                 }
@@ -1708,17 +1799,45 @@ export function showAddDataModal(data = null) {
 
                         const renderLocations = (locFilter = '') => {
                             const filtered = locations.filter(l => l.location.toLowerCase().includes(locFilter.toLowerCase()));
-                            locationsListContainer.innerHTML = filtered.length > 0 ? filtered.map(l => `
-                                <div class="location-option group/loc px-3 py-1.5 text-[9px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg cursor-pointer transition-all flex items-center gap-3 active:scale-[0.98] mb-0.5" data-location="${l.location}">
-                                    <div class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 group-hover/loc:bg-blue-500 transition-all"></div>
-                                    <span class="option-text truncate">${l.location}</span>
-                                </div>
-                            `).join('') : (locations.length === 0 ? `<div class="px-3 py-4 text-center text-[9px] font-bold ${t.textLabel} animate-pulse flex items-center justify-center gap-2"><svg class="w-3.5 h-3.5 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Fetching...</div>` : `<div class="px-3 py-8 text-center text-[9px] font-bold ${t.textLabel} opacity-60">No matching locations.</div>`);
+                            const trimmed = locFilter.trim();
+
+                            if (filtered.length > 0) {
+                                locationsListContainer.innerHTML = filtered.map(l => `
+                                    <div class="location-option group/loc px-3 py-1.5 text-[9px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg cursor-pointer transition-all flex items-center gap-3 active:scale-[0.98] mb-0.5" data-location="${l.location}">
+                                        <div class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 group-hover/loc:bg-blue-500 transition-all"></div>
+                                        <span class="option-text truncate">${l.location}</span>
+                                    </div>
+                                `).join('');
+                            } else if (locations.length === 0) {
+                                locationsListContainer.innerHTML = `<div class="px-3 py-4 text-center text-[9px] font-bold ${t.textLabel} animate-pulse flex items-center justify-center gap-2"><svg class="w-3.5 h-3.5 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Fetching...</div>`;
+                            } else {
+                                locationsListContainer.innerHTML = `
+                                    <div class="px-3 py-3 text-center text-[9px] font-bold ${t.textLabel} opacity-60">No matching locations.</div>
+                                    ${trimmed ? `
+                                    <div class="px-2 pb-2">
+                                        <button type="button" id="add-new-location-modal" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 text-[9px] font-black uppercase tracking-widest hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all active:scale-[0.98] cursor-pointer">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+                                            Add "${trimmed}" as location
+                                        </button>
+                                    </div>` : ''}
+                                `;
+                                if (trimmed) {
+                                    locationsListContainer.querySelector('#add-new-location-modal')?.addEventListener('click', () => {
+                                        officeInput.value = `${office.name} - ${trimmed}`;
+                                        officeInput.dataset.officeId = office.id;
+                                        officeInput.dataset.locationName = trimmed;
+                                        officeContainer.classList.add('hidden');
+                                        officeInput.dispatchEvent(new Event('change'));
+                                    });
+                                }
+                            }
 
                             locationsListContainer.querySelectorAll('.location-option').forEach(opt => {
                                 opt.addEventListener('click', (e) => {
                                     const location = opt.dataset.location;
                                     officeInput.value = `${office.name} - ${location}`;
+                                    officeInput.dataset.officeId = office.id;
+                                    officeInput.dataset.locationName = location;
                                     officeContainer.classList.add('hidden');
                                     officeInput.dispatchEvent(new Event('change'));
                                 });
@@ -1744,8 +1863,13 @@ export function showAddDataModal(data = null) {
                 });
 
                 officeInput.addEventListener('input', () => {
+                    // Manual typing invalidates any dropdown selection — clear tracked ids.
+                    delete officeInput.dataset.officeId;
+                    delete officeInput.dataset.locationName;
+                    currentView = 'OFFICES';
+                    selectedOffice = null;
                     officeContainer.classList.remove('hidden');
-                    render(currentView, selectedOffice, officeInput.value);
+                    render('OFFICES', null, officeInput.value);
                 });
 
                 document.addEventListener('click', (e) => {
@@ -1935,6 +2059,12 @@ export function showAddDataModal(data = null) {
                     if (!beneficiaryData.replacement) {
                         beneficiaryData.replacement = '';
                     }
+
+                    // Inject resolved office_id + location from the dropdown selection.
+                    // These let the backend skip office lookup and upsert the location directly.
+                    const offInputEl = popup.querySelector('#office-input');
+                    if (offInputEl?.dataset.officeId) beneficiaryData.officeId = offInputEl.dataset.officeId;
+                    if (offInputEl?.dataset.locationName) beneficiaryData.locationName = offInputEl.dataset.locationName;
 
                     // Prepare ID logic
                     const gipIdInput = popup.querySelector('#full-id-input')?.value;

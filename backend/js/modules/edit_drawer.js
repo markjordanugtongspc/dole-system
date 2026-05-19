@@ -637,7 +637,7 @@ export function showEditBeneficiaryDrawer(data) {
                             ${filteredOffices.length > 0 ? filteredOffices.map(o => {
                                 const hasLocations = parseInt(o.location_count || 0) > 0;
                                 return `
-                                    <div class="office-code-option group/opt px-3 py-2 text-[9px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg ${hasLocations ? 'cursor-pointer' : 'cursor-default opacity-60'} transition-all flex items-center justify-between group active:scale-[0.98] mx-1 mb-0.5" 
+                                    <div class="office-code-option group/opt px-3 py-2 text-[9px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg ${hasLocations ? 'cursor-pointer' : 'cursor-default opacity-60'} transition-all flex items-center justify-between group active:scale-[0.98] mx-1 mb-0.5"
                                         data-id="${o.id}" data-name="${o.office}" data-has-locations="${hasLocations}">
                                         <div class="flex items-center gap-2.5">
                                             <div class="w-2 h-2 rounded-md bg-blue-500/10 group-hover/opt:bg-blue-500/20 flex items-center justify-center transition-colors">
@@ -648,9 +648,67 @@ export function showEditBeneficiaryDrawer(data) {
                                         ${hasLocations ? `<svg class="w-3 h-3 text-slate-300 group-hover/opt:text-blue-500 group-hover/opt:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>` : ''}
                                     </div>
                                 `;
-                            }).join('') : `<div class="px-3 py-6 text-center text-[9px] font-bold ${t.textLabel} opacity-60">No matching offices.</div>`}
+                            }).join('') : `
+                                <div class="px-3 py-2 text-center text-[9px] font-bold ${t.textLabel} opacity-60 whitespace-nowrap">No matching offices.</div>
+                                ${filter.trim() ? `
+                                <div class="px-2 pb-2 flex flex-col gap-1.5">
+                                    <div class="text-[7px] font-black uppercase tracking-widest ${t.textLabel} opacity-50 px-1">New office: "${filter.trim()}"</div>
+                                    <div id="add-office-location-row-edit" class="hidden gap-1.5 items-center">
+                                        <input type="text" id="new-office-loc-input-edit" placeholder="Location name..." class="flex-1 min-w-0 px-2.5 py-1.5 text-[9px] font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                                        <button type="button" id="confirm-office-with-loc-edit" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-blue-500 text-white text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all active:scale-95 cursor-pointer whitespace-nowrap">
+                                            Confirm
+                                        </button>
+                                    </div>
+                                    <div class="flex gap-1.5">
+                                        <button type="button" id="add-office-with-loc-btn-edit" class="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 text-[9px] font-black uppercase tracking-widest hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap">
+                                            <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                            Add location
+                                        </button>
+                                        <button type="button" id="skip-office-loc-btn-edit" class="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-slate-700 transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap">
+                                            <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                            Skip
+                                        </button>
+                                    </div>
+                                </div>` : ''}
+                            `}
                         </div>
                     `;
+
+                    const newOfficeName = filter.trim();
+                    const locRow = officeContainer.querySelector('#add-office-location-row-edit');
+                    const locInput = officeContainer.querySelector('#new-office-loc-input-edit');
+                    const confirmBtn = officeContainer.querySelector('#confirm-office-with-loc-edit');
+                    const addLocBtn = officeContainer.querySelector('#add-office-with-loc-btn-edit');
+                    const skipBtn = officeContainer.querySelector('#skip-office-loc-btn-edit');
+
+                    if (addLocBtn && locRow) {
+                        addLocBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            locRow.classList.remove('hidden');
+                            locRow.classList.add('flex');
+                            setTimeout(() => locInput?.focus(), 50);
+                        });
+                    }
+                    if (confirmBtn && locInput) {
+                        const doConfirm = (e) => {
+                            e.stopPropagation();
+                            const loc = locInput.value.trim();
+                            officeInput.value = loc ? `${newOfficeName} - ${loc}` : newOfficeName;
+                            officeContainer.classList.add('hidden');
+                            officeInput.dispatchEvent(new Event('change'));
+                        };
+                        confirmBtn.addEventListener('click', doConfirm);
+                        locInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doConfirm(e); });
+                        locInput.addEventListener('click', (e) => e.stopPropagation());
+                    }
+                    if (skipBtn) {
+                        skipBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            officeInput.value = newOfficeName;
+                            officeContainer.classList.add('hidden');
+                            officeInput.dispatchEvent(new Event('change'));
+                        });
+                    }
 
                     officeContainer.querySelectorAll('.office-code-option').forEach(opt => {
                         opt.addEventListener('click', (e) => {
@@ -732,12 +790,36 @@ export function showEditBeneficiaryDrawer(data) {
 
                     const renderLocs = (f = '') => {
                         const filtered = locations.filter(l => l.location.toLowerCase().includes(f.toLowerCase()));
-                        locList.innerHTML = filtered.length > 0 ? filtered.map(l => `
-                            <div class="location-option-edit group/loc px-3 py-1.5 text-[9px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg cursor-pointer transition-all flex items-center gap-3 active:scale-[0.98] mb-0.5" data-location="${l.location}">
-                                <div class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 group-hover/loc:bg-blue-500 transition-all"></div>
-                                <span class="option-text truncate">${l.location}</span>
-                            </div>
-                        `).join('') : (locations.length === 0 ? `<div class="px-3 py-4 text-center text-[9px] font-bold ${t.textLabel} animate-pulse">Fetching...</div>` : `<div class="px-3 py-8 text-center text-[9px] font-bold ${t.textLabel} opacity-60">No matching locations.</div>`);
+                        const trimmed = f.trim();
+
+                        if (filtered.length > 0) {
+                            locList.innerHTML = filtered.map(l => `
+                                <div class="location-option-edit group/loc px-3 py-1.5 text-[9px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg cursor-pointer transition-all flex items-center gap-3 active:scale-[0.98] mb-0.5" data-location="${l.location}">
+                                    <div class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 group-hover/loc:bg-blue-500 transition-all"></div>
+                                    <span class="option-text truncate">${l.location}</span>
+                                </div>
+                            `).join('');
+                        } else if (locations.length === 0) {
+                            locList.innerHTML = `<div class="px-3 py-4 text-center text-[9px] font-bold ${t.textLabel} animate-pulse">Fetching...</div>`;
+                        } else {
+                            locList.innerHTML = `
+                                <div class="px-3 py-3 text-center text-[9px] font-bold ${t.textLabel} opacity-60">No matching locations.</div>
+                                ${trimmed ? `
+                                <div class="px-2 pb-2">
+                                    <button type="button" id="add-new-location-edit" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 text-[9px] font-black uppercase tracking-widest hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all active:scale-[0.98] cursor-pointer">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+                                        Add "${trimmed}" as location
+                                    </button>
+                                </div>` : ''}
+                            `;
+                            if (trimmed) {
+                                locList.querySelector('#add-new-location-edit')?.addEventListener('click', () => {
+                                    officeInput.value = `${office.name} - ${trimmed}`;
+                                    officeContainer.classList.add('hidden');
+                                    officeInput.dispatchEvent(new Event('change'));
+                                });
+                            }
+                        }
 
                         locList.querySelectorAll('.location-option-edit').forEach(opt => {
                             opt.addEventListener('click', () => {
@@ -777,7 +859,6 @@ export function showEditBeneficiaryDrawer(data) {
         };
         setupOfficeSelectorEdit();
 
-        // Replacement User Search Logic
         const repInput = drawerContainer.querySelector('#edit-replacement-input');
         const repBox = drawerContainer.querySelector('#edit-replacement-suggestions-box');
         const repLoader = drawerContainer.querySelector('#edit-replacement-loading');

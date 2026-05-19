@@ -41,7 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initLogoutHandler();
     initMobileSplash();
     initCharts();
-    initLDNPage();
+    // initLDNPage only wires up on the actual LDN page (needs beneficiary-table-body)
+    if (document.getElementById('beneficiary-table-body')) {
+        initLDNPage();
+    }
     initModalHandler();
     initAutoYear();
     loadUserProfile();
@@ -56,13 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
         initExportPage();
     }
 
-    // Background preload: warm up IndexedDB cache while the page-load animation plays.
-    // Runs on dashboard/non-LDN pages so the LDN list is instant on next navigation.
+    // Background preload: warm up IndexedDB cache on non-LDN pages so the list is
+    // instant on next navigation. Deferred so it never blocks the current page render.
     const isLDNPage = document.getElementById('beneficiary-table-body') !== null;
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     if (!isLDNPage && isLoggedIn) {
-        // Defer so it never blocks the current page's render
-        setTimeout(() => loadBeneficiaries(), 1500);
+        setTimeout(() => loadBeneficiaries(), 2000);
     }
 
     // Add password toggle functionality

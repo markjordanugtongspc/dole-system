@@ -48,6 +48,7 @@ let lastSupabaseFetchTime = 0;
 const FETCH_THROTTLE_MS = 2 * 60 * 1000; // 2 minutes
 let genderMap = {};
 let statusMap = {};
+let officeMap = {}; // keyed by offices.id → display name (e.g., "LGU - ILIGAN")
 
 
 let currentStatusFilter = localStorage.getItem('ldn_status_filter') || 'ONGOING';
@@ -116,9 +117,11 @@ function getFilteredBeneficiaries() {
         if (currentOfficeFilter !== 'ALL') {
             result = result.filter(b => (b.office || '').toUpperCase().includes(currentOfficeFilter.toUpperCase()));
         }
-    } else {
-        // Default mode: always show latest ONGOING rows.
-        result = result.filter(b => (b.remarks || 'UNKNOWN').toUpperCase() === DEFAULT_STATUS_FILTER);
+    }
+    // Default mode (Filter Mode OFF): show all records, ordered by priority office first
+    // then ONGOING/EXPIRED/rest → A-Z by name. office_id FK may be null for legacy records.
+    if (!filterModeEnabled) {
+        // no additional filter — sortByDefaultPriority handles ordering
     }
 
     const searchInput = document.getElementById('table-search');
@@ -137,21 +140,35 @@ function getFilteredBeneficiaries() {
     }
 
     if (!filterModeEnabled) {
-        return [...result].sort((a, b) => {
-            const aDate = new Date(a.createdAt || 0).getTime();
-            const bDate = new Date(b.createdAt || 0).getTime();
-            return bDate - aDate;
-        });
+        return sortByDefaultPriority(result);
     }
 
     return result;
 }
 
-function sortByLatestCreatedAtDesc(data) {
+// Iligan DOLE office — offices.id = 1 (office='LGU').
+// beneficiaries.office_id FK references offices.id (confirmed from schema).
+// office_locations.id=30, office_id=1, location='ILIGAN' is the location row for this office.
+const PRIORITY_OFFICE_ID = 1;
+
+// Default-mode status ordering: ONGOING first, then EXPIRED, then everything else.
+const STATUS_SORT_RANK = { 'ONGOING': 0, 'EXPIRED': 1 };
+function statusRank(remarks) {
+    const r = STATUS_SORT_RANK[(remarks || '').toUpperCase()];
+    return r === undefined ? 2 : r;
+}
+
+// Default sort (Filter Mode OFF): Iligan office first → ONGOING/EXPIRED/rest → A-Z by name.
+function sortByDefaultPriority(data) {
     return [...data].sort((a, b) => {
-        const aDate = new Date(a.createdAt || 0).getTime();
-        const bDate = new Date(b.createdAt || 0).getTime();
-        return bDate - aDate;
+        const aPriority = Number(a.officeId) === PRIORITY_OFFICE_ID ? 0 : 1;
+        const bPriority = Number(b.officeId) === PRIORITY_OFFICE_ID ? 0 : 1;
+        if (aPriority !== bPriority) return aPriority - bPriority;
+
+        const sr = statusRank(a.remarks) - statusRank(b.remarks);
+        if (sr !== 0) return sr;
+
+        return (a.name || '').localeCompare(b.name || '');
     });
 }
 
@@ -180,7 +197,7 @@ function sortDatasetByCriteria(data, criteria) {
             sorted.sort((a, b) => (a.address || '').localeCompare(b.address || ''));
             break;
         default:
-            return sortByLatestCreatedAtDesc(sorted);
+            return sortByDefaultPriority(sorted);
     }
     return sorted;
 }
@@ -264,6 +281,7 @@ function toggleFilterMode() {
     updateFilterUI();
     updateFilterInputsAvailability();
     updateFilterToggleButtonUI();
+    syncHeaderWithFilter();
     currentPage = 1;
     renderTable();
 }
@@ -296,7 +314,14 @@ function populateYearFilter() {
  */
 export async function loadBeneficiaries(forceRemoteRefresh = false) {
     // ── STEP 1: Serve from local cache immediately ───────────────────────────
-    const localData = await getLocalBeneficiaries();
+    let localData = await getLocalBeneficiaries();
+    // Cache migration: old records stored before officeId mapping was added have
+    // officeId=undefined. Force a fresh fetch so the filter works correctly.
+    if (localData.length > 0 && localData[0].officeId === undefined) {
+        await cacheBeneficiaries([]);
+        localData = [];
+        forceRemoteRefresh = true;
+    }
     if (localData.length > 0) {
         beneficiaries = localData;
         syncExpiredStatusesLocally(beneficiaries);
@@ -315,6 +340,38 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
         const savedSort = localStorage.getItem('ldn_sort_preference');
         sortData(savedSort || 'name_asc', false);
         console.log(`[Offline-First] Rendered ${localData.length} records from local cache`);
+    } else {
+        // Cache empty — show loading skeleton so user doesn't see "No beneficiaries found"
+        // while the remote fetch is in-flight.
+        const tbody = document.getElementById('beneficiary-table-body');
+        if (tbody) {
+            // ── SKELETON LOADING ────────────────────────────────────────────────
+            const skeletonRow = (widths) => `
+                <div class="flex items-center justify-between py-3">
+                    ${widths.map(w => `<div class="h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full ${w}"></div>`).join('')}
+                </div>`;
+            const skeletonRows = [
+                ['w-16', 'w-40', 'w-20', 'w-16', 'w-24', 'w-14', 'w-10'],
+                ['w-20', 'w-32', 'w-16', 'w-20', 'w-20', 'w-12', 'w-10'],
+                ['w-14', 'w-44', 'w-18', 'w-14', 'w-28', 'w-16', 'w-10'],
+                ['w-18', 'w-36', 'w-20', 'w-18', 'w-20', 'w-14', 'w-10'],
+                ['w-16', 'w-40', 'w-14', 'w-16', 'w-24', 'w-12', 'w-10'],
+                ['w-20', 'w-28', 'w-18', 'w-20', 'w-20', 'w-16', 'w-10'],
+                ['w-14', 'w-44', 'w-16', 'w-14', 'w-28', 'w-14', 'w-10'],
+                ['w-18', 'w-32', 'w-20', 'w-18', 'w-20', 'w-12', 'w-10'],
+            ];
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="px-6 pt-2 pb-1">
+                        <div role="status" class="animate-pulse">
+                            ${skeletonRows.map(skeletonRow).join('')}
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </td>
+                </tr>`;
+            tbody.setAttribute('aria-busy', 'true');
+            // ── END SKELETON LOADING ────────────────────────────────────────────
+        }
     }
 
     // ── STEP 2: Check if we should refresh from remote ──────────────────────
@@ -344,23 +401,31 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
                 console.log('[Offline-First] Fetching directly from Supabase (Optimized)...');
 
                 // Fetch mappings and offices lookup if not already loaded
-                let officeMap = {};
                 if (Object.keys(genderMap).length === 0) {
                     try {
-                        const [{ data: gData }, { data: sData }, { data: oData }] = await Promise.all([
+                        const [{ data: gData }, { data: sData }, { data: oData }, { data: olData }] = await Promise.all([
                             supabase.from('genders').select('gender_id, gender_name'),
                             supabase.from('status_types').select('status_id, status_name'),
-                            // select('*') avoids 400 errors when schema column names differ (id vs office_id, office vs office_name)
-                            supabase.from('offices').select('*').limit(500)
+                            supabase.from('offices').select('*').limit(500),
+                            supabase.from('office_locations').select('id, office_id, location').limit(500)
                         ]);
                         if (gData) gData.forEach(g => genderMap[g.gender_id] = g.gender_name);
                         if (sData) sData.forEach(s => statusMap[s.status_id] = s.status_name);
-                        // Build office lookup keyed by every id-like column, valued by every name-like column
-                        if (oData) oData.forEach(o => {
-                            const name = o.office_name || o.office || o.name || '';
-                            const key = o.id ?? o.office_id;
-                            if (key != null) officeMap[key] = name;
-                        });
+                        // Build officeMap keyed by offices.id (beneficiaries.office_id FK target).
+                        // For offices with exactly one location, display as "OFFICE - LOCATION"
+                        // so badge color detection (e.g. "LGU - ILIGAN") works correctly.
+                        if (oData) {
+                            const locationsByOffice = {};
+                            if (olData) olData.forEach(ol => {
+                                if (!locationsByOffice[ol.office_id]) locationsByOffice[ol.office_id] = [];
+                                locationsByOffice[ol.office_id].push(ol.location || '');
+                            });
+                            oData.forEach(o => {
+                                const baseName = o.office_name || o.office || o.name || '';
+                                const locs = locationsByOffice[o.id] || [];
+                                officeMap[o.id] = locs.length === 1 ? `${baseName} - ${locs[0]}` : baseName;
+                            });
+                        }
                     } catch (e) { console.warn('Mapping fetch failed:', e); }
                 }
 
@@ -402,6 +467,7 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
                         startDate: b.start_date,
                         endDate: b.end_date,
                         seriesNo: b.series_number,
+                        officeId: b.office_id ?? null,
                         office: (b.office_id && officeMap[b.office_id]) || 'N/A',
                         designation: b.designation,
                         replacement: b.replacement_notes,
@@ -497,7 +563,7 @@ function initOfficeFilter() {
                         <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-400">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </div>
-                        <input type="text" id="office-filter-search" placeholder="Search offices..." 
+                        <input type="text" id="office-filter-search" placeholder="Search offices..." dir="ltr"
                             class="w-full pl-8 pr-3 py-1.5 text-[10px] font-bold bg-gray-50 border border-gray-100 focus:ring-blue-500 focus:border-blue-500 rounded-lg outline-none"
                             value="${filter}">
                     </div>
@@ -506,10 +572,10 @@ function initOfficeFilter() {
                             const hasLocations = parseInt(o.location_count || 0) > 0;
                             return `
                                 <li class="mb-0.5">
-                                    <button class="office-filter-opt flex items-center justify-between w-full px-4 py-2 rounded-lg hover:bg-blue-50 hover:text-royal-blue transition-colors group ${hasLocations ? 'cursor-pointer' : 'cursor-default opacity-60'}" 
+                                    <button class="office-filter-opt flex items-center justify-between w-full px-4 py-2 rounded-lg transition-colors group cursor-pointer ${hasLocations ? 'hover:bg-blue-50 hover:text-royal-blue' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'}"
                                         data-id="${o.id}" data-name="${o.office}" data-has-locations="${hasLocations}">
                                         <span class="truncate">${o.office}</span>
-                                        ${hasLocations ? `<svg class="w-3 h-3 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>` : ''}
+                                        ${hasLocations ? `<svg class="w-3 h-3 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>` : `<svg class="w-3 h-3 text-gray-300 group-hover:text-gray-500 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`}
                                     </button>
                                 </li>
                             `;
@@ -524,12 +590,15 @@ function initOfficeFilter() {
             setTimeout(() => search.focus(), 50);
 
             dropdown.querySelectorAll('.office-filter-opt').forEach(btn => {
-                if (btn.dataset.hasLocations === 'true') {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (btn.dataset.hasLocations === 'true') {
                         render('LOCATIONS', { id: btn.dataset.id, name: btn.dataset.name });
-                    });
-                }
+                    } else {
+                        window.setOfficeFilter(btn.dataset.name);
+                        dropdown.classList.add('hidden');
+                    }
+                });
             });
         } else {
             dropdown.innerHTML = `
@@ -606,15 +675,14 @@ function syncHeaderWithFilter() {
     const clearBtn = document.getElementById('clear-office-filter-btn');
     if (!headerPrefix) return;
 
-    if (currentOfficeFilter === 'ALL') {
-        headerPrefix.textContent = 'Lanao Del Norte';
-        if (clearBtn) clearBtn.classList.add('hidden');
-    } else {
-        headerPrefix.textContent = currentOfficeFilter;
-        if (clearBtn) {
-            clearBtn.classList.remove('hidden');
-            clearBtn.classList.add('flex');
-        }
+    headerPrefix.textContent = currentOfficeFilter === 'ALL' ? 'LGU - ILIGAN' : currentOfficeFilter;
+
+    // Show "Clear All Filter" whenever the view is not in default state
+    // (Filter Mode ON, or an office filter is applied).
+    const isNonDefault = filterModeEnabled || currentOfficeFilter !== 'ALL';
+    if (clearBtn) {
+        clearBtn.classList.toggle('hidden', !isNonDefault);
+        clearBtn.classList.toggle('flex', isNonDefault);
     }
 }
 
@@ -641,8 +709,46 @@ window.setOfficeFilter = (officeName) => {
     if (sortDropdown) sortDropdown.classList.add('hidden');
 };
 
-window.clearOfficeFilter = () => {
-    window.setOfficeFilter('ALL');
+// Clear All Filter: reset every dropdown/filter/sort the user picked and return to default state.
+// Default = Filter Mode OFF, All Status, All Years, force-fetched from Supabase and sorted
+// Iligan office first → ONGOING/EXPIRED/rest → A-Z by name.
+window.clearOfficeFilter = async () => {
+    // Reset filter state to defaults
+    currentStatusFilter = DEFAULT_STATUS_FILTER;
+    currentYearFilter = DEFAULT_YEAR_FILTER;
+    currentOfficeFilter = 'ALL';
+    localStorage.setItem('ldn_status_filter', currentStatusFilter);
+    localStorage.setItem('ldn_year_filter', currentYearFilter);
+    localStorage.setItem('ldn_office_filter', 'ALL');
+
+    // Reset sort preference to A-Z so re-enabling Filter Mode starts clean
+    localStorage.setItem('ldn_sort_preference', 'name_asc');
+
+    // Turn Filter Mode OFF (default mode)
+    persistFilterMode(false);
+    updateFilterUI();
+    updateFilterInputsAvailability();
+    updateFilterToggleButtonUI();
+    syncHeaderWithFilter();
+
+    // Reset search box
+    const searchInput = document.getElementById('table-search');
+    if (searchInput) searchInput.value = '';
+
+    // Collapse any open dropdowns
+    const officeDropdown = document.getElementById('office-filter-dropdown');
+    const sortDropdown = document.getElementById('sort-dropdown');
+    const filterDropdown = document.getElementById('filter-dropdown');
+    if (officeDropdown) officeDropdown.classList.add('hidden');
+    if (sortDropdown) sortDropdown.classList.add('hidden');
+    if (filterDropdown) filterDropdown.classList.add('hidden');
+
+    currentPage = 1;
+    syncPageToUrl(currentPage);
+
+    // Force a fresh fetch + sort from Supabase, then render
+    await loadBeneficiaries(true);
+    renderTable();
 };
 
 export function initLDNHeader() {
@@ -920,12 +1026,56 @@ window.changePage = (page) => {
 };
 
 function getOfficeClass(office) {
-    if (!office) return 'bg-gray-100 text-gray-700 border border-gray-200 dark:!text-white';
-    if (office.includes('DOLE')) return 'bg-blue-100 text-blue-700 border border-blue-200 dark:!text-white';
-    if (office.includes('DepEd')) return 'bg-orange-100 text-orange-700 border border-orange-200 dark:!text-white';
-    if (office.includes('LGU')) return 'bg-purple-100 text-purple-700 border border-purple-200 dark:!text-white';
-    if (office.includes('DICT')) return 'bg-cyan-100 text-cyan-700 border border-cyan-200 dark:!text-white';
-    return 'bg-gray-100 text-gray-700 border border-gray-200 dark:!text-white';
+    if (!office || office === 'N/A') return 'bg-gray-100 text-gray-700 border border-gray-200 dark:!text-white';
+    const u = office.toUpperCase();
+
+    if (u.includes('LGU')) {
+        return /ILIGAN/i.test(office)
+            ? 'bg-yellow-400 text-white border border-yellow-500'
+            : 'bg-yellow-100 text-yellow-700 border border-yellow-200 dark:!text-white';
+    }
+    if (u.includes('DOLE'))   return 'bg-blue-100 text-blue-700 border border-blue-200 dark:!text-white';
+    if (u.includes('DEPED') || u.includes('DEPED')) return 'bg-orange-100 text-orange-700 border border-orange-200 dark:!text-white';
+    if (u.includes('DICT'))   return 'bg-cyan-100 text-cyan-700 border border-cyan-200 dark:!text-white';
+    if (u.includes('DOH'))    return 'bg-red-100 text-red-700 border border-red-200 dark:!text-white';
+    if (u.includes('DSWD'))   return 'bg-pink-100 text-pink-700 border border-pink-200 dark:!text-white';
+    if (u.includes('DTI'))    return 'bg-green-100 text-green-700 border border-green-200 dark:!text-white';
+    if (u.includes('DPWH'))   return 'bg-stone-100 text-stone-700 border border-stone-200 dark:!text-white';
+    if (u.includes('DILG'))   return 'bg-indigo-100 text-indigo-700 border border-indigo-200 dark:!text-white';
+    if (u.includes('DOST'))   return 'bg-violet-100 text-violet-700 border border-violet-200 dark:!text-white';
+    if (u.includes('DENR'))   return 'bg-emerald-100 text-emerald-700 border border-emerald-200 dark:!text-white';
+    if (u.includes('CHED'))   return 'bg-sky-100 text-sky-700 border border-sky-200 dark:!text-white';
+    if (u.includes('TESDA'))  return 'bg-teal-100 text-teal-700 border border-teal-200 dark:!text-white';
+    if (u.includes('DOJ'))    return 'bg-slate-100 text-slate-700 border border-slate-200 dark:!text-white';
+    if (u.includes('DOT') || u.includes('TOURISM')) return 'bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 dark:!text-white';
+    if (u.includes('DA') && !u.includes('DPWH') && !u.includes('DILG')) return 'bg-lime-100 text-lime-700 border border-lime-200 dark:!text-white';
+    if (u.includes('PRC'))    return 'bg-rose-100 text-rose-700 border border-rose-200 dark:!text-white';
+    if (u.includes('SSS'))    return 'bg-amber-100 text-amber-700 border border-amber-200 dark:!text-white';
+    if (u.includes('GSIS'))   return 'bg-purple-100 text-purple-700 border border-purple-200 dark:!text-white';
+    if (u.includes('PHIC') || u.includes('PHILHEALTH')) return 'bg-blue-200 text-blue-800 border border-blue-300 dark:!text-white';
+    if (u.includes('NBI'))    return 'bg-zinc-100 text-zinc-700 border border-zinc-200 dark:!text-white';
+
+    // Hash-based fallback — any new office gets a consistent unique color.
+    const palette = [
+        'bg-purple-100 text-purple-700 border border-purple-200',
+        'bg-rose-100 text-rose-700 border border-rose-200',
+        'bg-amber-100 text-amber-700 border border-amber-200',
+        'bg-teal-100 text-teal-700 border border-teal-200',
+        'bg-indigo-100 text-indigo-700 border border-indigo-200',
+        'bg-lime-100 text-lime-700 border border-lime-200',
+        'bg-sky-100 text-sky-700 border border-sky-200',
+        'bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200',
+        'bg-emerald-100 text-emerald-700 border border-emerald-200',
+        'bg-orange-100 text-orange-700 border border-orange-200',
+        'bg-pink-100 text-pink-700 border border-pink-200',
+        'bg-green-100 text-green-700 border border-green-200',
+        'bg-violet-100 text-violet-700 border border-violet-200',
+        'bg-cyan-100 text-cyan-700 border border-cyan-200',
+        'bg-red-100 text-red-700 border border-red-200',
+    ];
+    let hash = 0;
+    for (let i = 0; i < office.length; i++) hash = (hash * 31 + office.charCodeAt(i)) >>> 0;
+    return palette[hash % palette.length] + ' dark:!text-white';
 }
 
 function getStatusClass(status) {

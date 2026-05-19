@@ -17,12 +17,56 @@ function calculateAge(birthday) {
 }
 
 function getOfficeClass(office) {
-    if (!office) return 'bg-gray-100 text-gray-700 border-gray-200 dark:text-gray-300';
-    if (office.includes('DOLE')) return 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800';
-    if (office.includes('DepEd')) return 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800';
-    if (office.includes('LGU')) return 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-800';
-    if (office.includes('DICT')) return 'bg-cyan-100 text-cyan-700 border-cyan-200 dark:bg-cyan-900/40 dark:text-cyan-300 dark:border-cyan-800';
-    return 'bg-gray-100 text-gray-700 border-gray-200 dark:text-gray-300';
+    if (!office || office === 'N/A') return 'bg-gray-100 text-gray-700 border border-gray-200 dark:!text-white';
+    const u = office.toUpperCase();
+
+    if (u.includes('LGU')) {
+        return /ILIGAN/i.test(office)
+            ? 'bg-yellow-400 text-white border border-yellow-500'
+            : 'bg-yellow-100 text-yellow-700 border border-yellow-200 dark:!text-white';
+    }
+    if (u.includes('DOLE'))   return 'bg-blue-100 text-blue-700 border border-blue-200 dark:!text-white';
+    if (u.includes('DEPED'))  return 'bg-orange-100 text-orange-700 border border-orange-200 dark:!text-white';
+    if (u.includes('DICT'))   return 'bg-cyan-100 text-cyan-700 border border-cyan-200 dark:!text-white';
+    if (u.includes('DOH'))    return 'bg-red-100 text-red-700 border border-red-200 dark:!text-white';
+    if (u.includes('DSWD'))   return 'bg-pink-100 text-pink-700 border border-pink-200 dark:!text-white';
+    if (u.includes('DTI'))    return 'bg-green-100 text-green-700 border border-green-200 dark:!text-white';
+    if (u.includes('DPWH'))   return 'bg-stone-100 text-stone-700 border border-stone-200 dark:!text-white';
+    if (u.includes('DILG'))   return 'bg-indigo-100 text-indigo-700 border border-indigo-200 dark:!text-white';
+    if (u.includes('DOST'))   return 'bg-violet-100 text-violet-700 border border-violet-200 dark:!text-white';
+    if (u.includes('DENR'))   return 'bg-emerald-100 text-emerald-700 border border-emerald-200 dark:!text-white';
+    if (u.includes('CHED'))   return 'bg-sky-100 text-sky-700 border border-sky-200 dark:!text-white';
+    if (u.includes('TESDA'))  return 'bg-teal-100 text-teal-700 border border-teal-200 dark:!text-white';
+    if (u.includes('DOJ'))    return 'bg-slate-100 text-slate-700 border border-slate-200 dark:!text-white';
+    if (u.includes('DOT') || u.includes('TOURISM')) return 'bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 dark:!text-white';
+    if (u.includes('DA') && !u.includes('DPWH') && !u.includes('DILG')) return 'bg-lime-100 text-lime-700 border border-lime-200 dark:!text-white';
+    if (u.includes('PRC'))    return 'bg-rose-100 text-rose-700 border border-rose-200 dark:!text-white';
+    if (u.includes('SSS'))    return 'bg-amber-100 text-amber-700 border border-amber-200 dark:!text-white';
+    if (u.includes('GSIS'))   return 'bg-purple-100 text-purple-700 border border-purple-200 dark:!text-white';
+    if (u.includes('PHIC') || u.includes('PHILHEALTH')) return 'bg-blue-200 text-blue-800 border border-blue-300 dark:!text-white';
+    if (u.includes('NBI'))    return 'bg-zinc-100 text-zinc-700 border border-zinc-200 dark:!text-white';
+
+    // Hash-based fallback — any new office gets a consistent unique color.
+    const palette = [
+        'bg-purple-100 text-purple-700 border border-purple-200',
+        'bg-rose-100 text-rose-700 border border-rose-200',
+        'bg-amber-100 text-amber-700 border border-amber-200',
+        'bg-teal-100 text-teal-700 border border-teal-200',
+        'bg-indigo-100 text-indigo-700 border border-indigo-200',
+        'bg-lime-100 text-lime-700 border border-lime-200',
+        'bg-sky-100 text-sky-700 border border-sky-200',
+        'bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200',
+        'bg-emerald-100 text-emerald-700 border border-emerald-200',
+        'bg-orange-100 text-orange-700 border border-orange-200',
+        'bg-pink-100 text-pink-700 border border-pink-200',
+        'bg-green-100 text-green-700 border border-green-200',
+        'bg-violet-100 text-violet-700 border border-violet-200',
+        'bg-cyan-100 text-cyan-700 border border-cyan-200',
+        'bg-red-100 text-red-700 border border-red-200',
+    ];
+    let hash = 0;
+    for (let i = 0; i < office.length; i++) hash = (hash * 31 + office.charCodeAt(i)) >>> 0;
+    return palette[hash % palette.length] + ' dark:!text-white';
 }
 
 function getStatusClass(status) {

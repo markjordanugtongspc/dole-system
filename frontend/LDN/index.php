@@ -113,7 +113,7 @@ require_once __DIR__ . '/../../config/vite.php';
                     id="ldn-header-container">
                     <h1 class="text-xl sm:text-3xl font-black text-heading mb-0 sm:mb-2 leading-tight flex items-center gap-2"
                         id="ldn-header-wrapper">
-                        <span id="ldn-header-prefix" class="truncate">Lanao Del Norte</span>
+                        <span id="ldn-header-prefix" class="truncate">LGU - ILIGAN</span>
                         <span class="text-brand shrink-0">- GIP</span>
                     </h1>
                     <div id="ldn-header-icon" class="mb-1 text-royal-blue hidden sm:block">
@@ -272,7 +272,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 </svg>
                             </button>
                             <div id="tooltip-clear-filter" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-xs font-bold text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
-                                Clear Office Filter
+                                Clear All Filter
                                 <div class="tooltip-arrow" data-popper-arrow></div>
                             </div>
                             <!-- Sort Dropdown Menu -->
