@@ -9,9 +9,11 @@ let allBeneficiaries = [];
 let activeColumns = ['id', 'name', 'age', 'office', 'position', 'status']; // Default columns
 let currentFilters = {
     office: 'ALL',
+    location: 'ALL',
     remarks: 'ALL',
     gender: 'ALL',
     ageGroup: 'ALL',
+    year: 'ALL',
     search: '',
     sort: 'name',
     section: 'ALL', // ALL, ACTIVE, ARCHIVED
@@ -55,6 +57,11 @@ async function loadBeneficiaryData() {
             : (payload.data?.success && Array.isArray(payload.data.beneficiaries) ? payload.data.beneficiaries : []);
 
         allBeneficiaries = beneficiaries;
+        // Expose year list for the config modal
+        window.getExportYears = () => [...new Set(allBeneficiaries.map(b => {
+            const d = new Date(b.startDate || b.createdAt || '');
+            return isNaN(d.getTime()) ? null : d.getFullYear().toString();
+        }).filter(Boolean))].sort((a, b) => b - a);
         window.handleFilterUpdate(currentFilters);
     } catch (error) {
         console.error('Error loading data for export', error);
@@ -93,14 +100,27 @@ window.handleFilterUpdate = function (filters) {
     // Search Filter
     if (currentFilters.search) {
         filtered = filtered.filter(b =>
-            b.name.toLowerCase().includes(currentFilters.search) ||
-            b.id.toLowerCase().includes(currentFilters.search)
+            (b.name || '').toLowerCase().includes(currentFilters.search) ||
+            (b.id || '').toLowerCase().includes(currentFilters.search)
         );
     }
 
     // Office Filter
     if (currentFilters.office !== 'ALL') {
-        filtered = filtered.filter(b => b.office.includes(currentFilters.office));
+        filtered = filtered.filter(b => (b.office || '').toUpperCase().includes(currentFilters.office.toUpperCase()));
+    }
+
+    // Location sub-filter (only meaningful when office is selected)
+    if (currentFilters.location && currentFilters.location !== 'ALL') {
+        filtered = filtered.filter(b => (b.office || '').toUpperCase().includes(currentFilters.location.toUpperCase()));
+    }
+
+    // Year Filter (by start date year)
+    if (currentFilters.year && currentFilters.year !== 'ALL') {
+        filtered = filtered.filter(b => {
+            const d = new Date(b.startDate || b.createdAt || '');
+            return !isNaN(d.getTime()) && d.getFullYear().toString() === currentFilters.year;
+        });
     }
 
     // Gender Filter
@@ -261,6 +281,7 @@ window.exportToExcel = function () {
                     return `<td class="cell">${val}</td>`;
                 }).join('')}</tr>`;
             });
+            return html;
         })()}
                 <tr><td colspan="${columns.length}"></td></tr>
                 <tr><td colspan="${columns.length}"></td></tr>

@@ -670,12 +670,169 @@ function initOfficeFilter() {
     syncHeaderWithFilter();
 }
 
+function initOfficeQuickFilter() {
+    const btn = document.getElementById('office-quick-filter-btn');
+    const panel = document.getElementById('office-quick-filter-panel');
+    const closeBtn = document.getElementById('office-quick-filter-close');
+    const backBtn = document.getElementById('office-qf-back');
+    const label = document.getElementById('office-qf-label');
+    const scroll = document.getElementById('office-qf-scroll');
+    const list = document.getElementById('office-qf-list');
+    const arrowLeft = document.getElementById('office-qf-arrow-left');
+    const arrowRight = document.getElementById('office-qf-arrow-right');
+    if (!btn || !panel || !list || !scroll) return;
+
+    let isOpen = false;
+    let cachedOffices = [];
+    let cachedLocationsByOffice = {};
+    let prefetchDone = false;
+
+    const SCROLL_STEP = 200;
+
+    const updateArrows = () => {
+        if (!arrowLeft || !arrowRight) return;
+        const { scrollLeft, scrollWidth, clientWidth } = scroll;
+        arrowLeft.classList.toggle('hidden', scrollLeft <= 2);
+        arrowRight.classList.toggle('hidden', scrollLeft + clientWidth >= scrollWidth - 2);
+    };
+
+    scroll.addEventListener('scroll', updateArrows, { passive: true });
+
+    if (arrowLeft) arrowLeft.addEventListener('click', () => {
+        scroll.scrollBy({ left: -SCROLL_STEP, behavior: 'smooth' });
+    });
+    if (arrowRight) arrowRight.addEventListener('click', () => {
+        scroll.scrollBy({ left: SCROLL_STEP, behavior: 'smooth' });
+    });
+
+    // Pre-fetch everything once on init so panel opens instantly
+    const prefetch = async () => {
+        if (prefetchDone) return;
+        prefetchDone = true;
+        try {
+            const res = await apiGet('api/beneficiaries.php?get_offices_advanced=1');
+            if (res.success && res.data?.success && Array.isArray(res.data.offices)) {
+                cachedOffices = res.data.offices;
+                cachedLocationsByOffice = res.data.locations_by_office || {};
+            }
+        } catch (err) { console.error('QF prefetch failed:', err); prefetchDone = false; }
+    };
+
+    const fetchOffices = async () => {
+        await prefetch();
+        return cachedOffices;
+    };
+
+    const fetchLocations = async (officeId) => {
+        await prefetch();
+        return cachedLocationsByOffice[officeId] || [];
+    };
+
+    const openPanel = () => {
+        isOpen = true;
+        panel.style.pointerEvents = 'auto';
+        panel.style.maxHeight = '80px';
+        panel.style.opacity = '1';
+        btn.classList.add('bg-violet-50', 'text-violet-700', 'border-violet-200');
+    };
+
+    const closePanel = () => {
+        isOpen = false;
+        panel.style.maxHeight = '0';
+        panel.style.opacity = '0';
+        panel.style.pointerEvents = 'none';
+        btn.classList.remove('bg-violet-50', 'text-violet-700', 'border-violet-200');
+        setTimeout(() => { if (!isOpen) showOffices(); }, 350);
+    };
+
+    const showSkeleton = () => {
+        list.innerHTML = [1,2,3,4,5].map(() =>
+            `<div class="h-7 w-20 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse shrink-0"></div>`
+        ).join('');
+        scroll.scrollLeft = 0;
+        setTimeout(updateArrows, 50);
+    };
+
+    const afterRender = () => {
+        scroll.scrollLeft = 0;
+        setTimeout(updateArrows, 60);
+    };
+
+    const showOffices = async () => {
+        label.textContent = 'Filter by Office';
+        backBtn.classList.add('hidden');
+        backBtn.classList.remove('flex');
+        showSkeleton();
+        const offices = await fetchOffices();
+        if (!offices.length) {
+            list.innerHTML = `<span class="text-xs text-gray-400 italic px-2">No offices found.</span>`;
+            afterRender(); return;
+        }
+        list.innerHTML = offices.map(o => {
+            const cls = getOfficeClass(o.office);
+            return `<button class="office-qf-opt shrink-0 px-3 py-1 rounded-full text-[11px] font-bold border transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95 ${cls}"
+                data-id="${o.id}" data-name="${o.office}" data-has-locations="${parseInt(o.location_count || 0) > 0}">
+                ${o.office}
+            </button>`;
+        }).join('');
+        list.querySelectorAll('.office-qf-opt').forEach(b => {
+            b.addEventListener('click', () => {
+                if (b.dataset.hasLocations === 'true') {
+                    showLocations({ id: b.dataset.id, name: b.dataset.name });
+                } else {
+                    window.setOfficeFilter(b.dataset.name);
+                    closePanel();
+                }
+            });
+        });
+        afterRender();
+    };
+
+    const showLocations = async (office) => {
+        label.textContent = office.name;
+        backBtn.classList.remove('hidden');
+        backBtn.classList.add('flex');
+        showSkeleton();
+        const locations = await fetchLocations(office.id);
+        if (!locations.length) {
+            list.innerHTML = `<span class="text-xs text-gray-400 italic px-2">No locations found.</span>`;
+            afterRender(); return;
+        }
+        const officeClass = getOfficeClass(office.name);
+        list.innerHTML = locations.map(l => `
+            <button class="loc-qf-opt shrink-0 px-3 py-1 rounded-full text-[11px] font-bold border transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95 ${officeClass}"
+                data-location="${l.location}" data-office="${office.name}">
+                📍 ${l.location}
+            </button>
+        `).join('');
+        list.querySelectorAll('.loc-qf-opt').forEach(b => {
+            b.addEventListener('click', () => {
+                window.setOfficeFilter(`${b.dataset.office} - ${b.dataset.location}`);
+                closePanel();
+            });
+        });
+        afterRender();
+    };
+
+    btn.addEventListener('click', () => {
+        if (isOpen) { closePanel(); return; }
+        openPanel();
+        showOffices();
+    });
+
+    closeBtn.addEventListener('click', () => closePanel());
+    backBtn.addEventListener('click', () => showOffices());
+
+    // Warm the cache immediately so first open is instant
+    prefetch();
+}
+
 function syncHeaderWithFilter() {
     const headerPrefix = document.getElementById('ldn-header-prefix');
     const clearBtn = document.getElementById('clear-office-filter-btn');
     if (!headerPrefix) return;
 
-    headerPrefix.textContent = currentOfficeFilter === 'ALL' ? 'LGU - ILIGAN' : currentOfficeFilter;
+    headerPrefix.textContent = currentOfficeFilter === 'ALL' ? 'ALL BENEFICIARIES' : currentOfficeFilter;
 
     // Show "Clear All Filter" whenever the view is not in default state
     // (Filter Mode ON, or an office filter is applied).
@@ -760,7 +917,8 @@ export function initLDNPage() {
     initLDNHeader();
     initSearch();
     initFilterControls();
-    initOfficeFilter(); // New office filter logic
+    initOfficeFilter(); // Old sub-dropdown (kept for compatibility)
+    initOfficeQuickFilter(); // New standalone quick-filter strip
     initRealtimeSubscription(); // Instant updates from Supabase
 
     // Wire the Export Logs button

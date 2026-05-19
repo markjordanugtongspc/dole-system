@@ -426,6 +426,31 @@ export function showExportConfigModal(callback) {
                         </div>
                     </div>
 
+                    <!-- Location + Year row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Office Location</label>
+                            <div class="relative group">
+                                <select id="export-location" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none disabled:opacity-40 disabled:cursor-not-allowed" ${currentFilters.office === 'ALL' ? 'disabled' : ''}>
+                                    <option value="ALL">ALL LOCATIONS</option>
+                                    <!-- Populated when office changes -->
+                                </select>
+                                <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Year (Start Date)</label>
+                            <div class="relative group">
+                                <select id="export-year" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
+                                    <option value="ALL" ${(currentFilters.year || 'ALL') === 'ALL' ? 'selected' : ''}>ALL YEARS</option>
+                                    <!-- Populated dynamically from data -->
+                                </select>
+                                <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-100/50">
                         <!-- Gender Filter -->
                         <div>
@@ -550,25 +575,64 @@ export function showExportConfigModal(callback) {
             const form = popup.querySelector('#export-config-form');
             const officeSelect = form.querySelector('#export-office');
             
+            const locationSelect = form.querySelector('#export-location');
+            const yearSelect = form.querySelector('#export-year');
+
+            // Populate year dropdown from beneficiary data
+            if (yearSelect && window.getExportYears) {
+                const years = window.getExportYears();
+                const currentYear = currentFilters.year || 'ALL';
+                let yearHtml = `<option value="ALL" ${currentYear === 'ALL' ? 'selected' : ''}>ALL YEARS</option>`;
+                years.forEach(y => {
+                    yearHtml += `<option value="${y}" ${currentYear === y ? 'selected' : ''}>${y}</option>`;
+                });
+                yearSelect.innerHTML = yearHtml;
+            }
+
+            // Helper: load locations for a given office id
+            const loadLocations = async (officeId, currentLoc) => {
+                if (!locationSelect) return;
+                if (!officeId) { locationSelect.disabled = true; locationSelect.innerHTML = '<option value="ALL">ALL LOCATIONS</option>'; return; }
+                locationSelect.disabled = false;
+                locationSelect.innerHTML = '<option value="ALL">Loading...</option>';
+                try {
+                    const res = await window.apiGet(`api/beneficiaries.php?get_office_locations=1&office_id=${officeId}`);
+                    const locs = (res.success && res.data?.success && Array.isArray(res.data.locations)) ? res.data.locations : [];
+                    let html = `<option value="ALL">ALL LOCATIONS</option>`;
+                    locs.forEach(l => { html += `<option value="${l.location}" ${currentLoc === l.location ? 'selected' : ''}>${l.location}</option>`; });
+                    locationSelect.innerHTML = html;
+                } catch(e) { locationSelect.innerHTML = '<option value="ALL">ALL LOCATIONS</option>'; }
+            };
+
             if (officeSelect) {
                 (async () => {
-                    let offices = [];
-                    if (window.supabase && typeof window.isSupabaseMode === 'function' && window.isSupabaseMode()) {
-                        const { data, error } = await window.supabase.from('offices').select('office').order('office');
-                        if (!error && data) offices = data.map(o => o.office);
-                    }
-                    if (offices.length === 0) {
-                        try {
-                            const res = await window.apiGet('api/beneficiaries.php?get_offices=1');
-                            if (res.success && res.data?.success) offices = res.data.offices.map(o => typeof o === 'string' ? o : o.office);
-                        } catch(e){}
-                    }
+                    // Use advanced endpoint — returns sorted offices with location counts
+                    let officeData = [];
+                    try {
+                        const res = await window.apiGet('api/beneficiaries.php?get_offices_advanced=1');
+                        if (res.success && res.data?.success && Array.isArray(res.data.offices)) {
+                            officeData = res.data.offices;
+                        }
+                    } catch(e) {}
                     const currentOffice = currentFilters.office || 'ALL';
                     let html = `<option value="ALL" ${currentOffice === 'ALL' ? 'selected' : ''}>ALL OFFICES</option>`;
-                    offices.forEach(o => {
-                        html += `<option value="${o}" ${currentOffice === o ? 'selected' : ''}>${o}</option>`;
+                    officeData.forEach(o => {
+                        html += `<option value="${o.office}" data-id="${o.id}" ${currentOffice === o.office ? 'selected' : ''}>${o.office}</option>`;
                     });
                     officeSelect.innerHTML = html;
+
+                    // Load locations for current selection if applicable
+                    const selectedOpt = officeSelect.options[officeSelect.selectedIndex];
+                    const selectedId = selectedOpt?.dataset?.id;
+                    if (selectedId && currentOffice !== 'ALL') {
+                        await loadLocations(selectedId, currentFilters.location || 'ALL');
+                    }
+
+                    // Re-load locations when office changes
+                    officeSelect.addEventListener('change', async () => {
+                        const opt = officeSelect.options[officeSelect.selectedIndex];
+                        await loadLocations(opt?.dataset?.id, 'ALL');
+                    });
                 })();
             }
 
@@ -590,6 +654,8 @@ export function showExportConfigModal(callback) {
 
                 const filters = {
                     office: form.querySelector('#export-office').value,
+                    location: form.querySelector('#export-location')?.value || 'ALL',
+                    year: form.querySelector('#export-year')?.value || 'ALL',
                     gender: genderRadio ? genderRadio.value : (currentFilters.gender || 'ALL'),
                     remarks: remarksRadio ? remarksRadio.value : (currentFilters.remarks || 'ALL'),
                     ageGroup: ageGroupRadio ? ageGroupRadio.value : (currentFilters.ageGroup || 'ALL'),

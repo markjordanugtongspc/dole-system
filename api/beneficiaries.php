@@ -285,16 +285,25 @@ if ($method === 'GET') {
             $idCol = tableHasColumn($pdo, $isSupabase, 'offices', 'id') ? 'id' : 'office_id';
             $officeCol = tableHasColumn($pdo, $isSupabase, 'offices', 'office') ? 'office' : 'office_name';
             
-            // Get offices with a count of their locations to help frontend decide if drill-down is needed
+            // Get offices sorted: those with beneficiaries first, then by location count, then alphabetically
             $stmt = $pdo->prepare("
-                SELECT o.$idCol as id, o.$officeCol as office, 
-                       (SELECT COUNT(*) FROM office_locations ol WHERE ol.office_id = o.$idCol) as location_count
+                SELECT o.$idCol as id, o.$officeCol as office,
+                       (SELECT COUNT(*) FROM office_locations ol WHERE ol.office_id = o.$idCol) as location_count,
+                       (SELECT COUNT(*) FROM beneficiaries b WHERE b.office_id = o.$idCol) as beneficiary_count
                 FROM offices o
-                ORDER BY o.$officeCol ASC
+                ORDER BY beneficiary_count DESC, location_count DESC, o.$officeCol ASC
             ");
             $stmt->execute();
             $offices = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo json_encode(['success' => true, 'offices' => $offices]);
+            // Also include all locations per office so frontend can cache everything in one shot
+            $locStmt = $pdo->prepare("SELECT ol.office_id, ol.id, ol.location FROM office_locations ol ORDER BY ol.location ASC");
+            $locStmt->execute();
+            $allLocations = $locStmt->fetchAll(PDO::FETCH_ASSOC);
+            $locationsByOffice = [];
+            foreach ($allLocations as $loc) {
+                $locationsByOffice[$loc['office_id']][] = ['id' => $loc['id'], 'location' => $loc['location']];
+            }
+            echo json_encode(['success' => true, 'offices' => $offices, 'locations_by_office' => $locationsByOffice]);
             exit();
         }
 

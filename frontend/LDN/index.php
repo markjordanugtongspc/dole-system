@@ -113,7 +113,7 @@ require_once __DIR__ . '/../../config/vite.php';
                     id="ldn-header-container">
                     <h1 class="text-xl sm:text-3xl font-black text-heading mb-0 sm:mb-2 leading-tight flex items-center gap-2"
                         id="ldn-header-wrapper">
-                        <span id="ldn-header-prefix" class="truncate">LGU - ILIGAN</span>
+                        <span id="ldn-header-prefix" class="truncate">ALL BENEFICIARIES</span>
                         <span class="text-brand shrink-0">- GIP</span>
                     </h1>
                     <div id="ldn-header-icon" class="mb-1 text-royal-blue hidden sm:block">
@@ -200,6 +200,15 @@ require_once __DIR__ . '/../../config/vite.php';
 
                     <!-- Filter / Sort Actions -->
                     <div class="flex items-center gap-2 shrink-0">
+                        <!-- Office Quick Filter Button -->
+                        <button id="office-quick-filter-btn"
+                            class="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-gray-600 bg-white rounded-lg hover:bg-violet-50 hover:text-violet-700 transition-all duration-200 border border-default hover:border-violet-200 shadow-sm cursor-pointer active:scale-95 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-violet-900/30 dark:hover:text-violet-300 dark:border-gray-700">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                            <span>Office</span>
+                        </button>
+
                         <!-- Filter Dropdown Button -->
                         <div class="relative">
                             <button id="filter-dropdown-button" data-dropdown-toggle="filter-dropdown"
@@ -290,17 +299,6 @@ require_once __DIR__ . '/../../config/vite.php';
                                     <li><button onclick="sortData('name_desc')"
                                             class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Name
                                             (Z-A)</button></li>
-                                    <li>
-                                        <button id="office-filter-trigger" data-dropdown-toggle="office-filter-dropdown" data-dropdown-placement="right-start"
-                                            class="flex items-center justify-between w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer group">
-                                            <span>Filter by Office</span>
-                                            <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
-                                        </button>
-                                    </li>
-                                    <!-- Office Filter Sub-Dropdown -->
-                                    <div id="office-filter-dropdown" class="z-[60] hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-64 border border-gray-100 font-montserrat">
-                                        <!-- Content populated by ldngip.js -->
-                                    </div>
                                     <div class="border-t border-gray-50 my-1"></div>
                                     <li><button onclick="sortData('office')"
                                             class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Sort by Office</button></li>
@@ -318,6 +316,50 @@ require_once __DIR__ . '/../../config/vite.php';
                                             / Residency</button></li>
                                 </ul>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Office Quick Filter Panel -->
+                <div id="office-quick-filter-panel" class="overflow-hidden" style="max-height:0;opacity:0;transition:max-height 0.35s cubic-bezier(.34,1.56,.64,1),opacity 0.25s ease;pointer-events:none;">
+                    <div class="px-4 pt-2 pb-3 border-b border-default">
+                        <div class="flex items-center gap-2">
+                            <!-- X close button -->
+                            <button id="office-quick-filter-close"
+                                class="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all duration-200 cursor-pointer active:scale-90 border border-transparent hover:border-red-100">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                            <!-- Back button (hidden when in OFFICES view) -->
+                            <button id="office-qf-back"
+                                class="hidden shrink-0 items-center justify-center w-7 h-7 rounded-lg text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all duration-200 cursor-pointer active:scale-90 border border-transparent hover:border-blue-100">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <!-- Label -->
+                            <span id="office-qf-label" class="text-[10px] font-black text-violet-700 dark:text-violet-300 uppercase tracking-wider shrink-0">Filter by Office</span>
+                            <!-- Left arrow -->
+                            <button id="office-qf-arrow-left"
+                                class="hidden shrink-0 items-center justify-center w-6 h-6 rounded-full text-gray-400 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-all duration-150 cursor-pointer active:scale-90">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <!-- Horizontal scrollable badge list -->
+                            <div id="office-qf-scroll" class="flex-1 overflow-x-auto scrollbar-hide">
+                                <div id="office-qf-list" class="flex items-center gap-2 min-w-max py-0.5">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                            <!-- Right arrow -->
+                            <button id="office-qf-arrow-right"
+                                class="hidden shrink-0 items-center justify-center w-6 h-6 rounded-full text-gray-400 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-all duration-150 cursor-pointer active:scale-90">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>
