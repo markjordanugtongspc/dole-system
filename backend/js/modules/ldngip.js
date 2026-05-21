@@ -44,8 +44,8 @@ let currentPage = getPageFromUrl();
 const itemsPerPage = 10;
 let filteredDataGlobal = null; // Store current filtered state for pagination
 let isInitialDataHydrating = true;
-let lastSupabaseFetchTime = 0;
-const FETCH_THROTTLE_MS = 2 * 60 * 1000; // 2 minutes
+let lastSupabaseFetchTime = parseInt(localStorage.getItem('ldn_last_supabase_fetch') || '0');
+const FETCH_THROTTLE_MS = 5 * 60 * 1000; // 5 minutes (persisted across navigations)
 let genderMap = {};
 let statusMap = {};
 let officeMap = {}; // keyed by offices.id → display name (e.g., "LGU - ILIGAN")
@@ -455,6 +455,7 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
 
                 if (!error && data) {
                     lastSupabaseFetchTime = now;
+                    localStorage.setItem('ldn_last_supabase_fetch', String(now));
                     remoteData = data.map(b => ({
                         id: b.gip_id,
                         name: b.full_name,

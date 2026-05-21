@@ -1,6 +1,7 @@
 import ApexCharts from 'apexcharts';
 import { getBasePath, isSupabaseMode } from './auth.js';
 import { apiGet } from './ajax-manager.js';
+import { getLocalBeneficiaries, getTimeSinceLastSync, cacheBeneficiaries } from './db-manager.js';
 
 /**
  * 2026 LDNPFO GIP MONITORING - Data Visualization Module
@@ -105,31 +106,49 @@ const MUNICIPALITY_TARGETS = {
  * Initialize all dashboard charts
  */
 export async function initCharts(forceRefresh = false) {
-    // Skip silently when user is not authenticated — charts only render on dashboard
+    // Skip when not authenticated
     if (localStorage.getItem('isLoggedIn') !== 'true') return;
+
+    // Skip silently when no chart containers exist on this page (e.g. LDN table page)
+    // — avoids a wasted API call that nobody consumes
+    if (!document.getElementById('workforce-chart')) return;
 
     let rawData = [];
 
-    if (forceRefresh) {
-        cachedRawData = null;
-    }
+    if (forceRefresh) cachedRawData = null;
 
     if (cachedRawData) {
         rawData = cachedRawData;
     } else {
-        // [HYBRID-BRIDGE] Use authorized PHP API to bypass RLS issues in Production
-        try {
-            const result = await apiGet('api/beneficiaries.php?all=true');
-            if (result.success && result.data?.success && result.data?.beneficiaries) {
-                rawData = result.data.beneficiaries;
-            } else {
-                console.debug('[CHARTS] Skipping chart render:', result.data?.error || result.error);
+        // ── STEP 1: Read from IndexedDB instantly (zero network, survives page nav) ──
+        const CHART_CACHE_TTL = 60_000; // 60 s — same source of truth as ldngip.js
+        const [localData, msSinceSync] = await Promise.all([
+            getLocalBeneficiaries(),
+            getTimeSinceLastSync()
+        ]);
+
+        if (localData.length > 0 && msSinceSync < CHART_CACHE_TTL) {
+            rawData = localData;
+            cachedRawData = rawData;
+            console.log(`[Charts] IndexedDB hit — ${rawData.length} records (${Math.round(msSinceSync / 1000)}s old)`);
+        } else {
+            // ── STEP 2: Fetch from API and populate IndexedDB for future navigations ──
+            try {
+                const result = await apiGet('api/beneficiaries.php?all=true');
+                if (result.success && result.data?.success && result.data?.beneficiaries) {
+                    rawData = result.data.beneficiaries;
+                    cachedRawData = rawData;
+                    // Write to IndexedDB so LDN page (and next dashboard load) is instant
+                    cacheBeneficiaries(rawData).catch(() => {});
+                    console.log(`[Charts] API fetch — cached ${rawData.length} records to IndexedDB`);
+                } else {
+                    console.debug('[CHARTS] Skipping chart render:', result.data?.error || result.error);
+                    return;
+                }
+            } catch (error) {
+                console.debug('[CHARTS] Chart init skipped:', error?.message);
                 return;
             }
-            cachedRawData = rawData;
-        } catch (error) {
-            console.debug('[CHARTS] Chart init skipped:', error?.message);
-            return;
         }
     }
 
