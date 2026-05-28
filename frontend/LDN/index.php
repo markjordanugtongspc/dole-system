@@ -113,7 +113,11 @@ require_once __DIR__ . '/../../config/vite.php';
                     id="ldn-header-container">
                     <h1 class="text-xl sm:text-3xl font-black text-heading mb-0 sm:mb-2 leading-tight flex items-center gap-2"
                         id="ldn-header-wrapper">
-                        <span id="ldn-header-prefix" class="truncate">ALL BENEFICIARIES</span>
+                        <span id="ldn-header-prefix" class="truncate inline-flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-royal-blue dark:bg-blue-400 animate-bounce [animation-delay:-0.3s]"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-royal-blue dark:bg-blue-400 animate-bounce [animation-delay:-0.15s]"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-royal-blue dark:bg-blue-400 animate-bounce"></span>
+                        </span>
                         <span class="text-brand shrink-0">- GIP</span>
                     </h1>
                     <div id="ldn-header-icon" class="mb-1 text-royal-blue hidden sm:block">
@@ -300,8 +304,8 @@ require_once __DIR__ . '/../../config/vite.php';
                                             class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Name
                                             (Z-A)</button></li>
                                     <div class="border-t border-gray-50 my-1"></div>
-                                    <li><button onclick="sortData('office')"
-                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Sort by Office</button></li>
+                                    <li><button onclick="window.setOfficeFilter('ALL')"
+                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">All Office</button></li>
                                     <li><button onclick="sortData('remarks')"
                                             class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Remarks
                                             Status</button></li>

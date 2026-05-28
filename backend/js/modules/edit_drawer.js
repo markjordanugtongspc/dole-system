@@ -400,6 +400,52 @@ export function showEditBeneficiaryDrawer(data) {
 
         // --- Robust Masking Fallback ---
         const setupDateMask = (input, onValid) => {
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                let pasteData = (e.clipboardData || window.clipboardData).getData('text');
+                if (pasteData) {
+                    // Standardize separators to '/'
+                    pasteData = pasteData.replace(/[-.\s]/g, '/');
+                    const parts = pasteData.split('/');
+                    if (parts.length === 3) {
+                        const m = parts[0].padStart(2, '0');
+                        const d = parts[1].padStart(2, '0');
+                        let y = parts[2];
+                        if (y.length === 2) {
+                            const currentYear = new Date().getFullYear();
+                            const century = Math.floor(currentYear / 100) * 100;
+                            y = String(century + parseInt(y));
+                        } else {
+                            y = y.padStart(4, '0');
+                        }
+                        const formatted = `${m}/${d}/${y}`;
+                        input.value = formatted;
+                        
+                        // Trigger input event
+                        const inputEvent = new Event('input', { bubbles: true });
+                        input.dispatchEvent(inputEvent);
+                        
+                        const parsed = window.__parseFormattedDate(formatted);
+                        if (parsed && onValid) {
+                            if (!blockAutoCompute) onValid(parsed);
+                            if (document.activeElement === input) {
+                                input.blur();
+                            }
+                        }
+                        
+                        // Close datepicker
+                        if (input._datepicker) {
+                            input._datepicker.hide();
+                        } else {
+                            const picker = input.parentNode && input.parentNode._datepicker;
+                            if (picker && typeof picker.hide === 'function') {
+                                picker.hide();
+                            }
+                        }
+                    }
+                }
+            });
+
             input.addEventListener('input', (e) => {
                 const val = e.target.value;
                 const masked = window.__maskDate(val);
@@ -411,6 +457,15 @@ export function showEditBeneficiaryDrawer(data) {
                         if (!blockAutoCompute) onValid(parsed);
                         if (document.activeElement === input) {
                             input.blur();
+                        }
+                        // Close datepicker
+                        if (input._datepicker) {
+                            input._datepicker.hide();
+                        } else {
+                            const picker = input.parentNode && input.parentNode._datepicker;
+                            if (picker && typeof picker.hide === 'function') {
+                                picker.hide();
+                            }
                         }
                     }
                 }
@@ -436,7 +491,7 @@ export function showEditBeneficiaryDrawer(data) {
             setupDateMask(startDateInput, (start) => {
                 if (endDateInput) {
                     const end = new Date(start);
-                    end.setDate(end.getDate() + 182);
+                    end.setDate(end.getDate() + 243);
                     const m = String(end.getMonth() + 1).padStart(2, '0');
                     const d = String(end.getDate()).padStart(2, '0');
                     const y = end.getFullYear();

@@ -715,6 +715,28 @@ function initOfficeQuickFilter() {
             if (res.success && res.data?.success && Array.isArray(res.data.offices)) {
                 cachedOffices = res.data.offices;
                 cachedLocationsByOffice = res.data.locations_by_office || {};
+
+                // Auto-detect LDNPFO as default if no filter is saved in localStorage
+                const savedOffice = localStorage.getItem('ldn_office_filter');
+                if (!savedOffice) {
+                    const ldnOffice = cachedOffices.find(o => o.office.toUpperCase().includes('LDNPFO'));
+                    if (ldnOffice) {
+                        currentOfficeFilter = ldnOffice.office;
+                        localStorage.setItem('ldn_office_filter', currentOfficeFilter);
+                        
+                        // Enable filter mode if it wasn't
+                        if (!filterModeEnabled) {
+                            persistFilterMode(true);
+                            updateFilterUI();
+                            updateFilterInputsAvailability();
+                            updateFilterToggleButtonUI();
+                        }
+                        
+                        syncHeaderWithFilter();
+                        currentPage = 1;
+                        renderTable();
+                    }
+                }
             }
         } catch (err) { console.error('QF prefetch failed:', err); prefetchDone = false; }
     };
@@ -910,7 +932,7 @@ window.clearOfficeFilter = async () => {
 };
 
 export function initLDNHeader() {
-    // Already handled in syncHeaderWithFilter but kept for compatibility
+    syncHeaderWithFilter();
 }
 
 export function initLDNPage() {

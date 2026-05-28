@@ -128,12 +128,12 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             <span class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 text-[10px] sm:text-[11px] font-black px-2.5 py-1.5 rounded border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm border-l-4 border-l-gray-400 truncate">${data.id}</span>
         </div>
         <div class="flex flex-col gap-1 text-left overflow-hidden">
-            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1 flex items-center">
+            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1 flex items-center font-montserrat">
                 REMARKS / OFFICE
             </span>
-            <div class="flex items-center flex-wrap gap-1.5 min-h-[30px]">
-                <span class="${getStatusClass(data.remarks)} text-[10px] font-black px-2 py-1 rounded border uppercase tracking-widest shadow-sm border-l-4 ${data.remarks === 'ONGOING' ? 'border-l-green-600' : 'border-l-red-600'}">${data.remarks}</span>
-                <span class="${getOfficeClass(data.office)} hidden sm:inline-block text-[9px] font-black px-2.5 py-1 rounded-full border shadow-sm truncate max-w-[120px] lg:max-w-none" title="${data.office}">${data.office}</span>
+            <div class="flex items-center flex-wrap gap-2.5 min-h-[30px] font-montserrat">
+                <span class="${getStatusClass(data.remarks)} text-[10px] sm:text-[11px] font-black px-4 sm:px-6 py-2 rounded-lg border uppercase tracking-widest shadow-sm border-l-4 ${data.remarks === 'ONGOING' ? 'border-l-green-600' : 'border-l-red-600'} min-w-[110px] sm:min-w-[140px] text-center inline-block">${data.remarks}</span>
+                <span class="${getOfficeClass(data.office)} inline-block text-[9px] sm:text-[10px] font-black px-4 sm:px-6 py-2 rounded-full border shadow-sm truncate max-w-[180px] sm:max-w-[280px] lg:max-w-none min-w-[110px] sm:min-w-[140px] text-center" title="${data.office}">${data.office}</span>
             </div>
         </div>
     </div>
