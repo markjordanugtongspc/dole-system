@@ -18,7 +18,7 @@
     </span>
     <span class="sr-only">Notifications</span>
     <div id="notificationBadge"
-        class="hidden absolute inline-flex items-center justify-center min-w-5 h-5 px-1.5 text-[10px] sm:text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-1.5 -end-1.5">
+        class="hidden absolute inline-flex items-center justify-center min-w-5 h-5 px-1.5 text-[0.625rem] sm:text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-1.5 -end-1.5">
         0
     </div>
 </button>

@@ -70,7 +70,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div class="flex flex-col">
                             <span class="text-sm font-black text-royal-blue uppercase tracking-tight leading-tight">DOLE
                                 LDNPFO</span>
-                            <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">GIP
+                            <span class="text-[0.625rem] font-semibold text-gray-500 uppercase tracking-wider">GIP
                                 Monitoring 2026</span>
                         </div>
                     </div>
@@ -121,7 +121,7 @@ require_once __DIR__ . '/../../config/vite.php';
                     <div>
                         <div class="flex items-center gap-2 mb-1">
                             <span
-                                class="px-2 py-0.5 bg-royal-blue text-white text-[9px] font-black rounded uppercase tracking-widest hidden sm:inline-block">Primary
+                                class="px-2 py-0.5 bg-royal-blue text-white text-[0.5625rem] font-black rounded uppercase tracking-widest hidden sm:inline-block">Primary
                                 Analytics</span>
                             <h1 class="text-2xl sm:text-3xl font-black text-heading dark:text-white leading-tight">
                                 <span class="sm:hidden">2026 GIP Monitor</span>
@@ -129,7 +129,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             </h1>
                         </div>
                         <p
-                            class="text-[10px] sm:text-sm text-body dark:text-slate-400 font-bold uppercase tracking-wider sm:normal-case sm:font-medium">
+                            class="text-[0.625rem] sm:text-sm text-body dark:text-slate-400 font-bold uppercase tracking-wider sm:normal-case sm:font-medium">
                             <span class="sm:hidden">Statistical Dashboard & Visualization</span>
                             <span class="hidden sm:inline">Comprehensive analysis and visual monitoring of program
                                 beneficiaries</span>
@@ -139,10 +139,10 @@ require_once __DIR__ . '/../../config/vite.php';
                 <div
                     class="flex items-center gap-2 bg-slate-100 dark:bg-slate-700/50 p-1.5 rounded-xl border border-slate-200 dark:border-slate-600 self-start md:self-auto box-border">
                     <button id="view-general-btn"
-                        class="px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm text-[10px] font-black text-royal-blue dark:text-blue-400 uppercase tracking-widest transition-all duration-300 cursor-pointer">General
+                        class="px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm text-[0.625rem] font-black text-royal-blue dark:text-blue-400 uppercase tracking-widest transition-all duration-300 cursor-pointer">General
                         Overview</button>
                     <button id="view-performance-btn"
-                        class="px-3 py-1.5 text-[10px] font-bold text-slate-500 hover:text-royal-blue dark:hover:text-blue-400 transition-all duration-300 cursor-pointer uppercase tracking-widest">Performance</button>
+                        class="px-3 py-1.5 text-[0.625rem] font-bold text-slate-500 hover:text-royal-blue dark:hover:text-blue-400 transition-all duration-300 cursor-pointer uppercase tracking-widest">Performance</button>
                 </div>
             </div>
 
@@ -162,7 +162,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div class="flex items-center justify-between gap-4 relative z-10">
                             <div class="min-w-0">
                                 <p
-                                    class="text-[9px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
+                                    class="text-[0.5625rem] sm:text-[0.625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
                                     Total Beneficiaries
                                 </p>
                                 <h3
@@ -190,7 +190,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div class="flex items-center justify-between gap-4 relative z-10">
                             <div class="min-w-0">
                                 <p
-                                    class="text-[9px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
+                                    class="text-[0.5625rem] sm:text-[0.625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
                                     Female Ratio</p>
                                 <div class="flex items-baseline gap-2">
                                     <h3
@@ -220,7 +220,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div class="flex items-center justify-between gap-4 relative z-10">
                             <div class="min-w-0">
                                 <p
-                                    class="text-[9px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
+                                    class="text-[0.5625rem] sm:text-[0.625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
                                     Deployment Sites
                                 </p>
                                 <h3
@@ -248,7 +248,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div class="flex items-center justify-between gap-4 relative z-10">
                             <div class="min-w-0">
                                 <p
-                                    class="text-[9px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
+                                    class="text-[0.5625rem] sm:text-[0.625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
                                     Avg Age Range
                                 </p>
                                 <h3
@@ -283,7 +283,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div class="flex justify-between items-start mb-4 sm:mb-6 relative z-10">
                             <div>
                                 <p
-                                    class="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
+                                    class="text-[0.625rem] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
                                     Live Statistics</p>
                                 <h5 id="added-metric-value"
                                     class="text-3xl sm:text-5xl font-black transition-colors duration-500 leading-none metric-added-count">
@@ -292,7 +292,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                     Added Beneficiaries</p>
                             </div>
                             <div id="added-metric-badge"
-                                class="flex items-center px-3 py-1 text-[10px] sm:text-xs font-black text-white rounded-full shadow-lg transition-all duration-500 border border-white/20 translate-y-1">
+                                class="flex items-center px-3 py-1 text-[0.625rem] sm:text-xs font-black text-white rounded-full shadow-lg transition-all duration-500 border border-white/20 translate-y-1">
                                 <svg id="added-metric-icon" class="w-3 h-3 me-1.5 transition-transform duration-500"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -321,7 +321,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <!-- Dropdown menu -->
                                 <div id="lastDaysdropdown"
                                     class="z-20 hidden bg-white divide-y divide-slate-100 rounded-2xl shadow-2xl w-52 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:divide-slate-700 transition-all duration-300">
-                                    <ul class="py-2 text-[10px] sm:text-xs font-bold text-slate-700 dark:text-slate-300"
+                                    <ul class="py-2 text-[0.625rem] sm:text-xs font-bold text-slate-700 dark:text-slate-300"
                                         aria-labelledby="dropdownDefaultButton">
                                         <li class="px-4 py-2 opacity-50 italic">Syncing years...</li>
                                     </ul>
@@ -345,7 +345,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div class="flex justify-between items-start mb-4 sm:mb-6">
                             <div>
                                 <p
-                                    class="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
+                                    class="text-[0.625rem] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
                                     Diversity Index</p>
                                 <h5
                                     class="text-xl sm:text-2xl font-black text-royal-blue dark:text-blue-400 leading-none">
@@ -355,12 +355,12 @@ require_once __DIR__ . '/../../config/vite.php';
                             </div>
                             <div class="flex gap-2">
                                 <div
-                                    class="flex items-center px-2 py-1 text-[10px] font-black text-philippine-red bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-900/30 shadow-xs">
+                                    class="flex items-center px-2 py-1 text-[0.625rem] font-black text-philippine-red bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-900/30 shadow-xs">
                                     <span class="w-2 h-2 rounded-full bg-philippine-red me-2 animate-pulse"></span>
                                     <span class="metric-female-ratio uppercase">...</span>
                                 </div>
                                 <div
-                                    class="flex items-center px-2 py-1 text-[10px] font-black text-royal-blue bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-900/30 shadow-xs">
+                                    class="flex items-center px-2 py-1 text-[0.625rem] font-black text-royal-blue bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-900/30 shadow-xs">
                                     <span
                                         class="w-2 h-2 rounded-full bg-royal-blue me-2 shadow-[0_0_8px_rgba(0,56,168,0.5)]"></span>
                                     <span class="metric-male-ratio uppercase">...</span>
@@ -393,7 +393,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 </button>
                                 <div id="gender-filter-dropdown"
                                     class="z-20 hidden min-w-44 rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-800">
-                                    <ul class="py-2 text-[10px] sm:text-xs font-bold text-slate-700 dark:text-slate-300"
+                                    <ul class="py-2 text-[0.625rem] sm:text-xs font-bold text-slate-700 dark:text-slate-300"
                                         id="gender-filter-options">
                                         <li class="px-4 py-2 opacity-50 italic">Syncing years...</li>
                                     </ul>
@@ -431,7 +431,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <span
                                     class="count-college-grad text-3xl font-black text-white dark:text-white group-hover:scale-110 transition-transform duration-500">...</span>
                                 <span
-                                    class="mt-2 text-center text-[9px] font-black uppercase tracking-widest leading-tight text-white dark:text-white">College<br>Graduate</span>
+                                    class="mt-2 text-center text-[0.5625rem] font-black uppercase tracking-widest leading-tight text-white dark:text-white">College<br>Graduate</span>
                             </div>
                             <!-- College Level -->
                             <div
@@ -451,7 +451,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <span
                                     class="count-college-lvl text-3xl font-black text-white dark:text-white group-hover:scale-110 transition-transform duration-500">...</span>
                                 <span
-                                    class="mt-2 text-center text-[9px] font-black uppercase tracking-widest leading-tight text-white dark:text-white">College<br>Level</span>
+                                    class="mt-2 text-center text-[0.5625rem] font-black uppercase tracking-widest leading-tight text-white dark:text-white">College<br>Level</span>
                             </div>
                             <!-- HS Graduate -->
                             <div
@@ -469,7 +469,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <span
                                     class="count-hs-grad text-3xl font-black text-white dark:text-white group-hover:scale-110 transition-transform duration-500">...</span>
                                 <span
-                                    class="mt-2 text-center text-[9px] font-black uppercase tracking-widest leading-tight text-white dark:text-white">High
+                                    class="mt-2 text-center text-[0.5625rem] font-black uppercase tracking-widest leading-tight text-white dark:text-white">High
                                     School<br>Graduate</span>
                             </div>
                             <!-- Senior High -->
@@ -490,7 +490,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <span
                                     class="count-senior-high text-3xl font-black text-white dark:text-white group-hover:scale-110 transition-transform duration-500 font-mono">...</span>
                                 <span
-                                    class="mt-2 text-center text-[9px] font-black uppercase tracking-widest leading-tight text-white dark:text-white">Senior
+                                    class="mt-2 text-center text-[0.5625rem] font-black uppercase tracking-widest leading-tight text-white dark:text-white">Senior
                                     High<br>Student/Grad</span>
                             </div>
                         </div>
@@ -526,12 +526,12 @@ require_once __DIR__ . '/../../config/vite.php';
                             <div class="flex justify-between items-center pt-4">
                                 <!-- Button -->
                                 <!-- Label only -->
-                                <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] py-2">
+                                <div class="text-[0.625rem] font-black text-slate-400 uppercase tracking-[0.15em] py-2">
                                     Distribution Profile
                                 </div>
 
                                 <a href="../../frontend/export/index.php"
-                                    class="cursor-pointer inline-flex items-center uppercase tracking-widest font-black text-royal-blue hover:text-blue-800 text-[10px] group">
+                                    class="cursor-pointer inline-flex items-center uppercase tracking-widest font-black text-royal-blue hover:text-blue-800 text-[0.625rem] group">
                                     Export Full Report
                                     <svg class="w-3 h-3 ms-2 transform group-hover:translate-x-1 transition-transform"
                                         aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -551,7 +551,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             class="flex items-start justify-between border-slate-100 dark:border-slate-700 border-b pb-4 mb-2 gap-3 transition-all duration-500">
                             <dl class="flex-1 min-w-0">
                                 <dt
-                                    class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
+                                    class="text-[0.625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
                                     Primary Capacity</dt>
                                 <dd class="text-xl sm:text-2xl md:text-xl xl:text-2xl font-black text-royal-blue dark:text-blue-400 leading-tight md:leading-none metric-top-role truncate w-full"
                                     title="...">
@@ -560,7 +560,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             </dl>
                             <div class="shrink-0 self-start">
                                 <span
-                                    class="inline-flex items-center px-2 py-1 bg-blue-600 dark:bg-blue-500 text-white text-[9px] xl:text-[10px] font-black rounded-lg xl:rounded-full shadow-lg shadow-blue-500/30 uppercase tracking-widest">
+                                    class="inline-flex items-center px-2 py-1 bg-blue-600 dark:bg-blue-500 text-white text-[0.5625rem] xl:text-[0.625rem] font-black rounded-lg xl:rounded-full shadow-lg shadow-blue-500/30 uppercase tracking-widest">
                                     Active Load
                                 </span>
                             </div>
@@ -571,7 +571,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <div
                                     class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-100 dark:border-blue-900/30 transition-transform group-hover/roles:-translate-y-1">
                                     <dt
-                                        class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1">
+                                        class="text-[0.5625rem] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1">
                                         Office Based</dt>
                                     <dd
                                         class="text-2xl font-black text-royal-blue dark:text-blue-400 count-office-based">
@@ -580,7 +580,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <div
                                     class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-100 dark:border-red-900/30 transition-transform group-hover/roles:-translate-y-1">
                                     <dt
-                                        class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1">
+                                        class="text-[0.5625rem] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1">
                                         Field Based</dt>
                                     <dd
                                         class="text-2xl font-black text-philippine-red dark:text-red-400 count-field-based">
@@ -599,7 +599,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                         class="text-3xl font-black text-white dark:text-white count-absorbed text-center group-hover:scale-110 transition-transform duration-500">
                                         0</dd>
                                     <dt
-                                        class="mt-2 text-[9px] font-black text-white/90 dark:text-white/90 uppercase tracking-[0.2em] mb-1 text-center">
+                                        class="mt-2 text-[0.5625rem] font-black text-white/90 dark:text-white/90 uppercase tracking-[0.2em] mb-1 text-center">
                                         Absorbed</dt>
                                 </div>
                                 <div
@@ -609,7 +609,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                         class="text-3xl font-black text-white dark:text-white count-ongoing text-center group-hover:scale-110 transition-transform duration-500">
                                         0</dd>
                                     <dt
-                                        class="mt-2 text-[9px] font-black text-white/90 dark:text-white/90 uppercase tracking-[0.2em] mb-1 text-center">
+                                        class="mt-2 text-[0.5625rem] font-black text-white/90 dark:text-white/90 uppercase tracking-[0.2em] mb-1 text-center">
                                         Ongoing</dt>
                                 </div>
                             </div>
@@ -622,12 +622,12 @@ require_once __DIR__ . '/../../config/vite.php';
                             <div id="card-mode-footer"
                                 class="flex justify-between items-center pt-2 md:pt-3 transition-all duration-500">
                                 <div id="card-mode-desc"
-                                    class="text-[10px] font-bold text-slate-500 uppercase tracking-wider py-2">
+                                    class="text-[0.625rem] font-bold text-slate-500 uppercase tracking-wider py-2">
                                     Role Distribution
                                 </div>
 
                                 <div id="card-mode-toggle"
-                                    class="cursor-pointer inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-[10px] hover:underline group">
+                                    class="cursor-pointer inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-[0.625rem] hover:underline group">
                                     <span id="toggle-label-text">Employment Status</span>
                                     <svg id="toggle-icon"
                                         class="w-3 h-3 ms-1.5 transform group-hover:translate-x-1 transition-transform"
@@ -664,14 +664,14 @@ require_once __DIR__ . '/../../config/vite.php';
                                     class="text-lg sm:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight">
                                     Workforce Age Pattern</h5>
                                 <p
-                                    class="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-[0.3em]">
+                                    class="text-[0.625rem] sm:text-xs font-black text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-[0.3em]">
                                     Generation Distribution</p>
                             </div>
                         </div>
                         <div class="text-right">
                             <div class="flex flex-col">
                                 <span
-                                    class="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none mb-2">Age
+                                    class="text-[0.625rem] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none mb-2">Age
                                     Average</span>
                                 <div class="flex items-baseline justify-end gap-2">
                                     <h4
@@ -699,7 +699,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             </div>
                             System Performance Analyst
                         </h2>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-2 ms-12">Actionable insights & deployment efficiency metrics</p>
+                        <p class="text-[0.625rem] text-slate-500 font-bold uppercase tracking-widest mt-2 ms-12">Actionable insights & deployment efficiency metrics</p>
                     </div> -->
 
             <!-- Performance KPIs -->
@@ -719,12 +719,12 @@ require_once __DIR__ . '/../../config/vite.php';
                     </div>
 
                     <h4
-                        class="text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] opacity-80 mb-2 drop-shadow-sm">
+                        class="text-[0.625rem] sm:text-xs font-black uppercase tracking-[0.3em] opacity-80 mb-2 drop-shadow-sm">
                         Slots Utilization</h4>
                     <div class="flex items-end gap-2 mb-6">
                         <span
                             class="text-5xl sm:text-7xl font-black metric-utilization-rate drop-shadow-lg tracking-tighter">...</span>
-                        <span class="text-[10px] sm:text-xs font-bold opacity-70 mb-2 uppercase tracking-widest">of
+                        <span class="text-[0.625rem] sm:text-xs font-bold opacity-70 mb-2 uppercase tracking-widest">of
                             Quota</span>
                     </div>
 
@@ -735,7 +735,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             <div class="absolute top-0 right-0 bottom-0 w-8 bg-white/60 blur-sm animate-pulse"></div>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-3 text-[9px] font-black opacity-80 uppercase tracking-widest">
+                    <div class="flex justify-between mt-3 text-[0.5625rem] font-black opacity-80 uppercase tracking-widest">
                         <span>0%</span>
                         <span>100% CAP</span>
                     </div>
@@ -749,7 +749,7 @@ require_once __DIR__ . '/../../config/vite.php';
                     </div>
                     <div class="flex justify-between items-start mb-4">
                         <h4
-                            class="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">
+                            class="text-[0.625rem] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">
                             Onboarding Velocity</h4>
                         <div
                             class="p-2 sm:p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 rounded-xl group-hover:rotate-12 group-hover:scale-110 transition-transform shadow-inner border border-emerald-100 dark:border-emerald-900/30">
@@ -763,13 +763,13 @@ require_once __DIR__ . '/../../config/vite.php';
                         <span
                             class="text-5xl sm:text-6xl font-black text-heading dark:text-white metric-velocity-avg tracking-tight group-hover:-translate-y-1 transition-transform">...</span>
                         <span
-                            class="text-[10px] sm:text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">Days
+                            class="text-[0.625rem] sm:text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">Days
                             Avg</span>
                     </div>
                     <div class="mt-6 sm:mt-8 flex items-center gap-2">
                         <span
-                            class="px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 text-[9px] font-black rounded border border-emerald-200 dark:border-emerald-800 uppercase tracking-widest shadow-xs">Optimal</span>
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Processing
+                            class="px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 text-[0.5625rem] font-black rounded border border-emerald-200 dark:border-emerald-800 uppercase tracking-widest shadow-xs">Optimal</span>
+                        <span class="text-[0.5625rem] font-bold text-slate-400 uppercase tracking-wider">Processing
                             Timeline</span>
                     </div>
                 </div>
@@ -784,7 +784,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         </div>
                         <div class="relative z-10">
                             <h4
-                                class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
+                                class="text-[0.5625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
                                 Retention Index</h4>
                             <div class="flex items-baseline gap-1">
                                 <span
@@ -816,13 +816,13 @@ require_once __DIR__ . '/../../config/vite.php';
                                     class="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]">
                                 </div>
                                 <h4
-                                    class="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em]">
+                                    class="text-[0.5625rem] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em]">
                                     Data Integrity Shield</h4>
                             </div>
                             <div class="flex items-baseline gap-1 mt-1">
                                 <span class="text-3xl font-black text-slate-800 dark:text-white">100%</span>
                                 <span
-                                    class="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-50 dark:bg-white/10 px-1.5 py-0.5 rounded ml-1 border border-slate-100 dark:border-white/5">Verified</span>
+                                    class="text-[0.5rem] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-50 dark:bg-white/10 px-1.5 py-0.5 rounded ml-1 border border-slate-100 dark:border-white/5">Verified</span>
                             </div>
                         </div>
                         <div
@@ -851,7 +851,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 class="text-xl sm:text-2xl font-black text-heading dark:text-white uppercase tracking-tight flex items-center gap-2">
                                 Deployment Variances
                             </h5>
-                            <p class="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-[0.2em] mt-1">
+                            <p class="text-[0.625rem] sm:text-xs text-slate-500 font-bold uppercase tracking-[0.2em] mt-1">
                                 Target vs Actual Benchmarking Across Regions</p>
                         </div>
                         <div
@@ -860,13 +860,13 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <div class="w-2.5 h-2.5 rounded-full bg-royal-blue shadow-[0_0_8px_rgba(0,56,168,0.5)]">
                                 </div>
                                 <span
-                                    class="text-[9px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider">Actual
+                                    class="text-[0.5625rem] font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider">Actual
                                     Validated</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <div class="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-500"></div>
                                 <span
-                                    class="text-[9px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider">Target
+                                    class="text-[0.5625rem] font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider">Target
                                     Quota</span>
                             </div>
                         </div>
@@ -890,10 +890,10 @@ require_once __DIR__ . '/../../config/vite.php';
                     </div>
                     <div>
                         <h4
-                            class="text-[10px] sm:text-xs font-black text-royal-blue dark:text-blue-400 uppercase tracking-[0.2em] mb-1.5">
+                            class="text-[0.625rem] sm:text-xs font-black text-royal-blue dark:text-blue-400 uppercase tracking-[0.2em] mb-1.5">
                             Statistical Compliance Notice</h4>
                         <p
-                            class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-tight sm:normal-case sm:font-medium leading-relaxed">
+                            class="text-[0.6875rem] sm:text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-tight sm:normal-case sm:font-medium leading-relaxed">
                             This dashboard visualizes aggregated statistical patterns only. PII is
                             strictly excluded in compliance with <span
                                 class="font-black text-royal-blue dark:text-blue-400 underline underline-offset-4 decoration-2">RA
@@ -911,14 +911,14 @@ require_once __DIR__ . '/../../config/vite.php';
                         class="h-5 sm:h-6 bg-white rounded-full p-0.5 object-contain" alt="DOLE">
                     <div class="w-px h-3 sm:h-4 bg-slate-300 dark:bg-slate-600"></div>
                     <span
-                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest leading-none whitespace-nowrap text-slate-400 group-hover/brand:text-black dark:text-slate-300 dark:group-hover/brand:text-white transition-colors duration-300">GIP
+                        class="text-[0.5rem] sm:text-[0.5625rem] font-black uppercase tracking-widest leading-none whitespace-nowrap text-slate-400 group-hover/brand:text-black dark:text-slate-300 dark:group-hover/brand:text-white transition-colors duration-300">GIP
                         Monitoring</span>
                 </div>
 
                 <!-- Right Side Grid: Copyright -->
                 <div class="text-right group/copy cursor-default">
                     <p
-                        class="text-[7.5px] sm:text-[8px] font-bold uppercase tracking-widest whitespace-nowrap text-slate-400 group-hover/copy:text-black dark:text-slate-300 dark:group-hover/copy:text-white transition-colors duration-300">
+                        class="text-[0.46875rem] sm:text-[0.5rem] font-bold uppercase tracking-widest whitespace-nowrap text-slate-400 group-hover/copy:text-black dark:text-slate-300 dark:group-hover/copy:text-white transition-colors duration-300">
                         © <span class="auto-year">2026</span> DOLE-LDNPFO | GIP SYSTEM
                         V<?php echo htmlspecialchars(env('APP_VERSION', '4.2')); ?>
                     </p>

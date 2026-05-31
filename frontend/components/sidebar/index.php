@@ -122,8 +122,8 @@ $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
                             <img src="" class="sidebar-avatar-img hidden w-full h-full object-cover" alt="User Profile">
                         </div>
                         <div class="ms-2.5 text-left">
-                            <p class="text-[11px] font-bold text-white sidebar-user-name leading-tight">...</p>
-                            <p class="text-[9px] text-white/80 truncate sidebar-user-email">...</p>
+                            <p class="text-[0.6875rem] font-bold text-white sidebar-user-name leading-tight">...</p>
+                            <p class="text-[0.5625rem] text-white/80 truncate sidebar-user-email">...</p>
                         </div>
                     </div>
                 </div>
@@ -187,7 +187,7 @@ $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
                 </div>
                 <div class="ms-3 text-left flex-1">
                     <p class="text-xs font-bold text-white sidebar-user-name">...</p>
-                    <p class="text-[10px] text-white/60 truncate sidebar-user-email">...</p>
+                    <p class="text-[0.625rem] text-white/60 truncate sidebar-user-email">...</p>
                 </div>
                 <svg class="w-4 h-4 text-white transition-transform duration-200" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">

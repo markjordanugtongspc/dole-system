@@ -193,7 +193,7 @@ function renderProfileModal(profile) {
                 </div>
                 <div>
                     <h2 class="text-xl font-black text-heading leading-tight italic">User Profile</h2>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Manage your personal information</p>
+                    <p class="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest">Manage your personal information</p>
                 </div>
             </div>
 
@@ -208,12 +208,12 @@ function renderProfileModal(profile) {
                         </label>
                         <input type="file" id="profile-pic-input" name="profile_pic" class="hidden" accept="image/*">
                     </div>
-                    <p class="text-[9px] font-bold text-gray-400 uppercase mt-2 tracking-widest">Click icon to change avatar</p>
+                    <p class="text-[0.5625rem] font-bold text-gray-400 uppercase mt-2 tracking-widest">Click icon to change avatar</p>
                 </div>
 
                 <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100 space-y-4">
                     <div class="space-y-1">
-                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Username</label>
+                        <label class="text-[0.5625rem] font-black text-gray-400 uppercase tracking-widest ml-1">Username</label>
                         <div class="relative">
                             <input type="text" value="${profile.username}" disabled
                                 class="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-gray-400 cursor-not-allowed">
@@ -222,20 +222,20 @@ function renderProfileModal(profile) {
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
+                        <label class="text-[0.5625rem] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
                         <input type="text" id="profile-full-name" name="full_name" value="${profile.full_name}" placeholder="Your full name"
                             class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                        <label class="text-[0.5625rem] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
                         <input type="email" id="profile-email" name="email" value="${profile.email || ''}" placeholder="yourname@gmail.com"
                             class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
                     </div>
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" class="w-full bg-royal-blue text-white font-black text-[10px] uppercase tracking-[0.2em] py-3.5 rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <button type="submit" class="w-full bg-royal-blue text-white font-black text-[0.625rem] uppercase tracking-[0.2em] py-3.5 rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                         Save Profile Changes
                     </button>
@@ -329,9 +329,11 @@ export function updateUIProfile(profile) {
 
     // Update Sidebar elements
     const sidebarNameElements = document.querySelectorAll('.sidebar-user-name');
+    const sidebarEmailElements = document.querySelectorAll('.sidebar-user-email');
     const sidebarAvatarElements = document.querySelectorAll('.sidebar-user-avatar');
 
     sidebarNameElements.forEach(el => el.textContent = profile.full_name);
+    sidebarEmailElements.forEach(el => el.textContent = profile.email || 'No email set');
     sidebarAvatarElements.forEach(el => {
         if (avatarUrl) {
             el.innerHTML = `<img src="${avatarUrl}" class="w-full h-full object-cover" />`;
@@ -373,13 +375,13 @@ export function showExportConfigModal(callback) {
                 </div>
                 <div>
                     <h2 class="text-xl font-black text-heading leading-tight italic">Report Generator</h2>
-                    <p class="text-[10px] font-bold text-gray-400 dark:text-white! uppercase tracking-widest">Configure your data output</p>
+                    <p class="text-[0.625rem] font-bold text-gray-400 dark:text-white! uppercase tracking-widest">Configure your data output</p>
                 </div>
             </div>
 
             <form id="export-config-form" class="space-y-6">
                 <div class="pt-1">
-                    <button type="submit" class="w-full bg-royal-blue text-white font-black text-[10px] uppercase tracking-[0.2em] py-3.5 rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <button type="submit" class="w-full bg-royal-blue text-white font-black text-[0.625rem] uppercase tracking-[0.2em] py-3.5 rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Apply Profile Configuration
                     </button>
@@ -388,12 +390,12 @@ export function showExportConfigModal(callback) {
                 <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="w-1.5 h-4 bg-royal-blue rounded-full"></span>
-                        <label class="text-[10px] font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Global Filters</label>
+                        <label class="text-[0.625rem] font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Global Filters</label>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div class="space-y-1">
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Search Beneficiary</label>
+                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Search Beneficiary</label>
                             <div class="relative group">
                                 <input type="text" id="export-search" value="${currentFilters.search}" placeholder="Name or ID..." 
                                     class="w-full bg-white border border-gray-200 rounded-xl px-9 py-2.5 text-xs font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
@@ -402,7 +404,7 @@ export function showExportConfigModal(callback) {
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Office Category</label>
+                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Office Category</label>
                             <div class="relative group">
                                 <select id="export-office" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
                                     <option value="ALL" ${currentFilters.office === 'ALL' ? 'selected' : ''}>ALL OFFICES</option>
@@ -413,7 +415,7 @@ export function showExportConfigModal(callback) {
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Sort Data By</label>
+                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Sort Data By</label>
                             <div class="relative group">
                                 <select id="export-sort" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
                                     <option value="name" ${currentFilters.sort === 'name' ? 'selected' : ''}>NAME (A-Z)</option>
@@ -429,7 +431,7 @@ export function showExportConfigModal(callback) {
                     <!-- Location + Year row -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                         <div class="space-y-1">
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Office Location</label>
+                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Office Location</label>
                             <div class="relative group">
                                 <select id="export-location" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none disabled:opacity-40 disabled:cursor-not-allowed" ${currentFilters.office === 'ALL' ? 'disabled' : ''}>
                                     <option value="ALL">ALL LOCATIONS</option>
@@ -440,7 +442,7 @@ export function showExportConfigModal(callback) {
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Year (Start Date)</label>
+                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Year (Start Date)</label>
                             <div class="relative group">
                                 <select id="export-year" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
                                     <option value="ALL" ${(currentFilters.year || 'ALL') === 'ALL' ? 'selected' : ''}>ALL YEARS</option>
@@ -454,14 +456,14 @@ export function showExportConfigModal(callback) {
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-100/50">
                         <!-- Gender Filter -->
                         <div>
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Gender Filter</label>
+                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Gender Filter</label>
                             <div class="flex flex-wrap gap-1.5">
                                 ${['ALL', 'FEMALE', 'MALE'].map(s => {
         const configs = { 'ALL': 'peer-checked:bg-blue-600', 'FEMALE': 'peer-checked:bg-pink-600', 'MALE': 'peer-checked:bg-indigo-600' };
         return `
                                         <label class="cursor-pointer">
                                             <input type="radio" name="export-gender" value="${s}" ${currentFilters.gender === s ? 'checked' : ''} class="hidden peer">
-                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[0.5625rem] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
                                         </label>
                                     `;
     }).join('')}
@@ -470,7 +472,7 @@ export function showExportConfigModal(callback) {
 
                         <!-- Display Section -->
                         <div>
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Report Volume Section</label>
+                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Report Volume Section</label>
                             <div class="flex gap-1.5">
                                 ${[
             { id: 'ALL', label: 'All', color: 'peer-checked:bg-emerald-600' },
@@ -480,7 +482,7 @@ export function showExportConfigModal(callback) {
                                     <label class="cursor-pointer flex-1">
                                         <input type="radio" name="export-section" value="${s.id}" ${currentFilters.section === s.id ? 'checked' : ''} class="hidden peer">
                                         <div class="py-1.5 bg-white border border-gray-100 rounded-lg flex items-center justify-center gap-1.5 transition-all ${s.color} peer-checked:text-white peer-checked:border-transparent shadow-sm">
-                                            <span class="text-[9px] font-black uppercase tracking-tight">${s.label}</span>
+                                            <span class="text-[0.5625rem] font-black uppercase tracking-tight">${s.label}</span>
                                         </div>
                                     </label>
                                 `).join('')}
@@ -489,14 +491,14 @@ export function showExportConfigModal(callback) {
 
                         <!-- Remarks Filter -->
                         <div>
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Remarks Filter</label>
+                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Remarks Filter</label>
                             <div class="flex flex-wrap gap-1.5">
                                 ${['ALL', 'ONGOING', 'EXPIRED', 'RESIGNED', 'ABSORBED'].map(s => {
         const configs = { 'ALL': 'peer-checked:bg-blue-600', 'ONGOING': 'peer-checked:bg-green-500', 'EXPIRED': 'peer-checked:bg-red-600', 'RESIGNED': 'peer-checked:bg-slate-600', 'ABSORBED': 'peer-checked:bg-teal-600' };
         return `
                                         <label class="cursor-pointer">
                                             <input type="radio" name="export-remarks" value="${s}" ${currentFilters.remarks === s ? 'checked' : ''} class="hidden peer">
-                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[0.5625rem] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
                                         </label>
                                     `;
     }).join('')}
@@ -505,14 +507,14 @@ export function showExportConfigModal(callback) {
 
                         <!-- Age Filter -->
                         <div>
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Age Group Filter</label>
+                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Age Group Filter</label>
                             <div class="flex flex-wrap gap-1.5">
                                 ${['ALL', '18-24', '25-30', '31-40', '41+'].map(s => {
         const configs = { 'ALL': 'peer-checked:bg-blue-600', '18-24': 'peer-checked:bg-emerald-600', '25-30': 'peer-checked:bg-yellow-600', '31-40': 'peer-checked:bg-orange-600', '41+': 'peer-checked:bg-slate-600' };
         return `
                                         <label class="cursor-pointer">
                                             <input type="radio" name="export-age-group" value="${s}" ${currentFilters.ageGroup === s ? 'checked' : ''} class="hidden peer">
-                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[9px] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[0.5625rem] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
                                         </label>
                                     `;
     }).join('')}
@@ -522,11 +524,11 @@ export function showExportConfigModal(callback) {
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100/50">
                         <div class="space-y-1">
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Prepared By (Signature)</label>
+                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Prepared By (Signature)</label>
                             <input type="text" id="export-prepared" value="${currentFilters.preparedBy}" placeholder="Mary Joy Q. Nuñez" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all uppercase">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] font-black text-gray-500 uppercase tracking-tighter ml-1">Approved By (Signature)</label>
+                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Approved By (Signature)</label>
                             <input type="text" id="export-approved" value="${currentFilters.approvedBy}" placeholder="Noel B. Orias" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all uppercase">
                         </div>
                     </div>
@@ -535,7 +537,7 @@ export function showExportConfigModal(callback) {
                 <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100 mt-4">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="w-1.5 h-4 bg-golden-yellow rounded-full"></span>
-                        <label class="text-[10px] font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Output Column Selection</label>
+                        <label class="text-[0.625rem] font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Output Column Selection</label>
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -549,7 +551,7 @@ export function showExportConfigModal(callback) {
                                         <input type="checkbox" id="${id}" name="export-column" value="${val}" ${isChecked ? 'checked' : ''} class="sr-only peer">
                                         <div class="w-8 h-4.5 bg-gray-200 rounded-full peer peer-checked:bg-emerald-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:shadow-sm after:transition-all peer-checked:after:translate-x-3.5"></div>
                                     </div>
-                                    <span class="text-[9px] font-black text-gray-600 uppercase tracking-tight group-hover:text-emerald-600">${col}</span>
+                                    <span class="text-[0.5625rem] font-black text-gray-600 uppercase tracking-tight group-hover:text-emerald-600">${col}</span>
                                 </label>
                             `;
         }).join('')}
@@ -863,12 +865,12 @@ export function showAddDataModal(data = null) {
                         </div>
                         ${headerTitle}
                     </h3>
-                    <p class="text-[10px] ${t.textSubtitle} font-bold mt-1 uppercase tracking-widest pl-11">Enter the details of the GIP beneficiary below.</p>
+                    <p class="text-[0.625rem] ${t.textSubtitle} font-bold mt-1 uppercase tracking-widest pl-11">Enter the details of the GIP beneficiary below.</p>
                 </div>
                 ${!isEdit && !data?._isBulk ? `
                 <button type="button" id="bulk-add-btn" class="group flex items-center justify-center gap-2 px-3 py-2 ${t.bgCard} border ${t.borderCard} rounded-lg hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-300 w-full sm:w-auto sm:mr-4 focus:ring-4 focus:ring-blue-500/20 active:scale-95 cursor-pointer shadow-sm">
                     <svg class="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    <span class="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">Bulk Add</span>
+                    <span class="text-[0.625rem] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">Bulk Add</span>
                 </button>
                 ` : ''}
             </div>
@@ -878,14 +880,14 @@ export function showAddDataModal(data = null) {
                 <div class="${t.bgCard} rounded-xl p-4 sm:p-5 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
                     <div class="flex items-center gap-2 mb-1">
                         <div class="w-1 h-5 ${t.dotGreen} rounded-full"></div>
-                        <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest dark:text-white!">Personal & Educational Information</p>
+                        <p class="text-[0.5625rem] uppercase font-black ${t.textSectionTitle} tracking-widest dark:text-white!">Personal & Educational Information</p>
                     </div>
                     
                     <div class="space-y-3.5">
                         <div class="group">
-                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
-                            <input type="text" name="name" id="name-input-field" value="${data?.name || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} dark:text-white!" placeholder="e.g. Dela Cruz, Juan M.">
-                            <div id="duplicate-warning" class="hidden mt-1 text-[10px] font-bold items-center gap-1.5 animate-pulse">
+                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" id="name-input-field" value="${data?.name || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} dark:text-white!" placeholder="e.g. Dela Cruz, Juan M.">
+                            <div id="duplicate-warning" class="hidden mt-1 text-[0.625rem] font-bold items-center gap-1.5 animate-pulse">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 <span>Beneficiary already exist</span>
                             </div>
@@ -893,29 +895,29 @@ export function showAddDataModal(data = null) {
                         
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Contact No.</label>
-                                <input type="text" name="contact" value="${data?.contact || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} font-mono" placeholder="09XX-XXX-XXXX">
+                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Contact No.</label>
+                                <input type="text" name="contact" value="${data?.contact || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} font-mono" placeholder="09XX-XXX-XXXX">
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Address</label>
-                                <input type="text" name="address" value="${data?.address || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="Barangay, City">
+                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Address</label>
+                                <input type="text" name="address" value="${data?.address || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="Barangay, City">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Birthday</label>
+                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Birthday</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                         <svg class="w-4 h-4 ${t.iconColor}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
                                     </div>
-                                    <input type="text" name="birthday" value="${data?.birthday || ''}" id="birthday-input" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY">
+                                    <input type="text" name="birthday" value="${data?.birthday || ''}" id="birthday-input" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY">
                                 </div>
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Age</label>
-                                <input type="text" name="age" value="${data?.age || ''}" id="age-display" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-black ${t.textAge} outline-none font-mono focus:ring-4 ${t.focusGreen}" placeholder="Auto/Manual">
-                                <div id="age-warning" class="hidden mt-1 text-[10px] font-bold items-center gap-1.5 animate-pulse">
+                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Age</label>
+                                <input type="text" name="age" value="${data?.age || ''}" id="age-display" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-black ${t.textAge} outline-none font-mono focus:ring-4 ${t.focusGreen}" placeholder="Auto/Manual">
+                                <div id="age-warning" class="hidden mt-1 text-[0.625rem] font-bold items-center gap-1.5 animate-pulse">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                     <span>Age must be between 18 and 29 years old</span>
                                 </div>
@@ -924,25 +926,25 @@ export function showAddDataModal(data = null) {
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Gender</label>
-                                <select name="gender" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm cursor-pointer appearance-none">
+                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Gender</label>
+                                <select name="gender" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm cursor-pointer appearance-none">
                                     <option value="Male" ${data?.gender === 'Male' ? 'selected' : ''}>Male</option>
                                     <option value="Female" ${data?.gender === 'Female' ? 'selected' : ''}>Female</option>
                                 </select>
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Education</label>
+                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Education</label>
                                 <div class="relative" id="education-container">
                                     <input type="text" name="education" id="education-input" autocomplete="off"
                                         value="${data?.education || ''}" 
-                                        class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 pl-9 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" 
+                                        class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 pl-9 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" 
                                         placeholder="Course/Level...">
                                     <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
                                         <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                                     </div>
                                     <div id="course-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
                                         ${COMMON_COURSES.map(course => `
-                                            <div class="course-option px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
+                                            <div class="course-option px-3 py-2 text-[0.625rem] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
                                                 ${course.icon}
                                                 <span class="option-text">${course.name}</span>
                                             </div>
@@ -954,12 +956,12 @@ export function showAddDataModal(data = null) {
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t ${dk ? 'border-slate-800/70' : 'border-gray-100'}">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Designated Beneficiary</label>
-                                <input type="text" name="designatedBeneficiary" value="${data?.designatedBeneficiary || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="Assured family member">
+                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Designated Beneficiary</label>
+                                <input type="text" name="designatedBeneficiary" value="${data?.designatedBeneficiary || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="Assured family member">
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Relationship to Assured</label>
-                                <select name="relationshipToAssured" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm cursor-pointer appearance-none uppercase">
+                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Relationship to Assured</label>
+                                <select name="relationshipToAssured" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm cursor-pointer appearance-none uppercase">
                                     <option value="">SELECT RELATIONSHIP</option>
                                     ${ASSURED_RELATIONSHIPS.map((relationship) => `
                                         <option value="${relationship}" ${data?.relationshipToAssured === relationship ? 'selected' : ''}>${relationship}</option>
@@ -972,25 +974,25 @@ export function showAddDataModal(data = null) {
                     <div class="pt-1">
                         <div class="flex items-center gap-2 mb-2">
                             <div class="w-1 h-5 bg-golden-yellow rounded-full"></div>
-                            <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest">Contract Duration</p>
+                            <p class="text-[0.5625rem] uppercase font-black ${t.textSectionTitle} tracking-widest">Contract Duration</p>
                         </div>
                         <div id="date-range-picker" class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">Start Date</label>
+                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1">Start Date</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                         <svg class="w-4 h-4 ${t.iconColor}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
                                     </div>
-                                    <input type="text" name="startDate" id="datepicker-range-start" value="${data?.startDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusYellow} outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY">
+                                    <input type="text" name="startDate" id="datepicker-range-start" value="${data?.startDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusYellow} outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY">
                                 </div>
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">End Date</label>
+                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1">End Date</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                         <svg class="w-4 h-4 ${t.iconColor}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
                                     </div>
-                                    <input type="text" name="endDate" id="datepicker-range-end" value="${data?.endDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusRed} outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY">
+                                    <input type="text" name="endDate" id="datepicker-range-end" value="${data?.endDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusRed} outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY">
                                 </div>
                             </div>
                         </div>
@@ -1001,58 +1003,58 @@ export function showAddDataModal(data = null) {
                 <div class="${t.bgCard} rounded-xl p-4 sm:p-5 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
                     <div class="flex items-center gap-2 mb-1">
                         <div class="w-1 h-5 ${t.dotBlue} rounded-full"></div>
-                        <p class="text-[9px] uppercase font-black ${t.textSectionTitle} tracking-widest">Work & Administrative Data</p>
+                        <p class="text-[0.5625rem] uppercase font-black ${t.textSectionTitle} tracking-widest">Work & Administrative Data</p>
                     </div>
                     
                     <div class="space-y-3.5">
                          <div class="group">
-                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">ID Number</label>
+                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">ID Number</label>
                             <input type="text" name="gip_id" id="full-id-input" 
                                 value="${data?.id || ''}" 
-                                class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[11px] font-black ${t.idText} font-mono outline-none focus:ring-4 ${t.focusBlue} transition-all uppercase" 
+                                class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.6875rem] font-black ${t.idText} font-mono outline-none focus:ring-4 ${t.focusBlue} transition-all uppercase" 
                                 placeholder="ROX-RD-ESIG-2025-0001">
                             <input type="hidden" name="id" value="${data?.id || ''}">
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Assigned Office</label>
+                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Assigned Office</label>
                                 <div class="relative" id="office-container">
                                     <input type="text" name="office" id="office-input" autocomplete="off"
                                         value="${data?.office || ''}" 
-                                        class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
+                                        class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
                                         placeholder="e.g. DOLE Field Office">
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                         <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                     </div>
                                     <div id="office-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
                                         <!-- Will be populated by JS -->
-                                        <div class="px-3 py-4 text-center text-[10px] font-bold ${t.textLabel} animate-pulse">Loading offices...</div>
+                                        <div class="px-3 py-4 text-center text-[0.625rem] font-bold ${t.textLabel} animate-pulse">Loading offices...</div>
                                     </div>
                                 </div>
                             </div>
                             <div class="group">
-                                <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Series Number</label>
-                                <input type="text" name="seriesNo" id="series-no-input" value="${data?.seriesNo || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[12px] font-black ${dk ? 'text-white' : 'text-royal-blue'} font-mono focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm" placeholder="2025-00-000">
+                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Series Number</label>
+                                <input type="text" name="seriesNo" id="series-no-input" value="${data?.seriesNo || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-black ${dk ? 'text-white' : 'text-royal-blue'} font-mono focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm" placeholder="2025-00-000">
                             </div>
                         </div>
 
                         <div class="group">
-                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1 tracking-widest ${dk ? '' : 'transition-colors'} ${dk ? '' : 'group-focus-within:text-royal-blue'}">Nature of Work</label>
+                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 tracking-widest ${dk ? '' : 'transition-colors'} ${dk ? '' : 'group-focus-within:text-royal-blue'}">Nature of Work</label>
                             <div class="relative" id="work-container">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="w-3.5 h-3.5 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                                 </div>
                                 <input type="text" name="designation" id="designation-input" autocomplete="off"
                                     value="${data?.designation || 'N/A'}"
-                                    class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[12px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
+                                    class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
                                     placeholder="N/A">
                                 <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2 transform origin-top transition-all duration-200">
                                     <div class="px-2 py-1.5 mb-1.5 border-b ${t.borderSuggHead}">
-                                        <p class="text-[9px] font-black ${t.textWorkSuggHead} uppercase tracking-widest">Quick Select Roles</p>
+                                        <p class="text-[0.5625rem] font-black ${t.textWorkSuggHead} uppercase tracking-widest">Quick Select Roles</p>
                                     </div>
                                     ${COMMON_NATURE_OF_WORK.map(work => `
-                                        <div class="work-option px-3 py-2.5 text-[10px] font-black ${t.textWorkOpt} ${t.workHover} rounded-lg cursor-pointer transition-all flex items-center justify-between group/opt active:scale-[0.98]">
+                                        <div class="work-option px-3 py-2.5 text-[0.625rem] font-black ${t.textWorkOpt} ${t.workHover} rounded-lg cursor-pointer transition-all flex items-center justify-between group/opt active:scale-[0.98]">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-1.5 h-1.5 rounded-full ${t.workDot} transition-colors"></div>
                                                 <span class="option-text">${work}</span>
@@ -1065,19 +1067,19 @@ export function showAddDataModal(data = null) {
                         </div>
 
                         <div class="group">
-                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-1">Replacement History (Optional)</label>
+                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1">Replacement History (Optional)</label>
                             <input type="hidden" name="replacement" id="replacement-hidden" value="${data?.replacement || ''}">
                             <div class="relative" id="replacement-container">
                                 <input type="text" id="replacement-search-input" autocomplete="off"
                                     value="${data?.replacement || ''}"
-                                    class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[11px] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}"
+                                    class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.6875rem] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}"
                                     placeholder="Search beneficiary name...">
                                 <div id="replacement-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2"></div>
                             </div>
                         </div>
 
                         <div class="group">
-                            <label class="text-[9px] ${t.textLabel} font-black uppercase block mb-2">Employment Status Record</label>
+                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-2">Employment Status Record</label>
                             <div class="flex flex-wrap gap-2 items-center">
                                 <div class="flex flex-wrap gap-2 p-1.5 ${t.bgStatusWrap} border ${t.borderStatus} rounded-xl shadow-inner flex-1">
                                     ${(() => {
@@ -1090,7 +1092,7 @@ export function showAddDataModal(data = null) {
             return ['ONGOING', 'EXPIRED', 'RESIGNED', 'ABSORBED'].map(s => `
                                             <label class="cursor-pointer relative min-w-[80px]">
                                                 <input type="radio" name="remarks" value="${s}" ${data?.remarks === s ? 'checked' : ''} class="hidden peer remarks-radio">
-                                                <span class="px-3 py-1.5 rounded-lg border border-transparent text-[10px] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${statusConfigs[s] || ''} transition-all block text-center cursor-pointer shadow-sm">
+                                                <span class="px-3 py-1.5 rounded-lg border border-transparent text-[0.625rem] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${statusConfigs[s] || ''} transition-all block text-center cursor-pointer shadow-sm">
                                                     ${s}
                                                 </span>
                                             </label>
@@ -1099,11 +1101,11 @@ export function showAddDataModal(data = null) {
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <button type="button" id="absorb-btn" 
-                                        class="px-3 py-3 rounded-xl bg-[#2e7d32] text-white text-[10px] font-black hover:bg-[#1b5e20] transition-all duration-300 shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
+                                        class="px-3 py-3 rounded-xl bg-[#2e7d32] text-white text-[0.625rem] font-black hover:bg-[#1b5e20] transition-all duration-300 shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
                                         ABSORB
                                     </button>
                                     <button type="button" id="resign-btn" 
-                                        class="px-3 py-3 rounded-xl bg-[#ce1126] text-white text-[10px] font-black hover:bg-[#b71c1c] transition-all duration-300 shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
+                                        class="px-3 py-3 rounded-xl bg-[#ce1126] text-white text-[0.625rem] font-black hover:bg-[#b71c1c] transition-all duration-300 shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
                                         RESIGN
                                     </button>
                                 </div>
@@ -1120,13 +1122,13 @@ export function showAddDataModal(data = null) {
             <!-- Action Bar -->
             <div class="mt-6 flex flex-wrap lg:justify-end items-center gap-3 pt-6 rounded-b-3xl ${t.bgActionBar} border-t ${t.actionBarBorder}">
                 <button type="button" id="cancel-modal-btn"
-                    class="group flex items-center justify-center gap-2.5 px-4 lg:px-6 py-3 lg:py-3.5 ${t.bgCancelBtn} ${t.textCancel} font-black rounded-xl hover:bg-[#ce1126] hover:text-white transition-all duration-300 shadow-sm border ${t.cancelBorder} hover:border-[#ce1126] cursor-pointer text-[10px] lg:text-[12px] active:scale-[0.98] uppercase tracking-wider whitespace-nowrap order-1 lg:order-2">
+                    class="group flex items-center justify-center gap-2.5 px-4 lg:px-6 py-3 lg:py-3.5 ${t.bgCancelBtn} ${t.textCancel} font-black rounded-xl hover:bg-[#ce1126] hover:text-white transition-all duration-300 shadow-sm border ${t.cancelBorder} hover:border-[#ce1126] cursor-pointer text-[0.625rem] lg:text-[0.75rem] active:scale-[0.98] uppercase tracking-wider whitespace-nowrap order-1 lg:order-2">
                     <svg class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
                     <span>CANCEL</span>
                 </button>
 
                 <button type="submit" form="add-beneficiary-form" id="submit-beneficiary-btn"
-                    class="group flex items-center justify-center gap-2.5 px-4 lg:px-6 py-3 lg:py-3.5 ${t.bgSaveBtn} text-white font-black rounded-xl transition-all duration-300 shadow-lg ${t.saveShadow} cursor-pointer text-[10px] lg:text-[12px] transform active:scale-[0.98] uppercase tracking-wider whitespace-nowrap order-2 lg:order-1">
+                    class="group flex items-center justify-center gap-2.5 px-4 lg:px-6 py-3 lg:py-3.5 ${t.bgSaveBtn} text-white font-black rounded-xl transition-all duration-300 shadow-lg ${t.saveShadow} cursor-pointer text-[0.625rem] lg:text-[0.75rem] transform active:scale-[0.98] uppercase tracking-wider whitespace-nowrap order-2 lg:order-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                     <span>${isEdit ? 'UPDATE RECORD' : 'SAVE RECORD'}</span>
                 </button>
@@ -1276,7 +1278,7 @@ export function showAddDataModal(data = null) {
                 const isValid = !isNaN(ageNum) && ageNum >= 18 && ageNum <= 29;
                 
                 if (ageWarning) {
-                    ageWarning.className = `mt-1 text-[10px] font-bold ${!isValid ? 'flex' : 'hidden'} items-center gap-1.5 animate-pulse ${isDarkMode() ? 'text-red-400' : 'text-red-600'}`;
+                    ageWarning.className = `mt-1 text-[0.625rem] font-bold ${!isValid ? 'flex' : 'hidden'} items-center gap-1.5 animate-pulse ${isDarkMode() ? 'text-red-400' : 'text-red-600'}`;
                 }
                 
                 if (submitBtn) {
@@ -1332,7 +1334,7 @@ export function showAddDataModal(data = null) {
                     }
                 };
                 const setDuplicateWarning = (visible, duplicateName = '') => {
-                    dupWarning.className = `mt-1 text-[10px] font-bold ${visible ? 'flex' : 'hidden'} items-center gap-1.5 animate-pulse ${isDarkMode() ? 'text-red-400' : 'text-red-600'}`;
+                    dupWarning.className = `mt-1 text-[0.625rem] font-bold ${visible ? 'flex' : 'hidden'} items-center gap-1.5 animate-pulse ${isDarkMode() ? 'text-red-400' : 'text-red-600'}`;
                     const label = dupWarning.querySelector('span');
                     if (label) {
                         label.textContent = duplicateName ? `Beneficiary already exists: ${duplicateName}` : 'Beneficiary already exists';
@@ -1443,7 +1445,7 @@ export function showAddDataModal(data = null) {
             const renderReplacementSuggestions = (candidates) => {
                 if (!replacementSuggestions) return;
                 if (!candidates.length) {
-                    replacementSuggestions.innerHTML = `<div class="px-3 py-2 text-[10px] font-bold ${t.textCourseOpt}">No matching beneficiary found.</div>`;
+                    replacementSuggestions.innerHTML = `<div class="px-3 py-2 text-[0.625rem] font-bold ${t.textCourseOpt}">No matching beneficiary found.</div>`;
                     replacementSuggestions.classList.remove('hidden');
                     return;
                 }
@@ -1451,7 +1453,7 @@ export function showAddDataModal(data = null) {
                 replacementSuggestions.innerHTML = candidates.map((candidate) => {
                     const line = buildReplacementText(candidate);
                     return `
-                        <button type="button" class="replacement-option w-full text-left px-3 py-2 text-[10px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors"
+                        <button type="button" class="replacement-option w-full text-left px-3 py-2 text-[0.625rem] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors"
                             data-replacement="${line.replace(/"/g, '&quot;')}">
                             ${line}
                         </button>
@@ -1539,25 +1541,25 @@ export function showAddDataModal(data = null) {
                     
                     extensionContainer.innerHTML = `
                         <div class="mt-4 pt-4 border-t ${dk ? 'border-slate-800' : 'border-gray-100'}">
-                            <p class="text-[9px] uppercase font-black ${dk ? 'text-green-500' : 'text-[#2e7d32]'} border-b ${dk ? 'border-slate-800' : 'border-green-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> Absorption Details</p>
+                            <p class="text-[0.5625rem] uppercase font-black ${dk ? 'text-green-500' : 'text-[#2e7d32]'} border-b ${dk ? 'border-slate-800' : 'border-green-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> Absorption Details</p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                 <div class="group">
-                                    <label class="text-[9px] ${dk ? 'text-green-500' : 'text-[#2e7d32]'} font-black uppercase block mb-1 cursor-pointer" for="absorbDateModal">Absorption Date</label>
-                                    <input type="datetime-local" id="absorbDateModal" name="absorbDate" value="${localISOTime}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm font-mono cursor-pointer">
+                                    <label class="text-[0.5625rem] ${dk ? 'text-green-500' : 'text-[#2e7d32]'} font-black uppercase block mb-1 cursor-pointer" for="absorbDateModal">Absorption Date</label>
+                                    <input type="datetime-local" id="absorbDateModal" name="absorbDate" value="${localISOTime}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[0.6875rem] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm font-mono cursor-pointer">
                                 </div>
                                 <div class="group">
-                                    <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Where?</label>
-                                    <input type="text" name="absorb_where" value="${data?.absorb_where || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="Where to absorb?">
+                                    <label class="text-[0.5625rem] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Where?</label>
+                                    <input type="text" name="absorb_where" value="${data?.absorb_where || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[0.6875rem] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="Where to absorb?">
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="group">
-                                    <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Position</label>
-                                    <input type="text" name="absorb_position" value="${data?.absorb_position || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="What kind of position?">
+                                    <label class="text-[0.5625rem] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Position</label>
+                                    <input type="text" name="absorb_position" value="${data?.absorb_position || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[0.6875rem] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="What kind of position?">
                                 </div>
                                 <div class="group">
-                                    <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Agency</label>
-                                    <input type="text" name="absorb_agency" value="${data?.absorb_agency || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="On what agency?">
+                                    <label class="text-[0.5625rem] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Agency</label>
+                                    <input type="text" name="absorb_agency" value="${data?.absorb_agency || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[0.6875rem] font-bold focus:ring-4 ${dk ? 'focus:ring-green-500/10 focus:border-green-500' : 'focus:ring-[#2e7d32]/10 focus:border-[#2e7d32]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="On what agency?">
                                 </div>
                             </div>
                         </div>
@@ -1569,15 +1571,15 @@ export function showAddDataModal(data = null) {
                     
                     extensionContainer.innerHTML = `
                         <div class="mt-4 pt-4 border-t ${dk ? 'border-slate-800' : 'border-gray-100'}">
-                            <p class="text-[9px] uppercase font-black ${dk ? 'text-red-500' : 'text-[#ce1126]'} border-b ${dk ? 'border-slate-800' : 'border-red-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg> Resignation Details</p>
+                            <p class="text-[0.5625rem] uppercase font-black ${dk ? 'text-red-500' : 'text-[#ce1126]'} border-b ${dk ? 'border-slate-800' : 'border-red-100'} pb-1 flex items-center gap-2 mb-3"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg> Resignation Details</p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                                 <div class="group">
-                                    <label class="text-[9px] ${dk ? 'text-red-500' : 'text-[#ce1126]'} font-black uppercase block mb-1 cursor-pointer" for="resignedDateModal">Resignation Date</label>
-                                    <input type="datetime-local" id="resignedDateModal" name="resignedDate" value="${localISOTime}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-red-500/10 focus:border-red-500' : 'focus:ring-[#ce1126]/10 focus:border-[#ce1126]'} outline-none transition-all shadow-sm font-mono cursor-pointer">
+                                    <label class="text-[0.5625rem] ${dk ? 'text-red-500' : 'text-[#ce1126]'} font-black uppercase block mb-1 cursor-pointer" for="resignedDateModal">Resignation Date</label>
+                                    <input type="datetime-local" id="resignedDateModal" name="resignedDate" value="${localISOTime}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[0.6875rem] font-bold focus:ring-4 ${dk ? 'focus:ring-red-500/10 focus:border-red-500' : 'focus:ring-[#ce1126]/10 focus:border-[#ce1126]'} outline-none transition-all shadow-sm font-mono cursor-pointer">
                                 </div>
                                 <div class="group">
-                                    <label class="text-[9px] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Reason (Optional)</label>
-                                    <input type="text" name="resigned_reason" value="${data?.resigned_reason || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[11px] font-bold focus:ring-4 ${dk ? 'focus:ring-red-500/10 focus:border-red-500' : 'focus:ring-[#ce1126]/10 focus:border-[#ce1126]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="Why resigned?">
+                                    <label class="text-[0.5625rem] ${dk ? 'text-slate-500' : 'text-gray-400 dark:text-white!'} font-black uppercase block mb-1">Reason (Optional)</label>
+                                    <input type="text" name="resigned_reason" value="${data?.resigned_reason || ''}" class="w-full ${dk ? 'bg-slate-900 text-white border-slate-700' : 'bg-white text-slate-900 border-gray-300'} rounded-lg px-3 py-2 text-[0.6875rem] font-bold focus:ring-4 ${dk ? 'focus:ring-red-500/10 focus:border-red-500' : 'focus:ring-[#ce1126]/10 focus:border-[#ce1126]'} outline-none transition-all shadow-sm ${dk ? 'placeholder:text-slate-600' : 'placeholder:text-gray-300'}" placeholder="Why resigned?">
                                 </div>
                             </div>
                         </div>
@@ -1745,12 +1747,12 @@ export function showAddDataModal(data = null) {
                         const filteredOffices = offices.filter(o => o.office.toLowerCase().includes(filter.toLowerCase()));
                         
                         officeContainer.innerHTML = `
-                            <div class="px-2.5 py-1.5 text-[7px] font-black uppercase tracking-widest ${t.textLabel} opacity-70 border-b ${t.borderDivide} mb-1">OFFICE CODE</div>
+                            <div class="px-2.5 py-1.5 text-[0.4375rem] font-black uppercase tracking-widest ${t.textLabel} opacity-70 border-b ${t.borderDivide} mb-1">OFFICE CODE</div>
                             <div class="max-h-64 overflow-y-auto scrollbar-hide">
                                 ${filteredOffices.length > 0 ? filteredOffices.map(o => {
                                     const hasLocations = parseInt(o.location_count || 0) > 0;
                                     return `
-                                        <div class="office-code-option group/opt px-3 py-2 text-[9px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg ${hasLocations ? 'cursor-pointer' : 'cursor-default opacity-60'} transition-all flex items-center justify-between group active:scale-[0.98] mx-1 mb-0.5" 
+                                        <div class="office-code-option group/opt px-3 py-2 text-[0.5625rem] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg ${hasLocations ? 'cursor-pointer' : 'cursor-default opacity-60'} transition-all flex items-center justify-between group active:scale-[0.98] mx-1 mb-0.5" 
                                             data-id="${o.id}" data-name="${o.office}" data-has-locations="${hasLocations}">
                                             <div class="flex items-center gap-2.5">
                                                 <div class="w-2 h-2 rounded-md bg-blue-500/10 group-hover/opt:bg-blue-500/20 flex items-center justify-center transition-colors">
@@ -1762,22 +1764,22 @@ export function showAddDataModal(data = null) {
                                         </div>
                                     `;
                                 }).join('') : `
-                                    <div class="px-3 py-2 text-center text-[9px] font-bold ${t.textLabel} opacity-60 whitespace-nowrap">No matching offices.</div>
+                                    <div class="px-3 py-2 text-center text-[0.5625rem] font-bold ${t.textLabel} opacity-60 whitespace-nowrap">No matching offices.</div>
                                     ${filter.trim() ? `
                                     <div class="px-2 pb-2 flex flex-col gap-1.5">
-                                        <div class="text-[7px] font-black uppercase tracking-widest ${t.textLabel} opacity-50 px-1">New office: "${filter.trim()}"</div>
+                                        <div class="text-[0.4375rem] font-black uppercase tracking-widest ${t.textLabel} opacity-50 px-1">New office: "${filter.trim()}"</div>
                                         <div id="add-office-location-row-modal" class="hidden gap-1.5 items-center">
-                                            <input type="text" id="new-office-loc-input-modal" placeholder="Location name..." class="flex-1 min-w-0 px-2.5 py-1.5 text-[9px] font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                                            <button type="button" id="confirm-office-with-loc-modal" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-blue-500 text-white text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all active:scale-95 cursor-pointer whitespace-nowrap">
+                                            <input type="text" id="new-office-loc-input-modal" placeholder="Location name..." class="flex-1 min-w-0 px-2.5 py-1.5 text-[0.5625rem] font-bold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                                            <button type="button" id="confirm-office-with-loc-modal" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-blue-500 text-white text-[0.5625rem] font-black uppercase tracking-widest hover:bg-blue-600 transition-all active:scale-95 cursor-pointer whitespace-nowrap">
                                                 Confirm
                                             </button>
                                         </div>
                                         <div class="flex gap-1.5">
-                                            <button type="button" id="add-office-with-loc-btn-modal" class="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 text-[9px] font-black uppercase tracking-widest hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap">
+                                            <button type="button" id="add-office-with-loc-btn-modal" class="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 text-[0.5625rem] font-black uppercase tracking-widest hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap">
                                                 <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                                 Add location
                                             </button>
-                                            <button type="button" id="skip-office-loc-btn-modal" class="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-slate-700 transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap">
+                                            <button type="button" id="skip-office-loc-btn-modal" class="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-700 text-[0.5625rem] font-black uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-slate-700 transition-all active:scale-[0.98] cursor-pointer whitespace-nowrap">
                                                 <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                                 Skip
                                             </button>
@@ -1848,7 +1850,7 @@ export function showAddDataModal(data = null) {
                                     <div class="p-1 rounded-md bg-green-500/10 text-green-600 dark:text-green-400">
                                         <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                     </div>
-                                    <div class="text-[7px] font-black uppercase tracking-widest ${t.textLabel} opacity-70">OFFICE LOCATION</div>
+                                    <div class="text-[0.4375rem] font-black uppercase tracking-widest ${t.textLabel} opacity-70">OFFICE LOCATION</div>
                                 </div>
                                 <button type="button" id="back-to-offices" class="p-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all cursor-pointer shadow-sm active:scale-90 flex items-center justify-center">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"/></svg>
@@ -1861,13 +1863,13 @@ export function showAddDataModal(data = null) {
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                     </div>
                                     <input type="text" id="location-search-internal" placeholder="Search in ${office.name}..." 
-                                        class="w-full pl-8 pr-3 py-1.5 text-[9px] font-bold bg-slate-100/50 dark:bg-slate-900/50 border-transparent focus:border-blue-500 focus:ring-0 rounded-lg transition-all"
+                                        class="w-full pl-8 pr-3 py-1.5 text-[0.5625rem] font-bold bg-slate-100/50 dark:bg-slate-900/50 border-transparent focus:border-blue-500 focus:ring-0 rounded-lg transition-all"
                                         value="${filter.includes(' - ') ? filter.split(' - ')[1] : ''}">
                                 </div>
                             </div>
 
                             <div id="locations-list-container" class="max-h-64 overflow-y-auto scrollbar-hide p-1">
-                                <div class="px-3 py-4 text-center text-[9px] font-bold ${t.textLabel} animate-pulse flex items-center justify-center gap-2">
+                                <div class="px-3 py-4 text-center text-[0.5625rem] font-bold ${t.textLabel} animate-pulse flex items-center justify-center gap-2">
                                     <svg class="w-3.5 h-3.5 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                     Fetching...
                                 </div>
@@ -1916,19 +1918,19 @@ export function showAddDataModal(data = null) {
 
                             if (filtered.length > 0) {
                                 locationsListContainer.innerHTML = filtered.map(l => `
-                                    <div class="location-option group/loc px-3 py-1.5 text-[9px] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg cursor-pointer transition-all flex items-center gap-3 active:scale-[0.98] mb-0.5" data-location="${l.location}">
+                                    <div class="location-option group/loc px-3 py-1.5 text-[0.5625rem] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg cursor-pointer transition-all flex items-center gap-3 active:scale-[0.98] mb-0.5" data-location="${l.location}">
                                         <div class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 group-hover/loc:bg-blue-500 transition-all"></div>
                                         <span class="option-text truncate">${l.location}</span>
                                     </div>
                                 `).join('');
                             } else if (locations.length === 0) {
-                                locationsListContainer.innerHTML = `<div class="px-3 py-4 text-center text-[9px] font-bold ${t.textLabel} animate-pulse flex items-center justify-center gap-2"><svg class="w-3.5 h-3.5 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Fetching...</div>`;
+                                locationsListContainer.innerHTML = `<div class="px-3 py-4 text-center text-[0.5625rem] font-bold ${t.textLabel} animate-pulse flex items-center justify-center gap-2"><svg class="w-3.5 h-3.5 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Fetching...</div>`;
                             } else {
                                 locationsListContainer.innerHTML = `
-                                    <div class="px-3 py-3 text-center text-[9px] font-bold ${t.textLabel} opacity-60">No matching locations.</div>
+                                    <div class="px-3 py-3 text-center text-[0.5625rem] font-bold ${t.textLabel} opacity-60">No matching locations.</div>
                                     ${trimmed ? `
                                     <div class="px-2 pb-2">
-                                        <button type="button" id="add-new-location-modal" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 text-[9px] font-black uppercase tracking-widest hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all active:scale-[0.98] cursor-pointer">
+                                        <button type="button" id="add-new-location-modal" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 text-[0.5625rem] font-black uppercase tracking-widest hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all active:scale-[0.98] cursor-pointer">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
                                             Add "${trimmed}" as location
                                         </button>
@@ -2136,7 +2138,7 @@ export function showAddDataModal(data = null) {
                     if (!ageVal || isNaN(ageNum) || ageNum < 18 || ageNum > 29) {
                         hasError = true;
                         if (ageWarning) {
-                            ageWarning.className = `mt-1 text-[10px] font-bold flex items-center gap-1.5 animate-pulse ${typeof isDarkMode === 'function' && isDarkMode() ? 'text-red-400' : 'text-red-600'}`;
+                            ageWarning.className = `mt-1 text-[0.625rem] font-bold flex items-center gap-1.5 animate-pulse ${typeof isDarkMode === 'function' && isDarkMode() ? 'text-red-400' : 'text-red-600'}`;
                         }
                         if (submitBtn) {
                             submitBtn.disabled = true;
@@ -2308,8 +2310,8 @@ function showToastOverlap(message, icon = 'success') {
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="${config.path}" /></svg>
         </div>
         <div class="flex flex-col">
-            <span class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">${config.label}</span>
-            <span class="text-[13px] font-black text-gray-700 dark:text-white leading-tight">${message}</span>
+            <span class="text-[0.625rem] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">${config.label}</span>
+            <span class="text-[0.8125rem] font-black text-gray-700 dark:text-white leading-tight">${message}</span>
         </div>
     `;
 

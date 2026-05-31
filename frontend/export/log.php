@@ -18,7 +18,7 @@ ob_start();
         </p>
 
         <table class="w-full text-xs text-left border-collapse mt-4">
-            <thead class="text-white bg-royal-blue font-bold uppercase tracking-wider text-[10px]">
+            <thead class="text-white bg-royal-blue font-bold uppercase tracking-wider text-[0.625rem]">
                 <tr class="text-center">
                     <th class="px-3 py-2 border border-royal-blue w-[10%]">NO.</th>
                     <th class="px-3 py-2 border border-royal-blue w-[30%]">RECORD DATE</th>
@@ -26,7 +26,7 @@ ob_start();
                     <th class="px-3 py-2 border border-royal-blue w-[30%]">STATUS</th>
                 </tr>
             </thead>
-            <tbody id="dtr-log-table-body" class="text-[10px] font-medium text-gray-700">
+            <tbody id="dtr-log-table-body" class="text-[0.625rem] font-medium text-gray-700">
                 <tr><td colspan="4" class="px-4 py-8 text-center text-gray-500 font-bold italic">Loading DTR logs...</td></tr>
             </tbody>
         </table>
@@ -43,7 +43,7 @@ ob_start();
         </p>
 
         <table class="w-full text-xs text-left border-collapse mt-4">
-            <thead class="text-white bg-orange-600 font-bold uppercase tracking-wider text-[10px]">
+            <thead class="text-white bg-orange-600 font-bold uppercase tracking-wider text-[0.625rem]">
                 <tr class="text-center">
                     <th class="px-3 py-2 border border-orange-600 w-[10%]">NO.</th>
                     <th class="px-3 py-2 border border-orange-600 w-[30%]">PERIOD</th>
@@ -51,7 +51,7 @@ ob_start();
                     <th class="px-3 py-2 border border-orange-600 w-[30%]">STATUS</th>
                 </tr>
             </thead>
-            <tbody id="ar-log-table-body" class="text-[10px] font-medium text-gray-700">
+            <tbody id="ar-log-table-body" class="text-[0.625rem] font-medium text-gray-700">
                 <tr><td colspan="4" class="px-4 py-8 text-center text-gray-500 font-bold italic">Loading AR logs...</td></tr>
             </tbody>
         </table>

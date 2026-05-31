@@ -51,7 +51,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <span
                                     class="text-sm font-black text-royal-blue uppercase tracking-tight leading-tight">DOLE
                                     LDNPFO</span>
-                                <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Export
+                                <span class="text-[0.625rem] font-semibold text-gray-500 uppercase tracking-wider">Export
                                     Center</span>
                             </div>
                         </a>
@@ -88,7 +88,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <div class="grid grid-cols-1 sm:flex gap-2 sm:gap-3 w-full md:w-auto">
                     <button onclick="window.showExportConfigModal(handleFilterUpdate)"
-                        class="flex justify-center items-center px-4 py-3 sm:px-5 sm:py-2.5 bg-white text-royal-blue border border-royal-blue/20 rounded-xl shadow-sm hover:bg-blue-50 transition-all text-[10px] sm:text-xs font-black uppercase tracking-wider cursor-pointer h-full dark:bg-blue-900 dark:text-white dark:hover:bg-blue-500 dark:hover:text-white dark:border-blue-700">
+                        class="flex justify-center items-center px-4 py-3 sm:px-5 sm:py-2.5 bg-white text-royal-blue border border-royal-blue/20 rounded-xl shadow-sm hover:bg-blue-50 transition-all text-[0.625rem] sm:text-xs font-black uppercase tracking-wider cursor-pointer h-full dark:bg-blue-900 dark:text-white dark:hover:bg-blue-500 dark:hover:text-white dark:border-blue-700">
                         <svg class="w-4 h-4 me-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
@@ -97,7 +97,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         Configure Report
                     </button>
                     <button onclick="window.exportToExcel()"
-                        class="flex justify-center items-center px-4 py-3 sm:px-5 sm:py-2.5 bg-emerald-600 text-white rounded-xl shadow-lg hover:bg-emerald-700 hover:-translate-y-0.5 active:scale-95 transition-all text-[10px] sm:text-xs font-black uppercase tracking-wider cursor-pointer border-none h-full">
+                        class="flex justify-center items-center px-4 py-3 sm:px-5 sm:py-2.5 bg-emerald-600 text-white rounded-xl shadow-lg hover:bg-emerald-700 hover:-translate-y-0.5 active:scale-95 transition-all text-[0.625rem] sm:text-xs font-black uppercase tracking-wider cursor-pointer border-none h-full">
                         <svg class="w-4 h-4 me-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
@@ -106,7 +106,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         Export to Excel
                     </button>
                     <button onclick="window.print()"
-                        class="flex justify-center items-center px-4 py-3 sm:px-5 sm:py-2.5 bg-royal-blue text-white rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 transition-all text-[10px] sm:text-xs font-black uppercase tracking-wider cursor-pointer h-full">
+                        class="flex justify-center items-center px-4 py-3 sm:px-5 sm:py-2.5 bg-royal-blue text-white rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 transition-all text-[0.625rem] sm:text-xs font-black uppercase tracking-wider cursor-pointer h-full">
                         <svg class="w-4 h-4 me-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
@@ -127,7 +127,7 @@ require_once __DIR__ . '/../../config/vite.php';
                     </svg>
                 </div>
                 <h3 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-1">Preview Unavailable</h3>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider max-w-[200px]">Table Preview is
+                <p class="text-[0.625rem] text-gray-400 font-bold uppercase tracking-wider max-w-[200px]">Table Preview is
                     not compatible on this device's screen size.</p>
             </div>
 
@@ -136,7 +136,7 @@ require_once __DIR__ . '/../../config/vite.php';
                 <div class="p-4 border-b border-gray-100 flex justify-between items-center">
                     <h3 class="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-white">Live Preview</h3>
                     <div
-                        class="text-[10px] font-bold text-gray-400 bg-white px-3 py-1 rounded-full border border-gray-100 italic">
+                        class="text-[0.625rem] font-bold text-gray-400 bg-white px-3 py-1 rounded-full border border-gray-100 italic">
                         Displaying <span id="record-count" class="text-royal-blue font-black">0</span> records</div>
                 </div>
 
@@ -178,7 +178,7 @@ require_once __DIR__ . '/../../config/vite.php';
 ob_start();
 ?>
     <table class="w-full text-xs text-left border-collapse">
-        <thead class="text-white bg-royal-blue font-bold uppercase tracking-wider text-[10px]">
+        <thead class="text-white bg-royal-blue font-bold uppercase tracking-wider text-[0.625rem]">
             <tr class="text-center">
                 <th class="px-2 py-2 border border-royal-blue w-[8%]">ID NO.</th>
                 <th class="px-2 py-2 border border-royal-blue w-[25%]" title="Last Name, First Name, Middle Initial">
@@ -191,7 +191,7 @@ ob_start();
                 <th class="px-2 py-2 border border-royal-blue w-[8%]">STATUS</th>
             </tr>
         </thead>
-        <tbody id="print-table-body" class="text-[10px] font-medium text-gray-700">
+        <tbody id="print-table-body" class="text-[0.625rem] font-medium text-gray-700">
             <!-- JS Will Inject Rows Here -->
         </tbody>
     </table>

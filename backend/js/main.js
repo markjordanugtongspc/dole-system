@@ -16,6 +16,7 @@ import { initExportPage } from './modules/export.js';
 import { getBasePath } from './modules/auth.js';
 import { initNotifications } from './modules/notifications.js';
 import { initDarkMode } from './modules/darkmode.js';
+import { initTextSize } from './modules/textsize.js';
 import { initSyncIndicator, startSyncWorker } from './modules/sync-manager.js';
 
 // [HYBRID] Initialize Smart Loader immediately (handles FOUC & pre-loading state)
@@ -41,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initLogoutHandler();
     initMobileSplash();
     initCharts();
+    initTextSize();
     // initLDNPage only wires up on the actual LDN page (needs beneficiary-table-body)
     if (document.getElementById('beneficiary-table-body')) {
         initLDNPage();

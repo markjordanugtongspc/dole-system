@@ -48,13 +48,13 @@ require_once __DIR__ . '/../../../config/vite.php';
         <div class="loader-spinner"></div>
     </div>
 
-    <nav class="fixed top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
-        <div class="px-6 py-4">
+    <nav class="fixed top-0 z-50 w-full bg-white border-b border-default shadow-sm transition-none">
+        <div class="px-3 py-3 lg:px-5">
             <div class="flex items-center justify-between">
                 <div class="flex items-center justify-start">
                     <button data-drawer-target="top-bar-sidebar" data-drawer-toggle="top-bar-sidebar"
                         aria-controls="top-bar-sidebar" type="button"
-                        class="sm:hidden text-gray-700 bg-transparent hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 rounded-lg text-sm p-2 cursor-pointer">
+                        class="sm:hidden text-heading bg-transparent hover:bg-neutral-secondary-medium focus:ring-4 focus:ring-neutral-tertiary rounded-base text-sm p-2 cursor-pointer">
                         <span class="sr-only">Open sidebar</span>
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -62,11 +62,11 @@ require_once __DIR__ . '/../../../config/vite.php';
                     </button>
                     <div class="flex ms-2 md:me-24 items-center select-none">
                         <img src="../../../frontend/images/logo/doleiligan.png"
-                            class="h-10 me-3 bg-white rounded-full p-0.5 object-contain" alt="DOLE Logo" />
+                            class="h-8 me-3 bg-white rounded-full p-0.5 object-contain" alt="DOLE Logo" />
                         <div class="flex flex-col">
-                            <span class="text-lg font-black text-gray-800 tracking-tight font-outfit">Account
+                            <span class="text-sm font-black text-royal-blue uppercase tracking-tight leading-tight">Account
                                 Settings</span>
-                            <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">DOLE LDNPFO
+                            <span class="text-[0.625rem] font-semibold text-gray-500 uppercase tracking-wider">DOLE LDNPFO
                                 System</span>
                         </div>
                     </div>
@@ -74,8 +74,8 @@ require_once __DIR__ . '/../../../config/vite.php';
                 <div class="flex items-center gap-3">
                     <?php include __DIR__ . '/../../components/notification.php'; ?>
                     <button id="logoutBtn"
-                        class="flex items-center justify-center text-xs font-bold text-red-600 hover:bg-red-50 w-9 h-9 sm:w-auto sm:h-auto sm:px-4 sm:py-2 flex-shrink-0 rounded-full sm:rounded-lg transition-all duration-200 cursor-pointer border border-red-200 uppercase hover:scale-105">
-                        <svg class="w-4 h-4 sm:me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="flex items-center justify-center text-xs font-bold text-philippine-red hover:bg-red-50 w-9 h-9 sm:w-auto sm:h-auto sm:px-4 sm:py-2 flex-shrink-0 rounded-full sm:rounded-lg transition-all duration-200 cursor-pointer border border-philippine-red/20 uppercase hover:scale-105">
+                        <svg class="w-4 h-4 sm:me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
                             </path>
@@ -240,7 +240,7 @@ require_once __DIR__ . '/../../../config/vite.php';
                             </div>
 
                             <!-- Save Button -->
-                            <div class="flex items-center justify-between glass-card rounded-2xl p-5">
+                            <div class="flex items-center justify-between">
                                 <div id="save-status" class="hidden flex items-center gap-2 text-emerald-600">
                                     <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
@@ -351,6 +351,25 @@ require_once __DIR__ . '/../../../config/vite.php';
                                             class="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500">
                                         </div>
                                     </label>
+                                </div>
+
+                                <div class="flex items-center justify-between py-4 border-b border-gray-100">
+                                    <div>
+                                        <h4 class="text-sm font-bold text-gray-700">Text Size</h4>
+                                        <p class="text-xs text-gray-500 mt-1">Adjust the interface text size</p>
+                                    </div>
+                                    <div class="relative">
+                                        <select id="pref-text-size" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 text-sm font-bold rounded-xl focus:ring-royal-blue focus:border-royal-blue block w-32 sm:w-40 p-2.5 pr-8 outline-none transition-all cursor-pointer">
+                                            <option value="small">Small</option>
+                                            <option value="normal" selected>Normal</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="large">Large</option>
+                                            <option value="extra-large">Extra Large</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="flex items-center justify-between py-4">

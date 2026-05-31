@@ -123,19 +123,19 @@ function renderMatrixTable(label, matrix, headerColor) {
  * Main export trigger — called from the LDN page header button.
  */
 export async function showLogsExportModal(beneficiaries) {
-    const btnBase = "flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[10px] gap-1.5";
+    const btnBase = "flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[0.625rem] gap-1.5";
     const totalBeneficiaries = beneficiaries.length;
 
     const result = await Swal.fire({
         title: '<span class="text-xl font-black text-heading uppercase tracking-tight">Export DTR/AR',
         html: `
             <div class="font-montserrat text-left">
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 ps-1">
+                <p class="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest mb-4 ps-1">
                     Configure and export logs for <span class="text-royal-blue font-black">${totalBeneficiaries} beneficiaries</span>
                 </p>
 
                 <!-- Log Type -->
-                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2 ps-1">Log Type</label>
+                <label class="text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest block mb-2 ps-1">Log Type</label>
                 <div class="grid grid-cols-3 gap-2 mb-5">
                     <label class="relative block cursor-pointer">
                         <input type="radio" name="exp-type" value="dtr" class="peer sr-only" checked>
@@ -161,7 +161,7 @@ export async function showLogsExportModal(beneficiaries) {
                 </div>
 
                 <!-- Beneficiary Count -->
-                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2 ps-1">Beneficiaries to Include</label>
+                <label class="text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest block mb-2 ps-1">Beneficiaries to Include</label>
                 <div class="grid grid-cols-3 gap-2 mb-3" id="count-options">
                     <label class="relative block cursor-pointer">
                         <input type="radio" name="exp-count" value="10" class="peer sr-only" checked>
@@ -189,7 +189,7 @@ export async function showLogsExportModal(beneficiaries) {
                 </div>
 
                 <!-- Year -->
-                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2 ps-1">Year</label>
+                <label class="text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest block mb-2 ps-1">Year</label>
                 <select id="exp-year" class="block w-full text-xs font-bold text-gray-700 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 mb-4 focus:ring-2 focus:ring-royal-blue/20 focus:border-royal-blue outline-none">
                     <option value="${new Date().getFullYear()}">${new Date().getFullYear()}</option>
                     <option value="${new Date().getFullYear() - 1}">${new Date().getFullYear() - 1}</option>
@@ -250,7 +250,7 @@ export async function generateExcelExport(beneficiaries, type, year) {
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Fetching logs from database...</span>
+            <span class="text-[0.625rem] font-black text-gray-400 uppercase tracking-widest">Fetching logs from database...</span>
         </div>`,
         showConfirmButton: false,
         allowOutsideClick: false,

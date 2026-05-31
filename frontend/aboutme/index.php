@@ -52,7 +52,7 @@ require_once __DIR__ . '/../../config/db.php'; // Loads .env and provides env() 
                                 <span
                                     class="text-sm font-black text-royal-blue uppercase tracking-tight leading-tight">DOLE
                                     LDNPFO</span>
-                                <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">About Me
+                                <span class="text-[0.625rem] font-semibold text-gray-500 uppercase tracking-wider">About Me
                                     - Developer Profile</span>
                             </div>
                         </div>
@@ -136,23 +136,23 @@ require_once __DIR__ . '/../../config/db.php'; // Loads .env and provides env() 
                                 Tech Stack</h3>
                             <div class="grid grid-cols-3 gap-2">
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-red-500 transition-colors cursor-default text-center truncate">Laravel</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[0.625rem] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-red-500 transition-colors cursor-default text-center truncate">Laravel</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-purple-900 transition-colors cursor-default text-center truncate">PHP</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[0.625rem] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-purple-900 transition-colors cursor-default text-center truncate">PHP</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-sky-500 transition-colors cursor-default text-center truncate">Tailwind</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[0.625rem] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-sky-500 transition-colors cursor-default text-center truncate">Tailwind</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-sky-500 transition-colors cursor-default text-center">Flowbite</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[0.625rem] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-sky-500 transition-colors cursor-default text-center">Flowbite</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-orange-500 transition-colors cursor-default text-center truncate">HTML5</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[0.625rem] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-orange-500 transition-colors cursor-default text-center truncate">HTML5</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-yellow-400 transition-colors cursor-default text-center truncate">JS</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[0.625rem] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-yellow-400 transition-colors cursor-default text-center truncate">JS</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-cyan-600 transition-colors cursor-default text-center truncate">MySQL</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[0.625rem] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-cyan-600 transition-colors cursor-default text-center truncate">MySQL</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-fuchsia-500 transition-colors cursor-default text-center truncate">Vite</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[0.625rem] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-fuchsia-500 transition-colors cursor-default text-center truncate">Vite</span>
                                 <span
-                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[10px] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-emerald-500 transition-colors cursor-default text-center truncate">NodeJS</span>
+                                    class="col-span-1 px-1 py-1.5 rounded-lg bg-gray-50 text-gray-600 text-[0.625rem] sm:text-xs font-bold border border-gray-200 hover:bg-royal-blue hover:text-emerald-500 transition-colors cursor-default text-center truncate">NodeJS</span>
                             </div>
                         </div>
 

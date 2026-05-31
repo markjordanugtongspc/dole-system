@@ -207,7 +207,7 @@ function renderNotifications(notifications) {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
                 <p class="text-slate-400 text-sm font-bold uppercase tracking-widest">Inbox Empty</p>
-                <p class="text-slate-300 text-[10px] mt-1 italic">No recent activity detected</p>
+                <p class="text-slate-300 text-[0.625rem] mt-1 italic">No recent activity detected</p>
             </div>
         `;
         return;
@@ -416,7 +416,7 @@ window.clearNotificationView = async function () {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
                 <p class="text-slate-400 text-sm font-bold uppercase tracking-widest">Inbox Cleared</p>
-                <p class="text-slate-300 text-[10px] mt-1 italic">Notifications have been archived</p>
+                <p class="text-slate-300 text-[0.625rem] mt-1 italic">Notifications have been archived</p>
             </div>
         `;
         list.style.opacity = '1';

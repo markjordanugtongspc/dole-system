@@ -76,7 +76,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
                     <span
                         class="block text-xl font-black text-royal-blue dark:text-white uppercase tracking-tight leading-none">GIP</span>
                     <span
-                        class="block text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.18em] mt-0.5">Portal</span>
+                        class="block text-[0.5625rem] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.18em] mt-0.5">Portal</span>
                 </div>
             </a>
 
@@ -109,7 +109,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
                         </svg>
                         <span class="ms-3">Reports</span>
                         <span
-                            class="ms-auto text-[9px] font-black uppercase tracking-wider text-amber-500 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400 px-1.5 py-0.5 rounded-sm border border-amber-200 dark:border-amber-700">Soon</span>
+                            class="ms-auto text-[0.5625rem] font-black uppercase tracking-wider text-amber-500 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400 px-1.5 py-0.5 rounded-sm border border-amber-200 dark:border-amber-700">Soon</span>
                     </a>
                 </li>
 
@@ -156,7 +156,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
             <!-- ─── Settings Separator ────────────────────────────────── -->
             <div id="gip-settings-section" class="border-t border-gray-200 dark:border-gray-700 pt-3 mt-2 transition-all duration-300 ease-in-out">
                 <p id="gip-settings-title"
-                    class="px-3 mb-1.5 text-[9px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-[0.22em] transition-all duration-300 ease-in-out">
+                    class="px-3 mb-1.5 text-[0.5625rem] font-black text-gray-300 dark:text-gray-600 uppercase tracking-[0.22em] transition-all duration-300 ease-in-out">
                     Settings</p>
                 <ul id="gip-settings-list" class="space-y-0.5 transition-all duration-300 ease-in-out overflow-hidden max-h-[200px]">
 
@@ -232,15 +232,15 @@ $current_uri = $_SERVER['REQUEST_URI'];
                                 d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707-.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                         </svg>
                         <span
-                            class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider">Gabay ng Intern</span>
+                            class="text-[0.625rem] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider">Gabay ng Intern</span>
                     </div>
-                    <span class="text-[8px] font-bold text-amber-500 bg-amber-100 dark:bg-amber-950/40 px-1.5 py-0.5 rounded uppercase tracking-widest leading-none">Tip</span>
+                    <span class="text-[0.5rem] font-bold text-amber-500 bg-amber-100 dark:bg-amber-950/40 px-1.5 py-0.5 rounded uppercase tracking-widest leading-none">Tip</span>
                 </div>
-                <p id="gip-tip-content" class="text-[11px] text-gray-600 dark:text-gray-300 mb-3 leading-relaxed transition-all duration-300 min-h-[48px]">
+                <p id="gip-tip-content" class="text-[0.6875rem] text-gray-600 dark:text-gray-300 mb-3 leading-relaxed transition-all duration-300 min-h-[48px]">
                     Palaging i-check ang iyong DTR at attachments bago matapos ang 15-day period upang maiwasan ang delay sa sahod.
                 </p>
                 <button onclick="cycleGipTip()"
-                    class="flex items-center justify-center gap-1.5 w-full py-1.5 px-3 text-[10px] font-black text-white bg-amber-500 hover:bg-amber-600 active:scale-95 rounded-lg shadow-md transition-all duration-150 uppercase tracking-wider cursor-pointer">
+                    class="flex items-center justify-center gap-1.5 w-full py-1.5 px-3 text-[0.625rem] font-black text-white bg-amber-500 hover:bg-amber-600 active:scale-95 rounded-lg shadow-md transition-all duration-150 uppercase tracking-wider cursor-pointer">
                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
@@ -290,7 +290,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
                     </div>
                     <div class="ms-3 text-left flex-1 min-w-0">
                         <p class="text-xs font-bold text-gray-800 dark:text-white sidebar-user-name truncate">...</p>
-                        <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate sidebar-user-email">...</p>
+                        <p class="text-[0.625rem] text-gray-400 dark:text-gray-500 truncate sidebar-user-email">...</p>
                     </div>
                     <svg id="gip-profile-arrow" class="w-4 h-4 text-gray-300 group-hover:text-royal-blue transition-transform shrink-0 duration-200"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -314,15 +314,15 @@ $current_uri = $_SERVER['REQUEST_URI'];
                 <h1
                     class="text-base font-black text-royal-blue dark:text-white uppercase tracking-tight leading-none">
                     GIP Dashboard</h1>
-                <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium mt-0.5">
+                <p class="text-[0.625rem] text-gray-400 dark:text-gray-500 font-medium mt-0.5">
                     Government Internship Program &mdash; DOLE Lanao del Norte PFO, Iligan City
                 </p>
             </div>
             <div class="flex items-center gap-3">
                 <span
-                    class="hidden sm:block text-[11px] font-semibold text-gray-400 dark:text-gray-500"><?php echo date('F d, Y'); ?></span>
+                    class="hidden sm:block text-[0.6875rem] font-semibold text-gray-400 dark:text-gray-500"><?php echo date('F d, Y'); ?></span>
                 <span
-                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-[10px] font-black uppercase tracking-wider border border-green-200 dark:border-green-800">
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-[0.625rem] font-black uppercase tracking-wider border border-green-200 dark:border-green-800">
                     <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                     Live
                 </span>
@@ -341,7 +341,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
                         <div class="min-w-0 flex flex-col">
                             <p class="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Total Attend</p>
                             <p id="gip-stat-total" class="text-3xl font-black text-royal-blue dark:text-blue-400 tabular-nums leading-none">—</p>
-                            <span class="text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-semibold block">present today</span>
+                            <span class="text-[0.625rem] text-gray-400 dark:text-gray-500 mt-1 font-semibold block">present today</span>
                         </div>
                         <!-- Modern Graph / Status Pill (▼ +12%) -->
                         <div class="flex items-center gap-1 text-emerald-500 dark:text-emerald-400 font-bold text-xs shrink-0 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-100 dark:border-emerald-500/20">
@@ -360,7 +360,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
                         <div class="min-w-0 flex flex-col">
                             <p class="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Total Absent</p>
                             <p id="gip-stat-ongoing" class="text-3xl font-black text-red-500 dark:text-red-400 tabular-nums leading-none">—</p>
-                            <span class="text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-semibold block">not in today</span>
+                            <span class="text-[0.625rem] text-gray-400 dark:text-gray-500 mt-1 font-semibold block">not in today</span>
                         </div>
                         <!-- Modern Graph / Status Pill (▼ +3%) -->
                         <div class="flex items-center gap-1 text-emerald-500 dark:text-emerald-400 font-bold text-xs shrink-0 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-100 dark:border-emerald-500/20">
@@ -379,7 +379,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
                         <div class="min-w-0 flex flex-col">
                             <p class="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Total Tickets</p>
                             <p id="gip-stat-completed" class="text-3xl font-black text-indigo-600 dark:text-indigo-400 tabular-nums leading-none">—</p>
-                            <span class="text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-semibold block">filed requests</span>
+                            <span class="text-[0.625rem] text-gray-400 dark:text-gray-500 mt-1 font-semibold block">filed requests</span>
                         </div>
                         <!-- Modern Graph / Status Pill (▼ +8 tasks) -->
                         <div class="flex items-center gap-1 text-emerald-500 dark:text-emerald-400 font-bold text-xs shrink-0 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-100 dark:border-emerald-500/20">
@@ -398,7 +398,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
                         <div class="min-w-0 flex flex-col">
                             <p class="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Contract Progress</p>
                             <p id="gip-contract-percentage" class="text-3xl font-black text-amber-600 dark:text-amber-400 tabular-nums leading-none">0%</p>
-                            <span class="text-[10px] text-gray-400 dark:text-gray-500 mt-1 font-semibold block">
+                            <span class="text-[0.625rem] text-gray-400 dark:text-gray-500 mt-1 font-semibold block">
                                 <span id="gip-contract-remaining-days" class="text-amber-600 dark:text-amber-400 font-bold">calculating...</span> (Apr 16 - Nov 15)
                             </span>
                         </div>
@@ -417,10 +417,10 @@ $current_uri = $_SERVER['REQUEST_URI'];
                         <div>
                             <h3 class="text-sm font-black text-gray-800 dark:text-white uppercase tracking-tight">
                                 Peak Attendance</h3>
-                            <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium mt-0.5">Intern attendance by period</p>
+                            <p class="text-[0.625rem] text-gray-400 dark:text-gray-500 font-medium mt-0.5">Intern attendance by period</p>
                         </div>
                         <span
-                            class="text-[10px] font-bold text-amber-500 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-full border border-amber-200 dark:border-amber-700 uppercase tracking-wider">Coming
+                            class="text-[0.625rem] font-bold text-amber-500 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-full border border-amber-200 dark:border-amber-700 uppercase tracking-wider">Coming
                             Soon</span>
                     </div>
                     <div
@@ -431,7 +431,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
                                 d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
                         </svg>
                         <p class="text-xs text-gray-300 dark:text-gray-600 font-semibold">Chart visualization here</p>
-                        <p class="text-[10px] text-gray-300 dark:text-gray-600 mt-1">GIP-specific analytics coming
+                        <p class="text-[0.625rem] text-gray-300 dark:text-gray-600 mt-1">GIP-specific analytics coming
                             soon</p>
                     </div>
                 </div>
@@ -442,9 +442,9 @@ $current_uri = $_SERVER['REQUEST_URI'];
                     <div class="flex items-center justify-between mb-1">
                         <h3 class="text-sm font-black text-gray-800 dark:text-white uppercase tracking-tight">
                             Attendance</h3>
-                        <span class="text-[9px] font-black uppercase tracking-wider text-amber-500 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400 px-1.5 py-0.5 rounded-sm border border-amber-200 dark:border-amber-700">Coming Soon</span>
+                        <span class="text-[0.5625rem] font-black uppercase tracking-wider text-amber-500 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400 px-1.5 py-0.5 rounded-sm border border-amber-200 dark:border-amber-700">Coming Soon</span>
                     </div>
-                    <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium mb-5">Manual tap-in record for GIP interns</p>
+                    <p class="text-[0.625rem] text-gray-400 dark:text-gray-500 font-medium mb-5">Manual tap-in record for GIP interns</p>
                     <div class="flex-1 flex flex-col items-center justify-center gap-3">
                         <button disabled
                             class="flex flex-col items-center justify-center gap-3 w-full py-8 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30 cursor-not-allowed group transition-all duration-150">
@@ -456,7 +456,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
                             </div>
                             <div class="text-center">
                                 <p class="text-sm font-black text-gray-400 dark:text-gray-500 uppercase tracking-tight">Record Attendance</p>
-                                <p class="text-[10px] text-gray-300 dark:text-gray-600 mt-0.5">Tap button — drawer coming soon</p>
+                                <p class="text-[0.625rem] text-gray-300 dark:text-gray-600 mt-0.5">Tap button — drawer coming soon</p>
                             </div>
                         </button>
                     </div>
@@ -471,9 +471,9 @@ $current_uri = $_SERVER['REQUEST_URI'];
                     <div class="flex items-center justify-between mb-1">
                         <h3 class="text-sm font-black text-gray-800 dark:text-white uppercase tracking-tight">
                             GIP Requirements</h3>
-                        <span class="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">View Only</span>
+                        <span class="text-[0.5625rem] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">View Only</span>
                     </div>
-                    <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium mb-4">Document submission status</p>
+                    <p class="text-[0.625rem] text-gray-400 dark:text-gray-500 font-medium mb-4">Document submission status</p>
                     <ul class="space-y-2.5">
                         <?php
                         $gipDocs = ['GIP FORM', 'BIRTH CERTIFICATE', 'DIPLOMA', 'TOR', 'VALID ID'];
@@ -483,16 +483,16 @@ $current_uri = $_SERVER['REQUEST_URI'];
                                     <!-- unchecked circle -->
                                     <div class="w-4 h-4 shrink-0 rounded-full border-2 border-gray-200 dark:border-gray-600 flex items-center justify-center">
                                     </div>
-                                    <span class="text-[11px] font-semibold text-gray-700 dark:text-gray-300 truncate"><?php echo htmlspecialchars($doc); ?></span>
+                                    <span class="text-[0.6875rem] font-semibold text-gray-700 dark:text-gray-300 truncate"><?php echo htmlspecialchars($doc); ?></span>
                                 </div>
-                                <span class="shrink-0 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-sm
+                                <span class="shrink-0 text-[0.5625rem] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-sm
                                     bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-600">
                                     Not Submitted
                                 </span>
                             </li>
                         <?php endforeach; ?>
                     </ul>
-                    <p class="text-[9px] text-gray-300 dark:text-gray-600 mt-4 text-center">Backend integration coming soon</p>
+                    <p class="text-[0.5625rem] text-gray-300 dark:text-gray-600 mt-4 text-center">Backend integration coming soon</p>
                 </div>
 
                 <div
@@ -500,15 +500,15 @@ $current_uri = $_SERVER['REQUEST_URI'];
                     <div class="flex items-center justify-between mb-1">
                         <h3 class="text-sm font-black text-gray-800 dark:text-white uppercase tracking-tight">
                             AR / DTR Submission</h3>
-                        <span class="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">View Only</span>
+                        <span class="text-[0.5625rem] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">View Only</span>
                     </div>
-                    <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium mb-4">Current 15-day period status</p>
+                    <p class="text-[0.625rem] text-gray-400 dark:text-gray-500 font-medium mb-4">Current 15-day period status</p>
 
                     <div id="gip-period-cards" class="space-y-3">
                         <!-- Rendered by inline JS below -->
                     </div>
 
-                    <p class="text-[9px] text-gray-300 dark:text-gray-600 mt-4 text-center">Auto-detection &amp; submission tracking coming soon</p>
+                    <p class="text-[0.5625rem] text-gray-300 dark:text-gray-600 mt-4 text-center">Auto-detection &amp; submission tracking coming soon</p>
                 </div>
             </div>
 
@@ -516,7 +516,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
 
         <!-- Footer -->
         <footer class="border-t border-gray-100 dark:border-gray-800 py-4 text-center">
-            <p class="text-[9px] text-gray-300 dark:text-gray-600 font-bold uppercase tracking-widest">
+            <p class="text-[0.5625rem] text-gray-300 dark:text-gray-600 font-bold uppercase tracking-widest">
                 &copy; <span class="auto-year"></span> GIP Portal &mdash; System V<?php echo htmlspecialchars(env('APP_VERSION', '4.2')); ?>
                 &nbsp;|&nbsp;
                 <span class="text-royal-blue/40 dark:text-blue-800 font-black">Mark Jordan Ugtong</span>
@@ -722,20 +722,20 @@ $current_uri = $_SERVER['REQUEST_URI'];
                         <div class="min-w-0">
                             <div class="flex items-center gap-1.5 mb-0.5">
                                 ${isCurrent ? '<span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shrink-0"></span>' : ''}
-                                <span class="text-[9px] font-black uppercase tracking-widest ${isCurrent ? 'text-royal-blue dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}">${isCurrent ? 'Current Period' : 'Previous Period'}</span>
+                                <span class="text-[0.5625rem] font-black uppercase tracking-widest ${isCurrent ? 'text-royal-blue dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}">${isCurrent ? 'Current Period' : 'Previous Period'}</span>
                             </div>
-                            <p class="text-[11px] font-black text-gray-700 dark:text-gray-300">${label}</p>
-                            <p class="text-[9px] text-gray-400 dark:text-gray-500 mt-0.5">DTR &amp; AR due this period</p>
+                            <p class="text-[0.6875rem] font-black text-gray-700 dark:text-gray-300">${label}</p>
+                            <p class="text-[0.5625rem] text-gray-400 dark:text-gray-500 mt-0.5">DTR &amp; AR due this period</p>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <span class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md border ${
+                            <span class="text-[0.5625rem] font-black uppercase tracking-wider px-2 py-1 rounded-md border ${
                                 isPaid
                                     ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'
                                     : 'bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400 border-red-200 dark:border-red-500/20'
                             }">
                                 ${isPaid ? 'PAID' : 'NOT PAID'}
                             </span>
-                            <span class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md border ${
+                            <span class="text-[0.5625rem] font-black uppercase tracking-wider px-2 py-1 rounded-md border ${
                                 isPaid
                                     ? 'bg-blue-50 dark:bg-royal-blue/10 text-royal-blue dark:text-blue-400 border-blue-200 dark:border-blue-800'
                                     : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600'

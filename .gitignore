@@ -49,3 +49,6 @@ composer.lock
 # XAMPP Specific
 xampp/
 htdocs/phpmyadmin/
+
+# Python Scripts
+*.py

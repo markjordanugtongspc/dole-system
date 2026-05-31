@@ -557,7 +557,7 @@ function initOfficeFilter() {
 
             dropdown.innerHTML = `
                 <div class="px-4 py-3 bg-blue-50/50 rounded-t-xl border-b border-gray-100 flex items-center justify-between">
-                    <span class="block text-[10px] font-black text-royal-blue uppercase tracking-wider">OFFICE CODE</span>
+                    <span class="block text-[0.625rem] font-black text-royal-blue uppercase tracking-wider">OFFICE CODE</span>
                 </div>
                 <div class="p-2">
                     <div class="relative mb-2">
@@ -565,7 +565,7 @@ function initOfficeFilter() {
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </div>
                         <input type="text" id="office-filter-search" placeholder="Search offices..." dir="ltr"
-                            class="w-full pl-8 pr-3 py-1.5 text-[10px] font-bold bg-gray-50 border border-gray-100 focus:ring-blue-500 focus:border-blue-500 rounded-lg outline-none"
+                            class="w-full pl-8 pr-3 py-1.5 text-[0.625rem] font-bold bg-gray-50 border border-gray-100 focus:ring-blue-500 focus:border-blue-500 rounded-lg outline-none"
                             value="${filter}">
                     </div>
                     <ul class="max-h-60 overflow-y-auto py-1 text-xs font-bold text-gray-700 scrollbar-hide">
@@ -608,7 +608,7 @@ function initOfficeFilter() {
                          <div class="p-1 rounded-md bg-green-500/10 text-green-600">
                             <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         </div>
-                        <span class="block text-[10px] font-black text-royal-blue uppercase tracking-wider">OFFICE LOCATION</span>
+                        <span class="block text-[0.625rem] font-black text-royal-blue uppercase tracking-wider">OFFICE LOCATION</span>
                     </div>
                     <button id="back-to-offices-filter" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all cursor-pointer shadow-sm active:scale-90 flex items-center justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"/></svg>
@@ -620,7 +620,7 @@ function initOfficeFilter() {
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </div>
                         <input type="text" id="loc-filter-search" placeholder="Search in ${office.name}..." 
-                            class="w-full pl-8 pr-3 py-1.5 text-[10px] font-bold bg-gray-50 border border-gray-100 focus:ring-blue-500 focus:border-blue-500 rounded-lg outline-none">
+                            class="w-full pl-8 pr-3 py-1.5 text-[0.625rem] font-bold bg-gray-50 border border-gray-100 focus:ring-blue-500 focus:border-blue-500 rounded-lg outline-none">
                     </div>
                     <ul id="loc-filter-list" class="max-h-60 overflow-y-auto py-1 text-xs font-bold text-gray-700 scrollbar-hide">
                         <li class="px-4 py-4 text-center text-gray-400 animate-pulse">Fetching...</li>
@@ -793,7 +793,7 @@ function initOfficeQuickFilter() {
         }
         list.innerHTML = offices.map(o => {
             const cls = getOfficeClass(o.office);
-            return `<button class="office-qf-opt shrink-0 px-3 py-1 rounded-full text-[11px] font-bold border transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95 ${cls}"
+            return `<button class="office-qf-opt shrink-0 px-3 py-1 rounded-full text-[0.6875rem] font-bold border transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95 ${cls}"
                 data-id="${o.id}" data-name="${o.office}" data-has-locations="${parseInt(o.location_count || 0) > 0}">
                 ${o.office}
             </button>`;
@@ -823,7 +823,7 @@ function initOfficeQuickFilter() {
         }
         const officeClass = getOfficeClass(office.name);
         list.innerHTML = locations.map(l => `
-            <button class="loc-qf-opt shrink-0 px-3 py-1 rounded-full text-[11px] font-bold border transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95 ${officeClass}"
+            <button class="loc-qf-opt shrink-0 px-3 py-1 rounded-full text-[0.6875rem] font-bold border transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95 ${officeClass}"
                 data-location="${l.location}" data-office="${office.name}">
                 📍 ${l.location}
             </button>
@@ -1079,7 +1079,7 @@ export function renderTable(dataToRender = null) {
             </td>
             <td class="px-4 py-3 text-center">
                 <div class="flex justify-center">
-                    <span class="${getOfficeClass(data.office)} text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded whitespace-nowrap">
+                    <span class="${getOfficeClass(data.office)} text-[0.625rem] sm:text-xs font-bold px-2.5 py-0.5 rounded whitespace-nowrap">
                         ${data.office || 'N/A'}
                     </span>
                 </div>
@@ -1160,7 +1160,7 @@ function renderPagination(totalItems, totalPages, activePage = currentPage) {
 
             <!-- Go To -->
             <div class="flex items-center gap-1 ml-1 shrink-0">
-                <span class="text-[10px] sm:text-xs font-bold text-gray-400 hidden sm:inline">Go to</span>
+                <span class="text-[0.625rem] sm:text-xs font-bold text-gray-400 hidden sm:inline">Go to</span>
                 <input type="number" id="goto-page-input" min="1" max="${totalPages}" placeholder="—"
                     class="w-14 h-8 text-center text-xs font-black rounded-lg border-2 border-gray-300 bg-gray-50 text-gray-800 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all shadow-sm"
                     aria-label="Go to page"
@@ -1392,7 +1392,7 @@ export async function archiveRecord(id) {
         html: `
             <div class="py-4">
                 <p class="text-sm font-medium text-gray-500">Are you sure you want to archive this record?</p>
-                <p class="text-[10px] font-black text-philippine-red mt-1 uppercase tracking-widest">ID: ${id}</p>
+                <p class="text-[0.625rem] font-black text-philippine-red mt-1 uppercase tracking-widest">ID: ${id}</p>
             </div>
         `,
         showCancelButton: true,

@@ -124,16 +124,16 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
     <div class="grid grid-cols-2 gap-4 mt-6 w-full">
         <div class="flex flex-col gap-1 text-left">
-            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1">ID NO.</span>
-            <span class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 text-[10px] sm:text-[11px] font-black px-2.5 py-1.5 rounded border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm border-l-4 border-l-gray-400 truncate">${data.id}</span>
+            <span class="text-[0.625rem] text-gray-500 font-bold uppercase tracking-widest pl-1">ID NO.</span>
+            <span class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 text-[0.625rem] sm:text-[0.6875rem] font-black px-2.5 py-1.5 rounded border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm border-l-4 border-l-gray-400 truncate">${data.id}</span>
         </div>
         <div class="flex flex-col gap-1 text-left overflow-hidden">
-            <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-1 flex items-center font-montserrat">
+            <span class="text-[0.625rem] text-gray-500 font-bold uppercase tracking-widest pl-1 flex items-center font-montserrat">
                 REMARKS / OFFICE
             </span>
             <div class="flex items-center flex-wrap gap-2.5 min-h-[30px] font-montserrat">
-                <span class="${getStatusClass(data.remarks)} text-[10px] sm:text-[11px] font-black px-4 sm:px-6 py-2 rounded-lg border uppercase tracking-widest shadow-sm border-l-4 ${data.remarks === 'ONGOING' ? 'border-l-green-600' : 'border-l-red-600'} min-w-[110px] sm:min-w-[140px] text-center inline-block">${data.remarks}</span>
-                <span class="${getOfficeClass(data.office)} inline-block text-[9px] sm:text-[10px] font-black px-4 sm:px-6 py-2 rounded-full border shadow-sm truncate max-w-[180px] sm:max-w-[280px] lg:max-w-none min-w-[110px] sm:min-w-[140px] text-center" title="${data.office}">${data.office}</span>
+                <span class="${getStatusClass(data.remarks)} text-[0.625rem] sm:text-[0.6875rem] font-black px-4 sm:px-6 py-2 rounded-lg border uppercase tracking-widest shadow-sm border-l-4 ${data.remarks === 'ONGOING' ? 'border-l-green-600' : 'border-l-red-600'} min-w-[110px] sm:min-w-[140px] text-center inline-block">${data.remarks}</span>
+                <span class="${getOfficeClass(data.office)} inline-block text-[0.5625rem] sm:text-[0.625rem] font-black px-4 sm:px-6 py-2 rounded-full border shadow-sm truncate max-w-[180px] sm:max-w-[280px] lg:max-w-none min-w-[110px] sm:min-w-[140px] text-center" title="${data.office}">${data.office}</span>
             </div>
         </div>
     </div>
@@ -143,11 +143,11 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 <div class="flex justify-between items-center mb-4 pb-2 border-b border-default">
     <h4 id="drawer-section-title" class="text-sm font-bold text-heading uppercase tracking-widest">Personal Profile</h4>
     <div class="flex gap-2">
-        <button id="drawer-prev-btn" class="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-neutral-secondary-medium text-heading text-[9px] font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm border border-default-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-tertiary cursor-pointer">
+        <button id="drawer-prev-btn" class="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-neutral-secondary-medium text-heading text-[0.5625rem] font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm border border-default-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-tertiary cursor-pointer">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
             PREV
         </button>
-        <button id="drawer-next-btn" class="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-brand text-white text-[9px] font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm shadow-brand-medium/50 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-strong cursor-pointer text-center">
+        <button id="drawer-next-btn" class="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-brand text-white text-[0.5625rem] font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm shadow-brand-medium/50 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-strong cursor-pointer text-center">
             NEXT
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
         </button>
@@ -182,7 +182,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 <div class="w-6 h-6 rounded bg-golden-yellow/10 flex items-center justify-center text-golden-yellow border border-golden-yellow/20 shrink-0">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                 </div>
-                <span class="text-[11px] lg:text-sm font-black text-heading whitespace-nowrap tracking-tight truncate" title="${data.education}">${data.education || 'N/A'}</span>
+                <span class="text-[0.6875rem] lg:text-sm font-black text-heading whitespace-nowrap tracking-tight truncate" title="${data.education}">${data.education || 'N/A'}</span>
             </div>
         </div>
         <div class="flex justify-between items-start group pt-3 mt-1 border-t border-gray-50 dark:border-slate-800/60">
@@ -202,37 +202,37 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
     <div id="drawer-page-0" class="flex-1 flex flex-col gap-4">
         
         <div class="bg-gray-50/50 dark:bg-slate-800/50 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm w-full">
-            <p class="text-[9px] uppercase tracking-widest text-gray-400 dark:text-white font-black mb-3">Work Registry</p>
+            <p class="text-[0.5625rem] uppercase tracking-widest text-gray-400 dark:text-white font-black mb-3">Work Registry</p>
             <div class="flex items-center gap-3">
                 <div class="p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800 shrink-0">
                     <svg class="w-5 h-5 text-royal-blue dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <label class="text-[9px] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest truncate">Series No.</label>
+                    <label class="text-[0.5625rem] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest truncate">Series No.</label>
                     <span class="text-sm sm:text-base font-black text-royal-blue dark:text-blue-400 font-mono whitespace-nowrap leading-none tracking-tight">${data.seriesNo || '2025-00-000'}</span>
                 </div>
             </div>
         </div>
 
          <div class="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-4 rounded-xl shadow-sm">
-            <label class="text-[9px] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest">Designation / Role</label>
+            <label class="text-[0.5625rem] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest">Designation / Role</label>
             <p class="text-sm font-black text-heading break-words whitespace-normal leading-snug">${data.designation}</p>
         </div>
         
          <div class="bg-gray-50/30 dark:bg-slate-800/30 p-4 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
-            <label class="text-[9px] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest">Replacement History</label>
+            <label class="text-[0.5625rem] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest">Replacement History</label>
              <p class="text-sm text-emerald-600 dark:text-emerald-400 font-bold italic underline decoration-emerald-500/30 underline-offset-4 cursor-default">${data.replacement || 'None found.'}</p>
         </div>
 
         ${data.remarks === 'ABSORBED' ? `
         <div class="bg-[#e8f5e9]/50 dark:bg-green-900/10 p-4 rounded-xl border border-[#c8e6c9] dark:border-green-900/30 mt-2">
-            <p class="text-[9px] uppercase font-black text-[#2e7d32] dark:text-green-500 border-b border-green-200 dark:border-slate-800 pb-1 flex items-center gap-2 mb-3">
+            <p class="text-[0.5625rem] uppercase font-black text-[#2e7d32] dark:text-green-500 border-b border-green-200 dark:border-slate-800 pb-1 flex items-center gap-2 mb-3">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> 
                 Absorption Details
             </p>
             <div class="flex flex-col gap-2">
                 <div class="flex justify-between items-start group">
-                    <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4">Date</span>
+                    <span class="text-gray-500 font-medium text-[0.625rem] uppercase font-bold tracking-widest mr-4">Date</span>
                     <span class="font-black text-[#1b5e20] dark:text-green-400 text-xs text-right whitespace-nowrap">${(() => {
                 if (!data.absorbDate || String(data.absorbDate).includes('0000-00-00')) return 'N/A';
                 const d = new Date(data.absorbDate);
@@ -241,15 +241,15 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             })()}</span>
                 </div>
                 <div class="flex justify-between items-start group">
-                    <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4 mt-0.5">Where</span>
+                    <span class="text-gray-500 font-medium text-[0.625rem] uppercase font-bold tracking-widest mr-4 mt-0.5">Where</span>
                     <span class="font-black text-heading text-xs text-right break-words max-w-[60%] leading-tight">${data.absorb_where || 'N/A'}</span>
                 </div>
                 <div class="flex justify-between items-start group">
-                    <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4 mt-0.5">Position</span>
+                    <span class="text-gray-500 font-medium text-[0.625rem] uppercase font-bold tracking-widest mr-4 mt-0.5">Position</span>
                     <span class="font-black text-heading text-xs text-right break-words max-w-[60%] leading-tight">${data.absorb_position || 'N/A'}</span>
                 </div>
                 <div class="flex justify-between items-start group">
-                    <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4 mt-0.5">Agency</span>
+                    <span class="text-gray-500 font-medium text-[0.625rem] uppercase font-bold tracking-widest mr-4 mt-0.5">Agency</span>
                     <span class="font-black text-heading text-xs text-right break-words max-w-[60%] leading-tight">${data.absorb_agency || 'N/A'}</span>
                 </div>
             </div>
@@ -258,13 +258,13 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
         ${data.remarks === 'RESIGNED' ? `
         <div class="bg-[#ffebee]/50 dark:bg-red-900/10 p-4 rounded-xl border border-[#ffcdd2] dark:border-red-900/30 mt-2">
-            <p class="text-[9px] uppercase font-black text-[#ce1126] dark:text-red-500 border-b border-red-200 dark:border-slate-800 pb-1 flex items-center gap-2 mb-3">
+            <p class="text-[0.5625rem] uppercase font-black text-[#ce1126] dark:text-red-500 border-b border-red-200 dark:border-slate-800 pb-1 flex items-center gap-2 mb-3">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg> 
                 Resignation Details
             </p>
             <div class="flex flex-col gap-2">
                 <div class="flex justify-between items-start group">
-                    <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4">Date</span>
+                    <span class="text-gray-500 font-medium text-[0.625rem] uppercase font-bold tracking-widest mr-4">Date</span>
                     <span class="font-black text-[#b71c1c] dark:text-red-400 text-xs text-right whitespace-nowrap">${(() => {
                 if (!data.resignedDate || String(data.resignedDate).includes('0000-00-00')) return 'N/A';
                 const d = new Date(data.resignedDate);
@@ -273,7 +273,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             })()}</span>
                 </div>
                 <div class="flex justify-between items-start group">
-                    <span class="text-gray-500 font-medium text-[10px] uppercase font-bold tracking-widest mr-4 mt-0.5">Reason</span>
+                    <span class="text-gray-500 font-medium text-[0.625rem] uppercase font-bold tracking-widest mr-4 mt-0.5">Reason</span>
                     <span class="font-black text-heading text-xs text-right break-words max-w-[60%] leading-tight">${data.resigned_reason || 'N/A'}</span>
                 </div>
             </div>
@@ -285,13 +285,13 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
          <div class="flex justify-between items-center border-b-2 border-brand pb-2">
             <h4 class="text-sm font-bold text-heading uppercase tracking-widest">Submission Logs</h4>
             <div class="flex gap-2">
-                <button type="button" id="add-dtr-log-btn" class="bg-blue-50 dark:bg-blue-900/40 text-royal-blue dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-600 dark:hover:text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm whitespace-nowrap cursor-pointer">
+                <button type="button" id="add-dtr-log-btn" class="bg-blue-50 dark:bg-blue-900/40 text-royal-blue dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-600 dark:hover:text-white text-[0.625rem] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm whitespace-nowrap cursor-pointer">
                     + DTR
                 </button>
-                <button type="button" id="add-ar-log-btn" class="bg-orange-50 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300 border border-orange-200 dark:border-orange-800 hover:bg-orange-500 hover:text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap">
+                <button type="button" id="add-ar-log-btn" class="bg-orange-50 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300 border border-orange-200 dark:border-orange-800 hover:bg-orange-500 hover:text-white text-[0.625rem] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap">
                     + AR
                 </button>
-                <button type="button" id="export-log-btn" class="bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-500 hover:text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap flex items-center gap-1">
+                <button type="button" id="export-log-btn" class="bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-500 hover:text-white text-[0.625rem] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap flex items-center gap-1">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     EXPORT
                 </button>
@@ -320,13 +320,13 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 return `
                         <div class="flex justify-between items-center p-3 rounded-xl border border-blue-100 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors edit-log-btn" data-type="dtr" data-id="${l.id}" data-val="${l.day || rawStr}" data-status="${s}">
                             <span class="text-xs font-black text-royal-blue dark:text-blue-400 capitalize whitespace-nowrap pointer-events-none">${l.day || displayDate}</span>
-                            <span class="text-[11px] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
+                            <span class="text-[0.6875rem] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
                             <button class="absolute top-0 right-0 h-full w-10 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform cursor-pointer delete-log-btn" data-type="dtr" data-id="${l.id}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
                     `;
-            }).join('') : `<p class="text-[11px] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No DTR logs submitted.</p>`}
+            }).join('') : `<p class="text-[0.6875rem] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No DTR logs submitted.</p>`}
                 </div>
             </div>
 
@@ -351,13 +351,13 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 return `
                         <div class="flex justify-between items-center p-3 rounded-xl border border-orange-100 dark:border-orange-900/50 bg-orange-50/50 dark:bg-orange-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors edit-log-btn" data-type="ar" data-id="${l.id}" data-val="${rawStr}" data-status="${s}">
                             <span class="text-xs font-black text-orange-600 dark:text-orange-400 capitalize whitespace-nowrap pointer-events-none">${rawStr || displayDate}</span>
-                            <span class="text-[11px] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
+                            <span class="text-[0.6875rem] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
                             <button class="absolute top-0 right-0 h-full w-10 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform cursor-pointer delete-log-btn" data-type="ar" data-id="${l.id}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
                     `;
-            }).join('') : `<p class="text-[11px] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No AR logs submitted.</p>`}
+            }).join('') : `<p class="text-[0.6875rem] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No AR logs submitted.</p>`}
                 </div>
             </div>
          </div>
@@ -401,7 +401,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                         </div>
                         <span class="text-xs sm:text-sm font-black ${isCompleted ? 'text-heading' : 'text-gray-500 dark:text-gray-400'} uppercase tracking-tight flex-1">${doc.name}</span>
                     </div>
-                    <button type="button" class="ml-3 ${badgeClass} text-[10px] font-black px-3 py-1.5 rounded-full border uppercase tracking-widest transition-colors flex-shrink-0 drawer-doc-btn" data-id="${doc.id}" data-name="${doc.name}" data-status="${status} cursosr-pointer">
+                    <button type="button" class="ml-3 ${badgeClass} text-[0.625rem] font-black px-3 py-1.5 rounded-full border uppercase tracking-widest transition-colors flex-shrink-0 drawer-doc-btn" data-id="${doc.id}" data-name="${doc.name}" data-status="${status} cursosr-pointer">
                         ${status}
                     </button>
                 </div>
@@ -547,13 +547,13 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 const docName = btn.dataset.name;
                 const currentStatus = btn.dataset.status;
 
-                const btnBase = "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[9px] gap-2 transition-all duration-300 ";
+                const btnBase = "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[0.5625rem] gap-2 transition-all duration-300 ";
 
                 const result = await Swal.fire({
                     title: '<span class="text-xl font-black text-heading uppercase tracking-tight">Update Document</span>',
                     html: `
                         <div class="font-montserrat text-left">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-4 ps-1">Set status for <span class="text-brand font-black">${docName}</span></label>
+                            <label class="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest block mb-4 ps-1">Set status for <span class="text-brand font-black">${docName}</span></label>
                             
                             <div class="grid grid-cols-3 gap-3">
                                 <label class="relative block cursor-pointer">
@@ -776,7 +776,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             const labelStr = dbType === 'dtr' ? 'Record Date' : 'Period';
             const isD = isDarkMode();
 
-            const btnBase = "flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[10px] sm:text-xs gap-2 ";
+            const btnBase = "flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[0.625rem] sm:text-xs gap-2 ";
             const checkIcon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
             const xIcon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
 
@@ -785,11 +785,11 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 html: `
                     <div class="flex flex-col gap-5 text-left font-montserrat mt-2">
                         <div>
-                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">${labelStr}</label>
+                            <label class="text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest block mb-1">${labelStr}</label>
                             <input id="swal-log-val" value="${currentVal}" class="bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-slate-600 text-heading text-sm rounded-xl focus:ring-brand focus:border-brand block w-full p-2.5 font-bold uppercase transition-all" placeholder="Enter value">
                         </div>
                         <div>
-                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Validation Status</label>
+                            <label class="text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest block mb-2">Validation Status</label>
                             <div class="grid grid-cols-2 gap-3">
                                 <label class="relative block cursor-pointer">
                                     <input type="radio" name="swal-log-status" value="VERIFIED" class="peer sr-only" ${currentStatus === 'VERIFIED' ? 'checked' : ''}>
@@ -871,12 +871,12 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         const exportLogBtn = drawerContainer.querySelector('#export-log-btn');
         if (exportLogBtn) {
             exportLogBtn.addEventListener('click', async () => {
-                const btnBase = "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[11px] gap-2 ";
+                const btnBase = "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[0.6875rem] gap-2 ";
                 const result = await Swal.fire({
                     title: '<span class="text-xl font-black text-heading uppercase tracking-tight">Export DTR/AR',
                     html: `
                         <div class="font-montserrat text-left">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-4 ps-1">Select the type of log to export for <span class="text-brand font-black">ALL DATA</span></label>
+                            <label class="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest block mb-4 ps-1">Select the type of log to export for <span class="text-brand font-black">ALL DATA</span></label>
                             
                             <div class="grid grid-cols-3 gap-2">
                                 <label class="relative block cursor-pointer">

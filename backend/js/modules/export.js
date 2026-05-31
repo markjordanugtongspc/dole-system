@@ -67,7 +67,7 @@ async function loadBeneficiaryData() {
         console.error('Error loading data for export', error);
         const tbody = document.getElementById('web-table-body');
         if (tbody) {
-            tbody.innerHTML = `<tr><td colspan="${activeColumns.length}" class="px-6 py-12 text-center text-red-500 font-bold uppercase text-[10px] tracking-widest">Failed to load data</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="${activeColumns.length}" class="px-6 py-12 text-center text-red-500 font-bold uppercase text-[0.625rem] tracking-widest">Failed to load data</td></tr>`;
         }
         Swal.fire({
             toast: true,
@@ -329,7 +329,7 @@ const COL_MAP = {
 
 function generateTableHeader(columns, classes = "px-4 py-2.5") {
     return `
-        <tr class="text-[11px] text-white uppercase bg-royal-blue font-bold tracking-widest text-center">
+        <tr class="text-[0.6875rem] text-white uppercase bg-royal-blue font-bold tracking-widest text-center">
             ${columns.map(c => {
         let tooltip = '';
         if (c === 'name') tooltip = ' title="Last Name, First Name, Middle Initial"';
@@ -356,19 +356,19 @@ function generateTableRow(row, columns, isPrint = false) {
                 const colors = { 'ABSORBED': 'text-golden-yellow', 'RESIGNED': 'text-slate-500', 'EXPIRED': 'text-philippine-red', 'ONGOING': 'text-green-600' };
                 classes += ` text-center font-bold uppercase ${colors[val] || 'text-gray-500'}`;
             }
-            if (c === 'startdate' || c === 'enddate') classes += " text-center font-mono text-[9px]";
+            if (c === 'startdate' || c === 'enddate') classes += " text-center font-mono text-[0.5625rem]";
             return `<td class="${classes}">${val}</td>`;
         } else {
             if (c === 'id') return `<th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap font-mono text-xs text-center">${val}</th>`;
             if (c === 'name') return `<td class="px-4 py-3 font-bold text-royal-blue group-hover/row:translate-x-1 transition-transform uppercase">${val}</td>`;
-            if (c === 'age') return `<td class="px-4 py-3 text-center text-[11px] font-black text-emerald-700 uppercase tracking-tight">${val}</td>`;
-            if (c === 'office') return `<td class="px-4 py-3 text-center"><span class="bg-white text-blue-700 px-2 py-0.5 rounded text-[10px] border border-blue-100 font-bold shadow-sm">${val}</span></td>`;
+            if (c === 'age') return `<td class="px-4 py-3 text-center text-[0.6875rem] font-black text-emerald-700 uppercase tracking-tight">${val}</td>`;
+            if (c === 'office') return `<td class="px-4 py-3 text-center"><span class="bg-white text-blue-700 px-2 py-0.5 rounded text-[0.625rem] border border-blue-100 font-bold shadow-sm">${val}</span></td>`;
             if (c === 'status') {
                 const colors = { 'ABSORBED': 'bg-golden-yellow/10 text-golden-yellow border-golden-yellow/20', 'RESIGNED': 'bg-slate-100 text-slate-500 border-slate-200', 'EXPIRED': 'bg-red-50 text-philippine-red border-red-100', 'ONGOING': 'bg-green-50 text-green-600 border-green-100' };
-                return `<td class="px-4 py-3 text-center"><span class="${colors[val] || 'bg-gray-100 text-gray-700 border-gray-200'} px-2 py-0.5 rounded text-xs border uppercase font-bold text-[10px] shadow-sm">${val}</span></td>`;
+                return `<td class="px-4 py-3 text-center"><span class="${colors[val] || 'bg-gray-100 text-gray-700 border-gray-200'} px-2 py-0.5 rounded text-xs border uppercase font-bold text-[0.625rem] shadow-sm">${val}</span></td>`;
             }
-            if (c === 'startdate') return `<td class="px-4 py-3 text-center text-[11px] font-black text-royal-blue uppercase tracking-tight">${val}</td>`;
-            if (c === 'enddate') return `<td class="px-4 py-3 text-center text-[11px] font-black text-philippine-red uppercase tracking-tight">${val}</td>`;
+            if (c === 'startdate') return `<td class="px-4 py-3 text-center text-[0.6875rem] font-black text-royal-blue uppercase tracking-tight">${val}</td>`;
+            if (c === 'enddate') return `<td class="px-4 py-3 text-center text-[0.6875rem] font-black text-philippine-red uppercase tracking-tight">${val}</td>`;
             return `<td class="px-4 py-3 text-xs font-semibold text-gray-500 text-center">${val}</td>`;
         }
     }).join('');
@@ -408,7 +408,7 @@ function renderWebTable(data) {
             html += `
                 <tr class="${currentArchived ? 'bg-red-50/30' : 'bg-green-50/30'}">
                     <td colspan="${activeColumns.length}" class="px-6 py-3 border-y border-gray-100 text-center">
-                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${currentArchived ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-green-100 text-green-600 border border-green-200'}">
+                        <span class="px-3 py-1 rounded-full text-[0.625rem] font-black uppercase tracking-widest ${currentArchived ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-green-100 text-green-600 border border-green-200'}">
                             ${currentArchived ? 'Archived Records' : 'Active Beneficiaries'}
                         </span>
                     </td>
@@ -424,7 +424,7 @@ function renderWebTable(data) {
                     <td colspan="${activeColumns.length}" class="px-8 py-2 border-b border-gray-100">
                         <div class="flex items-center gap-2 opacity-60">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                            <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest">${currentOffice || 'UNASSIGNED OFFICE'}</span>
+                            <span class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-widest">${currentOffice || 'UNASSIGNED OFFICE'}</span>
                         </div>
                     </td>
                 </tr>
@@ -450,7 +450,7 @@ function renderPrintTable(data) {
     const tbody = document.getElementById('print-table-body');
 
     thead.innerHTML = `
-        <tr class="text-white bg-royal-blue font-bold uppercase tracking-wider text-[10px] text-center">
+        <tr class="text-white bg-royal-blue font-bold uppercase tracking-wider text-[0.625rem] text-center">
             ${activeColumns.map(c => {
         let tooltip = '';
         if (c === 'name') tooltip = ' title="Last Name, First Name, Middle Initial"';
@@ -483,7 +483,7 @@ function renderPrintTable(data) {
             html += `
                 <tr class="print:bg-gray-200 bg-gray-200">
                     <td colspan="${activeColumns.length}" class="px-3 py-1 border border-gray-400 text-center">
-                        <span class="text-[10px] font-black uppercase tracking-[0.2em]">${currentArchived ? 'SECTION: ARCHIVED RECORDS' : 'SECTION: ACTIVE BENEFICIARIES'}</span>
+                        <span class="text-[0.625rem] font-black uppercase tracking-[0.2em]">${currentArchived ? 'SECTION: ARCHIVED RECORDS' : 'SECTION: ACTIVE BENEFICIARIES'}</span>
                     </td>
                 </tr>
             `;
@@ -494,7 +494,7 @@ function renderPrintTable(data) {
             html += `
                 <tr class="bg-gray-50 print:bg-gray-50">
                     <td colspan="${activeColumns.length}" class="px-3 py-1.5 border border-gray-200 text-center">
-                        <span class="text-[9px] font-black text-gray-800 uppercase tracking-widest text-center">Office: ${currentOffice || 'N/A'}</span>
+                        <span class="text-[0.5625rem] font-black text-gray-800 uppercase tracking-widest text-center">Office: ${currentOffice || 'N/A'}</span>
                     </td>
                 </tr>
             `;

@@ -299,7 +299,7 @@ export async function initCharts(forceRefresh = false) {
 
     const badge = document.getElementById('added-metric-badge');
     if (badge) {
-        badge.className = `flex items-center px-3 py-1 text-[10px] sm:text-xs font-black text-white rounded-full shadow-lg transition-all duration-500 border border-white/20 translate-y-1 ${badgeClass}`;
+        badge.className = `flex items-center px-3 py-1 text-[0.625rem] sm:text-xs font-black text-white rounded-full shadow-lg transition-all duration-500 border border-white/20 translate-y-1 ${badgeClass}`;
     }
 
     const icon = document.getElementById('added-metric-icon');
@@ -348,13 +348,13 @@ export async function initCharts(forceRefresh = false) {
         }],
         xaxis: { 
             categories: timelineLabels,
-            labels: { show: true, style: { colors: theme.muted, fontSize: '10px', fontWeight: 600 } },
+            labels: { show: true, style: { colors: theme.muted, fontSize: '0.625rem', fontWeight: 600 } },
             axisBorder: { show: false },
             axisTicks: { show: false }
         },
         yaxis: { 
             show: true,
-            labels: { show: true, style: { colors: theme.muted, fontSize: '10px', fontWeight: 600 } }
+            labels: { show: true, style: { colors: theme.muted, fontSize: '0.625rem', fontWeight: 600 } }
         },
         grid: { 
             show: true,
@@ -403,9 +403,9 @@ export async function initCharts(forceRefresh = false) {
                     size: '75%',
                     labels: {
                         show: true,
-                        name: { show: true, fontSize: '12px', fontWeight: 600, color: theme.muted },
-                        value: { show: true, fontSize: '24px', fontWeight: 900, color: theme.text, formatter: (val) => val },
-                        total: { show: true, label: 'TOTAL', fontSize: '10px', fontWeight: 800, color: theme.muted, formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0) }
+                        name: { show: true, fontSize: '0.75rem', fontWeight: 600, color: theme.muted },
+                        value: { show: true, fontSize: '1.5rem', fontWeight: 900, color: theme.text, formatter: (val) => val },
+                        total: { show: true, label: 'TOTAL', fontSize: '0.625rem', fontWeight: 800, color: theme.muted, formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0) }
                     }
                 }
             }
@@ -418,7 +418,7 @@ export async function initCharts(forceRefresh = false) {
             breakpoint: 640,
             options: {
                 chart: { height: 260 },
-                plotOptions: { pie: { donut: { size: '70%', labels: { value: { fontSize: '18px' } } } } }
+                plotOptions: { pie: { donut: { size: '70%', labels: { value: { fontSize: '1.125rem' } } } } }
             }
         }]
     };
@@ -441,8 +441,8 @@ export async function initCharts(forceRefresh = false) {
             radialBar: {
                 hollow: { size: '45%' },
                 dataLabels: {
-                    name: { fontSize: '11px', fontWeight: 700, color: theme.muted, offsetY: -5 },
-                    value: { fontSize: '16px', fontWeight: 900, color: theme.text, offsetY: 5 },
+                    name: { fontSize: '0.6875rem', fontWeight: 700, color: theme.muted, offsetY: -5 },
+                    value: { fontSize: '1rem', fontWeight: 900, color: theme.text, offsetY: 5 },
                     total: { show: true, label: 'GRADUATES', color: theme.muted }
                 },
                 track: { background: theme.grid, strokeWidth: '95%' }
@@ -455,7 +455,7 @@ export async function initCharts(forceRefresh = false) {
             breakpoint: 640,
             options: {
                 chart: { height: 320 },
-                plotOptions: { radialBar: { hollow: { size: '30%' }, dataLabels: { value: { fontSize: '14px' } } } }
+                plotOptions: { radialBar: { hollow: { size: '30%' }, dataLabels: { value: { fontSize: '0.875rem' } } } }
             }
         }]
     };
@@ -504,7 +504,7 @@ export async function initCharts(forceRefresh = false) {
         dataLabels: { 
             enabled: true,
             offsetY: -20,
-            style: { fontSize: '12px', fontWeight: '900', colors: [theme.text] }
+            style: { fontSize: '0.75rem', fontWeight: '900', colors: [theme.text] }
         },
         legend: { show: false },
         xaxis: {
@@ -532,11 +532,11 @@ export async function initCharts(forceRefresh = false) {
         dataLabels: { enabled: false },
         xaxis: {
             categories: sortedRoles.map(r => r[0]),
-            labels: { show: true, style: { fontWeight: 600, colors: theme.muted, fontSize: '9px' } },
+            labels: { show: true, style: { fontWeight: 600, colors: theme.muted, fontSize: '0.5625rem' } },
             axisBorder: { show: false },
             axisTicks: { show: false }
         },
-        yaxis: { labels: { show: true, style: { fontWeight: 700, colors: theme.text, fontSize: '10px' } } },
+        yaxis: { labels: { show: true, style: { fontWeight: 700, colors: theme.text, fontSize: '0.625rem' } } },
         grid: {
             borderColor: theme.grid,
             strokeDashArray: 4,
@@ -547,8 +547,8 @@ export async function initCharts(forceRefresh = false) {
             breakpoint: 640,
             options: {
                 chart: { height: 350 },
-                xaxis: { labels: { style: { fontSize: '8px' } } },
-                yaxis: { labels: { style: { fontSize: '9px' } } }
+                xaxis: { labels: { style: { fontSize: '0.5rem' } } },
+                yaxis: { labels: { style: { fontSize: '0.5625rem' } } }
             }
         }]
     };
@@ -571,15 +571,15 @@ export async function initCharts(forceRefresh = false) {
             enabled: true,
             offsetY: -10,
             offsetX: 0,
-            style: { fontSize: '9px', fontWeight: '800' },
+            style: { fontSize: '0.5625rem', fontWeight: '800' },
             background: { enabled: true, padding: 3, borderRadius: 4, borderWidth: 0, opacity: 0.9 }
         },
         xaxis: {
             categories: Object.keys(filteredStats.ages),
-            labels: { style: { fontWeight: 600, colors: theme.muted, fontSize: '10px' } },
+            labels: { style: { fontWeight: 600, colors: theme.muted, fontSize: '0.625rem' } },
             axisBorder: { show: false }
         },
-        yaxis: { labels: { style: { fontWeight: 600, colors: theme.muted, fontSize: '10px' } } },
+        yaxis: { labels: { style: { fontWeight: 600, colors: theme.muted, fontSize: '0.625rem' } } },
         grid: {
             borderColor: theme.grid,
             strokeDashArray: 6,
@@ -628,7 +628,7 @@ export async function initCharts(forceRefresh = false) {
         stroke: { show: true, width: 2, colors: ['transparent'] },
         xaxis: {
             categories: Object.keys(performanceStats.municipalityData),
-            labels: { style: { fontWeight: 600, colors: theme.muted, fontSize: '9px' } },
+            labels: { style: { fontWeight: 600, colors: theme.muted, fontSize: '0.5625rem' } },
             axisBorder: { show: false },
             axisTicks: { show: false }
         },
@@ -885,26 +885,26 @@ function populateWorkforceDropdown(years, rawData) {
             <a href="javascript:void(0)" onclick="updateWorkforceFilter('ALL', 'Overall Stats')" 
                 class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === 'ALL' ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
                 <span>Overall Stats</span>
-                <span class="bg-royal-blue/10 text-royal-blue dark:bg-blue-900/30 dark:text-blue-400 py-0.5 px-2 rounded-full text-[10px] font-black">${totalOverall}</span>
+                <span class="bg-royal-blue/10 text-royal-blue dark:bg-blue-900/30 dark:text-blue-400 py-0.5 px-2 rounded-full text-[0.625rem] font-black">${totalOverall}</span>
             </a>
         </li>
         <li class="border-t border-slate-100 dark:border-slate-700 my-1"></li>
         <li>
             <a href="javascript:void(0)" onclick="updateWorkforceFilter('7D', 'Last 7 Days')" class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === '7D' ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
                 <span>Last 7 Days</span>
-                <span class="bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 py-0.5 px-2 rounded-full text-[10px] font-black">${countPastDays(7)}</span>
+                <span class="bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 py-0.5 px-2 rounded-full text-[0.625rem] font-black">${countPastDays(7)}</span>
             </a>
         </li>
         <li>
             <a href="javascript:void(0)" onclick="updateWorkforceFilter('30D', 'Last 30 Days')" class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === '30D' ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
                 <span>Last 30 Days</span>
-                <span class="bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400 py-0.5 px-2 rounded-full text-[10px] font-black">${countPastDays(30)}</span>
+                <span class="bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400 py-0.5 px-2 rounded-full text-[0.625rem] font-black">${countPastDays(30)}</span>
             </a>
         </li>
         <li>
             <a href="javascript:void(0)" onclick="updateWorkforceFilter('90D', 'Last 90 Days')" class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === '90D' ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
                 <span>Last 90 Days</span>
-                <span class="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 py-0.5 px-2 rounded-full text-[10px] font-black">${countPastDays(90)}</span>
+                <span class="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 py-0.5 px-2 rounded-full text-[0.625rem] font-black">${countPastDays(90)}</span>
             </a>
         </li>
         <li class="border-t border-slate-100 dark:border-slate-700 my-1"></li>
@@ -917,7 +917,7 @@ function populateWorkforceDropdown(years, rawData) {
         <li>
             <a href="javascript:void(0)" onclick="updateWorkforceFilter('${year}', 'Year ${year}')" class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentWorkforceFilter === year ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
                 <span>Year ${year}</span>
-                <span class="bg-slate-100 text-slate-600 dark:bg-slate-600/50 dark:text-slate-300 py-0.5 px-2 rounded-full text-[10px] font-black">${yearCount}</span>
+                <span class="bg-slate-100 text-slate-600 dark:bg-slate-600/50 dark:text-slate-300 py-0.5 px-2 rounded-full text-[0.625rem] font-black">${yearCount}</span>
             </a>
         </li>`;
     });
@@ -941,7 +941,7 @@ function populateGenderFilterDropdown(years, rawData) {
             <a href="javascript:void(0)" onclick="updateGenderFilter('ALL', 'All Years')"
                 class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentGenderFilter === 'ALL' ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
                 <span>All Years</span>
-                <span class="bg-royal-blue/10 text-royal-blue dark:bg-blue-900/30 dark:text-blue-400 py-0.5 px-2 rounded-full text-[10px] font-black">${totalOverall}</span>
+                <span class="bg-royal-blue/10 text-royal-blue dark:bg-blue-900/30 dark:text-blue-400 py-0.5 px-2 rounded-full text-[0.625rem] font-black">${totalOverall}</span>
             </a>
         </li>
         <li class="border-t border-slate-100 dark:border-slate-700 my-1"></li>
@@ -954,7 +954,7 @@ function populateGenderFilterDropdown(years, rawData) {
             <a href="javascript:void(0)" onclick="updateGenderFilter('${year}', 'Year ${year}')"
                 class="flex items-center justify-between px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors uppercase tracking-widest ${currentGenderFilter === year ? 'bg-royal-blue/10 text-royal-blue' : 'text-slate-600 dark:text-slate-300'}">
                 <span>Year ${year}</span>
-                <span class="bg-slate-100 text-slate-600 dark:bg-slate-600/50 dark:text-slate-300 py-0.5 px-2 rounded-full text-[10px] font-black">${yearCount}</span>
+                <span class="bg-slate-100 text-slate-600 dark:bg-slate-600/50 dark:text-slate-300 py-0.5 px-2 rounded-full text-[0.625rem] font-black">${yearCount}</span>
             </a>
         </li>
         `;

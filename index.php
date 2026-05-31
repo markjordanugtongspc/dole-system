@@ -197,8 +197,8 @@ require_once __DIR__ . '/config/db.php';
             <!-- Headers (Left-aligned, Enhanced Visibility) -->
             <div class="pt-4 mb-2 text-left w-full pl-2">
                 <h1 class="text-2xl sm:text-2xl font-black text-royal-blue dark:text-blue-400 leading-tight uppercase tracking-tight whitespace-nowrap">DOLE-GIP</h1>
-                <p class="text-[10px] sm:text-[10px] font-bold text-slate-700 dark:text-slate-300 mt-0.5 uppercase tracking-widest whitespace-nowrap">Republic of the Philippines</p>
-                <p class="text-[8px] sm:text-[8px] font-black text-white bg-royal-blue/90 dark:bg-blue-600/90 px-2 py-0.5 inline-block rounded uppercase tracking-widest shadow-sm mt-1 backdrop-blur-md">Department of Labor and Employment</p>
+                <p class="text-[0.625rem] sm:text-[0.625rem] font-bold text-slate-700 dark:text-slate-300 mt-0.5 uppercase tracking-widest whitespace-nowrap">Republic of the Philippines</p>
+                <p class="text-[0.5rem] sm:text-[0.5rem] font-black text-white bg-royal-blue/90 dark:bg-blue-600/90 px-2 py-0.5 inline-block rounded uppercase tracking-widest shadow-sm mt-1 backdrop-blur-md">Department of Labor and Employment</p>
             </div>
 
             <!-- Logo Container (Middle Center, Circle Trimmed) -->
@@ -217,10 +217,10 @@ require_once __DIR__ . '/config/db.php';
             <!-- Action Buttons (Positioned firmly below logo) -->
             <div class="flex flex-col gap-3 mb-auto relative z-20 w-full max-w-[280px] mx-auto">
                 <button id="show-login-btn" 
-                    class="w-full  bg-royal-blue text-white hover:bg-royal-blue/90 text-white font-black py-4 rounded-xl shadow-lg transition-all text-[11px] uppercase tracking-[0.2em] active:scale-[0.97]">
+                    class="w-full  bg-royal-blue text-white hover:bg-royal-blue/90 text-white font-black py-4 rounded-xl shadow-lg transition-all text-[0.6875rem] uppercase tracking-[0.2em] active:scale-[0.97]">
                     Login
                 </button>
-                <button id="forgot-password-splash-btn" class="forgot-password-link w-full text-royal-blue hover:bg-red-500/5 font-bold py-3 rounded-xl transition-all text-[10px] uppercase tracking-[0.15em] border border-red-500/10 active:scale-[0.97]">
+                <button id="forgot-password-splash-btn" class="forgot-password-link w-full text-royal-blue hover:bg-red-500/5 font-bold py-3 rounded-xl transition-all text-[0.625rem] uppercase tracking-[0.15em] border border-red-500/10 active:scale-[0.97]">
                     Forgot Password
                 </button>
             </div>
@@ -329,7 +329,7 @@ require_once __DIR__ . '/config/db.php';
                 <h2 class="text-2xl sm:text-xl font-black text-royal-blue dark:text-blue-400 uppercase tracking-tight mb-2 sm:mb-4 !text-nowrap">
                     Welcome Back!
                 </h2>
-                <p class="text-[10px] sm:text-[12px] text-gray-400 dark:text-slate-500 font-black uppercase tracking-widest !text-nowrap">
+                <p class="text-[0.625rem] sm:text-[0.75rem] text-gray-400 dark:text-slate-500 font-black uppercase tracking-widest !text-nowrap">
                     Department of Labor and Employment
                 </p>
             </div>
@@ -348,7 +348,7 @@ require_once __DIR__ . '/config/db.php';
             </button>
 
             <!-- Notification Request Button (Optional/Initial) -->
-            <button id="request-notifications-btn" class="lg:hidden mt-4 text-[10px] font-bold text-slate-400 hover:text-royal-blue uppercase tracking-widest transition-colors hidden">
+            <button id="request-notifications-btn" class="lg:hidden mt-4 text-[0.625rem] font-bold text-slate-400 hover:text-royal-blue uppercase tracking-widest transition-colors hidden">
                 Enable Notifications
             </button>
 
@@ -434,7 +434,7 @@ require_once __DIR__ . '/config/db.php';
 
         <form id="loginFormMobile" class="space-y-6 login-form-shared">
             <div class="w-full">
-                <label for="username_mobile" class="block text-[10px] font-black text-gray-500 dark:text-slate-400 mb-2 uppercase tracking-[0.2em]">
+                <label for="username_mobile" class="block text-[0.625rem] font-black text-gray-500 dark:text-slate-400 mb-2 uppercase tracking-[0.2em]">
                     Username
                 </label>
                 <input type="text" id="username_mobile" name="username" required
@@ -443,7 +443,7 @@ require_once __DIR__ . '/config/db.php';
             </div>
 
             <div class="w-full">
-                <label for="password_mobile" class="block text-[10px] font-black text-gray-500 dark:text-slate-400 mb-2 uppercase tracking-[0.2em]">
+                <label for="password_mobile" class="block text-[0.625rem] font-black text-gray-500 dark:text-slate-400 mb-2 uppercase tracking-[0.2em]">
                     Password
                 </label>
                 <div class="relative">
@@ -466,11 +466,11 @@ require_once __DIR__ . '/config/db.php';
                 <div class="flex items-center">
                     <input type="checkbox" id="rememberMe_mobile" name="rememberMe"
                         class="w-5 h-5 rounded-md border-gray-300 dark:border-slate-800 text-royal-blue focus:ring-blue-500/20 cursor-pointer" />
-                    <label for="rememberMe_mobile" class="ml-2.5 text-[13px] font-bold text-gray-600 dark:text-slate-400 cursor-pointer">
+                    <label for="rememberMe_mobile" class="ml-2.5 text-[0.8125rem] font-bold text-gray-600 dark:text-slate-400 cursor-pointer">
                         Remember me
                     </label>
                 </div>
-                <a href="#" class="forgot-password-link text-[13px] font-black text-royal-blue uppercase tracking-tight">
+                <a href="#" class="forgot-password-link text-[0.8125rem] font-black text-royal-blue uppercase tracking-tight">
                     Forgot?
                 </a>
             </div>

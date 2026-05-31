@@ -80,7 +80,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div class="flex flex-col">
                             <span class="text-sm font-black text-royal-blue uppercase tracking-tight leading-tight">DOLE
                                 LDNPFO</span>
-                            <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">GIP
+                            <span class="text-[0.625rem] font-semibold text-gray-500 uppercase tracking-wider">GIP
                                 Monitoring 2026</span>
                         </div>
                     </a>
@@ -144,7 +144,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <span class="text-[10px] sm:text-sm uppercase">Export DTR/AR
+                        <span class="text-[0.625rem] sm:text-sm uppercase">Export DTR/AR
                     </button>
 
                     <button type="button" onclick="showAddDataModal()" class="
@@ -167,7 +167,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
                         </svg>
-                        <span class="text-[10px] sm:text-sm uppercase">Add Data</span>
+                        <span class="text-[0.625rem] sm:text-sm uppercase">Add Data</span>
                     </button>
                 </div>
 
@@ -229,14 +229,14 @@ require_once __DIR__ . '/../../config/vite.php';
                                 class="z-50 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
                                 <div class="px-4 py-3 bg-blue-50/50 rounded-t-xl">
                                     <span
-                                        class="block text-[10px] font-black text-royal-blue uppercase tracking-wider">Filter
+                                        class="block text-[0.625rem] font-black text-royal-blue uppercase tracking-wider">Filter
                                         By</span>
                                 </div>
                                 <div class="p-4">
                                     <!-- Year select -->
                                     <div class="mb-3">
                                         <label
-                                            class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Year</label>
+                                            class="block text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest mb-1">Year</label>
                                         <select id="filter-year"
                                             class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
                                             <option value="ALL">All Years</option>
@@ -246,7 +246,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                     <!-- Status select -->
                                     <div class="mb-4">
                                         <label
-                                            class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Status</label>
+                                            class="block text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest mb-1">Status</label>
                                         <select id="filter-status"
                                             class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
                                             <option value="ALL">All Status</option>
@@ -293,7 +293,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 class="z-50 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
                                 <div class="px-4 py-3 bg-orange-50/50 rounded-t-xl">
                                     <span
-                                        class="block text-[10px] font-black text-orange-600 uppercase tracking-wider">Sort
+                                        class="block text-[0.625rem] font-black text-orange-600 uppercase tracking-wider">Sort
                                         Beneficiaries</span>
                                 </div>
                                 <ul class="py-2 text-xs font-bold text-gray-700" aria-labelledby="sort-dropdown-button">
@@ -343,7 +343,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 </svg>
                             </button>
                             <!-- Label -->
-                            <span id="office-qf-label" class="text-[10px] font-black text-violet-700 dark:text-violet-300 uppercase tracking-wider shrink-0">Filter by Office</span>
+                            <span id="office-qf-label" class="text-[0.625rem] font-black text-violet-700 dark:text-violet-300 uppercase tracking-wider shrink-0">Filter by Office</span>
                             <!-- Left arrow -->
                             <button id="office-qf-arrow-left"
                                 class="hidden shrink-0 items-center justify-center w-6 h-6 rounded-full text-gray-400 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-all duration-150 cursor-pointer active:scale-90">

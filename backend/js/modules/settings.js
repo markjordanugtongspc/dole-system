@@ -131,11 +131,22 @@ async function initSettings() {
         }
     });
 
-    // 5. Submit Preferences (reusing profile logic)
+    // 5. Submit Preferences (purely local/localStorage)
     const prefBtn = document.getElementById('save-pref-btn');
     if (prefBtn) {
         prefBtn.addEventListener('click', () => {
-            settingsForm.requestSubmit();
+            // Dispatch a custom event so other modules (like textsize.js) know to save their state
+            document.dispatchEvent(new CustomEvent('preferencesSaved'));
+            
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Preferences Saved',
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            });
         });
     }
 
@@ -200,6 +211,7 @@ function populateSettings(profile) {
 
     // UI Headers
     document.querySelectorAll('.sidebar-user-name').forEach(el => el.textContent = profile.full_name);
+    document.querySelectorAll('.sidebar-user-email').forEach(el => el.textContent = profile.email || 'No email set');
     document.getElementById('settings-user-email').textContent = profile.email || 'no-email@dole.gov.ph';
 
     // Role Display
