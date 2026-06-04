@@ -420,6 +420,41 @@ require_once __DIR__ . '/../../config/vite.php';
             const base = path.includes('/dole-system/') ? path.substring(0, path.indexOf('/dole-system/') + '/dole-system/'.length) : '';
             window.location.href = `${base}${window.location.search}${window.location.hash}`;
         }
+
+        // Process URL Query Parameters on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Auto-open Register Member Modal
+            if (urlParams.get('add_member') === 'true') {
+                setTimeout(() => {
+                    if (typeof window.showAddDataModal === 'function') {
+                        window.showAddDataModal();
+                    }
+                }, 600);
+            }
+            
+            // Auto-focus Search Bar
+            if (urlParams.get('focus_search') === 'true') {
+                setTimeout(() => {
+                    const searchInput = document.getElementById('table-search');
+                    if (searchInput) {
+                        searchInput.focus();
+                        searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 600);
+            }
+
+            // Auto-open specific Beneficiary Drawer
+            const gipId = urlParams.get('gip_id');
+            if (gipId) {
+                setTimeout(() => {
+                    if (typeof window.viewBeneficiary === 'function') {
+                        window.viewBeneficiary({ id: gipId });
+                    }
+                }, 600);
+            }
+        });
     </script>
 
 </body>

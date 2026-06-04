@@ -108,20 +108,26 @@ async function initSettings() {
                 }
 
                 Swal.fire({
+                    toast: true,
+                    position: window.innerWidth < 768 ? 'top-end' : 'bottom-end',
                     icon: 'success',
                     title: 'System Synced',
-                    text: 'Your profile information has been updated successfully.',
+                    text: 'Your profile has been updated.',
                     timer: 3000,
                     showConfirmButton: false,
                     customClass: {
-                        popup: 'rounded-3xl border border-blue-50'
+                        popup: 'rounded-xl border border-blue-50'
                     }
                 });
             } else {
                 Swal.fire({
+                    toast: true,
+                    position: window.innerWidth < 768 ? 'top-end' : 'bottom-end',
                     icon: 'error',
                     title: 'Update Interrupted',
-                    text: result.error || 'Something went wrong during the update.'
+                    text: result.error || 'Something went wrong during the update.',
+                    timer: 3000,
+                    showConfirmButton: false
                 });
             }
         } catch (error) {
@@ -140,7 +146,7 @@ async function initSettings() {
             
             Swal.fire({
                 toast: true,
-                position: 'top-end',
+                position: window.innerWidth < 768 ? 'top-end' : 'bottom-end',
                 icon: 'success',
                 title: 'Preferences Saved',
                 showConfirmButton: false,
@@ -159,11 +165,27 @@ async function initSettings() {
         const confirmPass = document.getElementById('confirm_password').value;
 
         if (!currentPass || !newPass || !confirmPass) {
-            return Swal.fire({ icon: 'warning', title: 'Missing Fields', text: 'All password fields are required.' });
+            return Swal.fire({
+                toast: true,
+                position: window.innerWidth < 768 ? 'top-end' : 'bottom-end',
+                icon: 'warning',
+                title: 'Missing Fields',
+                text: 'All password fields are required.',
+                timer: 3000,
+                showConfirmButton: false
+            });
         }
 
         if (newPass !== confirmPass) {
-            return Swal.fire({ icon: 'error', title: 'ismatch Detected', text: 'New passwords do not match.' });
+            return Swal.fire({
+                toast: true,
+                position: window.innerWidth < 768 ? 'top-end' : 'bottom-end',
+                icon: 'error',
+                title: 'Mismatch Detected',
+                text: 'New passwords do not match.',
+                timer: 3000,
+                showConfirmButton: false
+            });
         }
 
         try {
@@ -187,17 +209,23 @@ async function initSettings() {
             if (result.success) {
                 passwordForm.reset();
                 Swal.fire({
+                    toast: true,
+                    position: window.innerWidth < 768 ? 'top-end' : 'bottom-end',
                     icon: 'success',
                     title: 'Security Updated',
-                    text: 'Your password has been changed successfully.',
+                    text: 'Your password has been changed.',
                     timer: 3000,
                     showConfirmButton: false
                 });
             } else {
                 Swal.fire({
+                    toast: true,
+                    position: window.innerWidth < 768 ? 'top-end' : 'bottom-end',
                     icon: 'error',
                     title: 'Authentication Error',
-                    text: result.error || 'Incorrect current password.'
+                    text: result.error || 'Incorrect current password.',
+                    timer: 3000,
+                    showConfirmButton: false
                 });
             }
         } catch (error) {

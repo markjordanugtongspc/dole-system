@@ -122,18 +122,18 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         </button>
     </div>
 
-    <div class="grid grid-cols-2 gap-4 mt-6 w-full">
-        <div class="flex flex-col gap-1 text-left">
+    <div class="grid grid-cols-12 gap-4 mt-6 w-full">
+        <div class="col-span-5 flex flex-col gap-1 text-left">
             <span class="text-[0.625rem] text-gray-500 font-bold uppercase tracking-widest pl-1">ID NO.</span>
             <span class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 text-[0.625rem] sm:text-[0.6875rem] font-black px-2.5 py-1.5 rounded border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm border-l-4 border-l-gray-400 truncate">${data.id}</span>
         </div>
-        <div class="flex flex-col gap-1 text-left overflow-hidden">
+        <div class="col-span-7 flex flex-col gap-1 text-left overflow-hidden w-full">
             <span class="text-[0.625rem] text-gray-500 font-bold uppercase tracking-widest pl-1 flex items-center font-montserrat">
                 REMARKS / OFFICE
             </span>
-            <div class="flex items-center flex-wrap gap-2.5 min-h-[30px] font-montserrat">
-                <span class="${getStatusClass(data.remarks)} text-[0.625rem] sm:text-[0.6875rem] font-black px-4 sm:px-6 py-2 rounded-lg border uppercase tracking-widest shadow-sm border-l-4 ${data.remarks === 'ONGOING' ? 'border-l-green-600' : 'border-l-red-600'} min-w-[110px] sm:min-w-[140px] text-center inline-block">${data.remarks}</span>
-                <span class="${getOfficeClass(data.office)} inline-block text-[0.5625rem] sm:text-[0.625rem] font-black px-4 sm:px-6 py-2 rounded-full border shadow-sm truncate max-w-[180px] sm:max-w-[280px] lg:max-w-none min-w-[110px] sm:min-w-[140px] text-center" title="${data.office}">${data.office}</span>
+            <div class="flex justify-start items-center w-full gap-2 min-h-[30px] font-montserrat flex-nowrap">
+                <span class="${getStatusClass(data.remarks)} text-[0.5625rem] sm:text-[0.625rem] font-black px-2.5 sm:px-4 py-2 rounded-lg border uppercase tracking-widest shadow-sm border-l-4 ${data.remarks === 'ONGOING' ? 'border-l-green-600' : 'border-l-red-600'} min-w-[80px] sm:min-w-[100px] text-center inline-block whitespace-nowrap">${data.remarks}</span>
+                <span class="${getOfficeClass(data.office)} inline-block text-[0.5625rem] sm:text-[0.625rem] font-black px-2.5 sm:px-4 py-2 rounded-lg border shadow-sm min-w-[80px] sm:min-w-[100px] text-center whitespace-nowrap max-w-full truncate" title="${data.office}">${data.office}</span>
             </div>
         </div>
     </div>

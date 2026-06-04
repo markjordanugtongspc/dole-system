@@ -153,7 +153,7 @@ export async function showProfileModal() {
             const { data, error } = await supabase
                 .from('users')
                 .select('*')
-                .eq('id', uid)
+                .eq('user_id', uid)
                 .single();
             
             if (error) throw error;

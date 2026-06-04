@@ -6,6 +6,10 @@ import '../css/main.css';
 import 'animate.css';
 import 'flowbite';
 import { initFlowbite } from 'flowbite';
+import Swal from 'sweetalert2';
+
+// Expose Swal globally for inline scripts (e.g. PHP pages)
+window.Swal = Swal;
 import Datepicker from 'flowbite-datepicker/Datepicker';
 import DateRangePicker from 'flowbite-datepicker/DateRangePicker';
 import { initLoginHandler, initLogoutHandler, initSmartLoader, initMobileSplash } from './modules/auth.js';

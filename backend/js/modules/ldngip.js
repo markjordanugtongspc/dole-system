@@ -131,6 +131,7 @@ function getFilteredBeneficiaries() {
         result = result.filter(b =>
             (b.name?.toLowerCase().includes(query) || false) ||
             (b.id?.toLowerCase().includes(query) || false) ||
+            (b.contact?.toLowerCase().includes(query) || false) ||
             (b.office?.toLowerCase().includes(query) || false) ||
             (b.remarks?.toLowerCase().includes(query) || false) ||
             (b.designation?.toLowerCase().includes(query) || false) ||
@@ -1068,6 +1069,10 @@ export function renderTable(dataToRender = null) {
     const endIndex = startIndex + itemsPerPage;
     const pagedData = dataToRender.slice(startIndex, endIndex);
 
+    const searchInput = document.getElementById('table-search');
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const isSearchingContact = query !== "" && /\d/.test(query);
+
     tbody.innerHTML = pagedData.map(data => `
         <tr class="bg-blue-50 border-b border-blue-100 hover:bg-blue-100 transition-colors group cursor-pointer"
             onclick='viewBeneficiary(${JSON.stringify(data)})'>
@@ -1075,7 +1080,17 @@ export function renderTable(dataToRender = null) {
                 ${data.id}
             </th>
             <td class="px-4 py-3 font-bold text-royal-blue text-center">
-                ${data.name}
+                <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                    <span class="text-xs sm:text-sm font-black leading-tight">${data.name}</span>
+                    ${isSearchingContact && data.contact ? `
+                        <span class="inline-flex items-center bg-royal-blue text-white text-[10px] px-2 py-0.5 rounded font-black gap-1 animate-pulse shadow-sm" title="Contact No: ${data.contact}">
+                            <svg class="w-2.5 h-2.5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            <span>${data.contact}</span>
+                        </span>
+                    ` : ''}
+                </div>
             </td>
             <td class="px-4 py-3 text-center">
                 <div class="flex justify-center">

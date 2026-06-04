@@ -1,6 +1,6 @@
 {
-  "_modal-6GOp-F0G.js": {
-    "file": "assets/modal-6GOp-F0G.js",
+  "_modal-DS2Smvw-.js": {
+    "file": "assets/modal-DS2Smvw-.js",
     "name": "modal",
     "imports": [
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js",
@@ -28,28 +28,28 @@
     ]
   },
   "backend/js/main.js": {
-    "file": "assets/main-3b74-djj.js",
+    "file": "assets/main-B7w0CBTJ.js",
     "name": "main",
     "src": "backend/js/main.js",
     "isEntry": true,
     "imports": [
       "_vendor-DHtNC8Ux.js",
       "_vendor-flowbite-B7rSfpuT.js",
-      "_modal-6GOp-F0G.js",
-      "_vendor-charts-BjInCqFR.js",
-      "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
+      "node_modules/sweetalert2/dist/sweetalert2.esm.all.js",
+      "_modal-DS2Smvw-.js",
+      "_vendor-charts-BjInCqFR.js"
     ],
     "dynamicImports": [
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
     ]
   },
   "backend/js/modules/settings.js": {
-    "file": "assets/settings-DTbAWTUQ.js",
+    "file": "assets/settings-DXh_x9km.js",
     "name": "settings",
     "src": "backend/js/modules/settings.js",
     "isEntry": true,
     "imports": [
-      "_modal-6GOp-F0G.js",
+      "_modal-DS2Smvw-.js",
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js",
       "_vendor-DHtNC8Ux.js"
     ]
@@ -61,7 +61,7 @@
     "isDynamicEntry": true
   },
   "style.css": {
-    "file": "assets/style-BIhwPrbB.css",
+    "file": "assets/style-B0gkCyaM.css",
     "src": "style.css"
   }
 }

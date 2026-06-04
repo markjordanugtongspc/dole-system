@@ -141,8 +141,8 @@ require_once __DIR__ . '/../../config/vite.php';
                     <button id="view-general-btn"
                         class="px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm text-[0.625rem] font-black text-royal-blue dark:text-blue-400 uppercase tracking-widest transition-all duration-300 cursor-pointer">General
                         Overview</button>
-                    <button id="view-performance-btn"
-                        class="px-3 py-1.5 text-[0.625rem] font-bold text-slate-500 hover:text-royal-blue dark:hover:text-blue-400 transition-all duration-300 cursor-pointer uppercase tracking-widest">Performance</button>
+                    <button id="view-quick-access-btn"
+                        class="px-3 py-1.5 text-[10px] font-bold text-slate-500 hover:text-royal-blue dark:hover:text-blue-400 transition-all duration-300 cursor-pointer uppercase tracking-widest">QUICK ACCESS</button>
                 </div>
             </div>
 
@@ -691,195 +691,122 @@ require_once __DIR__ . '/../../config/vite.php';
             <!-- End of general-view-section content -->
         </div> <!-- End of general-view-section -->
 
-        <div id="performance-view-section" class="hidden opacity-0 transition-opacity duration-500">
-            <!-- <div class="mb-6">
-                        <h2 class="text-2xl font-black text-heading dark:text-white uppercase tracking-tight flex items-center gap-3">
-                            <div class="p-2 bg-royal-blue/10 dark:bg-blue-900/40 rounded-xl">
-                                <svg class="w-6 h-6 text-royal-blue dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            </div>
-                            System Performance Analyst
-                        </h2>
-                        <p class="text-[0.625rem] text-slate-500 font-bold uppercase tracking-widest mt-2 ms-12">Actionable insights & deployment efficiency metrics</p>
-                    </div> -->
-
-            <!-- Performance KPIs -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
-                <!-- Slots Utilization -->
-                <div
-                    class="bg-gradient-to-br from-royal-blue via-blue-700 to-indigo-900 rounded-3xl p-6 sm:p-8 text-white shadow-[0_10px_40px_-10px_rgba(0,56,168,0.5)] relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500">
-                    <div
-                        class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700">
-                    </div>
-                    <div class="absolute right-6 top-6 opacity-20 group-hover:opacity-40 transition-opacity">
-                        <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clip-rule="evenodd"></path>
+        <div id="quick-access-view-section" class="hidden opacity-0 transition-opacity duration-500">
+            <!-- Section Title -->
+            <div class="mb-6 px-1">
+                <h2 class="text-xl sm:text-2xl font-black text-heading dark:text-white uppercase tracking-tight flex items-center gap-3">
+                    <div class="p-2.5 bg-royal-blue/10 dark:bg-blue-900/40 rounded-2xl shadow-inner">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-royal-blue dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                         </svg>
                     </div>
-
-                    <h4
-                        class="text-[0.625rem] sm:text-xs font-black uppercase tracking-[0.3em] opacity-80 mb-2 drop-shadow-sm">
-                        Slots Utilization</h4>
-                    <div class="flex items-end gap-2 mb-6">
-                        <span
-                            class="text-5xl sm:text-7xl font-black metric-utilization-rate drop-shadow-lg tracking-tighter">...</span>
-                        <span class="text-[0.625rem] sm:text-xs font-bold opacity-70 mb-2 uppercase tracking-widest">of
-                            Quota</span>
-                    </div>
-
-                    <div
-                        class="w-full bg-black/20 h-2.5 rounded-full overflow-hidden backdrop-blur-sm shadow-inner group-hover:bg-black/30 transition-colors">
-                        <div class="bg-gradient-to-r from-blue-300 via-white to-blue-100 h-full relative metric-utilization-progress"
-                            style="width: 0%">
-                            <div class="absolute top-0 right-0 bottom-0 w-8 bg-white/60 blur-sm animate-pulse"></div>
-                        </div>
-                    </div>
-                    <div class="flex justify-between mt-3 text-[0.5625rem] font-black opacity-80 uppercase tracking-widest">
-                        <span>0%</span>
-                        <span>100% CAP</span>
-                    </div>
-                </div>
-
-                <!-- Onboarding Velocity -->
-                <div
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-2xl transition-all duration-500 group relative overflow-hidden">
-                    <div
-                        class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]">
-                    </div>
-                    <div class="flex justify-between items-start mb-4">
-                        <h4
-                            class="text-[0.625rem] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">
-                            Onboarding Velocity</h4>
-                        <div
-                            class="p-2 sm:p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 rounded-xl group-hover:rotate-12 group-hover:scale-110 transition-transform shadow-inner border border-emerald-100 dark:border-emerald-900/30">
-                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="flex items-end gap-2 mb-2 pt-2">
-                        <span
-                            class="text-5xl sm:text-6xl font-black text-heading dark:text-white metric-velocity-avg tracking-tight group-hover:-translate-y-1 transition-transform">...</span>
-                        <span
-                            class="text-[0.625rem] sm:text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">Days
-                            Avg</span>
-                    </div>
-                    <div class="mt-6 sm:mt-8 flex items-center gap-2">
-                        <span
-                            class="px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 text-[0.5625rem] font-black rounded border border-emerald-200 dark:border-emerald-800 uppercase tracking-widest shadow-xs">Optimal</span>
-                        <span class="text-[0.5625rem] font-bold text-slate-400 uppercase tracking-wider">Processing
-                            Timeline</span>
-                    </div>
-                </div>
-
-                <!-- Retention & Data Integrity Stack -->
-                <div class="grid grid-rows-2 gap-4 sm:gap-6">
-                    <!-- Retention Index -->
-                    <div
-                        class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl transition-all flex justify-between items-center group relative overflow-hidden">
-                        <div
-                            class="absolute -right-4 -bottom-4 w-16 h-16 bg-blue-50 dark:bg-blue-900/10 rounded-full group-hover:scale-150 transition-transform duration-500">
-                        </div>
-                        <div class="relative z-10">
-                            <h4
-                                class="text-[0.5625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
-                                Retention Index</h4>
-                            <div class="flex items-baseline gap-1">
-                                <span
-                                    class="text-3xl font-black text-heading dark:text-white metric-retention-rate">...</span>
-                            </div>
-                        </div>
-                        <div
-                            class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center relative z-10 border border-blue-100 dark:border-blue-800/50">
-                            <div
-                                class="absolute inset-0 border-2 border-royal-blue/30 rounded-2xl scale-110 group-hover:scale-125 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                            </div>
-                            <svg class="w-5 h-5 text-royal-blue dark:text-blue-400" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                    </div>
-
-                    <!-- Data Integrity Shield (API Connected Idea) -->
-                    <div
-                        class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm dark:shadow-2xl flex justify-between items-center relative overflow-hidden group transition-all duration-500">
-                        <div
-                            class="absolute right-0 top-0 w-32 h-32 bg-emerald-500/[0.03] dark:bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/[0.08] dark:group-hover:bg-emerald-500/20 transition-colors">
-                        </div>
-                        <div class="relative z-10">
-                            <div class="flex items-center gap-2 mb-1">
-                                <div
-                                    class="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]">
-                                </div>
-                                <h4
-                                    class="text-[0.5625rem] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em]">
-                                    Data Integrity Shield</h4>
-                            </div>
-                            <div class="flex items-baseline gap-1 mt-1">
-                                <span class="text-3xl font-black text-slate-800 dark:text-white">100%</span>
-                                <span
-                                    class="text-[0.5rem] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-50 dark:bg-white/10 px-1.5 py-0.5 rounded ml-1 border border-slate-100 dark:border-white/5">Verified</span>
-                            </div>
-                        </div>
-                        <div
-                            class="relative z-10 text-emerald-500 dark:text-emerald-400/80 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors bg-emerald-50 dark:bg-emerald-400/10 p-2.5 rounded-xl border border-emerald-100 dark:border-emerald-400/20 shadow-sm">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                                </path>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+                    Quick Access Shortcuts
+                </h2>
+                <p class="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-[0.2em] mt-2 ms-14">
+                    Accelerated administrative actions and database utilities
+                </p>
             </div>
 
-            <!-- Performance Charts -->
-            <div class="grid grid-cols-1 gap-6 mb-8 mt-0 pt-0">
-                <div
-                    class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm hover:shadow-2xl transition-shadow duration-500 relative overflow-hidden group/chart">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-b from-royal-blue/5 to-transparent opacity-0 group-hover/chart:opacity-100 transition-opacity duration-1000">
-                    </div>
-                    <div
-                        class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 relative z-10 pb-3 border-b border-slate-100 dark:border-slate-700">
-                        <div>
-                            <h5
-                                class="text-xl sm:text-2xl font-black text-heading dark:text-white uppercase tracking-tight flex items-center gap-2">
-                                Deployment Variances
-                            </h5>
-                            <p class="text-[0.625rem] sm:text-xs text-slate-500 font-bold uppercase tracking-[0.2em] mt-1">
-                                Target vs Actual Benchmarking Across Regions</p>
-                        </div>
-                        <div
-                            class="hidden sm:flex px-4 py-2 bg-slate-50 dark:bg-slate-700/50 rounded-2xl items-center gap-4 border border-slate-200 dark:border-slate-600 shadow-inner mt-4 sm:mt-0">
-                            <div class="flex items-center gap-2">
-                                <div class="w-2.5 h-2.5 rounded-full bg-royal-blue shadow-[0_0_8px_rgba(0,56,168,0.5)]">
-                                </div>
-                                <span
-                                    class="text-[0.5625rem] font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider">Actual
-                                    Validated</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-500"></div>
-                                <span
-                                    class="text-[0.5625rem] font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider">Target
-                                    Quota</span>
-                            </div>
+            <!-- Quick Access Grid (2 columns on mobile, 4 columns on desktop) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-8">
+                <!-- Short 1: Add Beneficiary -->
+                <button onclick="window.location.href = basePath + 'frontend/LDN/index.php?add_member=true'"
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-7 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left h-full min-h-[130px] sm:min-h-[190px] focus:outline-none focus:ring-4 focus:ring-royal-blue/10">
+                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-royal-blue/5 rounded-full blur-2xl group-hover:bg-royal-blue/10 transition-colors"></div>
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-royal-blue via-blue-600 to-indigo-600"></div>
+                    
+                    <div class="flex justify-between items-start mb-2 sm:mb-6">
+                        <div class="p-2 sm:p-3.5 bg-blue-50 dark:bg-blue-900/20 text-royal-blue dark:text-blue-400 rounded-2xl group-hover:rotate-6 group-hover:scale-110 transition-transform border border-blue-100 dark:border-blue-900/30 shadow-inner">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg>
                         </div>
                     </div>
-                    <div id="performance-gap-chart" class="min-h-[350px] relative z-10"></div>
-                </div>
+                    <div>
+                        <h4 class="text-[11px] sm:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight mb-1 group-hover:text-royal-blue dark:group-hover:text-blue-400 transition-colors">
+                            Register Member
+                        </h4>
+                        <p class="text-[8px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
+                            Add GIP Beneficiary
+                        </p>
+                    </div>
+                </button>
+
+                <!-- Short 2: Beneficiary Lookup -->
+                <button onclick="window.location.href = basePath + 'frontend/LDN/index.php?focus_search=true'"
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-7 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left h-full min-h-[130px] sm:min-h-[190px] focus:outline-none focus:ring-4 focus:ring-violet-500/10">
+                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-violet-500/5 rounded-full blur-2xl group-hover:bg-violet-500/10 transition-colors"></div>
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-violet-500 via-purple-600 to-fuchsia-600"></div>
+                    
+                    <div class="flex justify-between items-start mb-2 sm:mb-6">
+                        <div class="p-2 sm:p-3.5 bg-violet-50 dark:bg-violet-900/20 text-violet-500 dark:text-violet-400 rounded-2xl group-hover:-rotate-6 group-hover:scale-110 transition-transform border border-violet-100 dark:border-violet-900/30 shadow-inner">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-[11px] sm:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight mb-1 group-hover:text-violet-500 dark:group-hover:text-violet-400 transition-colors">
+                            Member Lookup
+                        </h4>
+                        <p class="text-[8px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
+                            View Logs & Docs
+                        </p>
+                    </div>
+                </button>
+
+                <!-- Short 3: Report Generator -->
+                <button onclick="window.location.href = basePath + 'frontend/export/index.php'"
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-7 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left h-full min-h-[130px] sm:min-h-[190px] focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
+                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors"></div>
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-teal-600 to-green-600"></div>
+                    
+                    <div class="flex justify-between items-start mb-2 sm:mb-6">
+                        <div class="p-2 sm:p-3.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 dark:text-emerald-400 rounded-2xl group-hover:rotate-6 group-hover:scale-110 transition-transform border border-emerald-100 dark:border-emerald-900/30 shadow-inner">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-[11px] sm:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight mb-1 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors">
+                            Report Generator
+                        </h4>
+                        <p class="text-[8px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
+                            Export Excel
+                        </p>
+                    </div>
+                </button>
+
+                <!-- Short 4: My Profile & Settings -->
+                <button onclick="window.location.href = basePath + 'frontend/user/settings/index.php'"
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-7 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left h-full min-h-[130px] sm:min-h-[190px] focus:outline-none focus:ring-4 focus:ring-orange-500/10">
+                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-orange-500/5 rounded-full blur-2xl group-hover:bg-orange-500/10 transition-colors"></div>
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-500 via-red-500 to-pink-600"></div>
+                    
+                    <div class="flex justify-between items-start mb-2 sm:mb-6">
+                        <div class="p-2 sm:p-3.5 bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400 rounded-2xl group-hover:-rotate-6 group-hover:scale-110 transition-transform border border-orange-100 dark:border-orange-900/30 shadow-inner">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-[11px] sm:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight mb-1 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
+                            My Account
+                        </h4>
+                        <p class="text-[8px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
+                            Profile Settings
+                        </p>
+                    </div>
+                </button>
             </div>
         </div>
 
         <footer class="mt-8 border-t border-slate-200 dark:border-slate-700 pt-8 pb-4">
             <!-- Top Row: Compliance Notice -->
             <div
-                class="mb-8 bg-blue-50/50 dark:bg-blue-900/10 border-l-4 border-royal-blue rounded-r-2xl p-4 sm:p-6 transition-all duration-500">
+                class="mb-8 bg-gradient-to-r from-blue-50/50 via-indigo-50/30 to-blue-50/50 dark:from-blue-950/20 dark:via-indigo-950/10 dark:to-blue-950/20 border border-slate-100 dark:border-slate-800/60 border-l-4 border-l-royal-blue rounded-r-2xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-500">
                 <div class="flex items-start gap-4">
                     <div class="p-2.5 bg-royal-blue/10 dark:bg-blue-400/10 rounded-xl shrink-0 mt-0.5 shadow-sm">
                         <svg class="w-5 h-5 text-royal-blue dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
@@ -890,14 +817,14 @@ require_once __DIR__ . '/../../config/vite.php';
                     </div>
                     <div>
                         <h4
-                            class="text-[0.625rem] sm:text-xs font-black text-royal-blue dark:text-blue-400 uppercase tracking-[0.2em] mb-1.5">
+                            class="text-[10px] sm:text-xs font-black text-royal-blue dark:text-blue-400 uppercase tracking-[0.2em] mb-1.5">
                             Statistical Compliance Notice</h4>
                         <p
-                            class="text-[0.6875rem] sm:text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-tight sm:normal-case sm:font-medium leading-relaxed">
+                            class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-tight sm:normal-case sm:font-medium leading-relaxed">
                             This dashboard visualizes aggregated statistical patterns only. PII is
-                            strictly excluded in compliance with <span
-                                class="font-black text-royal-blue dark:text-blue-400 underline underline-offset-4 decoration-2">RA
-                                10173</span>.
+                            strictly excluded in compliance with <button onclick="showComplianceInfo()"
+                                class="cursor-pointer font-black text-royal-blue dark:text-blue-400 underline underline-offset-4 decoration-2 focus:outline-none">RA
+                                10173</button>.
                         </p>
                     </div>
                 </div>
@@ -906,19 +833,19 @@ require_once __DIR__ . '/../../config/vite.php';
             <div
                 class="flex flex-col sm:flex-row justify-between items-center gap-6 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <!-- Left Side: Brand -->
-                <div class="flex items-center gap-3 group/brand cursor-default">
+                <div onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex items-center gap-3 group/brand cursor-pointer">
                     <img src="../../frontend/images/logo/doleiligan.png"
-                        class="h-5 sm:h-6 bg-white rounded-full p-0.5 object-contain" alt="DOLE">
+                        class="h-6 sm:h-7 bg-white rounded-full p-0.5 object-contain hover:rotate-6 transition-transform duration-300 cursor-pointer" alt="DOLE">
                     <div class="w-px h-3 sm:h-4 bg-slate-300 dark:bg-slate-600"></div>
                     <span
-                        class="text-[0.5rem] sm:text-[0.5625rem] font-black uppercase tracking-widest leading-none whitespace-nowrap text-slate-400 group-hover/brand:text-black dark:text-slate-300 dark:group-hover/brand:text-white transition-colors duration-300">GIP
+                        class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest leading-none whitespace-nowrap text-slate-400 group-hover/brand:text-royal-blue dark:text-slate-300 dark:group-hover/brand:text-blue-400 transition-colors duration-300 cursor-pointer">GIP
                         Monitoring</span>
                 </div>
 
                 <!-- Right Side Grid: Copyright -->
                 <div class="text-right group/copy cursor-default">
                     <p
-                        class="text-[0.46875rem] sm:text-[0.5rem] font-bold uppercase tracking-widest whitespace-nowrap text-slate-400 group-hover/copy:text-black dark:text-slate-300 dark:group-hover/copy:text-white transition-colors duration-300">
+                        class="text-[7.5px] sm:text-[8px] font-bold uppercase tracking-widest whitespace-nowrap text-slate-400 group-hover/copy:text-black dark:text-slate-300 dark:group-hover/copy:text-white transition-colors duration-300">
                         © <span class="auto-year">2026</span> DOLE-LDNPFO | GIP SYSTEM
                         V<?php echo htmlspecialchars(env('APP_VERSION', '4.2')); ?>
                     </p>
@@ -934,34 +861,149 @@ require_once __DIR__ . '/../../config/vite.php';
                 window.location.href = `${base}`;
             }
 
+            // Global base path resolved from PHP config
+            const basePath = '<?php echo $baseUrl; ?>/';
+
+            window.showComplianceInfo = function() {
+                Swal.fire({
+                    title: '<span class="text-lg font-black text-heading uppercase tracking-tight">RA 10173 (Data Privacy Act)</span>',
+                    html: `
+                        <div class="font-montserrat text-left text-xs leading-relaxed space-y-3">
+                            <p>The <strong>Data Privacy Act of 2012 (Republic Act No. 10173)</strong> protects all forms of information, be it private, personal, or sensitive. It ensures that the Philippines complies with international standards for data protection.</p>
+                            <div class="bg-blue-50/50 dark:bg-blue-900/10 border-l-4 border-royal-blue p-3 rounded-r-xl">
+                                <p class="font-bold text-[10px] text-royal-blue uppercase tracking-widest mb-1">PII Security Shield</p>
+                                <p class="text-slate-500 dark:text-slate-400">Personally Identifiable Information (PII) is strictly restricted or omitted from general dashboards to guarantee compliance with national privacy guidelines.</p>
+                            </div>
+                            <p>For administrative access requests or data policy inquiries, please contact the DOLE Data Protection Team.</p>
+                        </div>
+                    `,
+                    icon: 'info',
+                    confirmButtonText: '<span class="font-black uppercase tracking-widest cursor-pointer">Understood</span>',
+                    customClass: {
+                        container: 'font-montserrat',
+                        popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100 dark:border-slate-800 dark:bg-slate-900',
+                        confirmButton: 'bg-brand text-white hover:bg-brand-strong text-xs px-6 py-2.5 rounded-xl border border-transparent shadow-sm cursor-pointer'
+                    },
+                    buttonsStyling: false
+                });
+            };
+
+            window.openQuickLookup = function() {
+                Swal.fire({
+                    title: '<span class="text-lg font-black text-heading uppercase tracking-tight font-montserrat">Search Member</span>',
+                    html: `
+                        <div class="font-montserrat text-left p-1">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Type Name or ID</label>
+                            <div class="relative mb-4">
+                                <input type="text" id="swal-quick-search-input" placeholder="e.g. ROX-RD-ESIG..." 
+                                    class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
+                            </div>
+                            <div id="swal-quick-search-results" class="max-h-[220px] overflow-y-auto space-y-1 rounded-xl">
+                                <p class="text-xs text-slate-400 italic text-center py-4">Start typing to search...</p>
+                            </div>
+                        </div>
+                    `,
+                    showConfirmButton: false,
+                    showCancelButton: true,
+                    cancelButtonText: '<span class="font-black uppercase tracking-widest cursor-pointer">Close</span>',
+                    customClass: {
+                        container: 'font-montserrat',
+                        popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100 dark:border-slate-800 dark:bg-slate-900',
+                        cancelButton: 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 text-xs px-6 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 shadow-sm mx-2 cursor-pointer'
+                    },
+                    buttonsStyling: false,
+                    didOpen: (popup) => {
+                        const input = popup.querySelector('#swal-quick-search-input');
+                        const resultsContainer = popup.querySelector('#swal-quick-search-results');
+                        
+                        if (!input || !resultsContainer) return;
+
+                        let debounceTimer = null;
+
+                        input.addEventListener('input', () => {
+                            clearTimeout(debounceTimer);
+                            const query = input.value.trim();
+                            
+                            if (query.length < 2) {
+                                resultsContainer.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">Type at least 2 characters...</p>';
+                                return;
+                            }
+
+                            resultsContainer.innerHTML = `
+                                <div class="flex justify-center items-center py-4">
+                                    <div class="w-6 h-6 border-4 border-royal-blue border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                            `;
+
+                            debounceTimer = setTimeout(async () => {
+                                try {
+                                    const res = await fetch(`${basePath}api/beneficiaries.php?replacement_candidates=1&q=${encodeURIComponent(query)}&limit=10`);
+                                    const json = await res.json();
+                                    
+                                    if (json.success && Array.isArray(json.candidates) && json.candidates.length > 0) {
+                                        resultsContainer.innerHTML = json.candidates.map(c => `
+                                            <button data-id="${c.id}" class="quick-search-item flex justify-between items-center p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-royal-blue/10 dark:hover:bg-blue-900/30 hover:border-royal-blue/20 cursor-pointer transition-all duration-200 w-full text-left focus:outline-none">
+                                                <div class="flex flex-col text-left">
+                                                    <span class="text-xs font-black text-slate-800 dark:text-white">${c.name}</span>
+                                                    <span class="text-[9px] font-bold text-slate-400 font-mono">${c.id}</span>
+                                                </div>
+                                                <span class="text-[9px] font-black text-royal-blue dark:text-blue-400 bg-royal-blue/5 dark:bg-blue-900/30 px-2 py-1 rounded border border-royal-blue/10 cursor-pointer">VIEW</span>
+                                            </button>
+                                        `).join('');
+
+                                        resultsContainer.querySelectorAll('.quick-search-item').forEach(item => {
+                                            item.addEventListener('click', () => {
+                                                const id = item.dataset.id;
+                                                Swal.close();
+                                                if (window.viewBeneficiary) {
+                                                    window.viewBeneficiary({ id: id });
+                                                }
+                                            });
+                                        });
+                                    } else {
+                                        resultsContainer.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-4">No matching records found.</p>';
+                                    }
+                                } catch (e) {
+                                    resultsContainer.innerHTML = '<p class="text-xs text-red-500 italic text-center py-4">Error loading results.</p>';
+                                    console.error(e);
+                                }
+                            }, 300);
+                        });
+
+                        // Focus search input on open
+                        setTimeout(() => input.focus(), 150);
+                    }
+                });
+            };
+
             // --- DASHBOARD VIEW SWITCHER LOGIC ---
             document.addEventListener('DOMContentLoaded', function () {
                 const genBtn = document.getElementById('view-general-btn');
-                const perfBtn = document.getElementById('view-performance-btn');
+                const quickBtn = document.getElementById('view-quick-access-btn');
                 const genView = document.getElementById('general-view-section');
-                const perfView = document.getElementById('performance-view-section');
+                const quickView = document.getElementById('quick-access-view-section');
 
-                if (!genBtn || !perfBtn) return;
+                if (!genBtn || !quickBtn) return;
 
                 function switchView(target) {
-                    if (target === 'performance') {
+                    if (target === 'quick-access') {
                         genBtn.classList.remove('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-royal-blue', 'dark:text-blue-400', 'font-black');
                         genBtn.classList.add('text-slate-500', 'font-bold');
-                        perfBtn.classList.add('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-royal-blue', 'dark:text-blue-400', 'font-black');
-                        perfBtn.classList.remove('text-slate-500', 'font-bold');
+                        quickBtn.classList.add('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-royal-blue', 'dark:text-blue-400', 'font-black');
+                        quickBtn.classList.remove('text-slate-500', 'font-bold');
 
                         genView.classList.add('hidden', 'opacity-0');
-                        perfView.classList.remove('hidden');
-                        setTimeout(() => perfView.classList.remove('opacity-0'), 10);
+                        quickView.classList.remove('hidden');
+                        setTimeout(() => quickView.classList.remove('opacity-0'), 10);
 
                         window.dispatchEvent(new Event('resize'));
                     } else {
-                        perfBtn.classList.remove('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-royal-blue', 'dark:text-blue-400', 'font-black');
-                        perfBtn.classList.add('text-slate-500', 'font-bold');
+                        quickBtn.classList.remove('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-royal-blue', 'dark:text-blue-400', 'font-black');
+                        quickBtn.classList.add('text-slate-500', 'font-bold');
                         genBtn.classList.add('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-royal-blue', 'dark:text-blue-400', 'font-black');
                         genBtn.classList.remove('text-slate-500', 'font-bold');
 
-                        perfView.classList.add('hidden', 'opacity-0');
+                        quickView.classList.add('hidden', 'opacity-0');
                         genView.classList.remove('hidden');
                         setTimeout(() => genView.classList.remove('opacity-0'), 10);
 
@@ -970,7 +1012,26 @@ require_once __DIR__ . '/../../config/vite.php';
                 }
 
                 genBtn.addEventListener('click', () => switchView('general'));
-                perfBtn.addEventListener('click', () => switchView('performance'));
+                quickBtn.addEventListener('click', () => switchView('quick-access'));
+
+                // Auto-open logic on load based on query parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const gipId = urlParams.get('gip_id');
+                const showProfile = urlParams.get('profile');
+                
+                if (gipId) {
+                    setTimeout(() => {
+                        if (window.viewBeneficiary) {
+                            window.viewBeneficiary({ id: gipId });
+                        }
+                    }, 500);
+                } else if (showProfile === 'true') {
+                    setTimeout(() => {
+                        if (window.showProfileModal) {
+                            window.showProfileModal();
+                        }
+                    }, 500);
+                }
 
                 // Card Mode Toggle (Roles vs Status)
                 const cardToggle = document.getElementById('card-mode-toggle');
