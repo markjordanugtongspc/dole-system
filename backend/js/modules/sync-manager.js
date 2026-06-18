@@ -154,53 +154,38 @@ async function pushToRemote(item) {
     return await pushToFetch(item);
 }
 
+import { apiRequest } from './ajax-manager.js';
+
 /**
  * Standard fetch fallback for local Laragon/PHP
  */
 async function pushToFetch(item) {
-    const userId = getUserId();
-    const url = `${getBasePath()}${item.endpoint}`;
-
-    const headers = {
-        'Content-Type': 'application/json',
-        ...(userId ? { 'X-User-Id': String(userId) } : {}),
-    };
-
     const opts = {
-        method: item.method,
-        headers,
+        method: item.method
     };
+
+    let endpoint = item.endpoint;
 
     // PATCH requests send params in the URL, others send in body
-    const finalUrl = item.method === 'PATCH'
-        ? `${url}?${new URLSearchParams(item.payload).toString()}`
-        : url;
-
-    if (item.method !== 'PATCH' && item.method !== 'GET') {
+    if (item.method === 'PATCH') {
+        endpoint = `${item.endpoint}?${new URLSearchParams(item.payload).toString()}`;
+    } else if (item.method !== 'GET') {
         opts.body = JSON.stringify(item.payload);
     }
 
-    const response = await fetch(finalUrl, opts);
-    let result;
-    try {
-        result = await response.json();
-    } catch (e) {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        throw new Error('Invalid JSON response');
-    }
+    const response = await apiRequest(endpoint, opts);
 
-    if (!response.ok || !result.success) {
-        throw new Error(result.error || `HTTP ${response.status}`);
+    if (!response.success) {
+        throw new Error(response.error || 'Failed to sync with remote server');
     }
 
     logger.debug('[Sync] Remote ack', {
         method: item.method,
-        endpoint: item.endpoint,
-        hasUserId: Boolean(userId),
-        finalUrl
+        endpoint: endpoint,
+        success: true
     });
 
-    return result;
+    return response.data || { success: true };
 }
 
 /**

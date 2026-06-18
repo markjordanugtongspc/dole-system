@@ -6,6 +6,8 @@ import Swal from 'sweetalert2';
 import { BulkApp } from './bulk_tool.js';
 import { showBeneficiaryDrawer } from './drawer.js';
 import { showEditBeneficiaryDrawer } from './edit_drawer.js';
+import { getLocalBeneficiaries, cacheBeneficiaries } from './db-manager.js';
+import { renderSearchStatsChart } from './charts.js';
 
 export function initModalHandler() {
     // Expose the functions to the global window object
@@ -136,6 +138,9 @@ export function initModalHandler() {
     };
     window.showProfileModal = function () {
         showProfileModal();
+    };
+    window.showSearchExtraStatsModal = function () {
+        showSearchExtraStatsModal();
     };
 }
 
@@ -2402,3 +2407,338 @@ window.handleContactSubmit = async function (event) {
 
     return false;
 };
+
+export function showSearchExtraStatsModal() {
+    Swal.fire({
+        html: `
+        <form class="max-w-3xl mx-auto" id="extraStatsSearchForm">   
+            <div class="flex shadow-2xl rounded-2xl relative">
+                <!-- Dropdown Sort Button -->
+                <button id="statsSortDropdownBtn" class="shrink-0 z-[60] inline-flex items-center py-4 px-5 text-sm font-bold text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-s-2xl hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600 dark:focus:ring-gray-700 dark:text-white dark:border-slate-600 cursor-pointer transition-all" type="button">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
+                    <span class="hidden sm:inline" id="statsSortDropdownLabel">Sort</span>
+                    <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                    </svg>
+                </button>
+                <div id="statsSortDropdown" class="absolute top-full mt-2 left-0 !z-[9999] hidden bg-white divide-y divide-gray-100 rounded-xl shadow-xl w-44 dark:bg-slate-700">
+                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200 uppercase font-bold tracking-widest" aria-labelledby="statsSortDropdownBtn">
+                        <li><button type="button" data-sort="keyword" class="stats-sort-option inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer transition-colors">Keyword</button></li>
+                        <li><button type="button" data-sort="date" class="stats-sort-option inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer transition-colors">Date</button></li>
+                        <li><button type="button" data-sort="offices" class="stats-sort-option inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer transition-colors">Offices</button></li>
+                        <li><button type="button" data-sort="education" class="stats-sort-option inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer transition-colors">Education</button></li>
+                        <li><button type="button" data-sort="ages" class="stats-sort-option inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer transition-colors">Ages</button></li>
+                    </ul>
+                </div>
+                
+                <div class="relative w-full group flex">
+                    <!-- Standard Search Input -->
+                    <input type="search" id="statsSearchInput" class="block w-full p-4 pr-[90px] text-sm text-gray-900 border border-s-0 border-gray-300 rounded-e-2xl bg-white focus:ring-royal-blue focus:border-royal-blue dark:bg-slate-800 dark:border-slate-600 dark:placeholder-gray-400 dark:text-white transition-all outline-none" placeholder="Search by name, office, status..." autocomplete="off" />
+                    
+                    <!-- Date Range Picker (Hidden initially) -->
+                    <div id="statsDatePickerContainer" class="hidden items-center w-full bg-white dark:bg-slate-800 border border-s-0 border-gray-300 dark:border-slate-600 rounded-e-2xl p-2.5 pr-[90px]">
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
+                            </div>
+                            <input id="datepicker-range-start" name="start" type="date" class="block w-full ps-9 pe-2 py-1.5 bg-transparent border-0 text-sm focus:ring-0 text-gray-900 dark:text-white dark:placeholder-gray-400 outline-none cursor-pointer">
+                        </div>
+                        <span class="mx-2 text-gray-500 dark:text-gray-400 text-xs font-bold">TO</span>
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
+                            </div>
+                            <input id="datepicker-range-end" name="end" type="date" class="block w-full ps-9 pe-2 py-1.5 bg-transparent border-0 text-sm focus:ring-0 text-gray-900 dark:text-white dark:placeholder-gray-400 outline-none cursor-pointer">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="absolute top-0 end-0 p-4 text-sm font-medium h-full text-white bg-royal-blue rounded-e-2xl border border-royal-blue hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer transition-all active:scale-95 flex items-center justify-center min-w-[80px] z-10">
+                        <svg class="w-5 h-5 mr-0 sm:mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                        </svg>
+                        <span class="uppercase font-bold tracking-widest text-xs hidden sm:inline">Search</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="statsSearchLoader" class="hidden mt-8 mb-4 text-center">
+                <svg class="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-royal-blue" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                </svg>
+                <p class="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest mt-2 animate-pulse">Analyzing Statistics...</p>
+            </div>
+            
+            <div id="statsSearchResult" class="mt-8 hidden grid-cols-1 md:grid-cols-2 gap-6 text-left transition-opacity duration-300 relative z-20">
+                <!-- Left Column: Chart -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 p-4 shadow-2xl flex flex-col items-center justify-center min-h-[280px]">
+                    <h3 class="text-[0.625rem] font-black text-slate-400 uppercase tracking-widest mb-1 text-center w-full border-b border-gray-100 dark:border-slate-700 pb-2">Status Distribution</h3>
+                    <div id="statsModalChartContainer" class="w-full h-[220px] flex justify-center items-center mt-2"></div>
+                    <div class="w-full mt-auto pt-3 border-t border-gray-100 dark:border-slate-700 text-center">
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
+                            <span class="text-royal-blue dark:text-blue-400">&bull;</span> Showing aggregated analytics based on your search criteria. Data is dynamically cached for optimized performance.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Right Column: Stats Layout -->
+                <div class="bg-royal-blue dark:bg-blue-900 rounded-2xl shadow-2xl relative overflow-hidden flex flex-col border border-royal-blue dark:border-blue-800">
+                    <!-- Header part (Primary Color Background) -->
+                    <div class="p-5 pb-12 flex justify-between items-start text-white z-0 relative">
+                        <!-- Left side -->
+                        <div class="flex flex-col items-start text-left">
+                            <img src="../../frontend/images/logo/gip.png" alt="GIP Logo" class="w-12 h-12 object-contain mb-3 bg-transparent rounded-full" />
+                            <h2 class="text-xl font-black whitespace-nowrap tracking-wider leading-tight">EXTRA STATS</h2>
+                            <p class="text-xs font-normal text-blue-100 mt-1" id="statsSearchTermDisplay">Keyword: </p>
+                        </div>
+                        <!-- Right side -->
+                        <div class="text-[0.5625rem] font-bold text-blue-200 mt-2 uppercase tracking-widest text-right whitespace-nowrap" id="statsCurrentDateTime">
+                            <!-- Date/Time will be populated via JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- Body part (White wavy area) -->
+                    <div class="relative bg-white dark:bg-slate-800 rounded-b-2xl p-5 pt-8 flex-1 shadow-inner z-10 mt-[-24px]">
+                        <!-- Wavy Top Divider -->
+                        <svg class="absolute bottom-full left-0 w-full h-6 text-white dark:text-slate-800 drop-shadow-sm" preserveAspectRatio="none" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg">
+                          <path fill="currentColor" fill-opacity="1" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,149.3C672,149,768,203,864,224C960,245,1056,235,1152,213.3C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                        </svg>
+
+                        <div class="space-y-3 font-mono text-[13px] text-body dark:text-gray-300 px-2 relative z-20" id="statsTopResults">
+                            <!-- Top 3 results will be populated here via JS -->
+                        </div>
+                        
+                        <div class="mt-8 pt-4 border-t border-dashed border-gray-300 dark:border-gray-600 text-[0.625rem] text-center text-gray-400 font-bold uppercase tracking-widest flex flex-col gap-1 relative z-20">
+                            <span>End of Report</span>
+                            <span class="text-[9px] opacity-50 block mt-1">Generated by 2026 GIP Monitor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        `,
+        width: '800px',
+        showConfirmButton: false,
+        showCloseButton: false,
+        backdrop: true,
+        position: 'top',
+        scrollbarPadding: false,
+        customClass: {
+            container: 'font-montserrat !backdrop-blur-md !bg-slate-900/70',
+            popup: '!bg-transparent border-0 !shadow-none p-0 !overflow-visible mt-24',
+            htmlContainer: '!overflow-visible',
+            closeButton: 'hidden'
+        },
+        didOpen: () => {
+            const form = document.getElementById('extraStatsSearchForm');
+            const input = document.getElementById('statsSearchInput');
+            const dateContainer = document.getElementById('statsDatePickerContainer');
+            const dateStart = document.getElementById('datepicker-range-start');
+            const dateEnd = document.getElementById('datepicker-range-end');
+            
+            // Dropdown Toggle Logic
+            const dropdownBtn = document.getElementById('statsSortDropdownBtn');
+            const dropdownMenu = document.getElementById('statsSortDropdown');
+            const dropdownLabel = document.getElementById('statsSortDropdownLabel');
+            
+            let currentSearchMode = 'keyword';
+            
+            if (dropdownBtn && dropdownMenu) {
+                dropdownBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dropdownMenu.classList.toggle('hidden');
+                });
+                
+                // Handle Sort Selection
+                document.querySelectorAll('.stats-sort-option').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const sortType = e.target.getAttribute('data-sort');
+                        currentSearchMode = sortType;
+                        dropdownLabel.textContent = e.target.textContent;
+                        dropdownMenu.classList.add('hidden');
+                        
+                        // Show/Hide Inputs based on sort type
+                        if (sortType === 'date') {
+                            input.classList.add('hidden');
+                            input.required = false;
+                            dateContainer.classList.remove('hidden');
+                            dateContainer.classList.add('flex');
+                            input.value = ''; // clear text search
+                        } else {
+                            dateContainer.classList.add('hidden');
+                            dateContainer.classList.remove('flex');
+                            input.classList.remove('hidden');
+                            input.required = false; // Allow empty searches for Offices/Education/Ages to list all
+                            dateStart.value = '';
+                            dateEnd.value = '';
+                            
+                            // Adjust placeholder based on type
+                            if (sortType === 'offices') input.placeholder = "Search by Office name (e.g. Iligan)...";
+                            else if (sortType === 'education') input.placeholder = "Search by Education level (e.g. College)...";
+                            else if (sortType === 'ages') input.placeholder = "Search by Age (e.g. 24)...";
+                            else input.placeholder = "Search by name, office, status...";
+                        }
+                    });
+                });
+                
+                // Hide when clicked outside
+                document.addEventListener('click', (e) => {
+                    if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                        dropdownMenu.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Give input focus naturally
+            setTimeout(() => input?.focus(), 100);
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const searchParams = {
+                    mode: currentSearchMode,
+                    query: input.value.trim().toLowerCase(),
+                    startDate: dateStart.value,
+                    endDate: dateEnd.value
+                };
+                
+                // Allow empty search to just show recent 3 or general stats
+                await performStatsSearch(searchParams);
+            });
+        }
+    });
+}
+
+/**
+ * Searches the local cache and displays the result in the chart and receipt.
+ */
+async function performStatsSearch(searchParams) {
+    const loader = document.getElementById('statsSearchLoader');
+    const resultDiv = document.getElementById('statsSearchResult');
+    
+    loader.classList.remove('hidden');
+    resultDiv.classList.add('hidden');
+    resultDiv.classList.remove('grid');
+    
+    // Fetch from local cache for speed
+    let allData = await getLocalBeneficiaries();
+    
+    // Fallback: If cache is empty, fetch from API directly
+    if (!allData || allData.length === 0) {
+        const res = await apiGet('api/beneficiaries.php?all=true');
+        if (res && res.status === 'success' && res.data) {
+            allData = res.data;
+            if (typeof cacheBeneficiaries === 'function') {
+                cacheBeneficiaries(allData); // Save to local cache in background
+            }
+        } else if (res && res.data) { // Some endpoints return data directly without status wrap
+            allData = Array.isArray(res.data) ? res.data : (Array.isArray(res) ? res : []);
+            if (typeof cacheBeneficiaries === 'function') {
+                cacheBeneficiaries(allData);
+            }
+        }
+    }
+    
+    setTimeout(() => {
+        const { mode, query, startDate, endDate } = searchParams;
+        
+        const filteredData = allData.filter(b => {
+            if (mode === 'date') {
+                const bDateStr = b.startDate || b.createdAt;
+                if (!bDateStr) return false;
+                
+                const bDate = new Date(bDateStr);
+                if (isNaN(bDate.getTime())) return false;
+                
+                bDate.setHours(0,0,0,0);
+                
+                if (startDate) {
+                    const sDate = new Date(startDate);
+                    sDate.setHours(0,0,0,0);
+                    if (bDate < sDate) return false;
+                }
+                if (endDate) {
+                    const eDate = new Date(endDate);
+                    eDate.setHours(0,0,0,0);
+                    if (bDate > eDate) return false;
+                }
+                return true;
+            } else if (mode === 'offices') {
+                return (b.office?.toLowerCase().includes(query) || false);
+            } else if (mode === 'education') {
+                return (b.education?.toLowerCase().includes(query) || false);
+            } else if (mode === 'ages') {
+                return b.age == query; // Exact match or soft match
+            } else {
+                // Default Keyword Search
+                if (!query) return true; // Show all if empty
+                return (b.name?.toLowerCase().includes(query) || false) ||
+                       (b.id?.toLowerCase().includes(query) || false) ||
+                       (b.office?.toLowerCase().includes(query) || false) ||
+                       (b.remarks?.toLowerCase().includes(query) || false) ||
+                       (b.designation?.toLowerCase().includes(query) || false);
+            }
+        });
+
+        // Populate Top 3 Results in Receipt
+        let displayStr = '';
+        if (mode === 'date') {
+            if (startDate && endDate) displayStr = `Date: ${startDate} to ${endDate}`;
+            else if (startDate) displayStr = `Date: From ${startDate}`;
+            else if (endDate) displayStr = `Date: Until ${endDate}`;
+            else displayStr = `Date: All Time`;
+        } else {
+            displayStr = `${mode.charAt(0).toUpperCase() + mode.slice(1)}: "${query || 'ALL'}"`;
+        }
+        
+        document.getElementById('statsSearchTermDisplay').textContent = displayStr;
+        const topResultsContainer = document.getElementById('statsTopResults');
+        if (topResultsContainer) {
+            topResultsContainer.innerHTML = '';
+            if (filteredData.length > 0) {
+                const top3 = filteredData.slice(0, 3);
+                top3.forEach(b => {
+                    const statusText = (b.remarks || 'No Status').toUpperCase();
+                    let statusColor = 'text-gray-500';
+                    if (statusText === 'ONGOING') statusColor = 'text-green-500';
+                    else if (statusText === 'EXPIRED') statusColor = 'text-red-500';
+                    else if (statusText === 'ABSORBED') statusColor = 'text-emerald-600';
+                    else if (statusText === 'RESIGNED') statusColor = 'text-[#ce1126]';
+                    else statusColor = 'text-royal-blue';
+                    
+                    topResultsContainer.innerHTML += `
+                        <div class="flex flex-col border-b border-gray-200 dark:border-slate-700 pb-2 mb-2 last:border-0 last:pb-0 last:mb-0">
+                            <span class="font-bold text-gray-800 dark:text-gray-100 truncate">${b.name || 'Unknown Beneficiary'}</span>
+                            <div class="flex justify-between items-center text-xs mt-1">
+                                <span class="text-gray-500 truncate max-w-[60%]">${b.office || 'N/A'}</span>
+                                <span class="${statusColor} font-bold text-[10px] uppercase tracking-wider">${statusText}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                topResultsContainer.innerHTML = '<div class="text-center text-gray-400 font-bold text-xs mt-6 uppercase tracking-widest">No matching records found.</div>';
+            }
+        }
+
+        // Calculate Stats
+        const total = filteredData.length;
+        const ongoing = filteredData.filter(b => (b.remarks || '').toUpperCase() === 'ONGOING').length;
+        const expired = filteredData.filter(b => (b.remarks || '').toUpperCase() === 'EXPIRED').length;
+        const absorbed = filteredData.filter(b => (b.remarks || '').toUpperCase() === 'ABSORBED').length;
+        const resigned = filteredData.filter(b => (b.remarks || '').toUpperCase() === 'RESIGNED').length;
+
+        // Current Date and Time
+        const now = new Date();
+        const dateOptions = { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+        document.getElementById('statsCurrentDateTime').textContent = now.toLocaleString('en-US', dateOptions);
+
+        // Render Chart
+        renderSearchStatsChart(filteredData, 'statsModalChartContainer');
+
+        // Show UI
+        loader.classList.add('hidden');
+        resultDiv.classList.remove('hidden');
+        resultDiv.classList.add('grid');
+    }, 400); // UI breathing room
+}

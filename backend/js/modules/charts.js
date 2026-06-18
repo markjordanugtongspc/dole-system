@@ -1061,3 +1061,169 @@ window.addEventListener('dataSynced', () => {
     console.log('[Charts] Data synced detected, refreshing analytics...');
     initCharts(true); // Force refresh from remote
 });
+
+let currentStatsChart = null;
+
+export function renderSearchStatsChart(filteredData, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (currentStatsChart) {
+        currentStatsChart.destroy();
+        currentStatsChart = null;
+    }
+
+    if (filteredData.length === 0) {
+        // Fix NaN error: render a dummy "empty" chart when there's no data
+        const t = getThemeColors();
+        const emptyOptions = {
+            series: [1],
+            chart: {
+                type: 'donut',
+                height: 250,
+                fontFamily: 'Montserrat, sans-serif',
+                background: 'transparent',
+                animations: { enabled: false }
+            },
+            labels: ['No Data'],
+            colors: [t.grid],
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '65%',
+                        labels: {
+                            show: true,
+                            name: { show: false },
+                            value: {
+                                show: true,
+                                fontSize: '24px',
+                                fontWeight: 900,
+                                color: t.muted,
+                                formatter: () => '0'
+                            },
+                            total: {
+                                show: true,
+                                showAlways: true,
+                                label: 'TOTAL',
+                                fontSize: '10px',
+                                fontWeight: 900,
+                                color: t.muted,
+                                formatter: () => '0'
+                            }
+                        }
+                    }
+                }
+            },
+            dataLabels: { enabled: false },
+            stroke: { show: true, colors: isDark() ? ['#1e293b'] : ['#ffffff'], width: 2 },
+            tooltip: { enabled: false },
+            legend: { show: false }
+        };
+
+        currentStatsChart = new ApexCharts(container, emptyOptions);
+        currentStatsChart.render();
+        return;
+    }
+
+    const counts = {
+        ongoing: 0,
+        expired: 0,
+        absorbed: 0,
+        resigned: 0,
+        other: 0
+    };
+
+    filteredData.forEach(b => {
+        const r = (b.remarks || '').toUpperCase();
+        if (r === 'ONGOING') counts.ongoing++;
+        else if (r === 'EXPIRED') counts.expired++;
+        else if (r === 'ABSORBED') counts.absorbed++;
+        else if (r === 'RESIGNED') counts.resigned++;
+        else counts.other++;
+    });
+
+    const series = [];
+    const labels = [];
+    const colors = [];
+
+    if (counts.ongoing > 0) { series.push(counts.ongoing); labels.push('Ongoing'); colors.push(COLORS.successGreen); }
+    if (counts.expired > 0) { series.push(counts.expired); labels.push('Expired'); colors.push(COLORS.philippineRed); }
+    if (counts.absorbed > 0) { series.push(counts.absorbed); labels.push('Absorbed'); colors.push('#059669'); } // emerald-600
+    if (counts.resigned > 0) { series.push(counts.resigned); labels.push('Resigned'); colors.push('#b91c1c'); } // red-700
+    if (counts.other > 0) { series.push(counts.other); labels.push('Other'); colors.push(COLORS.mutedSlate()); }
+
+    const t = getThemeColors();
+
+    const options = {
+        series: series,
+        chart: {
+            type: 'donut',
+            height: 250,
+            fontFamily: 'Montserrat, sans-serif',
+            background: 'transparent',
+            animations: {
+                enabled: true,
+                easing: 'easeinout',
+                speed: 800,
+                dynamicAnimation: {
+                    enabled: true,
+                    speed: 350
+                }
+            }
+        },
+        labels: labels,
+        colors: colors,
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '65%',
+                    labels: {
+                        show: true,
+                        name: {
+                            show: true,
+                            fontSize: '10px',
+                            fontWeight: 800,
+                            color: t.muted,
+                            offsetY: -5
+                        },
+                        value: {
+                            show: true,
+                            fontSize: '24px',
+                            fontWeight: 900,
+                            color: t.text,
+                            offsetY: 5
+                        },
+                        total: {
+                            show: true,
+                            showAlways: true,
+                            label: 'TOTAL',
+                            fontSize: '10px',
+                            fontWeight: 900,
+                            color: t.muted
+                        }
+                    }
+                }
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            show: true,
+            colors: isDark() ? ['#1e293b'] : ['#ffffff'],
+            width: 2
+        },
+        tooltip: {
+            theme: isDark() ? 'dark' : 'light',
+            style: {
+                fontSize: '12px'
+            }
+        },
+        legend: {
+            show: false // Hidden since the receipt acts as our legend
+        }
+    };
+
+    currentStatsChart = new ApexCharts(container, options);
+    currentStatsChart.render();
+}

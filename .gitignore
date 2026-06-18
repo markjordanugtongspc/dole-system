@@ -52,3 +52,7 @@ htdocs/phpmyadmin/
 
 # Python Scripts
 *.py
+
+# Documents
+*.pdf
+*.pptx

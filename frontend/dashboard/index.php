@@ -146,6 +146,16 @@ require_once __DIR__ . '/../../config/vite.php';
                 </div>
             </div>
 
+            <!-- Custom Search Extra Stats Button -->
+            <div class="mb-6 px-2 flex justify-end">
+                <button onclick="window.showSearchExtraStatsModal()" class="flex items-center gap-2 px-4 py-2.5 bg-royal-blue text-white rounded-xl shadow-sm hover:bg-blue-700 transition-all duration-300 cursor-pointer text-xs font-black uppercase tracking-widest active:scale-95">
+                    <svg class="w-5 h-5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
+                    </svg>
+                    Search Extra Stats
+                </button>
+            </div>
+
             <!-- Dashboard Content Wrapper for Switching -->
             <div id="general-view-section" class="transition-opacity duration-500">
                 <!-- Key Metrics Summary (Existing) -->
