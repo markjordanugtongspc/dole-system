@@ -22,6 +22,7 @@ import { initNotifications } from './modules/notifications.js';
 import { initDarkMode } from './modules/darkmode.js';
 import { initTextSize } from './modules/textsize.js';
 import { initSyncIndicator, startSyncWorker } from './modules/sync-manager.js';
+import { initWageCalculator } from './modules/wage-calculator.js';
 
 // [HYBRID] Initialize Smart Loader immediately (handles FOUC & pre-loading state)
 initSmartLoader();
@@ -55,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAutoYear();
     loadUserProfile();
     initNotifications();
+    initWageCalculator();
 
     // Offline-First: Initialize sync indicator pill and start background worker
     initSyncIndicator();

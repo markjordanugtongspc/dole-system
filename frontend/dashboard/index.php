@@ -717,11 +717,11 @@ require_once __DIR__ . '/../../config/vite.php';
                 </p>
             </div>
 
-            <!-- Quick Access Grid (2 columns on mobile, 4 columns on desktop) -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-8">
+            <!-- Quick Access Grid (2 columns on mobile, 5 columns on desktop) -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-5 mb-8">
                 <!-- Short 1: Add Beneficiary -->
                 <button onclick="window.location.href = basePath + 'frontend/LDN/index.php?add_member=true'"
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-7 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left h-full min-h-[130px] sm:min-h-[190px] focus:outline-none focus:ring-4 focus:ring-royal-blue/10">
+                    class="aspect-square bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none p-3.5 sm:p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left focus:outline-none focus:ring-4 focus:ring-royal-blue/10">
                     <div class="absolute -right-8 -top-8 w-24 h-24 bg-royal-blue/5 rounded-full blur-2xl group-hover:bg-royal-blue/10 transition-colors"></div>
                     <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-royal-blue via-blue-600 to-indigo-600"></div>
                     
@@ -744,7 +744,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <!-- Short 2: Beneficiary Lookup -->
                 <button onclick="window.location.href = basePath + 'frontend/LDN/index.php?focus_search=true'"
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-7 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left h-full min-h-[130px] sm:min-h-[190px] focus:outline-none focus:ring-4 focus:ring-violet-500/10">
+                    class="aspect-square bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none p-3.5 sm:p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left focus:outline-none focus:ring-4 focus:ring-violet-500/10">
                     <div class="absolute -right-8 -top-8 w-24 h-24 bg-violet-500/5 rounded-full blur-2xl group-hover:bg-violet-500/10 transition-colors"></div>
                     <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-violet-500 via-purple-600 to-fuchsia-600"></div>
                     
@@ -767,7 +767,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <!-- Short 3: Report Generator -->
                 <button onclick="window.location.href = basePath + 'frontend/export/index.php'"
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-7 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left h-full min-h-[130px] sm:min-h-[190px] focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
+                    class="aspect-square bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none p-3.5 sm:p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
                     <div class="absolute -right-8 -top-8 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors"></div>
                     <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-teal-600 to-green-600"></div>
                     
@@ -790,7 +790,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <!-- Short 4: My Profile & Settings -->
                 <button onclick="window.location.href = basePath + 'frontend/user/settings/index.php'"
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-3.5 sm:p-7 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left h-full min-h-[130px] sm:min-h-[190px] focus:outline-none focus:ring-4 focus:ring-orange-500/10">
+                    class="aspect-square bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none p-3.5 sm:p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left focus:outline-none focus:ring-4 focus:ring-orange-500/10">
                     <div class="absolute -right-8 -top-8 w-24 h-24 bg-orange-500/5 rounded-full blur-2xl group-hover:bg-orange-500/10 transition-colors"></div>
                     <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-500 via-red-500 to-pink-600"></div>
                     
@@ -809,6 +809,20 @@ require_once __DIR__ . '/../../config/vite.php';
                             Profile Settings
                         </p>
                     </div>
+                </button>
+                <!-- Short 5: Salary Calculator -->
+                <button onclick="window.location.href = basePath + 'frontend/calculate/'"
+                    class="aspect-square bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none p-3.5 sm:p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left focus:outline-none focus:ring-4 focus:ring-cyan-500/10">
+                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-cyan-500/5 rounded-full blur-2xl group-hover:bg-cyan-500/10 transition-colors"></div>
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan-500 via-sky-600 to-blue-700"></div>
+                    <div class="flex justify-between items-start mb-2 sm:mb-6">
+                        <div class="p-2 sm:p-3.5 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 rounded-2xl group-hover:scale-110 transition-transform border border-cyan-100 dark:border-cyan-900/30 shadow-inner">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.5 21h13M12 21V7m0 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm2-1.8c3.073.661 2.467 2.8 5 2.8M5 8c3.359 0 2.192-2.115 5.012-2.793M7 9.556V7.75m0 1.806-1.95 4.393a.773.773 0 0 0 .37.962.785.785 0 0 0 .362.089h2.436a.785.785 0 0 0 .643-.335.776.776 0 0 0 .09-.716L7 9.556Zm10 0V7.313m0 2.243-1.95 4.393a.773.773 0 0 0 .37.962.786.786 0 0 0 .362.089h2.436a.785.785 0 0 0 .643-.335.775.775 0 0 0 .09-.716L17 9.556Z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div><h4 class="text-[11px] sm:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight mb-1 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">Calculate Salary</h4><p class="text-[8px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">GIP Wage Estimate</p></div>
                 </button>
             </div>
         </div>
