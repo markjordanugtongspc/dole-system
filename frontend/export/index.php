@@ -80,7 +80,7 @@ require_once __DIR__ . '/../../config/vite.php';
         <div class="p-6">
 
             <!-- Page Header -->
-            <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="mb-8 flex flex-col gap-5 border-l-4 border-royal-blue bg-gradient-to-r from-blue-50 to-white p-5 shadow-sm dark:from-blue-950/30 dark:to-slate-900 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     <h1 class="text-3xl font-black text-heading mb-2">Export Data</h1>
                     <p class="text-sm text-body font-medium">Generate reports and print beneficiary data.</p>
@@ -117,30 +117,17 @@ require_once __DIR__ . '/../../config/vite.php';
                 </div>
             </div>
 
-            <!-- Mobile Preview Unavailable State -->
-            <div
-                class="md:hidden bg-white border border-gray-100 rounded-2xl shadow-sm mb-8 p-8 flex flex-col items-center justify-center text-center">
-                <div class="bg-gray-50 p-4 rounded-full mb-3">
-                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-1">Preview Unavailable</h3>
-                <p class="text-[0.625rem] text-gray-400 font-bold uppercase tracking-wider max-w-[200px]">Table Preview is
-                    not compatible on this device's screen size.</p>
-            </div>
-
-            <!-- Desktop Live Preview Card -->
-            <div class="hidden md:block bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mb-8">
-                <div class="p-4 border-b border-gray-100 flex justify-between items-center">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-white">Live Preview</h3>
-                    <div
-                        class="text-[0.625rem] font-bold text-gray-400 bg-white px-3 py-1 rounded-full border border-gray-100 italic">
-                        Displaying <span id="record-count" class="text-royal-blue font-black">0</span> records</div>
-                </div>
-
-                <div class="overflow-x-auto">
+            <!-- Responsive Live Preview Card -->
+            <div class="block bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mb-8 dark:bg-slate-900 dark:border-slate-700">
+                <div class="flex flex-col gap-2 border-b border-gray-100 p-4 dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h3 class="text-sm font-black uppercase tracking-widest text-gray-600 dark:text-white">Live Report Preview</h3>
+                        <p class="mt-1 text-xs font-medium text-gray-400">Review the configured report before printing or exporting.</p>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-500 dark:text-gray-300">
+                        Displaying <span id="record-count" class="font-black text-royal-blue dark:text-blue-300">0</span> records
+                    </p>
+                </div>                <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-600">
                         <thead>
                             <!-- JS Will Inject Dynamic Headers Here -->
@@ -185,7 +172,7 @@ ob_start();
                     NAME</th>
                 <th class="px-2 py-2 border border-royal-blue w-[8%]">AGE</th>
                 <th class="px-2 py-2 border border-royal-blue w-[18%]">OFFICE / PLACE OF ASSIGNMENT</th>
-                <th class="px-2 py-2 border border-royal-blue w-[13%] text-xs">DESIGNATION</th>
+                <th class="px-2 py-2 border border-royal-blue w-[13%] text-xs">ASSIGNED UNIT</th>
                 <th class="px-2 py-2 border border-royal-blue w-[10%]">START DATE</th>
                 <th class="px-2 py-2 border border-royal-blue w-[10%]">END DATE</th>
                 <th class="px-2 py-2 border border-royal-blue w-[8%]">STATUS</th>

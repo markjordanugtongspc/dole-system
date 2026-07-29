@@ -68,7 +68,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
             class="h-full flex flex-col px-3 py-4 overflow-y-auto bg-white dark:bg-gray-800 border-e border-gray-200 dark:border-gray-700 shadow-sm">
 
             <!-- ─── Logo ──────────────────────────────────────────────── -->
-            <a href="<?php echo $baseUrl; ?>/frontend/GIP/dashboard/" class="flex items-center ps-1 mb-6 group cursor-pointer">
+            <a href="<?php echo $baseUrl; ?>/frontend/portal/dashboard/" class="flex items-center ps-1 mb-6 group cursor-pointer">
                 <img src="<?php echo $baseUrl; ?>/frontend/images/logo/gip.png"
                     class="h-11 w-11 me-3 rounded-full object-contain border-2 border-royal-blue/20 shadow-sm group-hover:border-royal-blue/40 transition-all duration-200"
                     alt="GIP Logo">
@@ -85,7 +85,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
 
                 <!-- Dashboard (active) -->
                 <li>
-                    <a href="<?php echo $baseUrl; ?>/frontend/GIP/dashboard/"
+                    <a href="<?php echo $baseUrl; ?>/frontend/portal/dashboard/"
                         class="flex items-center px-3 py-2.5 text-royal-blue bg-blue-50 dark:bg-royal-blue/20 dark:text-blue-300 rounded-lg group font-bold cursor-pointer"
                         aria-current="page">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,7 +141,7 @@ $current_uri = $_SERVER['REQUEST_URI'];
 
                 <!-- About Developer -->
                 <li>
-                    <a href="<?php echo $baseUrl; ?>/frontend/aboutme/"
+                    <a href="<?php echo $baseUrl; ?>/frontend/portal/aboutme/"
                         class="flex items-center px-3 py-2.5 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-royal-blue dark:hover:text-white group transition-all duration-150 cursor-pointer">
                         <svg class="w-5 h-5 shrink-0 transition duration-75 group-hover:text-royal-blue" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">

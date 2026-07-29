@@ -1,23 +1,25 @@
 import { apiGet } from './ajax-manager.js';
 import Swal from 'sweetalert2';
+import { COMMON_ASSIGNED_UNITS } from './assigned-units.js';
 
 /**
  * Export & Print Module Logic
  */
 
 let allBeneficiaries = [];
-let activeColumns = ['id', 'name', 'age', 'office', 'position', 'status']; // Default columns
+let activeColumns = ['id', 'name', 'age', 'office', 'assignedunit', 'status']; // Default columns
 let currentFilters = {
     office: 'ALL',
     location: 'ALL',
     remarks: 'ALL',
     gender: 'ALL',
+    assignedUnit: 'ALL',
     ageGroup: 'ALL',
     year: 'ALL',
     search: '',
     sort: 'name',
     section: 'ALL', // ALL, ACTIVE, ARCHIVED
-    columns: ['id', 'name', 'age', 'office', 'position', 'status'],
+    columns: ['id', 'name', 'age', 'office', 'assignedunit', 'status'],
     preparedBy: localStorage.getItem('ldn_export_prepared') || '',
     approvedBy: localStorage.getItem('ldn_export_approved') || ''
 };
@@ -32,8 +34,11 @@ function loadSavedConfig() {
     if (saved) {
         try {
             const config = JSON.parse(saved);
-            currentFilters = { ...currentFilters, ...config };
-            activeColumns = currentFilters.columns;
+            const migratedColumns = Array.isArray(config.columns)
+                ? config.columns.map((column) => column === 'position' ? 'assignedunit' : column)
+                : currentFilters.columns;
+            currentFilters = { ...currentFilters, ...config, columns: migratedColumns };
+            activeColumns = migratedColumns;
         } catch (e) {
             console.error('Error loading saved export config', e);
         }
@@ -62,6 +67,15 @@ async function loadBeneficiaryData() {
             const d = new Date(b.startDate || b.createdAt || '');
             return isNaN(d.getTime()) ? null : d.getFullYear().toString();
         }).filter(Boolean))].sort((a, b) => b - a);
+        window.getExportAssignedUnits = () => {
+            const liveUnits = [...new Set(allBeneficiaries.map((beneficiary) => String(beneficiary.designation || '').trim()).filter((unit) => unit && !['N/A', 'NA', 'NONE', 'UNASSIGNED'].includes(unit.toUpperCase())))];
+            const commonOrder = new Map(COMMON_ASSIGNED_UNITS.map((unit, index) => [unit.toUpperCase(), index]));
+            return liveUnits.sort((a, b) => {
+                const aOrder = commonOrder.get(a.toUpperCase()) ?? Number.MAX_SAFE_INTEGER;
+                const bOrder = commonOrder.get(b.toUpperCase()) ?? Number.MAX_SAFE_INTEGER;
+                return aOrder - bOrder || a.localeCompare(b);
+            });
+        };
         window.handleFilterUpdate(currentFilters);
     } catch (error) {
         console.error('Error loading data for export', error);
@@ -128,6 +142,12 @@ window.handleFilterUpdate = function (filters) {
         filtered = filtered.filter((b) => normalizeGender(b.gender) === currentFilters.gender);
     }
 
+    // Assigned Unit Filter (the database field remains designation for backward compatibility)
+    if (currentFilters.assignedUnit && currentFilters.assignedUnit !== 'ALL') {
+        const selectedUnit = currentFilters.assignedUnit.trim().toUpperCase();
+        filtered = filtered.filter((beneficiary) => String(beneficiary.designation || '').trim().toUpperCase() === selectedUnit);
+    }
+
     // Remarks Filter
     if (currentFilters.remarks && currentFilters.remarks !== 'ALL') {
         filtered = filtered.filter(b => (b.remarks || '').toUpperCase() === currentFilters.remarks.toUpperCase());
@@ -155,6 +175,8 @@ window.handleFilterUpdate = function (filters) {
                     return (a.id || '').localeCompare(b.id || '');
                 case 'office':
                     return (a.office || '').localeCompare(b.office || '');
+                case 'assignedunit':
+                    return (a.designation || '').localeCompare(b.designation || '');
                 case 'startdate':
                     const dateA = new Date(a.startDate || 0);
                     const dateB = new Date(b.startDate || 0);
@@ -192,11 +214,12 @@ function updateDisplays(data) {
     renderWebTable(data);
     renderPrintTable(data);
     const countEl = document.getElementById('record-count');
-    if (countEl) countEl.textContent = data.length;
+    if (countEl) countEl.textContent = data.length.toLocaleString();
     const printFilterSummary = document.getElementById('print-filter-summary');
     if (printFilterSummary) {
         const parts = [];
         if (currentFilters.office !== 'ALL') parts.push(`OFFICE: ${currentFilters.office}`);
+        if (currentFilters.assignedUnit !== 'ALL') parts.push(`ASSIGNED UNIT: ${currentFilters.assignedUnit}`);
         if (currentFilters.remarks !== 'ALL') parts.push(`REMARKS: ${currentFilters.remarks}`);
         if (currentFilters.gender !== 'ALL') parts.push(`GENDER: ${currentFilters.gender}`);
         if (currentFilters.ageGroup !== 'ALL') parts.push(`AGE: ${currentFilters.ageGroup}`);
@@ -270,7 +293,7 @@ window.exportToExcel = function () {
 
                 html += `<tr>${columns.map(c => {
                     let val = row[c] || '-';
-                    if (c === 'position') val = row.designation || '-';
+                    if (c === 'assignedunit') val = row.designation || '-';
                     if (c === 'startdate') val = row.startDateFormatted || row.startDate || '-';
                     if (c === 'enddate') val = row.endDateFormatted || row.endDate || '-';
                     if (c === 'status') {
@@ -321,7 +344,7 @@ const COL_MAP = {
     name: 'NAME',
     age: 'AGE',
     office: 'OFFICE',
-    position: 'DESIGNATION',
+    assignedunit: 'ASSIGNED UNIT',
     status: 'STATUS',
     startdate: 'START DATE',
     enddate: 'END DATE'
@@ -342,7 +365,7 @@ function generateTableHeader(columns, classes = "px-4 py-2.5") {
 function generateTableRow(row, columns, isPrint = false) {
     return columns.map(c => {
         let val = row[c] || '-';
-        if (c === 'position') val = row.designation || '-';
+        if (c === 'assignedunit') val = row.designation || '-';
         if (c === 'startdate') val = row.startDateFormatted || row.startDate || '-';
         if (c === 'enddate') val = row.endDateFormatted || row.endDate || '-';
         if (c === 'status') val = row.remarks || 'N/A';

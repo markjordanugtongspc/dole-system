@@ -82,7 +82,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                         </svg>
                         <span class="text-xs font-bold text-royal-blue"><span
-                                class="metric-total-beneficiaries">...</span> Beneficiaries</span>
+                                class="metric-total-beneficiaries"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span> Beneficiaries</span>
                     </div>
 
                     <?php include __DIR__ . '/../components/notification.php'; ?>
@@ -176,8 +176,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                     Total Beneficiaries
                                 </p>
                                 <h3
-                                    class="text-3xl sm:text-4xl font-black text-royal-blue dark:text-blue-400 group-hover:translate-x-1 transition-transform duration-500 metric-total-beneficiaries">
-                                    ...</h3>
+                                    class="text-3xl sm:text-4xl font-black text-royal-blue dark:text-blue-400 group-hover:translate-x-1 transition-transform duration-500 metric-total-beneficiaries"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h3>
                             </div>
                             <div
                                 class="shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:rotate-6 group-hover:scale-110 shadow-inner">
@@ -190,15 +189,15 @@ require_once __DIR__ . '/../../config/vite.php';
                         </div>
                     </div>
 
-                    <!-- Male Ratio Card -->
+                    <!-- Total Male Card -->
                     <div
                         class="group relative cursor-pointer overflow-hidden rounded-r-2xl rounded-l-none border border-default bg-white p-4 shadow-sm transition-all duration-500 ease-out hover:scale-[1.02] hover:shadow-2xl dark:border-slate-700 dark:bg-slate-800/80 sm:p-5">
                         <div class="absolute inset-y-0 left-0 w-1 bg-blue-600 dark:bg-blue-400"></div>
                         <div class="absolute -bottom-8 -right-8 h-24 w-24 rounded-full bg-blue-500/5 blur-2xl transition-colors group-hover:bg-blue-500/10"></div>
                         <div class="relative z-10 flex items-center justify-between gap-4">
                             <div class="min-w-0">
-                                <p class="mb-1 whitespace-nowrap text-[0.5625rem] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 sm:text-[0.625rem]">Male Ratio</p>
-                                <h3 class="metric-male-ratio text-3xl font-black text-blue-600 transition-transform duration-500 group-hover:translate-x-1 dark:text-blue-400 sm:text-4xl">...</h3>
+                                <p class="mb-1 whitespace-nowrap text-[0.5625rem] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 sm:text-[0.625rem]">Total Male</p>
+                                <h3 class="metric-male-ratio text-3xl font-black text-blue-600 transition-transform duration-500 group-hover:translate-x-1 dark:text-blue-400 sm:text-4xl"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h3>
                             </div>
                             <div class="flex h-12 w-12 shrink-0 items-center justify-center border border-blue-100 bg-blue-50 text-blue-600 shadow-inner transition-all duration-500 group-hover:rotate-6 group-hover:scale-110 dark:border-blue-900/50 dark:bg-blue-900/30 dark:text-blue-300 sm:h-14 sm:w-14">
                                 <svg class="h-7 w-7 sm:h-8 sm:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.25" aria-hidden="true">
@@ -209,15 +208,15 @@ require_once __DIR__ . '/../../config/vite.php';
                         </div>
                     </div>
 
-                    <!-- Female Ratio Card -->
+                    <!-- Total Female Card -->
                     <div
                         class="group relative cursor-pointer overflow-hidden rounded-r-2xl rounded-l-none border border-default bg-white p-4 shadow-sm transition-all duration-500 ease-out hover:scale-[1.02] hover:shadow-2xl dark:border-slate-700 dark:bg-slate-800/80 sm:p-5">
                         <div class="absolute inset-y-0 left-0 w-1 bg-pink-500 dark:bg-pink-400"></div>
                         <div class="absolute -bottom-8 -right-8 h-24 w-24 rounded-full bg-pink-500/5 blur-2xl transition-colors group-hover:bg-pink-500/10"></div>
                         <div class="relative z-10 flex items-center justify-between gap-4">
                             <div class="min-w-0">
-                                <p class="mb-1 whitespace-nowrap text-[0.5625rem] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 sm:text-[0.625rem]">Female Ratio</p>
-                                <h3 class="metric-female-ratio text-3xl font-black text-pink-500 transition-transform duration-500 group-hover:translate-x-1 dark:text-pink-400 sm:text-4xl">...</h3>
+                                <p class="mb-1 whitespace-nowrap text-[0.5625rem] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 sm:text-[0.625rem]">Total Female</p>
+                                <h3 class="metric-female-ratio text-3xl font-black text-pink-500 transition-transform duration-500 group-hover:translate-x-1 dark:text-pink-400 sm:text-4xl"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h3>
                             </div>
                             <div class="flex h-12 w-12 shrink-0 items-center justify-center border border-pink-100 bg-pink-50 text-pink-500 shadow-inner transition-all duration-500 group-hover:-rotate-6 group-hover:scale-110 dark:border-pink-900/50 dark:bg-pink-900/30 dark:text-pink-300 sm:h-14 sm:w-14">
                                 <svg class="h-7 w-7 sm:h-8 sm:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.25" aria-hidden="true">
@@ -240,9 +239,8 @@ require_once __DIR__ . '/../../config/vite.php';
                                     class="text-[0.5625rem] sm:text-[0.625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
                                     Highest Age Share
                                 </p>
-                                <h3 class="metric-top-age-label text-3xl sm:text-4xl font-black text-heading dark:text-white group-hover:translate-x-1 transition-transform duration-500">
-                                    ...</h3>
-                                <p class="metric-top-age-share mt-1 text-[0.625rem] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">... of recorded ages</p>
+                                <h3 class="metric-top-age-label text-3xl sm:text-4xl font-black text-heading dark:text-white group-hover:translate-x-1 transition-transform duration-500"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h3>
+                                <p class="metric-top-age-share mt-1 text-[0.625rem] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></p>
                             </div>
                             <div
                                 class="shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-gray-100 dark:bg-slate-700/50 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:skew-x-3 group-hover:scale-110 shadow-inner">
@@ -275,8 +273,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                     class="text-[0.625rem] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
                                     Live Statistics</p>
                                 <h5 id="added-metric-value"
-                                    class="text-3xl sm:text-5xl font-black transition-colors duration-500 leading-none metric-added-count">
-                                    ...</h5>
+                                    class="text-3xl sm:text-5xl font-black transition-colors duration-500 leading-none metric-added-count"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h5>
                                 <p class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 mt-2">Total
                                     Added Beneficiaries</p>
                             </div>
@@ -287,7 +284,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M12 6v13m0-13 4 4m-4-4-4 4" />
                                 </svg>
-                                <span class="metric-added-rate">...</span>
+                                <span class="metric-added-rate"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span>
                             </div>
                         </div>
 
@@ -346,13 +343,13 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <div
                                     class="flex items-center px-2 py-1 text-[0.625rem] font-black text-philippine-red bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-900/30 shadow-xs">
                                     <span class="w-2 h-2 rounded-full bg-philippine-red me-2 animate-pulse"></span>
-                                    <span class="metric-female-ratio uppercase">...</span>
+                                    <span class="metric-female-ratio uppercase"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span>
                                 </div>
                                 <div
                                     class="flex items-center px-2 py-1 text-[0.625rem] font-black text-royal-blue bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-900/30 shadow-xs">
                                     <span
                                         class="w-2 h-2 rounded-full bg-royal-blue me-2 shadow-[0_0_8px_rgba(0,56,168,0.5)]"></span>
-                                    <span class="metric-male-ratio uppercase">...</span>
+                                    <span class="metric-male-ratio uppercase"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span>
                                 </div>
                             </div>
                         </div>
@@ -423,7 +420,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             </div>
                         </div>
 
-                        <div id="education-chart" class="mt-4 h-[270px] w-full" aria-label="Education level distribution chart"></div>
+                        <div id="education-chart" class="mt-4 h-[300px] w-full overflow-visible" aria-label="Education level distribution chart"></div>
 
                         <div class="grid grid-cols-2 gap-2 border-t border-dashed border-slate-200 pt-4 dark:border-slate-700 sm:grid-cols-4">
                             <div class="border-l-4 border-royal-blue bg-slate-50 px-3 py-3 dark:bg-slate-900/50">
@@ -505,7 +502,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         </div>
                         <div class="shrink-0 border-l-4 border-royal-blue bg-blue-50 px-4 py-3 text-left dark:bg-blue-950/30 sm:text-right">
                             <span class="block text-[0.5625rem] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Data Year</span>
-                            <span id="age-chart-year" class="mt-1 block text-2xl font-black leading-none text-royal-blue dark:text-blue-400">...</span>
+                            <span id="age-chart-year" class="mt-1 block text-2xl font-black leading-none text-royal-blue dark:text-blue-400"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span>
                             <span class="mt-1 block text-[0.5625rem] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Latest recorded year</span>
                         </div>
                     </div>
@@ -535,11 +532,11 @@ require_once __DIR__ . '/../../config/vite.php';
                 </div>
             </div>
 
-            <div class="mb-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-5">
+            <div class="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 xl:grid-cols-5">
                 <button onclick="window.location.href = basePath + 'frontend/GIP/index.php?add_member=true'"
-                    class="group relative flex aspect-square cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-blue-200 bg-white p-3.5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-royal-blue hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-royal-blue/15 dark:border-blue-900/60 dark:bg-slate-900 sm:p-5">
+                    class="group relative flex min-h-48 cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-blue-200 bg-white p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-royal-blue hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-royal-blue/15 dark:border-blue-900/60 dark:bg-slate-900 sm:min-h-52 sm:p-5">
                     <div class="absolute inset-x-0 top-0 h-1.5 bg-royal-blue"></div>
-                    <svg class="pointer-events-none absolute -bottom-5 -right-5 h-32 w-32 -rotate-12 text-royal-blue opacity-[0.07] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 dark:text-blue-300 dark:opacity-[0.08] sm:h-36 sm:w-36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm10 10v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75M19 8v6m-3-3h6" /></svg>
+                    <svg class="pointer-events-none absolute -bottom-8 -right-8 h-40 w-40 -rotate-12 text-royal-blue opacity-[0.07] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 dark:text-blue-300 dark:opacity-[0.08] sm:h-44 sm:w-44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm10 10v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75M19 8v6m-3-3h6" /></svg>
                     <div class="relative z-10 flex items-start justify-between pt-1">
                         <span class="flex h-10 w-10 items-center justify-center bg-blue-50 text-royal-blue transition-transform duration-300 group-hover:scale-110 dark:bg-blue-900/30 dark:text-blue-400 sm:h-12 sm:w-12">
                             <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
@@ -547,16 +544,16 @@ require_once __DIR__ . '/../../config/vite.php';
                         <span class="text-[0.5625rem] font-black tracking-[0.2em] text-blue-300 dark:text-blue-700">01</span>
                     </div>
                     <div class="relative z-10">
-                        <h4 class="text-[0.6875rem] font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-royal-blue dark:text-white sm:text-sm">Register Member</h4>
-                        <p class="mt-1 text-[0.5rem] font-bold uppercase tracking-wider text-slate-400 sm:text-[0.625rem]">Add GIP beneficiary</p>
-                        <span class="mt-3 inline-flex items-center gap-1 text-[0.5625rem] font-black uppercase tracking-widest text-royal-blue dark:text-blue-400">Open <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
+                        <h4 class="text-sm font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-royal-blue dark:text-white sm:text-base">Register Member</h4>
+                        <p class="mt-1 text-[0.625rem] font-bold uppercase tracking-wider text-slate-400 sm:text-xs">Add GIP beneficiary</p>
+                        <span class="mt-3 inline-flex items-center gap-1 text-[0.625rem] font-black uppercase tracking-widest text-royal-blue dark:text-blue-400 sm:text-xs">Open <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
                     </div>
                 </button>
 
                 <button onclick="window.location.href = basePath + 'frontend/GIP/index.php?focus_search=true'"
-                    class="group relative flex aspect-square cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-red-200 bg-white p-3.5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-philippine-red hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-red-500/15 dark:border-red-900/60 dark:bg-slate-900 sm:p-5">
+                    class="group relative flex min-h-48 cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-red-200 bg-white p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-philippine-red hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-red-500/15 dark:border-red-900/60 dark:bg-slate-900 sm:min-h-52 sm:p-5">
                     <div class="absolute inset-x-0 top-0 h-1.5 bg-philippine-red"></div>
-                    <svg class="pointer-events-none absolute -bottom-5 -right-5 h-32 w-32 rotate-12 text-philippine-red opacity-[0.07] transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110 dark:text-red-300 dark:opacity-[0.08] sm:h-36 sm:w-36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><circle cx="10" cy="9" r="4" /><path stroke-linecap="round" stroke-linejoin="round" d="M3 20a7 7 0 0 1 12-4.9m6 5.9-4.2-4.2m1.2-3.3a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" /></svg>
+                    <svg class="pointer-events-none absolute -bottom-8 -right-8 h-40 w-40 rotate-12 text-philippine-red opacity-[0.07] transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110 dark:text-red-300 dark:opacity-[0.08] sm:h-44 sm:w-44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><circle cx="10" cy="9" r="4" /><path stroke-linecap="round" stroke-linejoin="round" d="M3 20a7 7 0 0 1 12-4.9m6 5.9-4.2-4.2m1.2-3.3a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" /></svg>
                     <div class="relative z-10 flex items-start justify-between pt-1">
                         <span class="flex h-10 w-10 items-center justify-center bg-red-50 text-philippine-red transition-transform duration-300 group-hover:scale-110 dark:bg-red-900/30 dark:text-red-400 sm:h-12 sm:w-12">
                             <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="m21 21-4.35-4.35m1.35-5.15a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" /></svg>
@@ -564,16 +561,16 @@ require_once __DIR__ . '/../../config/vite.php';
                         <span class="text-[0.5625rem] font-black tracking-[0.2em] text-red-300 dark:text-red-800">02</span>
                     </div>
                     <div class="relative z-10">
-                        <h4 class="text-[0.6875rem] font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-philippine-red dark:text-white sm:text-sm">Member Lookup</h4>
-                        <p class="mt-1 text-[0.5rem] font-bold uppercase tracking-wider text-slate-400 sm:text-[0.625rem]">Search GIP records</p>
-                        <span class="mt-3 inline-flex items-center gap-1 text-[0.5625rem] font-black uppercase tracking-widest text-philippine-red dark:text-red-400">Search <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
+                        <h4 class="text-sm font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-philippine-red dark:text-white sm:text-base">Member Lookup</h4>
+                        <p class="mt-1 text-[0.625rem] font-bold uppercase tracking-wider text-slate-400 sm:text-xs">Search GIP records</p>
+                        <span class="mt-3 inline-flex items-center gap-1 text-[0.625rem] font-black uppercase tracking-widest text-philippine-red dark:text-red-400 sm:text-xs">Search <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
                     </div>
                 </button>
 
                 <button onclick="window.location.href = basePath + 'frontend/export/index.php'"
-                    class="group relative flex aspect-square cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-yellow-200 bg-white p-3.5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-golden-yellow hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-yellow-400/20 dark:border-yellow-900/60 dark:bg-slate-900 sm:p-5">
+                    class="group relative flex min-h-48 cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-yellow-200 bg-white p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-golden-yellow hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-yellow-400/20 dark:border-yellow-900/60 dark:bg-slate-900 sm:min-h-52 sm:p-5">
                     <div class="absolute inset-x-0 top-0 h-1.5 bg-golden-yellow"></div>
-                    <svg class="pointer-events-none absolute -bottom-5 -right-5 h-32 w-32 -rotate-12 text-amber-500 opacity-[0.09] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 dark:text-yellow-300 dark:opacity-[0.08] sm:h-36 sm:w-36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 2h8l4 4v16H6V2Zm8 0v5h5M9 17v-4m3 4V9m3 8v-6" /></svg>
+                    <svg class="pointer-events-none absolute -bottom-8 -right-8 h-40 w-40 -rotate-12 text-amber-500 opacity-[0.09] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 dark:text-yellow-300 dark:opacity-[0.08] sm:h-44 sm:w-44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 2h8l4 4v16H6V2Zm8 0v5h5M9 17v-4m3 4V9m3 8v-6" /></svg>
                     <div class="relative z-10 flex items-start justify-between pt-1">
                         <span class="flex h-10 w-10 items-center justify-center bg-yellow-50 text-amber-600 transition-transform duration-300 group-hover:scale-110 dark:bg-yellow-900/30 dark:text-yellow-300 sm:h-12 sm:w-12">
                             <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.5L19 9.5V19a2 2 0 0 1-2 2Z" /></svg>
@@ -581,16 +578,16 @@ require_once __DIR__ . '/../../config/vite.php';
                         <span class="text-[0.5625rem] font-black tracking-[0.2em] text-yellow-500/60 dark:text-yellow-700">03</span>
                     </div>
                     <div class="relative z-10">
-                        <h4 class="text-[0.6875rem] font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-amber-600 dark:text-white sm:text-sm">Report Generator</h4>
-                        <p class="mt-1 text-[0.5rem] font-bold uppercase tracking-wider text-slate-400 sm:text-[0.625rem]">Export payroll data</p>
-                        <span class="mt-3 inline-flex items-center gap-1 text-[0.5625rem] font-black uppercase tracking-widest text-amber-600 dark:text-yellow-300">Generate <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
+                        <h4 class="text-sm font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-amber-600 dark:text-white sm:text-base">Report Generator</h4>
+                        <p class="mt-1 text-[0.625rem] font-bold uppercase tracking-wider text-slate-400 sm:text-xs">Export payroll data</p>
+                        <span class="mt-3 inline-flex items-center gap-1 text-[0.625rem] font-black uppercase tracking-widest text-amber-600 dark:text-yellow-300 sm:text-xs">Generate <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
                     </div>
                 </button>
 
                 <button onclick="window.location.href = basePath + 'frontend/user/settings/index.php'"
-                    class="group relative flex aspect-square cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-emerald-200 bg-white p-3.5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/15 dark:border-emerald-900/60 dark:bg-slate-900 sm:p-5">
+                    class="group relative flex min-h-48 cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-emerald-200 bg-white p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/15 dark:border-emerald-900/60 dark:bg-slate-900 sm:min-h-52 sm:p-5">
                     <div class="absolute inset-x-0 top-0 h-1.5 bg-emerald-500"></div>
-                    <svg class="pointer-events-none absolute -bottom-5 -right-5 h-32 w-32 rotate-12 text-emerald-600 opacity-[0.07] transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110 dark:text-emerald-300 dark:opacity-[0.08] sm:h-36 sm:w-36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><circle cx="10" cy="8" r="4" /><path stroke-linecap="round" stroke-linejoin="round" d="M3 21a7 7 0 0 1 14 0m3.5-8.5 1 1m-5 0 1-1m1.5-2v-1m0 8v-1m-3.5-3h-1m8 0h-1m-.44-2.56.7-.7m-5.66 5.66.7-.7m3.26.7.7.7m-5.66-5.66.7.7" /></svg>
+                    <svg class="pointer-events-none absolute -bottom-8 -right-8 h-40 w-40 rotate-12 text-emerald-600 opacity-[0.07] transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110 dark:text-emerald-300 dark:opacity-[0.08] sm:h-44 sm:w-44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><circle cx="10" cy="8" r="4" /><path stroke-linecap="round" stroke-linejoin="round" d="M3 21a7 7 0 0 1 14 0m3.5-8.5 1 1m-5 0 1-1m1.5-2v-1m0 8v-1m-3.5-3h-1m8 0h-1m-.44-2.56.7-.7m-5.66 5.66.7-.7m3.26.7.7.7m-5.66-5.66.7.7" /></svg>
                     <div class="relative z-10 flex items-start justify-between pt-1">
                         <span class="flex h-10 w-10 items-center justify-center bg-emerald-50 text-emerald-600 transition-transform duration-300 group-hover:scale-110 dark:bg-emerald-900/30 dark:text-emerald-400 sm:h-12 sm:w-12">
                             <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM5 21a7 7 0 0 1 14 0" /></svg>
@@ -598,16 +595,16 @@ require_once __DIR__ . '/../../config/vite.php';
                         <span class="text-[0.5625rem] font-black tracking-[0.2em] text-emerald-300 dark:text-emerald-800">04</span>
                     </div>
                     <div class="relative z-10">
-                        <h4 class="text-[0.6875rem] font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-emerald-600 dark:text-white sm:text-sm">My Account</h4>
-                        <p class="mt-1 text-[0.5rem] font-bold uppercase tracking-wider text-slate-400 sm:text-[0.625rem]">Profile and settings</p>
-                        <span class="mt-3 inline-flex items-center gap-1 text-[0.5625rem] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Manage <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
+                        <h4 class="text-sm font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-emerald-600 dark:text-white sm:text-base">My Account</h4>
+                        <p class="mt-1 text-[0.625rem] font-bold uppercase tracking-wider text-slate-400 sm:text-xs">Profile and settings</p>
+                        <span class="mt-3 inline-flex items-center gap-1 text-[0.625rem] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 sm:text-xs">Manage <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
                     </div>
                 </button>
 
                 <button onclick="window.location.href = basePath + 'frontend/calculate/'"
-                    class="group relative flex aspect-square cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-cyan-200 bg-white p-3.5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-cyan-500/15 dark:border-cyan-900/60 dark:bg-slate-900 sm:p-5">
+                    class="group relative flex min-h-48 cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-cyan-200 bg-white p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-cyan-500/15 dark:border-cyan-900/60 dark:bg-slate-900 sm:min-h-52 sm:p-5">
                     <div class="absolute inset-x-0 top-0 h-1.5 bg-cyan-500"></div>
-                    <svg class="pointer-events-none absolute -bottom-5 -right-5 h-32 w-32 -rotate-12 text-cyan-600 opacity-[0.07] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 dark:text-cyan-300 dark:opacity-[0.08] sm:h-36 sm:w-36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="1" /><path stroke-linecap="round" stroke-linejoin="round" d="M7 5h10v4H7V5Zm0 8h2m3 0h2m3 0h.01M7 17h2m3 0h2m3 0h.01" /></svg>
+                    <svg class="pointer-events-none absolute -bottom-8 -right-8 h-40 w-40 -rotate-12 text-cyan-600 opacity-[0.07] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 dark:text-cyan-300 dark:opacity-[0.08] sm:h-44 sm:w-44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="1" /><path stroke-linecap="round" stroke-linejoin="round" d="M7 5h10v4H7V5Zm0 8h2m3 0h2m3 0h.01M7 17h2m3 0h2m3 0h.01" /></svg>
                     <div class="relative z-10 flex items-start justify-between pt-1">
                         <span class="flex h-10 w-10 items-center justify-center bg-cyan-50 text-cyan-600 transition-transform duration-300 group-hover:scale-110 dark:bg-cyan-900/30 dark:text-cyan-400 sm:h-12 sm:w-12">
                             <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="M5 21h14M12 21V7m0 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm-5 2-2 5h4l-2-5Zm10 0-2 5h4l-2-5Z" /></svg>
@@ -615,9 +612,9 @@ require_once __DIR__ . '/../../config/vite.php';
                         <span class="text-[0.5625rem] font-black tracking-[0.2em] text-cyan-300 dark:text-cyan-800">05</span>
                     </div>
                     <div class="relative z-10">
-                        <h4 class="text-[0.6875rem] font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-cyan-600 dark:text-white sm:text-sm">Calculate Salary</h4>
-                        <p class="mt-1 text-[0.5rem] font-bold uppercase tracking-wider text-slate-400 sm:text-[0.625rem]">GIP wage estimate</p>
-                        <span class="mt-3 inline-flex items-center gap-1 text-[0.5625rem] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400">Calculate <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
+                        <h4 class="text-sm font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-cyan-600 dark:text-white sm:text-base">Calculate Salary</h4>
+                        <p class="mt-1 text-[0.625rem] font-bold uppercase tracking-wider text-slate-400 sm:text-xs">GIP wage estimate</p>
+                        <span class="mt-3 inline-flex items-center gap-1 text-[0.625rem] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400 sm:text-xs">Calculate <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
                     </div>
                 </button>
             </div>

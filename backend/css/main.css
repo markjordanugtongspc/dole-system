@@ -1064,3 +1064,16 @@ select:focus {
 .z-splash {
     z-index: 9999 !important;
 }
+/* Flowbite-style dashboard skeleton with a right-moving shimmer. */
+@keyframes dashboard-skeleton-sweep {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(200%); }
+}
+
+.dashboard-skeleton-sweep {
+    animation: dashboard-skeleton-sweep 1.35s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dashboard-skeleton-sweep { animation: none; }
+}

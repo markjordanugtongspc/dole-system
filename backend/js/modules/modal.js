@@ -194,7 +194,7 @@ function renderProfileModal(profile) {
 
     const modalHtml = `
         <div class="text-left font-montserrat p-1 overflow-visible">
-            <div class="flex items-center gap-3 mb-6">
+            <div class="flex flex-col gap-4 border-l-4 border-royal-blue bg-gradient-to-r from-blue-50 to-white p-4 sm:flex-row sm:items-center dark:from-blue-950/40 dark:to-slate-900">
                 <div class="w-12 h-12 bg-royal-blue/10 rounded-2xl flex items-center justify-center">
                     <svg class="w-6 h-6 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                 </div>
@@ -365,55 +365,57 @@ export function showExportConfigModal(callback) {
         office: 'ALL',
         remarks: 'ALL',
         gender: 'ALL',
+        assignedUnit: 'ALL',
         ageGroup: 'ALL',
         search: '',
         sort: 'name',
         section: 'ALL',
-        columns: ['id', 'name', 'age', 'office', 'position', 'startdate', 'enddate', 'status'],
+        columns: ['id', 'name', 'age', 'office', 'assignedunit', 'startdate', 'enddate', 'status'],
         preparedBy: localStorage.getItem('ldn_export_prepared') || '',
         approvedBy: localStorage.getItem('ldn_export_approved') || ''
     };
 
     const modalHtml = `
-        <div class="text-left font-montserrat p-1 overflow-visible">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-royal-blue/10 rounded-2xl flex items-center justify-center">
-                    <svg class="w-6 h-6 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <div class="w-full text-left font-montserrat">
+            <div class="flex flex-col gap-4 border-l-4 border-royal-blue bg-gradient-to-r from-blue-50 to-white p-4 dark:from-blue-950/40 dark:to-slate-900 sm:flex-row sm:items-center sm:p-5">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-royal-blue/10 sm:h-12 sm:w-12">
+                    <svg class="h-5 w-5 text-royal-blue sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </div>
                 <div>
-                    <h2 class="text-xl font-black text-heading leading-tight italic">Report Generator</h2>
-                    <p class="text-[0.625rem] font-bold text-gray-400 dark:text-white! uppercase tracking-widest">Configure your data output</p>
+                    <h2 class="text-lg font-black leading-tight text-heading sm:text-xl">Report Generator</h2>
+                    <p class="mt-1 text-[0.6875rem] font-medium leading-relaxed text-gray-500 dark:text-gray-300 sm:text-xs">Choose who and what should appear in the report. Your selections apply to preview, Excel, and print.</p>
                 </div>
             </div>
 
-            <form id="export-config-form" class="space-y-6">
-                <div class="pt-1">
-                    <button type="submit" class="w-full bg-royal-blue text-white font-black text-[0.625rem] uppercase tracking-[0.2em] py-3.5 rounded-xl shadow-lg hover:bg-blue-800 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Apply Profile Configuration
+            <form id="export-config-form" class="mt-4 space-y-4">
+                <div class="border-y border-blue-100 bg-blue-50/60 p-3 dark:border-blue-900/60 dark:bg-blue-950/30 sm:p-4">
+                    <button type="submit" class="flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 bg-royal-blue px-4 py-2.5 text-xs font-black uppercase tracking-wide text-white shadow-md transition-all hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-[0.99] sm:min-h-11 sm:text-sm dark:focus:ring-blue-900">
+                        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                        Apply Configuration &amp; Update Preview
                     </button>
                 </div>
+
                 <!-- Main Filter Grid (3 columns on MD) -->
-                <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
+                <div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 dark:border-slate-700 dark:bg-slate-800/50">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="w-1.5 h-4 bg-royal-blue rounded-full"></span>
-                        <label class="text-[0.625rem] font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Global Filters</label>
+                        <label class="text-xs font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Global Filters</label>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div class="space-y-1">
-                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Search Beneficiary</label>
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Search Beneficiary</label>
                             <div class="relative group">
                                 <input type="text" id="export-search" value="${currentFilters.search}" placeholder="Name or ID..." 
-                                    class="w-full bg-white border border-gray-200 rounded-xl px-9 py-2.5 text-xs font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
+                                    class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-9 py-2.5 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
                                 <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             </div>
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Office Category</label>
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Office Category</label>
                             <div class="relative group">
-                                <select id="export-office" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
+                                <select id="export-office" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
                                     <option value="ALL" ${currentFilters.office === 'ALL' ? 'selected' : ''}>ALL OFFICES</option>
                                     <!-- Options will be populated dynamically -->
                                 </select>
@@ -422,25 +424,26 @@ export function showExportConfigModal(callback) {
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Sort Data By</label>
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Sort Data By</label>
                             <div class="relative group">
-                                <select id="export-sort" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
+                                <select id="export-sort" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
                                     <option value="name" ${currentFilters.sort === 'name' ? 'selected' : ''}>NAME (A-Z)</option>
                                     <option value="startdate" ${currentFilters.sort === 'startdate' ? 'selected' : ''}>START DATE (NEWEST)</option>
                                     <option value="id" ${currentFilters.sort === 'id' ? 'selected' : ''}>ID NUMBER</option>
                                     <option value="office" ${currentFilters.sort === 'office' ? 'selected' : ''}>OFFICE NAME</option>
+                                    <option value="assignedunit" ${currentFilters.sort === 'assignedunit' ? 'selected' : ''}>ASSIGNED UNIT</option>
                                 </select>
                                 <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Location + Year row -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                    <!-- Office location, assigned unit, and year row -->
+                    <div class="grid grid-cols-1 gap-3 mt-3 sm:grid-cols-2 lg:grid-cols-3">
                         <div class="space-y-1">
-                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Office Location</label>
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Office Location</label>
                             <div class="relative group">
-                                <select id="export-location" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none disabled:opacity-40 disabled:cursor-not-allowed" ${currentFilters.office === 'ALL' ? 'disabled' : ''}>
+                                <select id="export-location" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none disabled:opacity-40 disabled:cursor-not-allowed" ${currentFilters.office === 'ALL' ? 'disabled' : ''}>
                                     <option value="ALL">ALL LOCATIONS</option>
                                     <!-- Populated when office changes -->
                                 </select>
@@ -449,9 +452,18 @@ export function showExportConfigModal(callback) {
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Year (Start Date)</label>
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Assigned Unit</label>
                             <div class="relative group">
-                                <select id="export-year" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
+                                <select id="export-assigned-unit" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
+                                    <option value="ALL">ALL ASSIGNED UNITS</option>
+                                </select>
+                                <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Year (Start Date)</label>
+                            <div class="relative group">
+                                <select id="export-year" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
                                     <option value="ALL" ${(currentFilters.year || 'ALL') === 'ALL' ? 'selected' : ''}>ALL YEARS</option>
                                     <!-- Populated dynamically from data -->
                                 </select>
@@ -460,17 +472,17 @@ export function showExportConfigModal(callback) {
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-100/50">
+                    <div class="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2 min-[900px]:grid-cols-4 pt-4 border-t border-gray-100/50">
                         <!-- Gender Filter -->
                         <div>
-                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Gender Filter</label>
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Gender Filter</label>
                             <div class="flex flex-wrap gap-1.5">
                                 ${['ALL', 'FEMALE', 'MALE'].map(s => {
         const configs = { 'ALL': 'peer-checked:bg-blue-600', 'FEMALE': 'peer-checked:bg-pink-600', 'MALE': 'peer-checked:bg-indigo-600' };
         return `
                                         <label class="cursor-pointer">
                                             <input type="radio" name="export-gender" value="${s}" ${currentFilters.gender === s ? 'checked' : ''} class="hidden peer">
-                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[0.5625rem] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                            <span class="flex min-h-9 sm:min-h-10 items-center justify-center whitespace-nowrap rounded-lg px-2.5 py-2 border border-gray-100 bg-white text-[0.625rem] sm:text-xs font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
                                         </label>
                                     `;
     }).join('')}
@@ -479,17 +491,17 @@ export function showExportConfigModal(callback) {
 
                         <!-- Display Section -->
                         <div>
-                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Report Volume Section</label>
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Report Volume Section</label>
                             <div class="flex gap-1.5">
                                 ${[
             { id: 'ALL', label: 'All', color: 'peer-checked:bg-emerald-600' },
             { id: 'ACTIVE', label: 'Active', color: 'peer-checked:bg-green-500' },
             { id: 'ARCHIVED', label: 'Archived', color: 'peer-checked:bg-red-600' }
         ].map(s => `
-                                    <label class="cursor-pointer flex-1">
+                                    <label class="min-w-0 flex-1 cursor-pointer">
                                         <input type="radio" name="export-section" value="${s.id}" ${currentFilters.section === s.id ? 'checked' : ''} class="hidden peer">
-                                        <div class="py-1.5 bg-white border border-gray-100 rounded-lg flex items-center justify-center gap-1.5 transition-all ${s.color} peer-checked:text-white peer-checked:border-transparent shadow-sm">
-                                            <span class="text-[0.5625rem] font-black uppercase tracking-tight">${s.label}</span>
+                                        <div class="min-h-9 py-2 sm:min-h-10 bg-white border border-gray-100 rounded-lg flex items-center justify-center gap-1.5 transition-all ${s.color} peer-checked:text-white peer-checked:border-transparent shadow-sm">
+                                            <span class="whitespace-nowrap text-[0.625rem] font-black uppercase tracking-tight sm:text-xs">${s.label}</span>
                                         </div>
                                     </label>
                                 `).join('')}
@@ -498,14 +510,14 @@ export function showExportConfigModal(callback) {
 
                         <!-- Remarks Filter -->
                         <div>
-                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Remarks Filter</label>
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Remarks Filter</label>
                             <div class="flex flex-wrap gap-1.5">
                                 ${['ALL', 'ONGOING', 'EXPIRED', 'RESIGNED', 'ABSORBED'].map(s => {
         const configs = { 'ALL': 'peer-checked:bg-blue-600', 'ONGOING': 'peer-checked:bg-green-500', 'EXPIRED': 'peer-checked:bg-red-600', 'RESIGNED': 'peer-checked:bg-slate-600', 'ABSORBED': 'peer-checked:bg-teal-600' };
         return `
                                         <label class="cursor-pointer">
                                             <input type="radio" name="export-remarks" value="${s}" ${currentFilters.remarks === s ? 'checked' : ''} class="hidden peer">
-                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[0.5625rem] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                            <span class="flex min-h-9 sm:min-h-10 items-center justify-center whitespace-nowrap rounded-lg px-2.5 py-2 border border-gray-100 bg-white text-[0.625rem] sm:text-xs font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
                                         </label>
                                     `;
     }).join('')}
@@ -514,14 +526,14 @@ export function showExportConfigModal(callback) {
 
                         <!-- Age Filter -->
                         <div>
-                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Age Group Filter</label>
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Age Group Filter</label>
                             <div class="flex flex-wrap gap-1.5">
                                 ${['ALL', '18-24', '25-30', '31-40', '41+'].map(s => {
         const configs = { 'ALL': 'peer-checked:bg-blue-600', '18-24': 'peer-checked:bg-emerald-600', '25-30': 'peer-checked:bg-yellow-600', '31-40': 'peer-checked:bg-orange-600', '41+': 'peer-checked:bg-slate-600' };
         return `
                                         <label class="cursor-pointer">
                                             <input type="radio" name="export-age-group" value="${s}" ${currentFilters.ageGroup === s ? 'checked' : ''} class="hidden peer">
-                                            <span class="px-2.5 py-1.5 rounded-lg border border-gray-100 bg-white text-[0.5625rem] font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                            <span class="flex min-h-9 sm:min-h-10 items-center justify-center whitespace-nowrap rounded-lg px-2.5 py-2 border border-gray-100 bg-white text-[0.625rem] sm:text-xs font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
                                         </label>
                                     `;
     }).join('')}
@@ -531,53 +543,52 @@ export function showExportConfigModal(callback) {
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100/50">
                         <div class="space-y-1">
-                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Prepared By (Signature)</label>
-                            <input type="text" id="export-prepared" value="${currentFilters.preparedBy}" placeholder="Mary Joy Q. Nuñez" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all uppercase">
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Prepared By (Signature)</label>
+                            <input type="text" id="export-prepared" value="${currentFilters.preparedBy}" placeholder="Mary Joy Q. Nuñez" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all uppercase">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[0.5625rem] font-black text-gray-500 uppercase tracking-tighter ml-1">Approved By (Signature)</label>
-                            <input type="text" id="export-approved" value="${currentFilters.approvedBy}" placeholder="Noel B. Orias" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold text-heading focus:border-royal-blue outline-none transition-all uppercase">
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Approved By (Signature)</label>
+                            <input type="text" id="export-approved" value="${currentFilters.approvedBy}" placeholder="Noel B. Orias" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all uppercase">
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-gray-50/50 rounded-2xl p-4 border border-gray-100 mt-4">
+                <div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 dark:border-slate-700 dark:bg-slate-800/50 mt-4">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="w-1.5 h-4 bg-golden-yellow rounded-full"></span>
-                        <label class="text-[0.625rem] font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Output Column Selection</label>
+                        <label class="text-xs font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Output Column Selection</label>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        ${['ID', 'Name', 'Age', 'Office', 'Position', 'Start Date', 'End Date', 'Status'].map(col => {
+                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                        ${['ID', 'Name', 'Age', 'Office', 'Assigned Unit', 'Start Date', 'End Date', 'Status'].map(col => {
             const val = col.toLowerCase().replace(' ', '');
             const isChecked = currentFilters.columns.includes(val);
             const id = `col-switch-${val}`;
             return `
-                                <label for="${id}" class="flex items-center gap-2 px-3 py-2 bg-white border border-gray-100 rounded-lg cursor-pointer hover:border-emerald-500/30 transition-all group select-none shadow-sm">
+                                <label for="${id}" class="flex min-h-10 sm:min-h-11 items-center gap-3 bg-white px-2.5 py-2 border border-gray-100 rounded-lg cursor-pointer hover:border-emerald-500/30 transition-all group select-none shadow-sm">
                                     <div class="relative flex items-center shrink-0 scale-90">
                                         <input type="checkbox" id="${id}" name="export-column" value="${val}" ${isChecked ? 'checked' : ''} class="sr-only peer">
                                         <div class="w-8 h-4.5 bg-gray-200 rounded-full peer peer-checked:bg-emerald-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:shadow-sm after:transition-all peer-checked:after:translate-x-3.5"></div>
                                     </div>
-                                    <span class="text-[0.5625rem] font-black text-gray-600 uppercase tracking-tight group-hover:text-emerald-600">${col}</span>
+                                    <span class="whitespace-nowrap text-[0.625rem] font-black uppercase tracking-tight text-gray-600 group-hover:text-emerald-600 sm:text-xs">${col}</span>
                                 </label>
                             `;
         }).join('')}
                     </div>
                 </div>
-
             </form>
         </div>
     `;
 
     Swal.fire({
         html: modalHtml,
-        width: '680px',
+        width: 'min(1120px, calc(100vw - clamp(0.5rem, 2vw, 1.5rem)))',
         showConfirmButton: false,
         showCloseButton: true,
-        padding: '1.5rem',
+        padding: 'clamp(0.75rem, 2vw, 1.5rem)',
         customClass: {
             container: 'font-montserrat',
-            popup: 'rounded-[1.5rem] shadow-2xl overflow-visible ldn-modal-popup',
+            popup: 'max-h-[calc(100vh-1rem)] overflow-y-auto rounded-2xl shadow-2xl ldn-modal-popup',
             closeButton: 'focus:outline-none bg-gray-50 border-none swal2-custom-close cursor-pointer'
         },
         didOpen: (popup) => {
@@ -586,7 +597,15 @@ export function showExportConfigModal(callback) {
             
             const locationSelect = form.querySelector('#export-location');
             const yearSelect = form.querySelector('#export-year');
+            const assignedUnitSelect = form.querySelector('#export-assigned-unit');
 
+            // Populate the assigned-unit selector from live beneficiary records, preserving the GIP unit order.
+            if (assignedUnitSelect) {
+                const assignedUnits = window.getExportAssignedUnits ? window.getExportAssignedUnits() : COMMON_ASSIGNED_UNITS;
+                const selectedAssignedUnit = currentFilters.assignedUnit || 'ALL';
+                assignedUnitSelect.innerHTML = `<option value="ALL" ${selectedAssignedUnit === 'ALL' ? 'selected' : ''}>ALL ASSIGNED UNITS</option>`
+                    + assignedUnits.map((unit) => `<option value="${unit}" ${selectedAssignedUnit === unit ? 'selected' : ''}>${unit}</option>`).join('');
+            }
             // Populate year dropdown from beneficiary data
             if (yearSelect && window.getExportYears) {
                 const years = window.getExportYears();
@@ -666,6 +685,7 @@ export function showExportConfigModal(callback) {
                     location: form.querySelector('#export-location')?.value || 'ALL',
                     year: form.querySelector('#export-year')?.value || 'ALL',
                     gender: genderRadio ? genderRadio.value : (currentFilters.gender || 'ALL'),
+                    assignedUnit: form.querySelector('#export-assigned-unit')?.value || 'ALL',
                     remarks: remarksRadio ? remarksRadio.value : (currentFilters.remarks || 'ALL'),
                     ageGroup: ageGroupRadio ? ageGroupRadio.value : (currentFilters.ageGroup || 'ALL'),
                     search: form.querySelector('#export-search').value.trim().toLowerCase(),
@@ -685,7 +705,7 @@ export function showExportConfigModal(callback) {
                         toast: true,
                         position: 'top-end',
                         icon: 'success',
-                        title: 'Generator pattern updated',
+                        title: 'Report configuration applied',
                         showConfirmButton: false,
                         timer: 3000,
                         timerProgressBar: true,

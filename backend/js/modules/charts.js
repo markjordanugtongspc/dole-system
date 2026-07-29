@@ -37,6 +37,8 @@ const COLORS = {
     mutedSlate: () => isDark() ? '#94a3b8' : '#94a3b8' // Using original value for education chart
 };
 
+const getBarGridColor = () => isDark() ? '#475569' : '#cbd5e1';
+
 // Data Cache to avoid re-fetching on theme change
 let cachedRawData = null;
 
@@ -511,7 +513,7 @@ export async function initCharts(forceRefresh = false) {
     const educationRows = [
         { key: 'College Grad', label: 'College Graduate', count: filteredStats.education['College Grad'] || 0, color: COLORS.royalBlue() },
         { key: 'College Lvl', label: 'College Level', count: filteredStats.education['College Lvl'] || 0, color: COLORS.goldenYellow },
-        { key: 'HS Grad', label: 'High School Graduate', count: filteredStats.education['HS Grad'] || 0, color: COLORS.philippineRed },
+        { key: 'HS Grad', label: 'High School', count: filteredStats.education['HS Grad'] || 0, color: COLORS.philippineRed },
         { key: 'Senior High', label: 'Senior High', count: filteredStats.education['Senior High'] || 0, color: COLORS.successGreen }
     ];
     const educationTotal = educationRows.reduce((sum, row) => sum + row.count, 0);
@@ -540,7 +542,7 @@ export async function initCharts(forceRefresh = false) {
             data: rankedEducationRows.map((row) => ({ x: row.label, y: row.count, fillColor: row.color }))
         }],
         chart: {
-            height: 270,
+            height: 285,
             type: 'bar',
             toolbar: { show: false },
             fontFamily: 'Montserrat, sans-serif',
@@ -559,7 +561,8 @@ export async function initCharts(forceRefresh = false) {
         dataLabels: {
             enabled: true,
             formatter: (value) => Math.round(value),
-            offsetX: 10,
+            offsetX: 12,
+            offsetY: 4,
             textAnchor: 'start',
             style: { fontSize: '0.625rem', fontWeight: 900, colors: [theme.text] },
             background: { enabled: true, borderRadius: 2, padding: 3, opacity: 0.9, borderWidth: 0 }
@@ -573,14 +576,15 @@ export async function initCharts(forceRefresh = false) {
             title: { text: 'TOTAL BENEFICIARIES', style: { color: theme.muted, fontSize: '0.5625rem', fontWeight: 800 } }
         },
         yaxis: {
-            labels: { maxWidth: 150, style: { colors: theme.text, fontSize: '0.625rem', fontWeight: 800 } }
+            labels: { minWidth: 118, maxWidth: 180, trim: false, style: { colors: theme.text, fontSize: '0.6875rem', fontWeight: 800 } }
         },
         grid: {
-            borderColor: theme.grid,
+            show: true,
+            borderColor: getBarGridColor(),
             strokeDashArray: 6,
-            xaxis: { lines: { show: true } },
-            yaxis: { lines: { show: false } },
-            padding: { top: 0, right: 40, bottom: -8, left: 4 }
+            xaxis: { lines: { show: false } },
+            yaxis: { lines: { show: true } },
+            padding: { top: 10, right: 58, bottom: -4, left: 8 }
         },
         legend: { show: false },
         tooltip: {
@@ -598,7 +602,7 @@ export async function initCharts(forceRefresh = false) {
             breakpoint: 640,
             options: {
                 chart: { height: 285 },
-                yaxis: { labels: { maxWidth: 110, style: { fontSize: '0.5625rem' } } },
+                yaxis: { labels: { minWidth: 96, maxWidth: 132, trim: false, style: { fontSize: '0.625rem' } } },
                 dataLabels: { style: { fontSize: '0.5625rem' } }
             }
         }]
@@ -656,8 +660,15 @@ export async function initCharts(forceRefresh = false) {
             axisTicks: { show: false },
             labels: { style: { colors: theme.muted, fontWeight: 700 } }
         },
-        yaxis: { show: false },
-        grid: { show: false },
+        yaxis: { show: true, labels: { show: false } },
+        grid: {
+            show: true,
+            borderColor: getBarGridColor(),
+            strokeDashArray: 6,
+            xaxis: { lines: { show: false } },
+            yaxis: { lines: { show: true } },
+            padding: { top: 20, right: 8, bottom: 0, left: 8 }
+        },
         tooltip: {
             theme: isDark() ? 'dark' : 'light',
             y: { formatter: (val) => val + " Beneficiaries" }
@@ -720,8 +731,8 @@ export async function initCharts(forceRefresh = false) {
         },
         grid: {
             show: true,
-            borderColor: theme.grid,
-            strokeDashArray: 7,
+            borderColor: getBarGridColor(),
+            strokeDashArray: 6,
             xaxis: { lines: { show: false } },
             yaxis: { lines: { show: true } },
             padding: { top: 18, left: 2, right: 4, bottom: -4 }
@@ -815,8 +826,8 @@ export async function initCharts(forceRefresh = false) {
         },
         grid: {
             show: true,
-            borderColor: theme.grid,
-            strokeDashArray: 7,
+            borderColor: getBarGridColor(),
+            strokeDashArray: 6,
             xaxis: { lines: { show: false } },
             yaxis: { lines: { show: true } },
             padding: { top: 18, left: 8, right: 12, bottom: 4 }
@@ -900,8 +911,10 @@ export async function initCharts(forceRefresh = false) {
         legend: { show: false },
         fill: { opacity: 1 },
         grid: {
-            borderColor: theme.grid,
-            strokeDashArray: 4,
+            show: true,
+            borderColor: getBarGridColor(),
+            strokeDashArray: 6,
+            xaxis: { lines: { show: false } },
             yaxis: { lines: { show: true } }
         }
     };
@@ -1104,12 +1117,8 @@ function updateSummaryMetrics(totalStats, filteredStats) {
 
     const female = totalStats.genders['Female'] || 0;
     const male = totalStats.genders['Male'] || 0;
-    const totalG = female + male;
-    const fRatio = totalG > 0 ? Math.round((female / totalG) * 100) + '%' : '0%';
-    const mRatio = totalG > 0 ? Math.round((male / totalG) * 100) + '%' : '0%';
-
-    document.querySelectorAll('.metric-female-ratio').forEach(el => el.textContent = fRatio);
-    document.querySelectorAll('.metric-male-ratio').forEach(el => el.textContent = mRatio);
+    document.querySelectorAll('.metric-female-ratio').forEach(el => el.textContent = female.toLocaleString());
+    document.querySelectorAll('.metric-male-ratio').forEach(el => el.textContent = male.toLocaleString());
 
     const dominantAge = (stats) => {
         const [age, count] = Object.entries(stats.exactAges || {})

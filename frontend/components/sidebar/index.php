@@ -3,7 +3,7 @@
     aria-label="Sidebar">
     <div
         class="h-full px-4 py-4 overflow-y-auto bg-royal-blue border-e border-royal-blue/20 pt-20 flex flex-col justify-between">
-        <ul class="space-y-3 font-medium">
+        <ul class="space-y-3 text-base font-medium">
             <?php
                 // Calculate base URL (same logic as vite.php for consistency)
                 $projectRoot = str_replace('\\', '/', dirname(dirname(dirname(__DIR__))));
@@ -15,18 +15,22 @@
                 $is_dashboard = (stripos($current_uri, '/frontend/dashboard') !== false);
                 $is_export = (stripos($current_uri, '/frontend/export') !== false);
                 $is_settings = (stripos($current_uri, '/frontend/user/settings') !== false);
-                $is_gip = (stripos($current_uri, '/frontend/GIP') !== false);
+                $is_gip = (stripos($current_uri, '/frontend/GIP') !== false || stripos($current_uri, '/frontend/portal/dashboard') !== false);
                 $is_calculate = (stripos($current_uri, '/frontend/calculate') !== false);
                 ?>
             <li>
                 <a href="<?php echo $baseUrl; ?>/frontend/dashboard/" title="Analytics Dashboard"
                     class="flex items-center px-4 py-3 rounded-lg group cursor-pointer transition-all duration-200 border-b-2 <?php echo $is_dashboard ? 'text-white font-black bg-white/20 border-white' : 'text-white/80 hover:bg-white/10 hover:text-white border-transparent hover:scale-105'; ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke-width="<?php echo $is_dashboard ? '2.5' : '1.5'; ?>" stroke="currentColor"
-                        class="w-5 h-5 transition-all duration-200 <?php echo $is_dashboard ? 'text-white scale-110' : 'text-white/80 group-hover:text-white group-hover:scale-110'; ?>">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
-                    </svg>
+                    <span class="relative h-6 w-6 shrink-0">
+                        <svg class="absolute inset-0 h-6 w-6 transition-all duration-200 <?php echo $is_dashboard ? 'hidden' : 'text-white/80 group-hover:hidden group-active:hidden'; ?>" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6.025A7.5 7.5 0 1 0 17.975 14H10V6.025Z" />
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 3c-.169 0-.334.014-.5.025V11h7.975c.011-.166.025-.331.025-.5A7.5 7.5 0 0 0 13.5 3Z" />
+                        </svg>
+                        <svg class="absolute inset-0 h-6 w-6 text-white transition-all duration-200 <?php echo $is_dashboard ? 'block scale-105' : 'hidden group-hover:block group-active:block'; ?>" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M13.5 2c-.178 0-.356.013-.492.022l-.074.005a1 1 0 0 0-.934.998V11a1 1 0 0 0 1 1h7.975a1 1 0 0 0 .998-.934l.005-.074A7.04 7.04 0 0 0 22 10.5 8.5 8.5 0 0 0 13.5 2Z" />
+                            <path d="M11 6.025a1 1 0 0 0-1.065-.998 8.5 8.5 0 1 0 9.038 9.039A1 1 0 0 0 17.975 13H11V6.025Z" />
+                        </svg>
+                    </span>
                     <span
                         class="ms-3 whitespace-nowrap transition-all duration-200 <?php echo $is_dashboard ? 'translate-x-1' : ''; ?>">DASHBOARD</span>
                 </a>
@@ -35,8 +39,20 @@
             <li>
                 <a href="<?php echo $baseUrl; ?>/frontend/GIP/"
                     class="flex items-center px-4 py-3 rounded-lg group cursor-pointer transition-all duration-200 border-b-2 <?php echo $is_gip ? 'text-white font-black bg-white/20 border-white' : 'text-white/80 hover:bg-white/10 hover:text-white border-transparent hover:scale-105'; ?>">
-                    <img src="<?php echo $baseUrl; ?>/frontend/images/search-map.png" alt="Search Map Icon"
-                        class="w-5 h-5 filter invert brightness-100 transition-transform duration-200 <?php echo $is_gip ? 'brightness-200 scale-105' : 'group-hover:invert group-hover:brightness-200 group-hover:scale-105'; ?>" />
+                    <span class="relative h-6 w-6 shrink-0">
+                        <svg class="absolute inset-0 h-6 w-6 transition-all duration-200 <?php echo $is_gip ? 'hidden' : 'text-white/80 group-hover:hidden group-active:hidden'; ?>" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                                <path d="M2.5 6L8 4l5.5 2L11 7.5V9s-.667-.5-3-.5S5 9 5 9V7.5zm0 0v4" />
+                                <path d="M11 8.5v.889c0 1.718-1.343 3.111-3 3.111s-3-1.393-3-3.111V8.5m10.318 2.53s.485-.353 2.182-.353s2.182.352 2.182.352m-4.364 0V10L13.5 9l4-1.5l4 1.5l-1.818 1v1.03m-4.364 0v.288a2.182 2.182 0 1 0 4.364 0v-.289M4.385 15.926c-.943.527-3.416 1.602-1.91 2.947C3.211 19.53 4.03 20 5.061 20h5.878c1.03 0 1.85-.47 2.586-1.127c1.506-1.345-.967-2.42-1.91-2.947c-2.212-1.235-5.018-1.235-7.23 0M16 20h3.705c.773 0 1.387-.376 1.939-.902c1.13-1.076-.725-1.936-1.432-2.357A5.34 5.34 0 0 0 16 16.214" />
+                            </g>
+                        </svg>
+                        <svg class="absolute inset-0 h-6 w-6 text-white transition-all duration-200 <?php echo $is_gip ? 'block scale-105' : 'hidden group-hover:block group-active:block'; ?>" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                <path d="M2.5 6L8 4l5.5 2L11 7.5V9s-.667-.5-3-.5S5 9 5 9V7.5zm0 0v4" />
+                                <path d="M11 8.5v.889c0 1.718-1.343 3.111-3 3.111s-3-1.393-3-3.111V8.5m10.318 2.53s.485-.353 2.182-.353s2.182.352 2.182.352m-4.364 0V10L13.5 9l4-1.5l4 1.5l-1.818 1v1.03m-4.364 0v.288a2.182 2.182 0 1 0 4.364 0v-.289M4.385 15.926c-.943.527-3.416 1.602-1.91 2.947C3.211 19.53 4.03 20 5.061 20h5.878c1.03 0 1.85-.47 2.586-1.127c1.506-1.345-.967-2.42-1.91-2.947c-2.212-1.235-5.018-1.235-7.23 0M16 20h3.705c.773 0 1.387-.376 1.939-.902c1.13-1.076-.725-1.936-1.432-2.357A5.34 5.34 0 0 0 16 16.214" />
+                            </g>
+                        </svg>
+                    </span>
                     <span
                         class="ms-3 whitespace-nowrap transition-all duration-200 <?php echo $is_gip ? 'translate-x-1' : ''; ?>">MANAGE GIP</span>
                 </a>
@@ -62,7 +78,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span class="ms-3 whitespace-nowrap <?php echo $is_export ? 'translate-x-1' : ''; ?>">PRINT / EXPORT DATA</span>
+                    <span class="ms-3 whitespace-nowrap <?php echo $is_export ? 'translate-x-1' : ''; ?>">EXPORT DATA</span>
                 </a>
             </li>
 
@@ -78,7 +94,7 @@
             </li> -->
 
             <?php
-$is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
+$is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false || stripos($current_uri, '/frontend/portal/aboutme') !== false);
 ?>
 
             <!-- <li>
