@@ -1,6 +1,6 @@
 import { getBasePath } from './auth.js';
 import { createNotification } from './notifications.js';
-import { apiGet, apiPatch, reinitFlowbite, generateChecksum } from './ajax-manager.js';
+import { apiGet, apiPatch, apiRequest, reinitFlowbite, generateChecksum } from './ajax-manager.js';
 import { supabase } from './supabase-client.js';
 import { isSupabaseMode } from './auth.js';
 import {
@@ -16,8 +16,8 @@ import { showLogsExportModal } from './logs-export.js';
 import Swal from 'sweetalert2';
 
 /**
- * LDN Handling Module
- * Handles data fetching from backend API, rendering, and sorting for the LDN page
+ * GIP Management Module
+ * Handles data fetching from backend API, rendering, and sorting for the GIP page
  */
 
 function translateDateToShortMonth(dateStr) {
@@ -39,23 +39,31 @@ function translateDateToShortMonth(dateStr) {
 // Beneficiaries data loaded from database
 let beneficiaries = [];
 let lastDataChecksum = null;
-const LDN_PAGE_SESSION_KEY = 'ldn_current_page';
+const GIP_PAGE_SESSION_KEY = 'gip_current_page';
 let currentPage = getPageFromUrl();
 const itemsPerPage = 10;
 let filteredDataGlobal = null; // Store current filtered state for pagination
 let isInitialDataHydrating = true;
-let lastSupabaseFetchTime = parseInt(localStorage.getItem('ldn_last_supabase_fetch') || '0');
+let lastSupabaseFetchTime = parseInt(localStorage.getItem('gip_last_supabase_fetch') || '0');
 const FETCH_THROTTLE_MS = 5 * 60 * 1000; // 5 minutes (persisted across navigations)
 let genderMap = {};
 let statusMap = {};
 let officeMap = {}; // keyed by offices.id → display name (e.g., "LGU - ILIGAN")
 
 
-let currentStatusFilter = localStorage.getItem('ldn_status_filter') || 'ONGOING';
-let currentYearFilter = localStorage.getItem('ldn_year_filter') || 'ALL';
-let currentOfficeFilter = localStorage.getItem('ldn_office_filter') || 'ALL';
-const FILTER_MODE_COOKIE = 'ldn_filter_mode';
-const FILTER_MODE_STORAGE_KEY = 'ldn_filter_mode';
+let currentStatusFilter = localStorage.getItem('gip_status_filter') || 'ONGOING';
+let currentYearFilter = localStorage.getItem('gip_year_filter') || 'ALL';
+let currentOfficeFilter = localStorage.getItem('gip_office_filter') || 'ALL';
+let currentEducationFilter = localStorage.getItem('gip_education_filter') || 'ALL';
+let currentBirthdayYearFilter = localStorage.getItem('gip_birthday_year_filter') || 'ALL';
+let currentBirthdayMonthFilter = localStorage.getItem('gip_birthday_month_filter') || 'ALL';
+let currentRelationshipFilter = localStorage.getItem('gip_relationship_filter') || 'ALL';
+let currentAssignedUnitFilter = localStorage.getItem('gip_assigned_unit_filter') || 'ALL';
+const PHONE_VISIBILITY_STORAGE_KEY = 'gip_phone_visibility';
+let showPhoneNumbers = localStorage.getItem(PHONE_VISIBILITY_STORAGE_KEY) === 'ON';
+const MONTH_NAMES = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+const FILTER_MODE_COOKIE = 'gip_filter_mode';
+const FILTER_MODE_STORAGE_KEY = 'gip_filter_mode';
 const DEFAULT_STATUS_FILTER = 'ONGOING';
 const DEFAULT_YEAR_FILTER = 'ALL';
 let filterModeEnabled = (localStorage.getItem(FILTER_MODE_STORAGE_KEY) || 'OFF') === 'ON';
@@ -69,7 +77,7 @@ function getPageFromUrl() {
 }
 
 function syncPageToUrl(page) {
-    sessionStorage.setItem(LDN_PAGE_SESSION_KEY, String(page));
+    sessionStorage.setItem(GIP_PAGE_SESSION_KEY, String(page));
     const url = new URL(window.location.href);
     if (page > 1) {
         url.searchParams.set('page', String(page));
@@ -97,6 +105,7 @@ if (filterModeFromCookie) {
 }
 
 function getFilteredBeneficiaries() {
+    normalizeDynamicFilterSelections();
     let result = beneficiaries;
 
     if (filterModeEnabled) {
@@ -118,6 +127,32 @@ function getFilteredBeneficiaries() {
             result = result.filter(b => (b.office || '').toUpperCase().includes(currentOfficeFilter.toUpperCase()));
         }
     }
+
+    if (currentEducationFilter !== 'ALL') {
+        const selectedEducation = currentEducationFilter.toUpperCase();
+        result = result.filter((beneficiary) => String(beneficiary.education || '').trim().toUpperCase() === selectedEducation);
+    }
+
+    if (currentBirthdayYearFilter !== 'ALL') {
+        const selectedYear = Number.parseInt(currentBirthdayYearFilter, 10);
+        result = result.filter((beneficiary) => getBirthdayYear(beneficiary) === selectedYear);
+    }
+
+    if (currentBirthdayMonthFilter !== 'ALL') {
+        const selectedMonth = Number.parseInt(currentBirthdayMonthFilter, 10);
+        result = result.filter((beneficiary) => getBirthdaySortKey(beneficiary)[0] === selectedMonth);
+    }
+
+    if (currentRelationshipFilter !== 'ALL') {
+        const selectedRelationship = currentRelationshipFilter.toUpperCase();
+        result = result.filter((beneficiary) => String(beneficiary.relationshipToAssured || '').trim().toUpperCase() === selectedRelationship);
+    }
+
+    if (currentAssignedUnitFilter !== 'ALL') {
+        const selectedAssignedUnit = currentAssignedUnitFilter.toUpperCase();
+        result = result.filter((beneficiary) => String(beneficiary.designation || '').trim().toUpperCase() === selectedAssignedUnit);
+    }
+
     // Default mode (Filter Mode OFF): show all records, ordered by priority office first
     // then ONGOING/EXPIRED/rest → A-Z by name. office_id FK may be null for legacy records.
     if (!filterModeEnabled) {
@@ -173,6 +208,74 @@ function sortByDefaultPriority(data) {
     });
 }
 
+function getBirthdaySortKey(beneficiary) {
+    const value = String(beneficiary?.birthday || '').trim();
+    if (!value) return [99, 99];
+
+    const isoMatch = value.match(/^\d{4}-(\d{2})-(\d{2})/);
+    if (isoMatch) return [Number.parseInt(isoMatch[1], 10) - 1, Number.parseInt(isoMatch[2], 10)];
+
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? [99, 99] : [date.getMonth(), date.getDate()];
+}
+
+function getBirthdayYear(beneficiary) {
+    const value = String(beneficiary?.birthday || '').trim();
+    if (!value) return null;
+
+    const isoMatch = value.match(/^(\d{4})-\d{2}-\d{2}/);
+    if (isoMatch) return Number.parseInt(isoMatch[1], 10);
+
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date.getFullYear();
+}
+
+function normalizeDynamicFilterSelections() {
+    const detectedYears = new Set(beneficiaries
+        .map((beneficiary) => getBirthdayYear(beneficiary))
+        .filter(Number.isInteger));
+    if (currentBirthdayYearFilter !== 'ALL' && !detectedYears.has(Number.parseInt(currentBirthdayYearFilter, 10))) {
+        currentBirthdayYearFilter = 'ALL';
+        localStorage.setItem('gip_birthday_year_filter', 'ALL');
+    }
+
+    const detectedMonths = new Set(beneficiaries
+        .map((beneficiary) => getBirthdaySortKey(beneficiary)[0])
+        .filter((month) => month >= 0 && month < MONTH_NAMES.length));
+    if (currentBirthdayMonthFilter !== 'ALL' && !detectedMonths.has(Number.parseInt(currentBirthdayMonthFilter, 10))) {
+        currentBirthdayMonthFilter = 'ALL';
+        localStorage.setItem('gip_birthday_month_filter', 'ALL');
+    }
+
+    const detectedRelationships = new Map(beneficiaries
+        .map((beneficiary) => String(beneficiary.relationshipToAssured || '').trim())
+        .filter(Boolean)
+        .map((relationship) => [relationship.toUpperCase(), relationship]));
+    if (currentRelationshipFilter !== 'ALL') {
+        const detectedRelationship = detectedRelationships.get(currentRelationshipFilter.toUpperCase());
+        if (detectedRelationship) {
+            currentRelationshipFilter = detectedRelationship;
+        } else {
+            currentRelationshipFilter = 'ALL';
+            localStorage.setItem('gip_relationship_filter', 'ALL');
+        }
+    }
+}
+
+function compareBirthdayMonth(a, b) {
+    const [aMonth, aDay] = getBirthdaySortKey(a);
+    const [bMonth, bDay] = getBirthdaySortKey(b);
+    return (aMonth - bMonth) || (aDay - bDay) || String(a.name || '').localeCompare(String(b.name || ''));
+}
+
+function compareRelationshipToAssured(a, b) {
+    const aRelationship = String(a.relationshipToAssured || '').trim();
+    const bRelationship = String(b.relationshipToAssured || '').trim();
+    if (!aRelationship && bRelationship) return 1;
+    if (aRelationship && !bRelationship) return -1;
+    return aRelationship.localeCompare(bRelationship) || String(a.name || '').localeCompare(String(b.name || ''));
+}
+
 function sortDatasetByCriteria(data, criteria) {
     const sorted = [...data];
     switch (criteria) {
@@ -190,6 +293,12 @@ function sortDatasetByCriteria(data, criteria) {
             break;
         case 'education':
             sorted.sort((a, b) => (a.education || '').localeCompare(b.education || ''));
+            break;
+        case 'birthday_month':
+            sorted.sort(compareBirthdayMonth);
+            break;
+        case 'relationship':
+            sorted.sort(compareRelationshipToAssured);
             break;
         case 'work':
             sorted.sort((a, b) => (a.designation || '').localeCompare(b.designation || ''));
@@ -210,11 +319,11 @@ export function applyFilters() {
     const yearSelect = document.getElementById('filter-year');
     if (statusSelect) {
         currentStatusFilter = statusSelect.value;
-        localStorage.setItem('ldn_status_filter', currentStatusFilter);
+        localStorage.setItem('gip_status_filter', currentStatusFilter);
     }
     if (yearSelect) {
         currentYearFilter = yearSelect.value;
-        localStorage.setItem('ldn_year_filter', currentYearFilter);
+        localStorage.setItem('gip_year_filter', currentYearFilter);
     }
     currentPage = 1;
     syncPageToUrl(currentPage);
@@ -268,15 +377,15 @@ function toggleFilterMode() {
     if (!nextMode) {
         currentStatusFilter = DEFAULT_STATUS_FILTER;
         currentYearFilter = DEFAULT_YEAR_FILTER;
-        localStorage.setItem('ldn_status_filter', currentStatusFilter);
-        localStorage.setItem('ldn_year_filter', currentYearFilter);
+        localStorage.setItem('gip_status_filter', currentStatusFilter);
+        localStorage.setItem('gip_year_filter', currentYearFilter);
     } else {
         const statusSelect = document.getElementById('filter-status');
         const yearSelect = document.getElementById('filter-year');
         if (statusSelect) currentStatusFilter = statusSelect.value;
         if (yearSelect) currentYearFilter = yearSelect.value;
-        localStorage.setItem('ldn_status_filter', currentStatusFilter);
-        localStorage.setItem('ldn_year_filter', currentYearFilter);
+        localStorage.setItem('gip_status_filter', currentStatusFilter);
+        localStorage.setItem('gip_year_filter', currentYearFilter);
     }
 
     updateFilterUI();
@@ -332,13 +441,13 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
         const hasMissingDates = beneficiaries.some(b =>
             (!b.startDateFormatted && !b.startDate) || (!b.endDateFormatted && !b.endDate)
         );
-        window.__ldn_hasMissingDates = hasMissingDates;
+        window.__gip_hasMissingDates = hasMissingDates;
 
         // Initialize checksum so polling can correctly detect changes immediately.
         lastDataChecksum = generateChecksum(beneficiaries);
         populateYearFilter();
         updateFilterUI();
-        const savedSort = localStorage.getItem('ldn_sort_preference');
+        const savedSort = localStorage.getItem('gip_sort_preference');
         sortData(savedSort || 'name_asc', false);
         console.log(`[Offline-First] Rendered ${localData.length} records from local cache`);
     } else {
@@ -363,7 +472,7 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
             ];
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="px-6 pt-2 pb-1">
+                    <td colspan="8" class="px-6 pt-2 pb-1">
                         <div role="status" class="animate-pulse">
                             ${skeletonRows.map(skeletonRow).join('')}
                             <span class="sr-only">Loading...</span>
@@ -380,7 +489,7 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
     const CACHE_TTL = 30 * 1000; // 30 seconds — only re-fetch if cache is stale
 
     if (!forceRemoteRefresh && msSinceSync < CACHE_TTL && localData.length > 0) {
-        const hasMissingDates = window.__ldn_hasMissingDates === true;
+        const hasMissingDates = window.__gip_hasMissingDates === true;
         if (!hasMissingDates) {
             console.log(`[Offline-First] Cache is fresh (${Math.round(msSinceSync / 1000)}s old), skipping remote fetch`);
             isInitialDataHydrating = false;
@@ -440,6 +549,7 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
                         birthday,
                         age,
                         education,
+                        relationship_to_assured,
                         start_date,
                         end_date,
                         series_number,
@@ -456,7 +566,7 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
 
                 if (!error && data) {
                     lastSupabaseFetchTime = now;
-                    localStorage.setItem('ldn_last_supabase_fetch', String(now));
+                    localStorage.setItem('gip_last_supabase_fetch', String(now));
                     remoteData = data.map(b => ({
                         id: b.gip_id,
                         name: b.full_name,
@@ -466,6 +576,7 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
                         age: b.age,
                         gender: genderMap[b.gender_id] || (b.gender_id == 1 ? 'Male' : (b.gender_id == 2 ? 'Female' : 'N/A')),
                         education: b.education,
+                        relationshipToAssured: b.relationship_to_assured,
                         startDate: b.start_date,
                         endDate: b.end_date,
                         seriesNo: b.series_number,
@@ -502,7 +613,7 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
                 syncExpiredStatusesLocally(beneficiaries);
                 populateYearFilter();
                 updateFilterUI();
-                const savedSort = localStorage.getItem('ldn_sort_preference');
+                const savedSort = localStorage.getItem('gip_sort_preference');
                 sortData(savedSort || 'name_asc', false);
                 lastDataChecksum = remoteChecksum;
                 console.log(`[Offline-First] Remote data synced and rendered (${remoteData.length} records)`);
@@ -718,12 +829,12 @@ function initOfficeQuickFilter() {
                 cachedLocationsByOffice = res.data.locations_by_office || {};
 
                 // Auto-detect LDNPFO as default if no filter is saved in localStorage
-                const savedOffice = localStorage.getItem('ldn_office_filter');
+                const savedOffice = localStorage.getItem('gip_office_filter');
                 if (!savedOffice) {
                     const ldnOffice = cachedOffices.find(o => o.office.toUpperCase().includes('LDNPFO'));
                     if (ldnOffice) {
                         currentOfficeFilter = ldnOffice.office;
-                        localStorage.setItem('ldn_office_filter', currentOfficeFilter);
+                        localStorage.setItem('gip_office_filter', currentOfficeFilter);
                         
                         // Enable filter mode if it wasn't
                         if (!filterModeEnabled) {
@@ -851,16 +962,337 @@ function initOfficeQuickFilter() {
     prefetch();
 }
 
+function populateEducationFilterOptions() {
+    const options = document.getElementById('education-filter-options');
+    const allOption = document.querySelector('[data-education-filter="ALL"]');
+    if (!options) return;
+
+    const levels = [...new Set(beneficiaries
+        .map((beneficiary) => String(beneficiary.education || '').trim())
+        .filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b));
+
+    options.replaceChildren(...levels.map((level) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.educationFilter = level;
+        button.className = `flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold transition-colors cursor-pointer ${currentEducationFilter === level ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' : 'text-gray-700 hover:bg-blue-50 hover:text-royal-blue dark:text-gray-200 dark:hover:bg-slate-700'}`;
+
+        const icon = document.createElement('span');
+        icon.className = 'inline-flex h-5 w-5 shrink-0 items-center justify-center text-blue-600';
+        icon.innerHTML = getEducationIcon(level);
+        const label = document.createElement('span');
+        label.textContent = level;
+        button.append(icon, label);
+        return button;
+    }));
+
+    if (allOption) {
+        allOption.classList.toggle('bg-green-100', currentEducationFilter === 'ALL');
+        allOption.classList.toggle('text-green-700', currentEducationFilter === 'ALL');
+    }
+}
+
+function closeEducationFilterMenu() {
+    const menu = document.getElementById('education-filter-menu');
+    const toggle = document.getElementById('education-filter-toggle');
+    const chevron = document.getElementById('education-filter-chevron');
+    if (menu) menu.classList.add('hidden');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    if (chevron) chevron.classList.remove('rotate-90');
+}
+
+function applyEducationFilter(education) {
+    currentEducationFilter = education || 'ALL';
+    localStorage.setItem('gip_education_filter', currentEducationFilter);
+    currentPage = 1;
+    syncPageToUrl(currentPage);
+    syncHeaderWithFilter();
+    renderTable();
+    closeEducationFilterMenu();
+    const sortDropdown = document.getElementById('sort-dropdown');
+    if (sortDropdown) sortDropdown.classList.add('hidden');
+}
+
+function initEducationFilter() {
+    const sortDropdown = document.getElementById('sort-dropdown');
+    const toggle = document.getElementById('education-filter-toggle');
+    const menu = document.getElementById('education-filter-menu');
+    const chevron = document.getElementById('education-filter-chevron');
+    if (!sortDropdown || !toggle || !menu) return;
+
+    toggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const willOpen = menu.classList.contains('hidden');
+        closeBirthdaySortFilterMenus();
+        closeRelationshipFilterMenu();
+        closeAssignedUnitFilterMenu();
+        menu.classList.toggle('hidden', !willOpen);
+        toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        if (chevron) chevron.classList.toggle('rotate-90', willOpen);
+    });
+
+    sortDropdown.addEventListener('click', (event) => {
+        const option = event.target.closest('[data-education-filter]');
+        if (!option) return;
+        event.preventDefault();
+        event.stopPropagation();
+        applyEducationFilter(option.dataset.educationFilter);
+    });
+}
+
+function setDynamicFilterOptionState(button, isActive) {
+    button.classList.toggle('bg-green-100', isActive);
+    button.classList.toggle('text-green-700', isActive);
+    button.classList.toggle('dark:bg-green-900/40', isActive);
+    button.classList.toggle('dark:text-green-300', isActive);
+}
+
+function populateBirthdayYearFilterOptions() {
+    const options = document.getElementById('birthday-year-filter-options');
+    const allOption = document.querySelector('[data-birthday-year-filter="ALL"]');
+    if (!options) return;
+
+    const detectedYears = [...new Set(beneficiaries
+        .map((beneficiary) => getBirthdayYear(beneficiary))
+        .filter(Number.isInteger))]
+        .sort((a, b) => a - b);
+
+    options.replaceChildren(...detectedYears.map((year) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.birthdayYearFilter = String(year);
+        button.className = 'flex w-full items-center gap-2 py-2 pr-4 pl-10 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700';
+        const label = document.createElement('span');
+        label.textContent = String(year);
+        button.append(label);
+        setDynamicFilterOptionState(button, currentBirthdayYearFilter === String(year));
+        return button;
+    }));
+
+    if (allOption) setDynamicFilterOptionState(allOption, currentBirthdayYearFilter === 'ALL');
+}
+
+function populateBirthdayMonthFilterOptions() {
+    const options = document.getElementById('birthday-month-filter-options');
+    const allOption = document.querySelector('[data-birthday-month-filter="ALL"]');
+    if (!options) return;
+
+    const detectedMonths = [...new Set(beneficiaries
+        .map((beneficiary) => getBirthdaySortKey(beneficiary)[0])
+        .filter((month) => month >= 0 && month < MONTH_NAMES.length))]
+        .sort((a, b) => a - b);
+
+    options.replaceChildren(...detectedMonths.map((monthIndex) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.birthdayMonthFilter = String(monthIndex);
+        button.className = 'flex w-full items-center gap-2 py-2 pr-4 pl-10 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700';
+        const label = document.createElement('span');
+        label.textContent = MONTH_NAMES[monthIndex];
+        button.append(label);
+        setDynamicFilterOptionState(button, currentBirthdayMonthFilter === String(monthIndex));
+        return button;
+    }));
+
+    if (allOption) setDynamicFilterOptionState(allOption, currentBirthdayMonthFilter === 'ALL');
+}
+
+function populateRelationshipFilterOptions() {
+    const options = document.getElementById('relationship-filter-options');
+    const allOption = document.querySelector('[data-relationship-filter="ALL"]');
+    if (!options) return;
+
+    const relationships = [...new Set(beneficiaries
+        .map((beneficiary) => String(beneficiary.relationshipToAssured || '').trim())
+        .filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b));
+
+    options.replaceChildren(...relationships.map((relationship) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.relationshipFilter = relationship;
+        button.className = 'flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700';
+        button.innerHTML = '<svg class="h-4 w-4 shrink-0 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-6-3.5M9 20H2v-2a4 4 0 016-3.5m8-7a3 3 0 11-6 0 3 3 0 016 0zM9 8a3 3 0 11-6 0 3 3 0 016 0z" /></svg>';
+        const label = document.createElement('span');
+        label.textContent = relationship;
+        button.append(label);
+        setDynamicFilterOptionState(button, currentRelationshipFilter.toUpperCase() === relationship.toUpperCase());
+        return button;
+    }));
+
+    if (allOption) setDynamicFilterOptionState(allOption, currentRelationshipFilter === 'ALL');
+}
+
+function populateAssignedUnitFilterOptions() {
+    document.querySelectorAll('[data-assigned-unit-filter]').forEach((button) => {
+        const value = button.dataset.assignedUnitFilter || 'ALL';
+        setDynamicFilterOptionState(button, value.toUpperCase() === currentAssignedUnitFilter.toUpperCase());
+    });
+}
+
+function closeNestedFilterMenu(type) {
+    const menu = document.getElementById(`${type}-filter-menu`);
+    const toggle = document.getElementById(`${type}-filter-toggle`);
+    const chevron = document.getElementById(`${type}-filter-chevron`);
+    if (menu) menu.classList.add('hidden');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    if (chevron) chevron.classList.remove('rotate-90');
+}
+
+function toggleNestedFilterMenu(type, willOpen) {
+    const menu = document.getElementById(`${type}-filter-menu`);
+    const toggle = document.getElementById(`${type}-filter-toggle`);
+    const chevron = document.getElementById(`${type}-filter-chevron`);
+    if (!menu || !toggle) return;
+    menu.classList.toggle('hidden', !willOpen);
+    toggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    if (chevron) chevron.classList.toggle('rotate-90', willOpen);
+}
+
+function closeBirthdaySortFilterMenus() {
+    closeNestedFilterMenu('birthday-year');
+    closeNestedFilterMenu('birthday-month');
+    closeNestedFilterMenu('birthday-sort');
+}
+
+function closeRelationshipFilterMenu() {
+    closeNestedFilterMenu('relationship');
+}
+
+function closeAssignedUnitFilterMenu() {
+    closeNestedFilterMenu('assigned-unit');
+}
+
+function finishDynamicFilterSelection() {
+    currentPage = 1;
+    syncPageToUrl(currentPage);
+    syncHeaderWithFilter();
+    renderTable();
+    closeBirthdaySortFilterMenus();
+    closeRelationshipFilterMenu();
+    closeAssignedUnitFilterMenu();
+    const sortDropdown = document.getElementById('sort-dropdown');
+    if (sortDropdown) sortDropdown.classList.add('hidden');
+}
+
+function initBirthdaySortFilter() {
+    const sortDropdown = document.getElementById('sort-dropdown');
+    const sortToggle = document.getElementById('birthday-sort-filter-toggle');
+    const sortMenu = document.getElementById('birthday-sort-filter-menu');
+    const yearToggle = document.getElementById('birthday-year-filter-toggle');
+    const yearMenu = document.getElementById('birthday-year-filter-menu');
+    const monthToggle = document.getElementById('birthday-month-filter-toggle');
+    const monthMenu = document.getElementById('birthday-month-filter-menu');
+    if (!sortDropdown || !sortToggle || !sortMenu || !yearToggle || !yearMenu || !monthToggle || !monthMenu) return;
+
+    sortToggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const willOpen = sortMenu.classList.contains('hidden');
+        closeEducationFilterMenu();
+        closeRelationshipFilterMenu();
+        closeAssignedUnitFilterMenu();
+        if (!willOpen) {
+            closeBirthdaySortFilterMenus();
+        } else {
+            toggleNestedFilterMenu('birthday-sort', true);
+        }
+    });
+
+    yearToggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const willOpen = yearMenu.classList.contains('hidden');
+        closeNestedFilterMenu('birthday-month');
+        toggleNestedFilterMenu('birthday-year', willOpen);
+    });
+
+    monthToggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const willOpen = monthMenu.classList.contains('hidden');
+        closeNestedFilterMenu('birthday-year');
+        toggleNestedFilterMenu('birthday-month', willOpen);
+    });
+
+    sortDropdown.addEventListener('click', (event) => {
+        const yearOption = event.target.closest('[data-birthday-year-filter]');
+        const monthOption = event.target.closest('[data-birthday-month-filter]');
+        if (!yearOption && !monthOption) return;
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (yearOption) {
+            currentBirthdayYearFilter = yearOption.dataset.birthdayYearFilter || 'ALL';
+            localStorage.setItem('gip_birthday_year_filter', currentBirthdayYearFilter);
+        }
+        if (monthOption) {
+            currentBirthdayMonthFilter = monthOption.dataset.birthdayMonthFilter || 'ALL';
+            localStorage.setItem('gip_birthday_month_filter', currentBirthdayMonthFilter);
+        }
+        finishDynamicFilterSelection();
+    });
+}
+
+function initRelationshipFilter() {
+    const sortDropdown = document.getElementById('sort-dropdown');
+    const toggle = document.getElementById('relationship-filter-toggle');
+    const menu = document.getElementById('relationship-filter-menu');
+    if (!sortDropdown || !toggle || !menu) return;
+
+    toggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const willOpen = menu.classList.contains('hidden');
+        closeEducationFilterMenu();
+        closeBirthdaySortFilterMenus();
+        closeAssignedUnitFilterMenu();
+        toggleNestedFilterMenu('relationship', willOpen);
+    });
+
+    sortDropdown.addEventListener('click', (event) => {
+        const option = event.target.closest('[data-relationship-filter]');
+        if (!option) return;
+        event.preventDefault();
+        event.stopPropagation();
+        currentRelationshipFilter = option.dataset.relationshipFilter || 'ALL';
+        localStorage.setItem('gip_relationship_filter', currentRelationshipFilter);
+        finishDynamicFilterSelection();
+    });
+}
+
+function initAssignedUnitFilter() {
+    const sortDropdown = document.getElementById('sort-dropdown');
+    const toggle = document.getElementById('assigned-unit-filter-toggle');
+    const menu = document.getElementById('assigned-unit-filter-menu');
+    if (!sortDropdown || !toggle || !menu) return;
+
+    toggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const willOpen = menu.classList.contains('hidden');
+        closeEducationFilterMenu();
+        closeBirthdaySortFilterMenus();
+        closeRelationshipFilterMenu();
+        toggleNestedFilterMenu('assigned-unit', willOpen);
+    });
+
+    sortDropdown.addEventListener('click', (event) => {
+        const option = event.target.closest('[data-assigned-unit-filter]');
+        if (!option) return;
+        event.preventDefault();
+        event.stopPropagation();
+        currentAssignedUnitFilter = option.dataset.assignedUnitFilter || 'ALL';
+        localStorage.setItem('gip_assigned_unit_filter', currentAssignedUnitFilter);
+        finishDynamicFilterSelection();
+    });
+}
+
 function syncHeaderWithFilter() {
-    const headerPrefix = document.getElementById('ldn-header-prefix');
+    const headerPrefix = document.getElementById('gip-header-prefix');
     const clearBtn = document.getElementById('clear-office-filter-btn');
     if (!headerPrefix) return;
 
     headerPrefix.textContent = currentOfficeFilter === 'ALL' ? 'ALL BENEFICIARIES' : currentOfficeFilter;
 
-    // Show "Clear All Filter" whenever the view is not in default state
-    // (Filter Mode ON, or an office filter is applied).
-    const isNonDefault = filterModeEnabled || currentOfficeFilter !== 'ALL';
+    // Show "Clear All Filter" whenever the view is not in default state.
+    const isNonDefault = filterModeEnabled || currentOfficeFilter !== 'ALL' || currentEducationFilter !== 'ALL' || currentBirthdayYearFilter !== 'ALL' || currentBirthdayMonthFilter !== 'ALL' || currentRelationshipFilter !== 'ALL' || currentAssignedUnitFilter !== 'ALL';
     if (clearBtn) {
         clearBtn.classList.toggle('hidden', !isNonDefault);
         clearBtn.classList.toggle('flex', isNonDefault);
@@ -869,7 +1301,7 @@ function syncHeaderWithFilter() {
 
 window.setOfficeFilter = (officeName) => {
     currentOfficeFilter = officeName;
-    localStorage.setItem('ldn_office_filter', officeName);
+    localStorage.setItem('gip_office_filter', officeName);
     
     // Enable filter mode if it wasn't
     if (!filterModeEnabled) {
@@ -898,12 +1330,22 @@ window.clearOfficeFilter = async () => {
     currentStatusFilter = DEFAULT_STATUS_FILTER;
     currentYearFilter = DEFAULT_YEAR_FILTER;
     currentOfficeFilter = 'ALL';
-    localStorage.setItem('ldn_status_filter', currentStatusFilter);
-    localStorage.setItem('ldn_year_filter', currentYearFilter);
-    localStorage.setItem('ldn_office_filter', 'ALL');
+    currentEducationFilter = 'ALL';
+    currentBirthdayYearFilter = 'ALL';
+    currentBirthdayMonthFilter = 'ALL';
+    currentRelationshipFilter = 'ALL';
+    currentAssignedUnitFilter = 'ALL';
+    localStorage.setItem('gip_status_filter', currentStatusFilter);
+    localStorage.setItem('gip_year_filter', currentYearFilter);
+    localStorage.setItem('gip_office_filter', 'ALL');
+    localStorage.setItem('gip_education_filter', 'ALL');
+    localStorage.setItem('gip_birthday_year_filter', 'ALL');
+    localStorage.setItem('gip_birthday_month_filter', 'ALL');
+    localStorage.setItem('gip_relationship_filter', 'ALL');
+    localStorage.setItem('gip_assigned_unit_filter', 'ALL');
 
     // Reset sort preference to A-Z so re-enabling Filter Mode starts clean
-    localStorage.setItem('ldn_sort_preference', 'name_asc');
+    localStorage.setItem('gip_sort_preference', 'name_asc');
 
     // Turn Filter Mode OFF (default mode)
     persistFilterMode(false);
@@ -932,21 +1374,27 @@ window.clearOfficeFilter = async () => {
     renderTable();
 };
 
-export function initLDNHeader() {
+export function initGIPHeader() {
     syncHeaderWithFilter();
 }
 
-export function initLDNPage() {
+export function initGIPPage() {
     loadBeneficiaries(); // Load from database
-    initLDNHeader();
+    initGIPHeader();
     initSearch();
+    initPhoneVisibilityToggle();
+    initTableControlActiveStates();
     initFilterControls();
+    initEducationFilter();
+    initBirthdaySortFilter();
+    initAssignedUnitFilter();
+    initRelationshipFilter();
     initOfficeFilter(); // Old sub-dropdown (kept for compatibility)
     initOfficeQuickFilter(); // New standalone quick-filter strip
     initRealtimeSubscription(); // Instant updates from Supabase
 
     // Wire the Export Logs button
-    const exportBtn = document.getElementById('ldn-export-logs-btn');
+    const exportBtn = document.getElementById('gip-export-logs-btn');
     if (exportBtn) {
         exportBtn.addEventListener('click', () => {
             showLogsExportModal(beneficiaries);
@@ -1010,6 +1458,70 @@ function initRealtimeSubscription() {
         });
 }
 
+function updatePhoneVisibilityToggleUI() {
+    const toggle = document.getElementById('phone-visibility-toggle');
+    const onLabel = document.getElementById('phone-visibility-on');
+    const offLabel = document.getElementById('phone-visibility-off');
+    if (!toggle || !onLabel || !offLabel) return;
+
+    toggle.setAttribute('aria-checked', String(showPhoneNumbers));
+    toggle.setAttribute('aria-label', showPhoneNumbers ? 'Hide beneficiary phone numbers' : 'Show beneficiary phone numbers');
+    toggle.className = showPhoneNumbers
+        ? 'grid w-full grid-cols-2 overflow-hidden rounded-lg border border-emerald-200 bg-emerald-50 p-1 text-xs font-black uppercase tracking-wider shadow-inner transition-colors dark:border-emerald-800 dark:bg-emerald-950/30 cursor-pointer'
+        : 'grid w-full grid-cols-2 overflow-hidden rounded-lg border border-red-200 bg-red-50 p-1 text-xs font-black uppercase tracking-wider shadow-inner transition-colors dark:border-red-800 dark:bg-red-950/30 cursor-pointer';
+    onLabel.className = showPhoneNumbers
+        ? 'bg-emerald-600 px-4 py-2 text-center text-white shadow-sm'
+        : 'px-4 py-2 text-center text-emerald-600 dark:text-emerald-400';
+    offLabel.className = showPhoneNumbers
+        ? 'px-4 py-2 text-center text-philippine-red dark:text-red-400'
+        : 'bg-philippine-red px-4 py-2 text-center text-white shadow-sm';
+}
+
+function initPhoneVisibilityToggle() {
+    const toggle = document.getElementById('phone-visibility-toggle');
+    if (!toggle) return;
+
+    updatePhoneVisibilityToggleUI();
+    toggle.addEventListener('click', () => {
+        showPhoneNumbers = !showPhoneNumbers;
+        localStorage.setItem(PHONE_VISIBILITY_STORAGE_KEY, showPhoneNumbers ? 'ON' : 'OFF');
+        updatePhoneVisibilityToggleUI();
+        renderTable();
+    });
+}
+function setActiveTableControl(activeButtonId = null) {
+    const controls = {
+        'office-quick-filter-btn': ['bg-violet-100', 'text-violet-700', 'border-violet-300', 'ring-2', 'ring-violet-200', 'dark:bg-violet-900/40', 'dark:text-violet-300'],
+        'filter-dropdown-button': ['bg-blue-100', 'text-royal-blue', 'border-blue-300', 'ring-2', 'ring-blue-200', 'dark:bg-blue-900/40', 'dark:text-blue-300'],
+        'sort-dropdown-button': ['bg-orange-100', 'text-orange-700', 'border-orange-300', 'ring-2', 'ring-orange-200', 'dark:bg-orange-900/40', 'dark:text-orange-300']
+    };
+
+    Object.entries(controls).forEach(([buttonId, activeClasses]) => {
+        const button = document.getElementById(buttonId);
+        if (!button) return;
+        const isActive = buttonId === activeButtonId;
+        button.setAttribute('aria-pressed', String(isActive));
+        button.classList.remove(...activeClasses);
+        if (isActive) button.classList.add(...activeClasses);
+    });
+}
+
+function initTableControlActiveStates() {
+    const controlIds = ['office-quick-filter-btn', 'filter-dropdown-button', 'sort-dropdown-button'];
+    controlIds.forEach((buttonId) => {
+        const button = document.getElementById(buttonId);
+        if (!button) return;
+        button.addEventListener('click', () => {
+            const nextActiveId = button.getAttribute('aria-pressed') === 'true' ? null : buttonId;
+            setActiveTableControl(nextActiveId);
+        });
+    });
+
+    document.addEventListener('click', (event) => {
+        const interactiveRegion = event.target.closest('#office-quick-filter-btn, #filter-dropdown-button, #filter-dropdown, #sort-dropdown-button, #sort-dropdown');
+        if (!interactiveRegion) setActiveTableControl(null);
+    });
+}
 function initFilterControls() {
     const applyFiltersButton = document.getElementById('apply-filters-button');
     if (!applyFiltersButton) return;
@@ -1031,6 +1543,12 @@ export function renderTable(dataToRender = null) {
     }
     const tbody = document.getElementById('beneficiary-table-body');
     if (!tbody) return;
+    populateEducationFilterOptions();
+    populateBirthdayYearFilterOptions();
+    populateBirthdayMonthFilterOptions();
+    populateRelationshipFilterOptions();
+    populateAssignedUnitFilterOptions();
+    renderEducationLevelSummary(dataToRender);
 
     // Update global reference for pagination
     filteredDataGlobal = dataToRender;
@@ -1038,7 +1556,7 @@ export function renderTable(dataToRender = null) {
     if (dataToRender.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="px-6 py-10 text-center text-gray-400 font-medium">
+                <td colspan="8" class="px-6 py-10 text-center text-gray-400 font-medium">
                     <div class="flex flex-col items-center gap-2">
                         <svg class="w-10 h-10 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -1072,45 +1590,52 @@ export function renderTable(dataToRender = null) {
     const searchInput = document.getElementById('table-search');
     const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
     const isSearchingContact = query !== "" && /\d/.test(query);
+    const shouldShowContact = showPhoneNumbers || isSearchingContact;
 
     tbody.innerHTML = pagedData.map(data => `
         <tr class="bg-blue-50 border-b border-blue-100 hover:bg-blue-100 transition-colors group cursor-pointer"
             onclick='viewBeneficiary(${JSON.stringify(data)})'>
-            <th scope="row" class="px-4 py-3 font-medium text-heading whitespace-nowrap font-mono text-xs text-center">
-                ${data.id}
-            </th>
-            <td class="px-4 py-3 font-bold text-royal-blue text-center">
-                <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                    <span class="text-xs sm:text-sm font-black leading-tight">${data.name}</span>
-                    ${isSearchingContact && data.contact ? `
-                        <span class="inline-flex items-center bg-royal-blue text-white text-[10px] px-2 py-0.5 rounded font-black gap-1 animate-pulse shadow-sm" title="Contact No: ${data.contact}">
+            <th scope="row" class="w-[32%] px-2 py-3 font-bold text-royal-blue text-start md:w-[22%] lg:w-[18%] lg:px-4">
+                <div class="flex min-w-0 flex-nowrap items-center justify-start gap-1.5 whitespace-nowrap">
+                    <span class="min-w-0 truncate text-xs font-black leading-tight sm:text-sm" title="${data.name}">${data.name}</span>
+                    ${shouldShowContact && data.contact ? `
+                        <span class="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded bg-royal-blue px-2 py-0.5 text-[0.5625rem] font-black tabular-nums text-white shadow-sm sm:text-[0.625rem]" title="Contact No: ${data.contact}">
                             <svg class="w-2.5 h-2.5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                             </svg>
-                            <span>${data.contact}</span>
+                            <span class="whitespace-nowrap">${data.contact}</span>
                         </span>
                     ` : ''}
                 </div>
+            </th>
+            <td class="hidden w-[24%] px-2 py-3 text-center lg:table-cell lg:px-4">
+                <span class="inline-block max-w-xs whitespace-normal break-words text-[0.6875rem] font-semibold leading-relaxed text-gray-700 dark:text-gray-300">
+                    ${data.address || 'N/A'}
+                </span>
             </td>
-            <td class="px-4 py-3 text-center">
-                <div class="flex justify-center">
-                    <span class="${getOfficeClass(data.office)} text-[0.625rem] sm:text-xs font-bold px-2.5 py-0.5 rounded whitespace-nowrap">
-                        ${data.office || 'N/A'}
-                    </span>
-                </div>
+            <td class="w-[12%] px-1 py-3 whitespace-nowrap text-center md:w-[8%] lg:w-[7%] lg:px-2">
+                <span class="inline-flex min-w-8 items-center justify-center rounded-full bg-violet-100 px-2.5 py-1 text-xs font-black text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+                    ${data.age !== null && data.age !== undefined && data.age !== '' ? data.age : 'N/A'}
+                </span>
             </td>
-            <td class="px-4 py-3 whitespace-nowrap text-center text-xs">
+            <td class="w-[18%] px-1 py-3 text-center md:w-[12%] lg:w-[10%] lg:px-2">
+                <span class="${getGenderClass(data.gender)} inline-flex max-w-full items-center justify-center rounded-full px-2 py-1 text-[0.5625rem] font-black uppercase sm:text-[0.625rem]">
+                    ${data.gender || 'N/A'}
+                </span>
+            </td>
+            <td class="hidden w-[15%] px-2 py-3 whitespace-nowrap text-center text-xs md:table-cell lg:w-[10%] lg:px-4">
                 <span class="${(data.startDateFormatted || data.startDate) ? 'font-black text-royal-blue uppercase tracking-tight' : 'font-bold text-gray-300 italic'}">${translateDateToShortMonth(data.startDateFormatted || data.startDate)}</span>
             </td>
-            <td class="px-4 py-3 whitespace-nowrap text-center text-xs">
+            <td class="hidden w-[15%] px-2 py-3 whitespace-nowrap text-center text-xs md:table-cell lg:w-[10%] lg:px-4">
                 <span class="${(data.endDateFormatted || data.endDate) ? 'font-black text-philippine-red uppercase tracking-tight' : 'font-bold text-gray-300 italic'}">${translateDateToShortMonth(data.endDateFormatted || data.endDate)}</span>
             </td>
-            <td class="px-4 py-3 text-center">
-                <span class="${getStatusClass(data.remarks)} text-xs font-bold px-2.5 py-0.5 rounded uppercase border">
+            <td class="w-[24%] px-1 py-3 text-center md:w-[18%] lg:w-[12%] lg:px-2">
+                <span class="${getStatusClass(data.remarks)} inline-flex max-w-full px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase sm:px-2.5 sm:text-xs rounded border">
                     ${data.remarks || 'N/A'}
                 </span>
             </td>
-            <td class="px-4 py-3 flex gap-2">
+            <td class="w-[14%] px-1 py-3 text-center md:w-[10%] lg:w-[9%] lg:px-2">
+                <div class="flex flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1 lg:gap-2">
                 <button type="button"
                     class="font-medium text-royal-blue hover:scale-110 transition-transform p-1 cursor-pointer"
                     title="Edit Details" onclick='event.stopPropagation(); editBeneficiary(${JSON.stringify(data)})'>
@@ -1129,6 +1654,7 @@ export function renderTable(dataToRender = null) {
                         </path>
                     </svg>
                 </button>
+                </div>
             </td>
         </tr>
     `).join('');
@@ -1274,6 +1800,44 @@ function getOfficeClass(office) {
     return palette[hash % palette.length] + ' dark:!text-white';
 }
 
+function getGenderClass(gender) {
+    const normalized = String(gender || '').trim().toUpperCase();
+    if (normalized === 'MALE') return 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300';
+    if (normalized === 'FEMALE') return 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300';
+    return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-200';
+}
+
+function getEducationIcon(education) {
+    const value = String(education || '').toUpperCase();
+    if (/INFORMATION|COMPUTER|TECHNOLOGY|\bIT\b/.test(value)) {
+        return '<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 4h14a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg>';
+    }
+    if (/ENGINEER|ARCHITECT/.test(value)) {
+        return '<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.7 6.3a4 4 0 01-5 5L4 17v3h3l5.7-5.7a4 4 0 005-5l-2.4 2.4-3-3 2.4-2.4z"/></svg>';
+    }
+    if (/EDUCATION|TEACHER/.test(value)) {
+        return '<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.25v13m0-13C10.8 5.5 9.25 5 7.5 5S4.2 5.5 3 6.25v13C4.2 18.5 5.75 18 7.5 18s3.3.5 4.5 1.25m0-13C13.2 5.5 14.75 5 16.5 5s3.3.5 4.5 1.25v13C19.8 18.5 18.25 18 16.5 18s-3.3.5-4.5 1.25"/></svg>';
+    }
+    if (/BIOLOGY|AGRICULTURE|SCIENCE/.test(value)) {
+        return '<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21V10m0 0C8 10 5 7 5 3c4 0 7 3 7 7zm0 4c4 0 7-3 7-7-4 0-7 3-7 7z"/></svg>';
+    }
+    return '<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.2-3.4a12 12 0 01.6 6.5A12 12 0 0012 20a12 12 0 00-6.8-2.9 12 12 0 01.6-6.5L12 14z"/></svg>';
+}
+
+function renderEducationLevelSummary(data) {
+    const summary = document.getElementById('gip-education-summary');
+    const countOutput = document.getElementById('gip-education-level-count');
+    if (!summary || !countOutput) return;
+
+    const levels = [...new Set((data || [])
+        .map((beneficiary) => String(beneficiary.education || '').trim())
+        .filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b));
+
+    countOutput.textContent = levels.length.toLocaleString();
+    summary.title = levels.length ? levels.join(', ') : 'No educational level recorded';
+}
+
 function getStatusClass(status) {
     if (!status) return 'bg-gray-100 text-gray-600 border-gray-200';
     const s = status.toUpperCase();
@@ -1284,24 +1848,33 @@ function getStatusClass(status) {
     return 'bg-gray-100 text-gray-600 border-gray-200';
 }
 
+function closeDataDropdowns() {
+    ['sort-dropdown', 'filter-dropdown'].forEach((id) => {
+        const dropdown = document.getElementById(id);
+        if (dropdown) dropdown.classList.add('hidden');
+    });
+    closeEducationFilterMenu();
+    closeBirthdaySortFilterMenus();
+    closeRelationshipFilterMenu();
+    closeAssignedUnitFilterMenu();
+}
+
 export function sortData(criteria, saveToStorage = true) {
     if (!filterModeEnabled) {
         if (saveToStorage) {
-            localStorage.setItem('ldn_sort_preference', criteria);
+            localStorage.setItem('gip_sort_preference', criteria);
             currentPage = 1;
             syncPageToUrl(currentPage);
         }
         renderTable(sortDatasetByCriteria(getFilteredBeneficiaries(), criteria));
 
-        const dropdown = document.getElementById('sort-dropdown');
-        if (dropdown && !dropdown.classList.contains('hidden')) {
-            dropdown.classList.add('hidden');
-        }
+        closeDataDropdowns();
+
         return;
     }
 
     if (saveToStorage) {
-        localStorage.setItem('ldn_sort_preference', criteria);
+        localStorage.setItem('gip_sort_preference', criteria);
         currentPage = 1;
         syncPageToUrl(currentPage);
     }
@@ -1330,6 +1903,12 @@ export function sortData(criteria, saveToStorage = true) {
         case 'education':
             beneficiaries.sort((a, b) => (a.education || '').localeCompare(b.education || ''));
             break;
+        case 'birthday_month':
+            beneficiaries.sort(compareBirthdayMonth);
+            break;
+        case 'relationship':
+            beneficiaries.sort(compareRelationshipToAssured);
+            break;
         case 'work':
             beneficiaries.sort((a, b) => (a.designation || '').localeCompare(b.designation || ''));
             break;
@@ -1340,14 +1919,11 @@ export function sortData(criteria, saveToStorage = true) {
 
     renderTable();
 
-    // Auto-hide the dropdown menu
-    const dropdown = document.getElementById('sort-dropdown');
-    if (dropdown && !dropdown.classList.contains('hidden')) {
-        dropdown.classList.add('hidden');
-    }
+    closeDataDropdowns();
+
 }
 
-export async function addBeneficiary(data) {
+export async function addBeneficiary(data, awaitRemoteSync = false) {
     // ── STEP 1: Capitalize fields ──────────────────────────────────────────────
     const capitalizedData = { ...data };
     const fieldsToCapitalize = ['name', 'address', 'education', 'designation', 'designatedBeneficiary', 'relationshipToAssured'];
@@ -1360,6 +1936,19 @@ export async function addBeneficiary(data) {
     const isTempId = (val) => typeof val === 'string' && val.startsWith('temp_');
     const hasRealId = Boolean(capitalizedData.id) && !isTempId(capitalizedData.id);
     const method = hasRealId ? 'PUT' : 'POST';
+
+    // Edit drawers require confirmed persistence before reporting success.
+    if (awaitRemoteSync) {
+        const remoteResult = await apiRequest('api/beneficiaries.php', {
+            method,
+            body: JSON.stringify(capitalizedData)
+        });
+        if (!remoteResult.success || remoteResult.data?.success !== true) {
+            const message = remoteResult.data?.error || remoteResult.error || 'The beneficiary update was not saved.';
+            Swal.fire({ icon: 'error', title: 'Update Failed', text: message });
+            return false;
+        }
+    }
 
     // ── STEP 2: Generate a temp id for new records so we can store locally ────
     if (!capitalizedData.id && !capitalizedData.gip_id) {
@@ -1385,18 +1974,19 @@ export async function addBeneficiary(data) {
         createNotification(`New user <strong>${capitalizedData.name}</strong> added. pending "Required Documents" for review.`, 'success');
     }
 
-    // ── STEP 5: Enqueue remote API sync (runs in background) ──────────────────
-    try {
-        // For POST, keep temp id locally but do NOT let it be treated as gip_id server-side.
-        // `_tempId` will be used by the sync worker to replace the local record once the server returns the real ROX id.
-        await enqueueSync(method, 'api/beneficiaries.php', capitalizedData);
-        // Trigger sync worker immediately (non-blocking)
-        processQueue();
-    } catch (e) {
-        console.error('[Offline-First] Failed to enqueue sync:', e);
+    // Keep add/offline operations queued, but do not duplicate a confirmed edit request.
+    if (!awaitRemoteSync) {
+        try {
+            // For POST, keep temp id locally but do NOT let it be treated as gip_id server-side.
+            // `_tempId` will be used by the sync worker to replace the local record once the server returns the real ROX id.
+            await enqueueSync(method, 'api/beneficiaries.php', capitalizedData);
+            processQueue();
+        } catch (e) {
+            console.error('[Offline-First] Failed to enqueue sync:', e);
+        }
     }
 
-    return true; // Return immediately — don't wait for remote
+    return true;
 }
 
 

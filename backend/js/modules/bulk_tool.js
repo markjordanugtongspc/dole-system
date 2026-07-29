@@ -195,7 +195,7 @@ export const BulkApp = {
             // index 4: Gender
             // index 5: Education
             // index 6: Assigned Office
-            // index 7: Nature of Work
+            // index 7: Assigned Unit
             // index 8: Start Date
             // index 9: End Date
 
@@ -388,7 +388,7 @@ export const BulkApp = {
                             ]);
                             if (idRes.success && idRes.data?.success && idRes.data?.nextId) {
                                 data.gip_id = idRes.data.nextId;
-                                data.id = null; // force POST branch in ldngip.js
+                                data.id = null; // force POST branch in gip.js
                             }
                             if (seriesRes.success && seriesRes.data?.success && seriesRes.data?.nextSeries) {
                                 data.seriesNo = seriesRes.data.nextSeries;

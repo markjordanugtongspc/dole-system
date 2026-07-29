@@ -1,4 +1,4 @@
-# Environment Configuration
+﻿# Environment Configuration
 .env
 config/.env
 config/.env.local
@@ -13,6 +13,7 @@ config/.env.supabase.backup
 # IDE and Editor Files
 .vscode/
 .idea/
+.claude/
 *.swp
 *.swo
 *~
@@ -27,7 +28,7 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# Build Output — dist/ is committed so Vercel can serve pre-built Vite assets
+# Build Output â€” dist/ is committed so Vercel can serve pre-built Vite assets
 # (Vercel does not run `npm run build` unless you configure a build command)
 build/
 .cache/

@@ -2,6 +2,7 @@ import ApexCharts from 'apexcharts';
 import { getBasePath, isSupabaseMode } from './auth.js';
 import { apiGet } from './ajax-manager.js';
 import { getLocalBeneficiaries, getTimeSinceLastSync, cacheBeneficiaries } from './db-manager.js';
+import { COMMON_ASSIGNED_UNITS } from './assigned-units.js';
 
 /**
  * 2026 LDNPFO GIP MONITORING - Data Visualization Module
@@ -86,6 +87,87 @@ function parseChartDate(value) {
     return isNaN(d.getTime()) ? null : d;
 }
 
+function getBeneficiaryAge(beneficiary) {
+    const storedAge = Number.parseInt(beneficiary?.age, 10);
+    if (Number.isInteger(storedAge) && storedAge >= 0) return storedAge;
+
+    const birthday = parseChartDate(beneficiary?.birthday);
+    if (!birthday) return null;
+
+    const today = new Date();
+    let age = today.getFullYear() - birthday.getFullYear();
+    const monthDifference = today.getMonth() - birthday.getMonth();
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthday.getDate())) age--;
+    return age >= 0 ? age : null;
+}
+
+function getAssignedUnitLabel(unit) {
+    const value = String(unit || '').trim();
+    const acronym = value.match(/\(([A-Z]{2,8})\)\s*$/i)?.[1];
+    if (acronym) return acronym.toUpperCase();
+    if (/information technology/i.test(value)) return 'IT';
+    return value.length > 18 ? `${value.slice(0, 16)}...` : value;
+}
+
+function getCanonicalAssignedUnit(unit) {
+    const normalized = String(unit || '').trim().toUpperCase().split(' ').filter(Boolean).join(' ');
+    if (!normalized || ['N/A', 'NA', 'NONE', 'UNASSIGNED'].includes(normalized)) return null;
+
+    const directMatch = COMMON_ASSIGNED_UNITS.find((candidate) => candidate.toUpperCase() === normalized);
+    if (directMatch) return directMatch;
+
+    const acronymMatch = COMMON_ASSIGNED_UNITS.find((candidate) => {
+        const start = candidate.lastIndexOf('(');
+        const end = candidate.lastIndexOf(')');
+        const acronym = start >= 0 && end > start ? candidate.slice(start + 1, end).toUpperCase() : '';
+        return acronym && (normalized === acronym || normalized.endsWith('(' + acronym + ')'));
+    });
+    if (acronymMatch) return acronymMatch;
+
+    const aliases = {
+        'INFORMATION TECHNOLOGY': 'Information Technology Unit (IT)',
+        'WELFARE WORKERS UNIT': 'Wellfare Workers Unit (WWU)',
+        'WELLFARE WORKERS UNIT': 'Wellfare Workers Unit (WWU)'
+    };
+    return aliases[normalized] || null;
+}
+
+function buildMonthlyAgePattern(data, yearFilter) {
+    const filterYear = /^\d{4}$/.test(String(yearFilter || '')) ? Number(yearFilter) : null;
+    const monthBuckets = Array.from({ length: 12 }, () => ({
+        total: 0,
+        ages: new Map(),
+        ageGroups: { '18-24': 0, '25-30': 0, '31-40': 0, '41+': 0 }
+    }));
+
+    data.forEach((beneficiary) => {
+        const addedDate = parseChartDate(beneficiary.createdAt);
+        const age = getBeneficiaryAge(beneficiary);
+        if (!addedDate || !Number.isInteger(age) || age < 18) return;
+        if (filterYear && addedDate.getFullYear() !== filterYear) return;
+
+        const bucket = monthBuckets[addedDate.getMonth()];
+        bucket.total++;
+        bucket.ages.set(age, (bucket.ages.get(age) || 0) + 1);
+        if (age <= 24) bucket.ageGroups['18-24']++;
+        else if (age <= 30) bucket.ageGroups['25-30']++;
+        else if (age <= 40) bucket.ageGroups['31-40']++;
+        else bucket.ageGroups['41+']++;
+    });
+
+    return monthBuckets.map((bucket, monthIndex) => ({
+        month: new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date(2024, monthIndex, 1)).toUpperCase(),
+        totalAdded: bucket.total,
+        ageGroups: bucket.ageGroups,
+        exactAges: [...bucket.ages.entries()].sort((a, b) => a[0] - b[0])
+    }));
+}
+function getLatestAddedYear(data) {
+    return data.reduce((latestYear, beneficiary) => {
+        const addedDate = parseChartDate(beneficiary.createdAt);
+        return addedDate ? Math.max(latestYear, addedDate.getFullYear()) : latestYear;
+    }, 0);
+}
 // --- Performance Target Config ---
 const MUNICIPALITY_TARGETS = {
     'ILIGAN': 120,
@@ -109,7 +191,7 @@ export async function initCharts(forceRefresh = false) {
     // Skip when not authenticated
     if (localStorage.getItem('isLoggedIn') !== 'true') return;
 
-    // Skip silently when no chart containers exist on this page (e.g. LDN table page)
+    // Skip silently when no chart containers exist on this page (e.g. GIP management page)
     // — avoids a wasted API call that nobody consumes
     if (!document.getElementById('workforce-chart')) return;
 
@@ -121,7 +203,7 @@ export async function initCharts(forceRefresh = false) {
         rawData = cachedRawData;
     } else {
         // ── STEP 1: Read from IndexedDB instantly (zero network, survives page nav) ──
-        const CHART_CACHE_TTL = 60_000; // 60 s — same source of truth as ldngip.js
+        const CHART_CACHE_TTL = 60_000; // 60 s — same source of truth as gip.js
         const [localData, msSinceSync] = await Promise.all([
             getLocalBeneficiaries(),
             getTimeSinceLastSync()
@@ -138,7 +220,7 @@ export async function initCharts(forceRefresh = false) {
                 if (result.success && result.data?.success && result.data?.beneficiaries) {
                     rawData = result.data.beneficiaries;
                     cachedRawData = rawData;
-                    // Write to IndexedDB so LDN page (and next dashboard load) is instant
+                    // Write to IndexedDB so GIP page (and next dashboard load) is instant
                     cacheBeneficiaries(rawData).catch(() => {});
                     console.log(`[Charts] API fetch — cached ${rawData.length} records to IndexedDB`);
                 } else {
@@ -426,42 +508,103 @@ export async function initCharts(forceRefresh = false) {
     renderChart("gender-chart", genderOptions);
 
     // --- 3. EDUCATION PROFILE (Linked to Workforce Filter) ---
-    const eduValues = [filteredStats.education["College Grad"], filteredStats.education["College Lvl"], filteredStats.education["HS Grad"], filteredStats.education["Senior High"]];
-    
-    // Update the sub-metrics for Education section
+    const educationRows = [
+        { key: 'College Grad', label: 'College Graduate', count: filteredStats.education['College Grad'] || 0, color: COLORS.royalBlue() },
+        { key: 'College Lvl', label: 'College Level', count: filteredStats.education['College Lvl'] || 0, color: COLORS.goldenYellow },
+        { key: 'HS Grad', label: 'High School Graduate', count: filteredStats.education['HS Grad'] || 0, color: COLORS.philippineRed },
+        { key: 'Senior High', label: 'Senior High', count: filteredStats.education['Senior High'] || 0, color: COLORS.successGreen }
+    ];
+    const educationTotal = educationRows.reduce((sum, row) => sum + row.count, 0);
+    const rankedEducationRows = [...educationRows].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+    const leadingEducation = rankedEducationRows[0];
+
     const eduMap = { 'College Grad': '.count-college-grad', 'College Lvl': '.count-college-lvl', 'HS Grad': '.count-hs-grad', 'Senior High': '.count-senior-high' };
-    Object.entries(eduMap).forEach(([key, sel]) => {
-        document.querySelectorAll(sel).forEach(el => el.textContent = filteredStats.education[key] || 0);
+    Object.entries(eduMap).forEach(([key, selector]) => {
+        document.querySelectorAll(selector).forEach((element) => {
+            element.textContent = filteredStats.education[key] || 0;
+        });
     });
 
+    const educationTotalOutput = document.getElementById('education-profile-total');
+    const educationLeadingOutput = document.getElementById('education-profile-leading');
+    if (educationTotalOutput) educationTotalOutput.textContent = educationTotal;
+    if (educationLeadingOutput) {
+        const leadingShare = educationTotal > 0 ? Math.round((leadingEducation.count / educationTotal) * 100) : 0;
+        educationLeadingOutput.textContent = educationTotal > 0 ? `${leadingEducation.label} · ${leadingShare}%` : 'No data';
+        educationLeadingOutput.title = educationLeadingOutput.textContent;
+    }
+
     const educationOptions = {
-        series: eduValues.map(v => filteredData.length > 0 ? Math.round((v / filteredData.length) * 100) : 0),
-        chart: { height: 380, type: 'radialBar', background: theme.cardBg, fontFamily: "Montserrat, sans-serif" },
+        series: [{
+            name: 'Beneficiaries',
+            data: rankedEducationRows.map((row) => ({ x: row.label, y: row.count, fillColor: row.color }))
+        }],
+        chart: {
+            height: 270,
+            type: 'bar',
+            toolbar: { show: false },
+            fontFamily: 'Montserrat, sans-serif',
+            background: theme.cardBg
+        },
         plotOptions: {
-            radialBar: {
-                hollow: { size: '45%' },
-                dataLabels: {
-                    name: { fontSize: '0.6875rem', fontWeight: 700, color: theme.muted, offsetY: -5 },
-                    value: { fontSize: '1rem', fontWeight: 900, color: theme.text, offsetY: 5 },
-                    total: { show: true, label: 'GRADUATES', color: theme.muted }
-                },
-                track: { background: theme.grid, strokeWidth: '95%' }
+            bar: {
+                horizontal: true,
+                distributed: true,
+                barHeight: '48%',
+                dataLabels: { position: 'top' },
+                borderRadius: 3,
+                borderRadiusApplication: 'end'
             }
         },
-        colors: [COLORS.royalBlue(), COLORS.goldenYellow, COLORS.philippineRed, COLORS.mutedSlate()],
-        labels: ['Col. Grad', 'Col. Lvl', 'HS Grad', 'Snr High'],
+        dataLabels: {
+            enabled: true,
+            formatter: (value) => Math.round(value),
+            offsetX: 10,
+            textAnchor: 'start',
+            style: { fontSize: '0.625rem', fontWeight: 900, colors: [theme.text] },
+            background: { enabled: true, borderRadius: 2, padding: 3, opacity: 0.9, borderWidth: 0 }
+        },
+        xaxis: {
+            min: 0,
+            forceNiceScale: true,
+            labels: { formatter: (value) => Math.round(value), style: { colors: theme.muted, fontSize: '0.5625rem', fontWeight: 700 } },
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            title: { text: 'TOTAL BENEFICIARIES', style: { color: theme.muted, fontSize: '0.5625rem', fontWeight: 800 } }
+        },
+        yaxis: {
+            labels: { maxWidth: 150, style: { colors: theme.text, fontSize: '0.625rem', fontWeight: 800 } }
+        },
+        grid: {
+            borderColor: theme.grid,
+            strokeDashArray: 6,
+            xaxis: { lines: { show: true } },
+            yaxis: { lines: { show: false } },
+            padding: { top: 0, right: 40, bottom: -8, left: 4 }
+        },
+        legend: { show: false },
+        tooltip: {
+            theme: isDark() ? 'dark' : 'light',
+            y: {
+                formatter: (value) => {
+                    const share = educationTotal > 0 ? Math.round((value / educationTotal) * 100) : 0;
+                    return `${value} beneficiaries (${share}% of recorded)`;
+                }
+            }
+        },
+        noData: { text: 'NO EDUCATION DATA', style: { color: theme.muted, fontSize: '11px' } },
         theme: { mode: isDark() ? 'dark' : 'light' },
         responsive: [{
             breakpoint: 640,
             options: {
-                chart: { height: 320 },
-                plotOptions: { radialBar: { hollow: { size: '30%' }, dataLabels: { value: { fontSize: '0.875rem' } } } }
+                chart: { height: 285 },
+                yaxis: { labels: { maxWidth: 110, style: { fontSize: '0.5625rem' } } },
+                dataLabels: { style: { fontSize: '0.5625rem' } }
             }
         }]
     };
 
-    renderChart("education-chart", educationOptions);
-
+    renderChart('education-chart', educationOptions);
     // --- 3.5 EMPLOYMENT STATUS (New Module) ---
     document.querySelectorAll('.count-absorbed').forEach(el => el.textContent = filteredStats.status["ABSORBED"] || 0);
     document.querySelectorAll('.count-ongoing').forEach(el => el.textContent = filteredStats.status["ONGOING"] || 0);
@@ -523,79 +666,200 @@ export async function initCharts(forceRefresh = false) {
     };
     renderChart("status-chart", statusColumnOptions);
 
-    // --- 4. JOB ROLES (Top 5) ---
-    const sortedRoles = Object.entries(filteredStats.designations).sort((a, b) => b[1] - a[1]).slice(0, 5);
-    const jobRolesOptions = {
-        series: [{ name: "Beneficiaries", data: sortedRoles.map(r => r[1]), color: chartColor }],
-        chart: { type: 'bar', height: 320, toolbar: { show: false }, fontFamily: "Montserrat, sans-serif", background: theme.cardBg },
-        plotOptions: { bar: { horizontal: true, columnWidth: '100%', borderRadius: 8, barHeight: '52%' } },
-        dataLabels: { enabled: false },
-        xaxis: {
-            categories: sortedRoles.map(r => r[0]),
-            labels: { show: true, style: { fontWeight: 600, colors: theme.muted, fontSize: '0.5625rem' } },
-            axisBorder: { show: false },
-            axisTicks: { show: false }
-        },
-        yaxis: { labels: { show: true, style: { fontWeight: 700, colors: theme.text, fontSize: '0.625rem' } } },
-        grid: {
-            borderColor: theme.grid,
-            strokeDashArray: 4,
-            padding: { left: -15, right: 0 }
-        },
-        theme: { mode: isDark() ? 'dark' : 'light' },
-        responsive: [{
-            breakpoint: 640,
-            options: {
-                chart: { height: 350 },
-                xaxis: { labels: { style: { fontSize: '0.5rem' } } },
-                yaxis: { labels: { style: { fontSize: '0.5625rem' } } }
-            }
-        }]
-    };
-
-    renderChart("job-roles-chart", jobRolesOptions);
-
-    // --- 5. AGE DEMOGRAPHICS ---
-    const ageOptions = {
-        series: [{ name: "Beneficiaries", data: Object.values(filteredStats.ages), color: chartColor }],
+    // --- 4. GLOBAL ASSIGNED UNIT DISTRIBUTION ---
+    const designationCounts = new Map(
+        Object.entries(totalStats.designations).map(([unit, count]) => [unit.trim().toUpperCase(), count])
+    );
+    const assignedUnitOrder = new Map(COMMON_ASSIGNED_UNITS.map((unit, index) => [unit, index]));
+    const sortedAssignedUnits = COMMON_ASSIGNED_UNITS
+        .map((unit) => [unit, designationCounts.get(unit.toUpperCase()) || 0])
+        .sort((a, b) => b[1] - a[1] || assignedUnitOrder.get(a[0]) - assignedUnitOrder.get(b[0]));
+    const assignedUnitNames = sortedAssignedUnits.map(([unit]) => unit);
+    const assignedUnitsOptions = {
+        series: [{ name: 'Total GIP', data: sortedAssignedUnits.map(([, count]) => count) }],
         chart: {
-            type: 'area',
+            type: 'bar',
             height: 220,
             toolbar: { show: false },
-            fontFamily: "Montserrat, sans-serif",
+            fontFamily: 'Montserrat, sans-serif',
             background: theme.cardBg
         },
-        stroke: { curve: 'smooth', width: 3 },
-        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.1 } },
+        colors: [COLORS.royalBlue()],
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                columnWidth: '34%',
+                borderRadius: 3,
+                borderRadiusApplication: 'end'
+            }
+        },
         dataLabels: {
             enabled: true,
-            offsetY: -10,
-            offsetX: 0,
-            style: { fontSize: '0.5625rem', fontWeight: '800' },
-            background: { enabled: true, padding: 3, borderRadius: 4, borderWidth: 0, opacity: 0.9 }
+            offsetY: -14,
+            formatter: (value) => Math.round(value),
+            style: { fontSize: '0.625rem', fontWeight: 900, colors: [theme.text] },
+            background: { enabled: true, borderRadius: 2, padding: 3, opacity: 0.86, borderWidth: 0 }
         },
         xaxis: {
-            categories: Object.keys(filteredStats.ages),
-            labels: { style: { fontWeight: 600, colors: theme.muted, fontSize: '0.625rem' } },
-            axisBorder: { show: false }
+            categories: assignedUnitNames,
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            labels: {
+                rotate: 0,
+                trim: false,
+                hideOverlappingLabels: false,
+                formatter: (unit) => getAssignedUnitLabel(unit),
+                style: { fontWeight: 800, colors: theme.muted, fontSize: '0.5625rem' }
+            }
         },
-        yaxis: { labels: { style: { fontWeight: 600, colors: theme.muted, fontSize: '0.625rem' } } },
+        yaxis: {
+            min: 0,
+            forceNiceScale: true,
+            labels: { formatter: (value) => Math.round(value), style: { fontWeight: 700, colors: theme.muted, fontSize: '0.5625rem' } },
+            title: { text: 'TOTAL COUNT', style: { color: theme.muted, fontSize: '0.5625rem', fontWeight: 800 } }
+        },
         grid: {
+            show: true,
             borderColor: theme.grid,
-            strokeDashArray: 6,
-            padding: { left: 20, right: 60 }
+            strokeDashArray: 7,
+            xaxis: { lines: { show: false } },
+            yaxis: { lines: { show: true } },
+            padding: { top: 18, left: 2, right: 4, bottom: -4 }
+        },
+        legend: { show: false },
+        tooltip: {
+            theme: isDark() ? 'dark' : 'light',
+            x: { formatter: (_value, context) => assignedUnitNames[context.dataPointIndex] || 'Assigned Unit' },
+            y: { formatter: (value) => `${value} Beneficiaries` }
         },
         theme: { mode: isDark() ? 'dark' : 'light' },
         responsive: [{
             breakpoint: 640,
             options: {
-                chart: { height: 160 }
+                chart: { height: 210 },
+                plotOptions: { bar: { columnWidth: '46%' } },
+                dataLabels: { style: { fontSize: '0.5rem' } },
+                xaxis: { labels: { style: { fontSize: '0.5rem' } } }
             }
         }]
     };
+    renderChart('assigned-units-chart', assignedUnitsOptions);
+    renderAssignedUnitSummary(sortedAssignedUnits);
 
-    renderChart("age-chart", ageOptions);
+    // --- 5. MONTHLY AGE DISTRIBUTION ---
+    const selectedAgeYear = /^\d{4}$/.test(currentWorkforceFilter) ? Number(currentWorkforceFilter) : 0;
+    const ageChartYear = selectedAgeYear || getLatestAddedYear(filteredData) || getLatestAddedYear(rawData) || new Date().getFullYear();
+    const monthlyAgePattern = buildMonthlyAgePattern(filteredData, ageChartYear);
+    const ageYearOutput = document.getElementById('age-chart-year');
+    if (ageYearOutput) ageYearOutput.textContent = ageChartYear;
 
+    const ageGroupDefinitions = [
+        { key: '18-24', label: 'AGE 18–24' },
+        { key: '25-30', label: 'AGE 25–30' },
+        { key: '31-40', label: 'AGE 31–40' },
+        { key: '41+', label: 'AGE 41+' }
+    ];
+    const ageOptions = {
+        series: ageGroupDefinitions.map((group) => ({
+            name: group.label,
+            data: monthlyAgePattern.map((item) => item.ageGroups[group.key])
+        })),
+        chart: {
+            type: 'bar',
+            stacked: true,
+            height: 330,
+            toolbar: { show: false },
+            zoom: { enabled: false },
+            fontFamily: 'Montserrat, sans-serif',
+            background: theme.cardBg
+        },
+        colors: ['#0038A8', '#2563EB', '#60A5FA', '#93C5FD'],
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                columnWidth: '54%',
+                borderRadius: 2,
+                borderRadiusApplication: 'end',
+                dataLabels: {
+                    total: {
+                        enabled: true,
+                        offsetY: -8,
+                        style: { fontSize: '0.625rem', fontWeight: 900, color: theme.text }
+                    }
+                }
+            }
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: (value) => value > 0 ? Math.round(value) : '',
+            style: { fontSize: '0.5625rem', fontWeight: 900, colors: ['#ffffff', '#ffffff', '#0f172a', '#0f172a'] },
+            dropShadow: { enabled: false }
+        },
+        xaxis: {
+            categories: monthlyAgePattern.map((item) => item.month),
+            axisBorder: { show: true, color: theme.grid },
+            axisTicks: { show: false },
+            title: { text: 'MONTH ADDED', style: { color: theme.muted, fontSize: '0.5625rem', fontWeight: 800 } },
+            labels: {
+                rotate: -40,
+                trim: false,
+                hideOverlappingLabels: false,
+                style: { fontWeight: 800, colors: theme.muted, fontSize: '0.5625rem' }
+            }
+        },
+        yaxis: {
+            min: 0,
+            forceNiceScale: true,
+            labels: { formatter: (value) => Math.round(value), style: { fontWeight: 700, colors: theme.muted, fontSize: '0.625rem' } },
+            title: { text: 'TOTAL BENEFICIARIES', style: { color: theme.muted, fontSize: '0.5625rem', fontWeight: 800 } }
+        },
+        grid: {
+            show: true,
+            borderColor: theme.grid,
+            strokeDashArray: 7,
+            xaxis: { lines: { show: false } },
+            yaxis: { lines: { show: true } },
+            padding: { top: 18, left: 8, right: 12, bottom: 4 }
+        },
+        legend: {
+            show: true,
+            position: 'top',
+            horizontalAlign: 'left',
+            fontSize: '10px',
+            fontWeight: 800,
+            labels: { colors: theme.muted },
+            markers: { size: 5, shape: 'square' },
+            itemMargin: { horizontal: 8, vertical: 3 }
+        },
+        tooltip: {
+            shared: true,
+            intersect: false,
+            theme: isDark() ? 'dark' : 'light',
+            custom: ({ dataPointIndex }) => {
+                const point = monthlyAgePattern[dataPointIndex];
+                const groupLines = ageGroupDefinitions
+                    .map((group) => `${group.label}: <strong>${point?.ageGroups[group.key] || 0}</strong>`)
+                    .join('<br>');
+                const exactAgeLines = point?.exactAges?.length
+                    ? point.exactAges.map(([age, count]) => `Age ${age}: ${count}`).join(' · ')
+                    : 'No recorded ages';
+                return `<div class="px-3 py-2 text-xs leading-5"><strong>${point?.month || ''} ${ageChartYear}</strong><br>Total: <strong>${point?.totalAdded || 0}</strong><br>${groupLines}<div class="mt-1 border-t border-slate-200 pt-1 text-[10px] dark:border-slate-600">${exactAgeLines}</div></div>`;
+            }
+        },
+        noData: { text: 'NO AGE DATA', align: 'center', verticalAlign: 'middle', style: { color: theme.muted, fontSize: '11px' } },
+        theme: { mode: isDark() ? 'dark' : 'light' },
+        responsive: [{
+            breakpoint: 640,
+            options: {
+                chart: { height: 360 },
+                plotOptions: { bar: { columnWidth: '66%' } },
+                dataLabels: { enabled: false },
+                xaxis: { labels: { rotate: -55, style: { fontSize: '0.5rem' } } },
+                legend: { fontSize: '9px', itemMargin: { horizontal: 5, vertical: 2 } }
+            }
+        }]
+    };
+    renderChart('age-chart', ageOptions);
     // --- 6. PERFORMANCE GAP ANALYSIS (Actual vs Target) ---
     const performanceStats = processPerformanceData(rawData);
     updatePerformanceSummary(performanceStats);
@@ -648,6 +912,20 @@ export async function initCharts(forceRefresh = false) {
 /**
  * Helper to render/re-render chart
  */
+function renderAssignedUnitSummary(rows) {
+    const container = document.getElementById('assigned-units-summary');
+    if (!container) return;
+
+    container.innerHTML = rows.map(([unit, count], index) => `
+        <div class="flex min-w-0 items-center justify-between gap-3 border border-slate-100 bg-slate-50/70 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/50">
+            <div class="flex min-w-0 items-center gap-2">
+                <span class="inline-flex h-5 min-w-5 shrink-0 items-center justify-center bg-royal-blue text-[0.5625rem] font-black text-white">${index + 1}</span>
+                <span class="break-words text-[0.625rem] font-black uppercase leading-relaxed tracking-tight text-slate-600 dark:text-slate-300" title="${unit}">${unit}</span>
+            </div>
+            <span class="inline-flex min-w-7 shrink-0 items-center justify-center bg-white px-2 py-1 text-xs font-black tabular-nums text-royal-blue shadow-sm dark:bg-slate-800 dark:text-blue-400">${count}</span>
+        </div>
+    `).join('');
+}
 function renderChart(id, options) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -666,6 +944,7 @@ function processBeneficiaryData(data) {
         education: { "College Grad": 0, "College Lvl": 0, "HS Grad": 0, "Senior High": 0 },
         designations: {},
         ages: { "18-24": 0, "25-30": 0, "31-40": 0, "41+": 0 },
+        exactAges: {},
         totalAge: 0,
         ageCount: 0,
         status: { "ABSORBED": 0, "ONGOING": 0, "EXPIRED": 0, "RESIGNED": 0 }
@@ -682,14 +961,20 @@ function processBeneficiaryData(data) {
         const simplified = gender === 'F' || gender === 'Female' ? 'Female' : (gender === 'M' || gender === 'Male' ? 'Male' : 'Unknown');
         stats.genders[simplified]++;
 
-        const edu = (b.education || '').toUpperCase();
-        if (edu.includes('GRADUATE') || edu.includes('DEGREE') || edu.includes('BS') || edu.includes('AB')) stats.education["College Grad"]++;
-        else if (edu.includes('COLLEGE') || edu.includes('LEVEL') || edu.includes('UNIT')) stats.education["College Lvl"]++;
-        else if (edu.includes('SENIOR')) stats.education["Senior High"]++;
-        else if (edu.includes('HS') || edu.includes('HIGH')) stats.education["HS Grad"]++;
+        const edu = String(b.education || '').trim().toUpperCase().replace(/\s+/g, ' ');
+        const isCollegeGraduate = (edu.includes('COLLEGE') && edu.includes('GRADUATE'))
+            || edu.includes('BACHELOR')
+            || edu.includes('DEGREE')
+            || /(^|\s)(BS|AB)(\s|$)/.test(edu);
+        if (edu.includes('SENIOR HIGH')) stats.education['Senior High']++;
+        else if (isCollegeGraduate) stats.education['College Grad']++;
+        else if (edu.includes('COLLEGE')) stats.education['College Lvl']++;
+        else if (edu.includes('HIGH SCHOOL') || /(^|\s)HS(\s|$)/.test(edu)) stats.education['HS Grad']++;
 
-        const design = b.designation || 'General Support';
-        stats.designations[design] = (stats.designations[design] || 0) + 1;
+        const assignedUnit = getCanonicalAssignedUnit(b.designation);
+        if (assignedUnit) {
+            stats.designations[assignedUnit] = (stats.designations[assignedUnit] || 0) + 1;
+        }
 
         // Employment Status Parse - Basis: status_id join (remarks) + absorption_log_id join (absorbDate)
         const remarksStr = (b.remarks || b.status_name || '').trim().replace(/\s+/g, '').toUpperCase();
@@ -715,10 +1000,11 @@ function processBeneficiaryData(data) {
             else stats.status["ONGOING"]++;
         }
 
-        const age = parseInt(b.age);
-        if (!isNaN(age)) {
+        const age = getBeneficiaryAge(b);
+        if (Number.isInteger(age)) {
             stats.totalAge += age;
             stats.ageCount++;
+            stats.exactAges[age] = (stats.exactAges[age] || 0) + 1;
             if (age >= 18 && age <= 24) stats.ages["18-24"]++;
             else if (age >= 25 && age <= 30) stats.ages["25-30"]++;
             else if (age >= 31 && age <= 40) stats.ages["31-40"]++;
@@ -825,27 +1111,28 @@ function updateSummaryMetrics(totalStats, filteredStats) {
     document.querySelectorAll('.metric-female-ratio').forEach(el => el.textContent = fRatio);
     document.querySelectorAll('.metric-male-ratio').forEach(el => el.textContent = mRatio);
 
-    const siteCount = Object.keys(totalStats.offices).length;
-    document.querySelectorAll('.metric-deployment-sites').forEach(el => el.textContent = siteCount);
+    const dominantAge = (stats) => {
+        const [age, count] = Object.entries(stats.exactAges || {})
+            .sort((a, b) => b[1] - a[1] || Number(a[0]) - Number(b[0]))[0] || [null, 0];
+        const percentage = stats.ageCount > 0 ? (count / stats.ageCount) * 100 : 0;
+        return { age, count, percentage };
+    };
+    const formatPercentage = (value) => `${Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1)}%`;
 
-    const avgAge = totalStats.ageCount > 0 ? Math.round(totalStats.totalAge / totalStats.ageCount) : 0;
-    document.querySelectorAll('.metric-avg-age').forEach(el => el.textContent = avgAge);
-    document.querySelectorAll('.metric-avg-age-range').forEach(el => el.textContent = avgAge + ' YRS');
-
-    // Section specific metrics - filtered by workforce
-    const officeTotal = Object.values(filteredStats.designations).reduce((a, b) => a + b, 0);
-    let fieldCount = 0;
-    Object.entries(filteredStats.designations).forEach(([n, c]) => {
-        if (n.toLowerCase().match(/field|driver|maintenance/)) fieldCount += c;
+    const overallTopAge = dominantAge(totalStats);
+    document.querySelectorAll('.metric-top-age-label').forEach((el) => {
+        el.textContent = overallTopAge.age === null ? 'N/A' : `${overallTopAge.age} YRS`;
     });
-    document.querySelectorAll('.count-office-based').forEach(el => el.textContent = officeTotal - fieldCount);
-    document.querySelectorAll('.count-field-based').forEach(el => el.textContent = fieldCount);
+    document.querySelectorAll('.metric-top-age-share').forEach((el) => {
+        el.textContent = `${formatPercentage(overallTopAge.percentage)} of recorded ages`;
+    });
 
-    const topRole = Object.entries(filteredStats.designations).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
-    document.querySelectorAll('.metric-top-role').forEach(el => {
-        el.dataset.originalTopRole = topRole;
-        const showingStatusMode = document.getElementById('status-content-view') && !document.getElementById('status-content-view').classList.contains('hidden');
-        el.textContent = showingStatusMode ? 'EMPLOYMENT STATUS' : topRole;
+    const filteredTopAge = dominantAge(filteredStats);
+    document.querySelectorAll('.metric-top-age').forEach((el) => {
+        el.textContent = filteredTopAge.age === null ? 'N/A' : filteredTopAge.age;
+    });
+    document.querySelectorAll('.metric-filtered-top-age-share').forEach((el) => {
+        el.textContent = `${formatPercentage(filteredTopAge.percentage)} of filtered ages`;
     });
 }
 

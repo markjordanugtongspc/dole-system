@@ -3,7 +3,7 @@ import { getBasePath } from './auth.js';
 import Swal from 'sweetalert2';
 
 /**
- * LDN Bulk Logs Export Module
+ * GIP Bulk Logs Export Module
  * Exports DTR / AR / Both logs as a clean Excel (.xls) file.
  * Uses the horizontal "matrix" format requested: Beneficiary vs Period columns.
  */
@@ -120,7 +120,7 @@ function renderMatrixTable(label, matrix, headerColor) {
 }
 
 /**
- * Main export trigger — called from the LDN page header button.
+ * Main export trigger — called from the GIP page header button.
  */
 export async function showLogsExportModal(beneficiaries) {
     const btnBase = "flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[0.625rem] gap-1.5";
@@ -300,7 +300,7 @@ export async function generateExcelExport(beneficiaries, type, year) {
         // For now, use numeric beneficiary_id from the data object if present
         const resolvedBeneficiaries = beneficiaries.map(b => ({
             ...b,
-            mapKey: String(b.id || b.gip_id || b.beneficiary_id) // Usually b.id is the gip_id in ldngip.js
+            mapKey: String(b.id || b.gip_id || b.beneficiary_id) // Usually b.id is the gip_id in gip.js
         }));
 
         let tablesHtml = '';
@@ -337,7 +337,7 @@ export async function generateExcelExport(beneficiaries, type, year) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `LDN_LOGS_${type.toUpperCase()}_${year}.xls`;
+        a.download = `GIP_LOGS_${type.toUpperCase()}_${year}.xls`;
         document.body.appendChild(a);
         a.click();
         URL.revokeObjectURL(url);

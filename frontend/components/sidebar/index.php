@@ -15,7 +15,7 @@
                 $is_dashboard = (stripos($current_uri, '/frontend/dashboard') !== false);
                 $is_export = (stripos($current_uri, '/frontend/export') !== false);
                 $is_settings = (stripos($current_uri, '/frontend/user/settings') !== false);
-                $is_ldn = (stripos($current_uri, '/frontend/LDN') !== false);
+                $is_gip = (stripos($current_uri, '/frontend/GIP') !== false);
                 $is_calculate = (stripos($current_uri, '/frontend/calculate') !== false);
                 ?>
             <li>
@@ -28,18 +28,17 @@
                             d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
                     </svg>
                     <span
-                        class="ms-3 whitespace-nowrap transition-all duration-200 <?php echo $is_dashboard ? 'translate-x-1' : ''; ?>">Dashboard</span>
+                        class="ms-3 whitespace-nowrap transition-all duration-200 <?php echo $is_dashboard ? 'translate-x-1' : ''; ?>">DASHBOARD</span>
                 </a>
             </li>
-            <!-- LDN - GIP Link (Simplified) -->
+            <!-- Manage GIP Link -->
             <li>
-                <a href="<?php echo $baseUrl; ?>/frontend/LDN/"
-                    class="flex items-center px-4 py-3 rounded-lg group cursor-pointer transition-all duration-200 border-b-2 <?php echo $is_ldn ? 'text-white font-black bg-white/20 border-white' : 'text-white/80 hover:bg-white/10 hover:text-white border-transparent hover:scale-105'; ?>">
+                <a href="<?php echo $baseUrl; ?>/frontend/GIP/"
+                    class="flex items-center px-4 py-3 rounded-lg group cursor-pointer transition-all duration-200 border-b-2 <?php echo $is_gip ? 'text-white font-black bg-white/20 border-white' : 'text-white/80 hover:bg-white/10 hover:text-white border-transparent hover:scale-105'; ?>">
                     <img src="<?php echo $baseUrl; ?>/frontend/images/search-map.png" alt="Search Map Icon"
-                        class="w-5 h-5 filter invert brightness-100 transition-transform duration-200 <?php echo $is_ldn ? 'brightness-200 scale-105' : 'group-hover:invert group-hover:brightness-200 group-hover:scale-105'; ?>" />
+                        class="w-5 h-5 filter invert brightness-100 transition-transform duration-200 <?php echo $is_gip ? 'brightness-200 scale-105' : 'group-hover:invert group-hover:brightness-200 group-hover:scale-105'; ?>" />
                     <span
-                        class="ms-3 whitespace-nowrap transition-all duration-200 <?php echo $is_ldn ? 'translate-x-1' : ''; ?>">LDN
-                        - GIP</span>
+                        class="ms-3 whitespace-nowrap transition-all duration-200 <?php echo $is_gip ? 'translate-x-1' : ''; ?>">MANAGE GIP</span>
                 </a>
             </li>
 
@@ -63,8 +62,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span class="ms-3 whitespace-nowrap <?php echo $is_export ? 'translate-x-1' : ''; ?>">Print / Export
-                        Data</span>
+                    <span class="ms-3 whitespace-nowrap <?php echo $is_export ? 'translate-x-1' : ''; ?>">PRINT / EXPORT DATA</span>
                 </a>
             </li>
 
@@ -106,7 +104,7 @@ $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
                             <path fill-rule="evenodd" d="M12 4a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm-2.952.462c-.483.19-.868.432-1.19.71-.363.315-.638.677-.831.93l-.106.14c-.21.268-.36.418-.574.527C6.125 6.883 5.74 7 5 7a1 1 0 0 0 0 2c.364 0 .696-.022 1-.067v.41l-1.864 4.2a1.774 1.774 0 0 0 .821 2.255c.255.133.538.202.825.202h2.436a1.786 1.786 0 0 0 1.768-1.558 1.774 1.774 0 0 0-.122-.899L8 9.343V8.028c.2-.188.36-.38.495-.553.062-.079.118-.15.168-.217.185-.24.311-.406.503-.571a1.89 1.89 0 0 1 .24-.177A3.01 3.01 0 0 0 11 7.829V20H5.5a1 1 0 1 0 0 2h13a1 1 0 1 0 0-2H13V7.83a3.01 3.01 0 0 0 1.63-1.387c.206.091.373.19.514.29.31.219.532.465.811.78l.025.027.02.023v1.78l-1.864 4.2a1.774 1.774 0 0 0 .821 2.255c.255.133.538.202.825.202h2.436a1.785 1.785 0 0 0 1.768-1.558 1.773 1.773 0 0 0-.122-.899L18 9.343v-.452c.302.072.633.109 1 .109a1 1 0 1 0 0-2c-.48 0-.731-.098-.899-.2-.2-.12-.363-.293-.651-.617l-.024-.026c-.267-.3-.622-.7-1.127-1.057a5.152 5.152 0 0 0-1.355-.678 3.001 3.001 0 0 0-5.896.04Z" clip-rule="evenodd" />
                         </svg>
                     </span>
-                    <span class="ms-3 whitespace-nowrap transition-all duration-200 <?php echo $is_calculate ? 'translate-x-1' : ''; ?>">Calculate Salary</span>
+                    <span class="ms-3 whitespace-nowrap transition-all duration-200 <?php echo $is_calculate ? 'translate-x-1' : ''; ?>">CALCULATE SALARY</span>
                 </a>
             </li>
             <!-- About Developer Section -->
@@ -118,8 +116,7 @@ $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span class="ms-3 whitespace-nowrap <?php echo $is_aboutme ? 'translate-x-1' : ''; ?>">About
-                        Developer</span>
+                    <span class="ms-3 whitespace-nowrap <?php echo $is_aboutme ? 'translate-x-1' : ''; ?>">ABOUT DEVELOPER</span>
                 </a>
             </li>
         </ul>
@@ -153,7 +150,7 @@ $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
-                            <span class="font-semibold">Profile</span>
+                            <span class="font-semibold">PROFILE</span>
                         </a>
                     </li>
                     <li>
@@ -168,7 +165,7 @@ $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <span class="<?php echo $is_settings ? '' : 'font-semibold'; ?>">Settings</span>
+                                <span class="<?php echo $is_settings ? '' : 'font-semibold'; ?>">SETTINGS</span>
                             </div>
                         </a>
                     </li>
@@ -187,7 +184,7 @@ $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false);
                                     d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
                                     fill-rule="evenodd" clip-rule="evenodd"></path>
                             </svg>
-                            <span class="font-semibold" id="sidebar-theme-label">Dark Mode</span>
+                            <span class="font-semibold" id="sidebar-theme-label">DARK MODE</span>
                         </button>
                     </li>
                 </ul>

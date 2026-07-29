@@ -8,6 +8,8 @@ import { showBeneficiaryDrawer } from './drawer.js';
 import { showEditBeneficiaryDrawer } from './edit_drawer.js';
 import { getLocalBeneficiaries, cacheBeneficiaries } from './db-manager.js';
 import { renderSearchStatsChart } from './charts.js';
+import { COMMON_ASSIGNED_UNITS } from './assigned-units.js';
+export { COMMON_ASSIGNED_UNITS };
 
 export function initModalHandler() {
     // Expose the functions to the global window object
@@ -717,19 +719,6 @@ export const COMMON_COURSES = [
     { name: "College Graduate", icon: `<svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>` }
 ];
 
-export const COMMON_NATURE_OF_WORK = [
-    "Administrative Support (Records)",
-    "Office Clerk (Finance Section)",
-    "Data Encoder (TSSD/LIMS)",
-    "Messenger / Liaison Officer",
-    "Utility Worker (Maintenance)",
-    "Scanning & Digitization Officer",
-    "Filing Clerk (Administrative)",
-    "Receptionist / Front Desk",
-    "IT Technical Support Assist.",
-    "Project Monitoring Assist."
-];
-
 export const ASSURED_RELATIONSHIPS = [
     "MOTHER",
     "FATHER",
@@ -1045,7 +1034,7 @@ export function showAddDataModal(data = null) {
                         </div>
 
                         <div class="group">
-                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 tracking-widest ${dk ? '' : 'transition-colors'} ${dk ? '' : 'group-focus-within:text-royal-blue'}">Nature of Work</label>
+                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 tracking-widest ${dk ? '' : 'transition-colors'} ${dk ? '' : 'group-focus-within:text-royal-blue'}">Assigned Unit</label>
                             <div class="relative" id="work-container">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg class="w-3.5 h-3.5 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -1056,9 +1045,9 @@ export function showAddDataModal(data = null) {
                                     placeholder="N/A">
                                 <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2 transform origin-top transition-all duration-200">
                                     <div class="px-2 py-1.5 mb-1.5 border-b ${t.borderSuggHead}">
-                                        <p class="text-[0.5625rem] font-black ${t.textWorkSuggHead} uppercase tracking-widest">Quick Select Roles</p>
+                                        <p class="text-[0.5625rem] font-black ${t.textWorkSuggHead} uppercase tracking-widest">Quick Select Units</p>
                                     </div>
-                                    ${COMMON_NATURE_OF_WORK.map(work => `
+                                    ${COMMON_ASSIGNED_UNITS.map(work => `
                                         <div class="work-option px-3 py-2.5 text-[0.625rem] font-black ${t.textWorkOpt} ${t.workHover} rounded-lg cursor-pointer transition-all flex items-center justify-between group/opt active:scale-[0.98]">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-1.5 h-1.5 rounded-full ${t.workDot} transition-colors"></div>
@@ -2196,7 +2185,7 @@ export function showAddDataModal(data = null) {
                             beneficiaryData.gip_id = gipIdInput; // Potential new GIP ID
                         }
                     } else {
-                        // In add mode, 'id' determines PUT vs POST in ldngip.js
+                        // In add mode, 'id' determines PUT vs POST in gip.js
                         // We set it to null to force POST
                         beneficiaryData.id = null;
                         if (gipIdInput) {
@@ -2204,13 +2193,13 @@ export function showAddDataModal(data = null) {
                         }
                     }
 
-                    // Call the simulation function from LDNgip.js
+                    // Call the simulation function from gip.js
                     if (window.addBeneficiaryData) {
                         (async () => {
                             const success = await window.addBeneficiaryData(beneficiaryData);
 
                             if (success) {
-                                // Clear draft EXCEPT for Office and Nature of Work for convenience
+                                // Clear draft EXCEPT for Office and Assigned Unit for convenience
                                 if (!isEdit) {
                                     const draftKey = 'add_beneficiary_draft';
                                     const currentOffice = form.querySelector('[name="office"]')?.value || '';

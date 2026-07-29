@@ -109,29 +109,27 @@ require_once __DIR__ . '/../../config/vite.php';
 
             <!-- Page Header with Toggle & Add Button -->
             <div class="mb-6 flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2 transition-all duration-200 cursor-pointer select-none"
-                    id="ldn-header-container">
-                    <h1 class="text-xl sm:text-3xl font-black text-heading mb-0 sm:mb-2 leading-tight flex items-center gap-2"
-                        id="ldn-header-wrapper">
-                        <span id="ldn-header-prefix" class="truncate inline-flex items-center gap-1.5">
+                <div class="flex min-w-0 flex-1 items-center gap-2 transition-all duration-200 select-none"
+                    id="gip-header-container">
+                    <h1 class="flex min-w-0 items-center gap-2 text-xl font-black leading-tight text-heading sm:mb-2 sm:text-3xl"
+                        id="gip-header-wrapper">
+                        <span id="gip-header-prefix" class="truncate inline-flex items-center gap-1.5">
                             <span class="w-2.5 h-2.5 rounded-full bg-royal-blue dark:bg-blue-400 animate-bounce [animation-delay:-0.3s]"></span>
                             <span class="w-2.5 h-2.5 rounded-full bg-royal-blue dark:bg-blue-400 animate-bounce [animation-delay:-0.15s]"></span>
                             <span class="w-2.5 h-2.5 rounded-full bg-royal-blue dark:bg-blue-400 animate-bounce"></span>
                         </span>
-                        <span class="text-brand shrink-0">- GIP</span>
+                        <span id="gip-education-summary" class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap text-brand">
+                            <span aria-hidden="true">-</span>
+                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.2-3.4a12 12 0 01.6 6.5A12 12 0 0012 20a12 12 0 00-6.8-2.9 12 12 0 01.6-6.5L12 14z"/></svg>
+                            <span id="gip-header-education-label">All Educational Level</span>
+                            <span id="gip-education-level-count"
+                                class="inline-flex min-w-5 shrink-0 items-center justify-center rounded-full bg-royal-blue px-1.5 py-0.5 text-[0.5625rem] font-black text-white">0</span>
+                        </span>
                     </h1>
-                    <div id="ldn-header-icon" class="mb-1 text-royal-blue hidden sm:block">
-                        <!-- Clickable SVG Icon -->
-                        <svg class="w-6 h-6 hover:text-royal-blue/80 cursor-pointer" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                        </svg>
-                    </div>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button type="button" id="ldn-export-logs-btn" class="flex items-center gap-2 px-3 py-2 sm:px-5 sm:py-2.5
+                    <button type="button" id="gip-export-logs-btn" class="flex items-center gap-2 px-3 py-2 sm:px-5 sm:py-2.5
                             bg-white text-emerald-700
                             hover:bg-emerald-600 hover:text-white
                             border border-emerald-200
@@ -178,7 +176,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <!-- Modern Search Bar -->
                 <div class="p-3 sm:p-5 bg-white border-b border-gray-100 flex items-center justify-between gap-2.5">
-                    <div class="relative flex-1 sm:max-w-md group">
+                    <div class="group relative flex-1 sm:max-w-lg lg:max-w-xl">
                         <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none">
                             <svg class="w-5 h-5 text-gray-400 group-focus-within:text-royal-blue transition-colors duration-300"
                                 aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -205,7 +203,7 @@ require_once __DIR__ . '/../../config/vite.php';
                     <!-- Filter / Sort Actions -->
                     <div class="flex items-center gap-2 shrink-0">
                         <!-- Office Quick Filter Button -->
-                        <button id="office-quick-filter-btn"
+                        <button id="office-quick-filter-btn" type="button" aria-pressed="false"
                             class="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-gray-600 bg-white rounded-lg hover:bg-violet-50 hover:text-violet-700 transition-all duration-200 border border-default hover:border-violet-200 shadow-sm cursor-pointer active:scale-95 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-violet-900/30 dark:hover:text-violet-300 dark:border-gray-700">
                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -215,7 +213,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                         <!-- Filter Dropdown Button -->
                         <div class="relative">
-                            <button id="filter-dropdown-button" data-dropdown-toggle="filter-dropdown"
+                            <button id="filter-dropdown-button" type="button" aria-pressed="false" data-dropdown-toggle="filter-dropdown"
                                 class="flex items-center justify-center p-2.5 text-gray-500 rounded-full hover:bg-blue-50 hover:text-royal-blue transition-all duration-300 border border-default hover:border-blue-100 group shadow-sm cursor-pointer">
                                 <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
@@ -256,6 +254,35 @@ require_once __DIR__ . '/../../config/vite.php';
                                             <option value="ABSORBED">Absorbed</option>
                                         </select>
                                     </div>
+                                    <div class="mb-4 border-t border-gray-100 pt-3">
+                                        <span class="mb-2 block text-[0.625rem] font-bold uppercase tracking-widest text-gray-500">Sort by Name</span>
+                                        <div class="grid grid-cols-2 gap-2" role="group" aria-label="Sort beneficiaries by name">
+                                            <button type="button" onclick="sortData('name_asc')"
+                                                class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2 py-2 text-[0.625rem] font-black text-gray-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-royal-blue cursor-pointer">
+                                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17V5m0 0L3 9m4-4l4 4M14 7h7m-7 5h5m-5 5h3" /></svg>
+                                                A to Z
+                                            </button>
+                                            <button type="button" onclick="sortData('name_desc')"
+                                                class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2 py-2 text-[0.625rem] font-black text-gray-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-royal-blue cursor-pointer">
+                                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7v12m0 0l-4-4m4 4l4-4M14 7h3m-3 5h5m-5 5h7" /></svg>
+                                                Z to A
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4 border-t border-gray-100 pt-3 dark:border-slate-700">
+                                        <div class="mb-2 flex flex-col gap-3">
+                                            <div class="min-w-0">
+                                                <span class="block text-[0.625rem] font-bold uppercase tracking-widest text-gray-500 dark:text-slate-400">Phone Numbers</span>
+                                                <span class="block text-[0.5625rem] font-semibold text-gray-400 dark:text-slate-500">Display beside beneficiary names</span>
+                                            </div>
+                                            <button id="phone-visibility-toggle" type="button" role="switch" aria-checked="false"
+                                                aria-label="Show beneficiary phone numbers"
+                                                class="grid w-full grid-cols-2 overflow-hidden rounded-lg border border-red-200 bg-red-50 p-1 text-xs font-black uppercase tracking-wider shadow-inner transition-colors dark:border-red-800 dark:bg-red-950/30 cursor-pointer">
+                                                <span id="phone-visibility-on" class="px-4 py-2 text-center text-emerald-600 dark:text-emerald-400">ON</span>
+                                                <span id="phone-visibility-off" class="bg-philippine-red px-4 py-2 text-center text-white shadow-sm">OFF</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                     <button id="apply-filters-button" type="button" aria-pressed="false"
                                         class="w-full bg-blue-700 hover:bg-royal-blue text-white font-bold py-2 px-4 rounded-lg text-xs transition-colors cursor-pointer active:scale-95 shadow-md">
                                         Filter Mode: OFF
@@ -266,7 +293,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                         <!-- Sort actions -->
                         <div class="relative shrink-0 flex items-center gap-2">
-                            <button id="sort-dropdown-button" data-dropdown-toggle="sort-dropdown"
+                            <button id="sort-dropdown-button" type="button" aria-pressed="false" data-dropdown-toggle="sort-dropdown"
                                 class="flex items-center justify-center p-2.5 text-gray-500 rounded-full hover:bg-orange-50 hover:text-orange-600 transition-all duration-300 border border-default hover:border-orange-100 group shadow-sm cursor-pointer">
                                 <svg class="w-5 h-5 transition-transform group-hover:rotate-180" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
@@ -293,31 +320,101 @@ require_once __DIR__ . '/../../config/vite.php';
                                 class="z-50 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
                                 <div class="px-4 py-3 bg-orange-50/50 rounded-t-xl">
                                     <span
-                                        class="block text-[0.625rem] font-black text-orange-600 uppercase tracking-wider">Sort
-                                        Beneficiaries</span>
+                                        class="block text-[0.625rem] font-black text-orange-600 uppercase tracking-wider">Table
+                                        Options</span>
                                 </div>
                                 <ul class="py-2 text-xs font-bold text-gray-700" aria-labelledby="sort-dropdown-button">
-                                    <li><button onclick="sortData('name_asc')"
-                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Name
-                                            (A-Z)</button></li>
-                                    <li><button onclick="sortData('name_desc')"
-                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Name
-                                            (Z-A)</button></li>
-                                    <div class="border-t border-gray-50 my-1"></div>
-                                    <li><button onclick="window.setOfficeFilter('ALL')"
-                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">All Office</button></li>
-                                    <li><button onclick="sortData('remarks')"
-                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Remarks
-                                            Status</button></li>
-                                    <li><button onclick="sortData('education')"
-                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Educational
-                                            Attainment</button></li>
-                                    <li><button onclick="sortData('work')"
-                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Nature
-                                            of Work</button></li>
-                                    <li><button onclick="sortData('address')"
-                                            class="flex items-center w-full px-4 py-2 hover:bg-orange-50 hover:text-orange-600 transition-colors cursor-pointer">Address
-                                            / Residency</button></li>
+                                    <li>
+                                        <button type="button" onclick="window.setOfficeFilter('ALL')"
+                                            class="flex w-full items-center gap-2 px-4 py-2 text-left transition-colors hover:bg-orange-50 hover:text-orange-600 cursor-pointer">
+                                            <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1" /></svg>
+                                            <span>All Office</span>
+                                        </button>
+                                    </li>
+                                    <li class="border-y border-gray-100">
+                                        <button id="education-filter-toggle" type="button" aria-expanded="false" aria-controls="education-filter-menu"
+                                            class="flex w-full items-center gap-2 px-4 py-2.5 text-left transition-colors hover:bg-orange-50 hover:text-orange-600 cursor-pointer">
+                                            <svg class="h-4 w-4 shrink-0 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.2-3.4a12 12 0 01.6 6.5A12 12 0 0012 20a12 12 0 00-6.8-2.9 12 12 0 01.6-6.5L12 14z"/></svg>
+                                            <span class="flex-1">Educational Level</span>
+                                            <svg id="education-filter-chevron" class="h-3.5 w-3.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                        </button>
+                                        <div id="education-filter-menu" class="hidden max-h-64 overflow-y-auto bg-slate-50 py-1 dark:bg-slate-800">
+                                            <button type="button" data-education-filter="ALL"
+                                                class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700">
+                                                <span class="inline-flex h-5 w-5 shrink-0 items-center justify-center text-blue-600">
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14v7"/></svg>
+                                                </span>
+                                                <span>All Educational Levels</span>
+                                            </button>
+                                            <div id="education-filter-options"></div>
+                                        </div>
+                                    </li>
+                                    <li class="border-b border-gray-100">
+                                        <button id="birthday-sort-filter-toggle" type="button" aria-expanded="false" aria-controls="birthday-sort-filter-menu"
+                                            class="flex w-full items-center gap-2 px-4 py-2.5 text-left transition-colors hover:bg-orange-50 hover:text-orange-600 cursor-pointer">
+                                            <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 2v3m8-3v3M3 9h18M5 4h14a2 2 0 012 2v14H3V6a2 2 0 012-2zm3 9h2m4 0h2m-8 4h2m4 0h2" /></svg>
+                                            <span class="flex-1">Birthday Sort</span>
+                                            <svg id="birthday-sort-filter-chevron" class="h-3.5 w-3.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                        </button>
+                                        <div id="birthday-sort-filter-menu" class="hidden bg-slate-50 py-1 dark:bg-slate-800">
+                                            <button id="birthday-year-filter-toggle" type="button" aria-expanded="false" aria-controls="birthday-year-filter-menu"
+                                                class="flex w-full items-center gap-2 py-2 pr-4 pl-7 text-left text-[0.6875rem] font-bold transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700">
+                                                <svg class="h-4 w-4 shrink-0 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 2v3m8-3v3M3 9h18M5 4h14a2 2 0 012 2v14H3V6a2 2 0 012-2z" /></svg>
+                                                <span class="flex-1">Birthday Year</span>
+                                                <svg id="birthday-year-filter-chevron" class="h-3.5 w-3.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                            </button>
+                                            <div id="birthday-year-filter-menu" class="hidden max-h-52 overflow-y-auto bg-white py-1 dark:bg-slate-900">
+                                                <button type="button" data-birthday-year-filter="ALL" class="flex w-full items-center gap-2 py-2 pr-4 pl-10 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700">
+                                                    <span>All Birthday Years</span>
+                                                </button>
+                                                <div id="birthday-year-filter-options"></div>
+                                            </div>
+                                            <button id="birthday-month-filter-toggle" type="button" aria-expanded="false" aria-controls="birthday-month-filter-menu"
+                                                class="flex w-full items-center gap-2 py-2 pr-4 pl-7 text-left text-[0.6875rem] font-bold transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700">
+                                                <svg class="h-4 w-4 shrink-0 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 2v3m8-3v3M3 9h18M5 4h14a2 2 0 012 2v14H3V6a2 2 0 012-2z" /></svg>
+                                                <span class="flex-1">Birthday Month</span>
+                                                <svg id="birthday-month-filter-chevron" class="h-3.5 w-3.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                            </button>
+                                            <div id="birthday-month-filter-menu" class="hidden max-h-52 overflow-y-auto bg-white py-1 dark:bg-slate-900">
+                                                <button type="button" data-birthday-month-filter="ALL" class="flex w-full items-center gap-2 py-2 pr-4 pl-10 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700">
+                                                    <span>All Birthday Months</span>
+                                                </button>
+                                                <div id="birthday-month-filter-options"></div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="border-b border-gray-100">
+                                        <button id="relationship-filter-toggle" type="button" aria-expanded="false" aria-controls="relationship-filter-menu"
+                                            class="flex w-full items-center gap-2 px-4 py-2.5 text-left transition-colors hover:bg-orange-50 hover:text-orange-600 cursor-pointer">
+                                            <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-6-3.5M9 20H2v-2a4 4 0 016-3.5m8-7a3 3 0 11-6 0 3 3 0 016 0zM9 8a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                            <span class="flex-1">Relationship to Assured</span>
+                                            <svg id="relationship-filter-chevron" class="h-3.5 w-3.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                        </button>
+                                        <div id="relationship-filter-menu" class="hidden max-h-64 overflow-y-auto bg-slate-50 py-1 dark:bg-slate-800">
+                                            <button type="button" data-relationship-filter="ALL" class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700">
+                                                <svg class="h-4 w-4 shrink-0 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-6-3.5M9 20H2v-2a4 4 0 016-3.5m8-7a3 3 0 11-6 0 3 3 0 016 0zM9 8a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                                <span>All Relationships</span>
+                                            </button>
+                                            <div id="relationship-filter-options"></div>
+                                        </div>
+                                    </li>
+                                    <li class="border-b border-gray-100">
+                                        <button id="assigned-unit-filter-toggle" type="button" aria-expanded="false" aria-controls="assigned-unit-filter-menu"
+                                            class="flex w-full items-center gap-2 px-4 py-2.5 text-left transition-colors hover:bg-orange-50 hover:text-orange-600 cursor-pointer">
+                                            <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                            <span class="flex-1">Assigned Unit</span>
+                                            <svg id="assigned-unit-filter-chevron" class="h-3.5 w-3.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                        </button>
+                                        <div id="assigned-unit-filter-menu" class="hidden max-h-72 overflow-y-auto bg-slate-50 py-1 dark:bg-slate-800">
+                                            <button type="button" data-assigned-unit-filter="ALL" class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700"><span>All Assigned Units</span></button>
+                                            <button type="button" data-assigned-unit-filter="Local Employment Unit (LEU)" class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700"><span>Local Employment Unit (LEU)</span></button>
+                                            <button type="button" data-assigned-unit-filter="Labor Standards Unit (LSU)" class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700"><span>Labor Standards Unit (LSU)</span></button>
+                                            <button type="button" data-assigned-unit-filter="Internal Management Services Unit (IMSU)" class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700"><span>Internal Management Services Unit (IMSU)</span></button>
+                                            <button type="button" data-assigned-unit-filter="Wellfare Workers Unit (WWU)" class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700"><span>Wellfare Workers Unit (WWU)</span></button>
+                                            <button type="button" data-assigned-unit-filter="Labor Relation Unit (LRU)" class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700"><span>Labor Relation Unit (LRU)</span></button>
+                                            <button type="button" data-assigned-unit-filter="Information Technology Unit (IT)" class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700"><span>Information Technology Unit (IT)</span></button>
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -368,37 +465,40 @@ require_once __DIR__ . '/../../config/vite.php';
                     </div>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left rtl:text-right text-body">
+                <div class="overflow-hidden">
+                    <table class="w-full table-fixed text-[0.625rem] text-left text-body sm:text-xs lg:text-sm">
                         <!-- Primary Color Header -->
                         <thead class="text-sm text-white bg-royal-blue border-b border-royal-blue/20">
                             <tr>
-                                <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
-                                    ID NO.
-                                </th>
-                                <th scope="col" class="px-4 py-2.5 font-medium text-center"
+                                <th scope="col" class="w-[32%] px-2 py-2.5 font-medium text-center md:w-[22%] lg:w-[18%] lg:px-4"
                                     title="Last Name, First Name, Middle Initial">
                                     NAME
                                 </th>
-                                <th scope="col" class="px-4 py-2.5 font-medium text-center">
-                                    OFFICE / PLACE OF ASSIGNMENT
+                                <th scope="col" class="hidden w-[24%] px-2 py-2.5 font-medium text-center lg:table-cell lg:px-4">
+                                    ADDRESS
                                 </th>
-                                <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
+                                <th scope="col" class="w-[12%] px-1 py-2.5 font-medium whitespace-nowrap text-center md:w-[8%] lg:w-[7%] lg:px-2">
+                                    AGE
+                                </th>
+                                <th scope="col" class="w-[18%] px-1 py-2.5 font-medium text-center md:w-[12%] lg:w-[10%] lg:px-2">
+                                    GENDER
+                                </th>
+                                <th scope="col" class="hidden w-[15%] px-2 py-2.5 font-medium whitespace-nowrap text-center md:table-cell lg:w-[10%] lg:px-4">
                                     START DATE
                                 </th>
-                                <th scope="col" class="px-4 py-2.5 font-medium whitespace-nowrap text-center">
+                                <th scope="col" class="hidden w-[15%] px-2 py-2.5 font-medium whitespace-nowrap text-center md:table-cell lg:w-[10%] lg:px-4">
                                     END DATE
                                 </th>
-                                <th scope="col" class="px-4 py-2.5 font-medium text-center">
+                                <th scope="col" class="w-[24%] px-1 py-2.5 font-medium text-center md:w-[18%] lg:w-[12%] lg:px-2">
                                     REMARKS
                                 </th>
-                                <th scope="col" class="px-4 py-2.5 font-medium text-center">
+                                <th scope="col" class="w-[14%] px-1 py-2.5 font-medium text-center md:w-[10%] lg:w-[9%] lg:px-2">
                                     Action
                                 </th>
                             </tr>
                         </thead>
                         <tbody id="beneficiary-table-body">
-                            <!-- Dynamic content injected by LDNgip.js -->
+                            <!-- Dynamic content injected by gip.js -->
                         </tbody>
                     </table>
                 </div>
@@ -406,7 +506,7 @@ require_once __DIR__ . '/../../config/vite.php';
                 <!-- Modern Pagination Footer -->
                 <div id="pagination-controls"
                     class="px-4 py-3 bg-white border-t border-gray-100 flex items-center justify-between font-montserrat">
-                    <!-- Pagination will be injected by LDNgip.js -->
+                    <!-- Pagination will be injected by gip.js -->
                 </div>
             </div>
 

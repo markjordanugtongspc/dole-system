@@ -217,7 +217,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         </div>
 
          <div class="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-4 rounded-xl shadow-sm">
-            <label class="text-[0.5625rem] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest">Designation / Role</label>
+            <label class="text-[0.5625rem] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest">Assigned Unit</label>
             <p class="text-sm font-black text-heading break-words whitespace-normal leading-snug">${data.designation}</p>
         </div>
         
@@ -459,7 +459,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
         drawerContainer = document.createElement('div');
         drawerContainer.id = 'beneficiary-drawer-container';
-        drawerContainer.className = 'fixed top-0 right-0 z-[100] h-screen p-4 sm:p-6 overflow-y-auto transition-transform duration-500 ease-in-out translate-x-full bg-neutral-primary-soft dark:bg-slate-900 w-full sm:w-[550px] lg:w-[650px] shadow-2xl';
+        drawerContainer.className = 'fixed top-0 right-0 z-[100] h-screen p-4 sm:p-6 overflow-y-auto transition-transform duration-500 ease-in-out translate-x-full bg-neutral-primary-soft dark:bg-slate-900 w-full sm:w-[500px] lg:w-[560px] shadow-2xl';
         drawerContainer.setAttribute('tabindex', '-1');
         drawerContainer.setAttribute('data-drawer-backdrop', 'true');
         drawerContainer.innerHTML = drawerHtml;

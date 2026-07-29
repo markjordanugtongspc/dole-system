@@ -14,7 +14,7 @@ import Datepicker from 'flowbite-datepicker/Datepicker';
 import DateRangePicker from 'flowbite-datepicker/DateRangePicker';
 import { initLoginHandler, initLogoutHandler, initSmartLoader, initMobileSplash } from './modules/auth.js';
 import { initCharts } from './modules/charts.js';
-import { initLDNPage, loadBeneficiaries } from './modules/ldngip.js';
+import { initGIPPage, loadBeneficiaries } from './modules/gip.js';
 import { initModalHandler, updateUIProfile } from './modules/modal.js';
 import { initExportPage } from './modules/export.js';
 import { getBasePath } from './modules/auth.js';
@@ -48,9 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileSplash();
     initCharts();
     initTextSize();
-    // initLDNPage only wires up on the actual LDN page (needs beneficiary-table-body)
+    // initGIPPage only wires up on the actual GIP page (needs beneficiary-table-body)
     if (document.getElementById('beneficiary-table-body')) {
-        initLDNPage();
+        initGIPPage();
     }
     initModalHandler();
     initAutoYear();
@@ -67,11 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
         initExportPage();
     }
 
-    // Background preload: warm up IndexedDB cache on non-LDN pages so the list is
+    // Background preload: warm up IndexedDB cache on non-GIP pages so the list is
     // instant on next navigation. Deferred so it never blocks the current page render.
-    const isLDNPage = document.getElementById('beneficiary-table-body') !== null;
+    const isGIPPage = document.getElementById('beneficiary-table-body') !== null;
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (!isLDNPage && isLoggedIn) {
+    if (!isGIPPage && isLoggedIn) {
         setTimeout(() => loadBeneficiaries(), 2000);
     }
 

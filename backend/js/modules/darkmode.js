@@ -87,7 +87,7 @@ function syncToggleUI(theme) {
     // Sidebar "Theme Toggle" button text (optional label update)
     const sidebarThemeLabel = document.getElementById('sidebar-theme-label');
     if (sidebarThemeLabel) {
-        sidebarThemeLabel.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        sidebarThemeLabel.textContent = isDark ? 'LIGHT MODE' : 'DARK MODE';
     }
 }
 

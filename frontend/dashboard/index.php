@@ -190,65 +190,44 @@ require_once __DIR__ . '/../../config/vite.php';
                         </div>
                     </div>
 
+                    <!-- Male Ratio Card -->
+                    <div
+                        class="group relative cursor-pointer overflow-hidden rounded-r-2xl rounded-l-none border border-default bg-white p-4 shadow-sm transition-all duration-500 ease-out hover:scale-[1.02] hover:shadow-2xl dark:border-slate-700 dark:bg-slate-800/80 sm:p-5">
+                        <div class="absolute inset-y-0 left-0 w-1 bg-blue-600 dark:bg-blue-400"></div>
+                        <div class="absolute -bottom-8 -right-8 h-24 w-24 rounded-full bg-blue-500/5 blur-2xl transition-colors group-hover:bg-blue-500/10"></div>
+                        <div class="relative z-10 flex items-center justify-between gap-4">
+                            <div class="min-w-0">
+                                <p class="mb-1 whitespace-nowrap text-[0.5625rem] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 sm:text-[0.625rem]">Male Ratio</p>
+                                <h3 class="metric-male-ratio text-3xl font-black text-blue-600 transition-transform duration-500 group-hover:translate-x-1 dark:text-blue-400 sm:text-4xl">...</h3>
+                            </div>
+                            <div class="flex h-12 w-12 shrink-0 items-center justify-center border border-blue-100 bg-blue-50 text-blue-600 shadow-inner transition-all duration-500 group-hover:rotate-6 group-hover:scale-110 dark:border-blue-900/50 dark:bg-blue-900/30 dark:text-blue-300 sm:h-14 sm:w-14">
+                                <svg class="h-7 w-7 sm:h-8 sm:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.25" aria-hidden="true">
+                                    <circle cx="9" cy="15" r="5"></circle>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m13 11 7-7m0 0h-5m5 0v5"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Female Ratio Card -->
                     <div
-                        class="relative overflow-hidden bg-white dark:bg-slate-800/80 border border-default dark:border-slate-700 rounded-r-2xl rounded-l-none p-4 sm:p-5 shadow-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ease-out cursor-pointer group">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-philippine-red"></div>
-                        <div
-                            class="absolute -right-8 -bottom-8 w-24 h-24 bg-philippine-red/5 rounded-full blur-2xl group-hover:bg-philippine-red/10 transition-colors">
-                        </div>
-                        <div class="flex items-center justify-between gap-4 relative z-10">
+                        class="group relative cursor-pointer overflow-hidden rounded-r-2xl rounded-l-none border border-default bg-white p-4 shadow-sm transition-all duration-500 ease-out hover:scale-[1.02] hover:shadow-2xl dark:border-slate-700 dark:bg-slate-800/80 sm:p-5">
+                        <div class="absolute inset-y-0 left-0 w-1 bg-pink-500 dark:bg-pink-400"></div>
+                        <div class="absolute -bottom-8 -right-8 h-24 w-24 rounded-full bg-pink-500/5 blur-2xl transition-colors group-hover:bg-pink-500/10"></div>
+                        <div class="relative z-10 flex items-center justify-between gap-4">
                             <div class="min-w-0">
-                                <p
-                                    class="text-[0.5625rem] sm:text-[0.625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
-                                    Female Ratio</p>
-                                <div class="flex items-baseline gap-2">
-                                    <h3
-                                        class="text-3xl sm:text-4xl font-black text-philippine-red dark:text-red-400 group-hover:translate-x-1 transition-transform duration-500 metric-female-ratio">
-                                        ...</h3>
-                                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                </div>
+                                <p class="mb-1 whitespace-nowrap text-[0.5625rem] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 sm:text-[0.625rem]">Female Ratio</p>
+                                <h3 class="metric-female-ratio text-3xl font-black text-pink-500 transition-transform duration-500 group-hover:translate-x-1 dark:text-pink-400 sm:text-4xl">...</h3>
                             </div>
-                            <div
-                                class="shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-red-50 dark:bg-red-900/30 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:-rotate-6 group-hover:scale-110 shadow-inner">
-                                <svg class="w-6 h-6 sm:w-7 sm:h-7 text-philippine-red dark:text-red-300" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            <div class="flex h-12 w-12 shrink-0 items-center justify-center border border-pink-100 bg-pink-50 text-pink-500 shadow-inner transition-all duration-500 group-hover:-rotate-6 group-hover:scale-110 dark:border-pink-900/50 dark:bg-pink-900/30 dark:text-pink-300 sm:h-14 sm:w-14">
+                                <svg class="h-7 w-7 sm:h-8 sm:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.25" aria-hidden="true">
+                                    <circle cx="12" cy="8" r="5"></circle>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 13v8m-3-3h6"></path>
                                 </svg>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Deployment Sites Card -->
-                    <div
-                        class="relative overflow-hidden bg-white dark:bg-slate-800/80 border border-default dark:border-slate-700 rounded-r-2xl rounded-l-none p-4 sm:p-5 shadow-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ease-out cursor-pointer group">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-golden-yellow"></div>
-                        <div
-                            class="absolute -right-8 -bottom-8 w-24 h-24 bg-golden-yellow/5 rounded-full blur-2xl group-hover:bg-golden-yellow/10 transition-colors">
-                        </div>
-                        <div class="flex items-center justify-between gap-4 relative z-10">
-                            <div class="min-w-0">
-                                <p
-                                    class="text-[0.5625rem] sm:text-[0.625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
-                                    Deployment Sites
-                                </p>
-                                <h3
-                                    class="text-3xl sm:text-4xl font-black text-golden-yellow group-hover:translate-x-1 transition-transform duration-500 metric-deployment-sites">
-                                    ...</h3>
-                            </div>
-                            <div
-                                class="shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-yellow-50 dark:bg-yellow-900/30 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:rotate-12 group-hover:scale-110 shadow-inner">
-                                <svg class="w-6 h-6 sm:w-7 sm:h-7 text-golden-yellow" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Average Age Range Card -->
+                    <!-- Highest Age Share Card -->
                     <div
                         class="relative overflow-hidden bg-white dark:bg-slate-800/80 border border-default dark:border-slate-700 rounded-r-2xl rounded-l-none p-4 sm:p-5 shadow-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ease-out cursor-pointer group">
                         <div class="absolute top-0 left-0 w-1 h-full bg-slate-400 dark:bg-slate-500"></div>
@@ -259,11 +238,11 @@ require_once __DIR__ . '/../../config/vite.php';
                             <div class="min-w-0">
                                 <p
                                     class="text-[0.5625rem] sm:text-[0.625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
-                                    Avg Age Range
+                                    Highest Age Share
                                 </p>
-                                <h3
-                                    class="text-3xl sm:text-4xl font-black text-heading dark:text-white group-hover:translate-x-1 transition-transform duration-500 metric-avg-age-range">
+                                <h3 class="metric-top-age-label text-3xl sm:text-4xl font-black text-heading dark:text-white group-hover:translate-x-1 transition-transform duration-500">
                                     ...</h3>
+                                <p class="metric-top-age-share mt-1 text-[0.625rem] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">... of recorded ages</p>
                             </div>
                             <div
                                 class="shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-gray-100 dark:bg-slate-700/50 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:skew-x-3 group-hover:scale-110 shadow-inner">
@@ -415,251 +394,97 @@ require_once __DIR__ . '/../../config/vite.php';
                 </div>
 
                 <!-- Secondary Charts Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="grid grid-cols-1 items-stretch gap-6 mb-8 lg:grid-cols-2">
 
-                    <!-- Education Profile (Enhanced Premium Layout) -->
+                    <!-- Education Profile -->
+                    <section
+                        class="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-500 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800/80 sm:p-6">
+                        <div class="flex flex-col gap-4 border-b border-slate-100 pb-4 dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex min-w-0 items-center gap-3">
+                                <div class="flex h-11 w-11 shrink-0 items-center justify-center bg-royal-blue text-white shadow-lg shadow-blue-500/20">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.25" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m3 9 9-5 9 5-9 5-9-5Zm3 2.5V16c3.5 2.75 8.5 2.75 12 0v-4.5M21 9v6" />
+                                    </svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <h5 class="text-base font-black uppercase tracking-tight text-slate-800 dark:text-white sm:text-xl">Education Profile</h5>
+                                    <p class="mt-1 text-[0.625rem] font-black uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Exact beneficiary count by attainment</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-px overflow-hidden border border-slate-200 bg-slate-200 dark:border-slate-700 dark:bg-slate-700">
+                                <div class="bg-slate-50 px-3 py-2 dark:bg-slate-900/60">
+                                    <span class="block text-[0.5rem] font-black uppercase tracking-widest text-slate-400">Recorded</span>
+                                    <span id="education-profile-total" class="mt-0.5 block text-lg font-black tabular-nums text-royal-blue dark:text-blue-400">0</span>
+                                </div>
+                                <div class="min-w-28 bg-slate-50 px-3 py-2 dark:bg-slate-900/60">
+                                    <span class="block text-[0.5rem] font-black uppercase tracking-widest text-slate-400">Leading Level</span>
+                                    <span id="education-profile-leading" class="mt-1 block truncate text-[0.625rem] font-black uppercase text-slate-700 dark:text-slate-200">No data</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="education-chart" class="mt-4 h-[270px] w-full" aria-label="Education level distribution chart"></div>
+
+                        <div class="grid grid-cols-2 gap-2 border-t border-dashed border-slate-200 pt-4 dark:border-slate-700 sm:grid-cols-4">
+                            <div class="border-l-4 border-royal-blue bg-slate-50 px-3 py-3 dark:bg-slate-900/50">
+                                <span class="block text-[0.5rem] font-black uppercase leading-tight text-slate-400">College Graduate</span>
+                                <span class="count-college-grad mt-1 block text-lg font-black tabular-nums text-slate-800 dark:text-white">0</span>
+                            </div>
+                            <div class="border-l-4 border-golden-yellow bg-slate-50 px-3 py-3 dark:bg-slate-900/50">
+                                <span class="block text-[0.5rem] font-black uppercase leading-tight text-slate-400">College Level</span>
+                                <span class="count-college-lvl mt-1 block text-lg font-black tabular-nums text-slate-800 dark:text-white">0</span>
+                            </div>
+                            <div class="border-l-4 border-philippine-red bg-slate-50 px-3 py-3 dark:bg-slate-900/50">
+                                <span class="block text-[0.5rem] font-black uppercase leading-tight text-slate-400">High School Graduate</span>
+                                <span class="count-hs-grad mt-1 block text-lg font-black tabular-nums text-slate-800 dark:text-white">0</span>
+                            </div>
+                            <div class="border-l-4 border-emerald-500 bg-slate-50 px-3 py-3 dark:bg-slate-900/50">
+                                <span class="block text-[0.5rem] font-black uppercase leading-tight text-slate-400">Senior High</span>
+                                <span class="count-senior-high mt-1 block text-lg font-black tabular-nums text-slate-800 dark:text-white">0</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto flex flex-col gap-2 border-t border-slate-100 pt-4 text-[0.5625rem] font-bold uppercase tracking-wider text-slate-400 dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between">
+                            <span>Unrecorded education values are excluded.</span>
+                            <a href="../../frontend/export/index.php" class="inline-flex items-center gap-1 font-black text-royal-blue transition-colors hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                Export Full Report
+                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14m-5-5 5 5-5 5" /></svg>
+                            </a>
+                        </div>
+                    </section>
+                    <!-- Assigned Units Distribution -->
                     <div
-                        class="max-w-full w-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-500 p-4 md:p-6 flex flex-col justify-between overflow-hidden">
-
-                        <!-- Education Stats Grid - Premium Facelift (Sticky Notes Aesthetic) -->
-                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
-                            <!-- College Graduate -->
-                            <div
-                                class="relative rounded-r-2xl rounded-l-none bg-royal-blue dark:bg-royal-blue p-4 shadow-md flex flex-col items-center justify-center hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 group overflow-hidden cursor-pointer">
-                                <div
-                                    class="absolute -right-4 -top-4 h-14 w-14 rounded-full bg-white/10 blur-xl transition-colors group-hover:bg-white/20">
-                                </div>
-                                <div
-                                    class="mb-2 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/25 bg-white/10 text-white shadow-sm">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H7a1 1 0 00-1 1v3M4 7h16" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M9 3h6M6 7h12" />
-                                    </svg>
-                                </div>
-                                <span
-                                    class="count-college-grad text-3xl font-black text-white dark:text-white group-hover:scale-110 transition-transform duration-500">...</span>
-                                <span
-                                    class="mt-2 text-center text-[0.5625rem] font-black uppercase tracking-widest leading-tight text-white dark:text-white">College<br>Graduate</span>
+                        class="group/units flex h-full w-full max-w-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-500 hover:shadow-2xl dark:border-slate-700 dark:bg-slate-800/80 sm:p-6">
+                        <div class="mb-4 flex items-start gap-4 border-b border-slate-100 pb-4 dark:border-slate-700">
+                            <div class="flex h-11 w-11 shrink-0 items-center justify-center bg-blue-600 text-white shadow-lg shadow-blue-500/20 dark:bg-blue-500">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.25" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 20V10m5 10V4m6 16v-7m5 7V7"></path>
+                                </svg>
                             </div>
-                            <!-- College Level -->
-                            <div
-                                class="relative rounded-r-2xl rounded-l-none bg-golden-yellow dark:bg-golden-yellow p-4 shadow-md flex flex-col items-center justify-center hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 group overflow-hidden cursor-pointer">
-                                <div
-                                    class="absolute -right-4 -top-4 h-14 w-14 rounded-full bg-white/15 blur-xl transition-colors group-hover:bg-white/25">
-                                </div>
-                                <div
-                                    class="mb-2 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/25 bg-white/10 text-white shadow-sm">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3"
-                                            d="M12 14l9-5-9-5-9 5 9 5z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3"
-                                            d="M12 14l6.16-3.422a11.95 11.95 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 11.95 11.95 0 01.665-6.479L12 14z" />
-                                    </svg>
-                                </div>
-                                <span
-                                    class="count-college-lvl text-3xl font-black text-white dark:text-white group-hover:scale-110 transition-transform duration-500">...</span>
-                                <span
-                                    class="mt-2 text-center text-[0.5625rem] font-black uppercase tracking-widest leading-tight text-white dark:text-white">College<br>Level</span>
-                            </div>
-                            <!-- HS Graduate -->
-                            <div
-                                class="relative rounded-r-2xl rounded-l-none bg-philippine-red dark:bg-philippine-red p-4 shadow-md flex flex-col items-center justify-center hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 group overflow-hidden cursor-pointer">
-                                <div
-                                    class="absolute -right-4 -top-4 h-14 w-14 rounded-full bg-white/10 blur-xl transition-colors group-hover:bg-white/20">
-                                </div>
-                                <div
-                                    class="mb-2 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/25 bg-white/10 text-white shadow-sm">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3"
-                                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                                    </svg>
-                                </div>
-                                <span
-                                    class="count-hs-grad text-3xl font-black text-white dark:text-white group-hover:scale-110 transition-transform duration-500">...</span>
-                                <span
-                                    class="mt-2 text-center text-[0.5625rem] font-black uppercase tracking-widest leading-tight text-white dark:text-white">High
-                                    School<br>Graduate</span>
-                            </div>
-                            <!-- Senior High -->
-                            <div
-                                class="relative rounded-r-2xl rounded-l-none bg-emerald-600 dark:bg-emerald-600 p-4 shadow-md flex flex-col items-center justify-center hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 group overflow-hidden cursor-pointer">
-                                <div
-                                    class="absolute -right-4 -top-4 h-14 w-14 rounded-full bg-white/10 blur-xl transition-colors group-hover:bg-white/20">
-                                </div>
-                                <div
-                                    class="mb-2 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/25 bg-white/10 text-white shadow-sm">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3"
-                                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                                            d="M8 8h2m-2 4h2m6-4h2m-2 4h2" />
-                                    </svg>
-                                </div>
-                                <span
-                                    class="count-senior-high text-3xl font-black text-white dark:text-white group-hover:scale-110 transition-transform duration-500 font-mono">...</span>
-                                <span
-                                    class="mt-2 text-center text-[0.5625rem] font-black uppercase tracking-widest leading-tight text-white dark:text-white">Senior
-                                    High<br>Student/Grad</span>
+                            <div class="min-w-0">
+                                <h5 class="text-base font-black uppercase tracking-tight text-slate-800 dark:text-white sm:text-xl">
+                                    Total Assigned Added per Units
+                                </h5>
+                                <p class="mt-1 text-[0.625rem] font-black uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                                    Global GIP count by assigned unit
+                                </p>
                             </div>
                         </div>
-
-                        <div class="flex flex-col items-center mb-4">
-                            <div class="flex items-center mb-1">
-                                <h5 class="text-sm font-black uppercase tracking-[0.2em] text-slate-400">
-                                    Education Profile</h5>
-                                <button data-popover-target="edu-progress-popover" class="ms-2 cursor-pointer">
-                                    <svg class="w-4 h-4 text-slate-300 hover:text-royal-blue transition-colors cursor-pointer"
-                                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewBox="0 0 24 24">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M9.529 9.988a2.502 2.502 0 1 1 5 .191A2.441 2.441 0 0 1 12 12.582V14m-.01 3.008H12M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div data-popover id="edu-progress-popover" role="tooltip"
-                                class="absolute z-10 p-3 invisible inline-block text-sm text-slate-500 transition-opacity duration-300 bg-white border border-slate-200 rounded-lg shadow-lg opacity-0 w-72 leading-relaxed">
-                                <h3 class="font-bold text-royal-blue mb-1">Education Distribution</h3>
-                                <p class="text-xs">Visualizes the percentage breakdown of beneficiaries based on their
-                                    highest educational attainment.</p>
-                                <div data-popper-arrow></div>
-                            </div>
-                        </div>
-
-                        <!-- Radial Chart -->
-                        <div class="flex-1 flex justify-center items-center py-2 my-2" id="education-chart">
-                        </div>
-
-                        <div class="grid grid-cols-1 items-center border-t border-slate-200 justify-between mt-4">
-                            <div class="flex justify-between items-center pt-4">
-                                <!-- Button -->
-                                <!-- Label only -->
-                                <div class="text-[0.625rem] font-black text-slate-400 uppercase tracking-[0.15em] py-2">
-                                    Distribution Profile
-                                </div>
-
-                                <a href="../../frontend/export/index.php"
-                                    class="cursor-pointer inline-flex items-center uppercase tracking-widest font-black text-royal-blue hover:text-blue-800 text-[0.625rem] group">
-                                    Export Full Report
-                                    <svg class="w-3 h-3 ms-2 transform group-hover:translate-x-1 transition-transform"
-                                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewBox="0 0 24 24">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M19 12H5m14 0-4 4m4-4-4-4" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Job Roles (Exclusive Premium Container) -->
-                    <div
-                        class="max-w-full w-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-500 p-4 md:p-6 flex flex-col justify-between overflow-hidden group/roles">
-                        <div id="card-header-wrapper"
-                            class="flex items-start justify-between border-slate-100 dark:border-slate-700 border-b pb-4 mb-2 gap-3 transition-all duration-500">
-                            <dl class="flex-1 min-w-0">
-                                <dt
-                                    class="text-[0.625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
-                                    Primary Capacity</dt>
-                                <dd class="text-xl sm:text-2xl md:text-xl xl:text-2xl font-black text-royal-blue dark:text-blue-400 leading-tight md:leading-none metric-top-role truncate w-full"
-                                    title="...">
-                                    ...
-                                </dd>
-                            </dl>
-                            <div class="shrink-0 self-start">
-                                <span
-                                    class="inline-flex items-center px-2 py-1 bg-blue-600 dark:bg-blue-500 text-white text-[0.5625rem] xl:text-[0.625rem] font-black rounded-lg xl:rounded-full shadow-lg shadow-blue-500/30 uppercase tracking-widest">
-                                    Active Load
-                                </span>
-                            </div>
-                        </div>
-
-                        <div id="roles-content-view" class="flex-1 flex flex-col">
-                            <div class="grid grid-cols-2 gap-4 py-3 mb-2">
-                                <div
-                                    class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-100 dark:border-blue-900/30 transition-transform group-hover/roles:-translate-y-1">
-                                    <dt
-                                        class="text-[0.5625rem] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1">
-                                        Office Based</dt>
-                                    <dd
-                                        class="text-2xl font-black text-royal-blue dark:text-blue-400 count-office-based">
-                                        ...</dd>
-                                </div>
-                                <div
-                                    class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-100 dark:border-red-900/30 transition-transform group-hover/roles:-translate-y-1">
-                                    <dt
-                                        class="text-[0.5625rem] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1">
-                                        Field Based</dt>
-                                    <dd
-                                        class="text-2xl font-black text-philippine-red dark:text-red-400 count-field-based">
-                                        ...</dd>
-                                </div>
-                            </div>
-                            <div id="job-roles-chart" class="flex-1 w-full flex items-center justify-center my-2"></div>
-                        </div>
-
-                        <div id="status-content-view" class="hidden flex-1 flex flex-col">
-                            <div class="grid grid-cols-2 gap-4 py-3 mb-2">
-                                <div
-                                    class="relative rounded-r-2xl rounded-l-none bg-emerald-600 dark:bg-emerald-600 p-4 shadow-md flex flex-col items-center justify-center hover:shadow-xl hover:-translate-y-1 transition-all duration-500 group overflow-hidden">
-                                    <div class="absolute -right-4 -top-4 h-14 w-14 rounded-full bg-white/10 blur-xl transition-colors group-hover:bg-white/20"></div>
-                                    <dd
-                                        class="text-3xl font-black text-white dark:text-white count-absorbed text-center group-hover:scale-110 transition-transform duration-500">
-                                        0</dd>
-                                    <dt
-                                        class="mt-2 text-[0.5625rem] font-black text-white/90 dark:text-white/90 uppercase tracking-[0.2em] mb-1 text-center">
-                                        Absorbed</dt>
-                                </div>
-                                <div
-                                    class="relative rounded-r-2xl rounded-l-none bg-blue-500 dark:bg-blue-500 p-4 shadow-md flex flex-col items-center justify-center hover:shadow-xl hover:-translate-y-1 transition-all duration-500 group overflow-hidden">
-                                    <div class="absolute -right-4 -top-4 h-14 w-14 rounded-full bg-white/10 blur-xl transition-colors group-hover:bg-white/20"></div>
-                                    <dd
-                                        class="text-3xl font-black text-white dark:text-white count-ongoing text-center group-hover:scale-110 transition-transform duration-500">
-                                        0</dd>
-                                    <dt
-                                        class="mt-2 text-[0.5625rem] font-black text-white/90 dark:text-white/90 uppercase tracking-[0.2em] mb-1 text-center">
-                                        Ongoing</dt>
-                                </div>
-                            </div>
-                            <div class="flex-1 flex items-center justify-center pt-2 my-2">
-                                <div id="status-chart" class="w-full"></div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 items-center border-t border-slate-200 justify-between mt-2">
-                            <div id="card-mode-footer"
-                                class="flex justify-between items-center pt-2 md:pt-3 transition-all duration-500">
-                                <div id="card-mode-desc"
-                                    class="text-[0.625rem] font-bold text-slate-500 uppercase tracking-wider py-2">
-                                    Role Distribution
-                                </div>
-
-                                <div id="card-mode-toggle"
-                                    class="cursor-pointer inline-flex items-center uppercase tracking-wider font-extrabold text-royal-blue hover:text-blue-800 text-[0.625rem] hover:underline group">
-                                    <span id="toggle-label-text">Employment Status</span>
-                                    <svg id="toggle-icon"
-                                        class="w-3 h-3 ms-1.5 transform group-hover:translate-x-1 transition-transform"
-                                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewBox="0 0 24 24">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="3" d="M5 12h14m-7 7 7-7-7-7" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
+                        <div id="assigned-units-chart" class="h-[230px] w-full"></div>
+                        <div id="assigned-units-summary" class="mt-3 grid grid-cols-1 gap-2 border-t border-dashed border-slate-200 pt-4 dark:border-slate-700 sm:grid-cols-2" aria-live="polite"></div>
+                        <p class="border-t border-slate-100 pt-3 text-[0.625rem] font-bold uppercase tracking-wider text-slate-400 dark:border-slate-700 dark:text-slate-500">
+                            Configured units only; unassigned values are excluded.
+                        </p>
                     </div>
 
                 </div>
-
                 <!-- Age Demographics (Workforce Heatmap Concept) -->
                 <div
                     class="lg:col-span-2 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-3xl p-4 sm:p-8 shadow-sm hover:shadow-2xl transition-all duration-500 min-h-[400px] flex flex-col group/age relative overflow-hidden">
                     <div
                         class="absolute -right-20 -top-20 w-64 h-64 bg-royal-blue/5 rounded-full blur-3xl group-hover/age:bg-royal-blue/10 transition-colors">
                     </div>
-                    <div class="flex justify-between items-center mb-10 relative z-10">
+                    <div class="relative z-10 mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex items-center">
                             <div
                                 class="w-14 h-14 sm:w-16 sm:h-16 bg-blue-600 dark:bg-blue-500 rounded-3xl flex items-center justify-center me-4 sm:me-6 shadow-xl shadow-blue-500/20 group-hover/age:rotate-6 group-hover/age:scale-105 transition-all duration-500">
@@ -672,28 +497,19 @@ require_once __DIR__ . '/../../config/vite.php';
                             <div>
                                 <h5
                                     class="text-lg sm:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight">
-                                    Workforce Age Pattern</h5>
+                                    Monthly Age Distribution</h5>
                                 <p
                                     class="text-[0.625rem] sm:text-xs font-black text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-[0.3em]">
-                                    Generation Distribution</p>
+                                    Age Brackets and Monthly Totals</p>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <div class="flex flex-col">
-                                <span
-                                    class="text-[0.625rem] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none mb-2">Age
-                                    Average</span>
-                                <div class="flex items-baseline justify-end gap-2">
-                                    <h4
-                                        class="text-3xl sm:text-5xl font-black text-royal-blue dark:text-blue-400 leading-none metric-avg-age">
-                                        ...</h4>
-                                    <span
-                                        class="text-xs sm:text-sm font-black text-slate-400 dark:text-slate-500">YRS</span>
-                                </div>
-                            </div>
+                        <div class="shrink-0 border-l-4 border-royal-blue bg-blue-50 px-4 py-3 text-left dark:bg-blue-950/30 sm:text-right">
+                            <span class="block text-[0.5625rem] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Data Year</span>
+                            <span id="age-chart-year" class="mt-1 block text-2xl font-black leading-none text-royal-blue dark:text-blue-400">...</span>
+                            <span class="mt-1 block text-[0.5625rem] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Latest recorded year</span>
                         </div>
                     </div>
-                    <div id="age-chart" class="flex-1 w-full min-h-[160px]"></div>
+                    <div id="age-chart" class="h-[350px] w-full"></div>
                 </div>
 
             </div>
@@ -702,131 +518,110 @@ require_once __DIR__ . '/../../config/vite.php';
         </div> <!-- End of general-view-section -->
 
         <div id="quick-access-view-section" class="hidden opacity-0 transition-opacity duration-500">
-            <!-- Section Title -->
-            <div class="mb-6 px-1">
-                <h2 class="text-xl sm:text-2xl font-black text-heading dark:text-white uppercase tracking-tight flex items-center gap-3">
-                    <div class="p-2.5 bg-royal-blue/10 dark:bg-blue-900/40 rounded-2xl shadow-inner">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-royal-blue dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                        </svg>
+            <div class="mb-6 border-l-4 border-golden-yellow bg-royal-blue px-4 py-5 text-white shadow-lg shadow-blue-900/10 sm:px-6">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <div class="mb-2 inline-flex items-center gap-2 bg-white/10 px-2.5 py-1 text-[0.5625rem] font-black uppercase tracking-[0.2em] text-blue-100">
+                            <span class="h-1.5 w-1.5 bg-golden-yellow"></span>
+                            Command Center
+                        </div>
+                        <h2 class="text-xl font-black uppercase tracking-tight sm:text-3xl">Quick Access Shortcuts</h2>
+                        <p class="mt-1 text-[0.625rem] font-bold uppercase tracking-[0.16em] text-blue-100 sm:text-xs">High-frequency GIP tools in one workspace</p>
                     </div>
-                    Quick Access Shortcuts
-                </h2>
-                <p class="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-[0.2em] mt-2 ms-14">
-                    Accelerated administrative actions and database utilities
-                </p>
+                    <div class="inline-flex w-fit items-center gap-2 border border-white/20 bg-white/10 px-3 py-2 text-[0.625rem] font-black uppercase tracking-widest">
+                        <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping bg-emerald-300 opacity-75"></span><span class="relative inline-flex h-2 w-2 bg-emerald-400"></span></span>
+                        System Ready
+                    </div>
+                </div>
             </div>
 
-            <!-- Quick Access Grid (2 columns on mobile, 5 columns on desktop) -->
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-5 mb-8">
-                <!-- Short 1: Add Beneficiary -->
-                <button onclick="window.location.href = basePath + 'frontend/LDN/index.php?add_member=true'"
-                    class="aspect-square bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none p-3.5 sm:p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left focus:outline-none focus:ring-4 focus:ring-royal-blue/10">
-                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-royal-blue/5 rounded-full blur-2xl group-hover:bg-royal-blue/10 transition-colors"></div>
-                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-royal-blue via-blue-600 to-indigo-600"></div>
-                    
-                    <div class="flex justify-between items-start mb-2 sm:mb-6">
-                        <div class="p-2 sm:p-3.5 bg-blue-50 dark:bg-blue-900/20 text-royal-blue dark:text-blue-400 rounded-2xl group-hover:rotate-6 group-hover:scale-110 transition-transform border border-blue-100 dark:border-blue-900/30 shadow-inner">
-                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                            </svg>
-                        </div>
+            <div class="mb-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-5">
+                <button onclick="window.location.href = basePath + 'frontend/GIP/index.php?add_member=true'"
+                    class="group relative flex aspect-square cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-blue-200 bg-white p-3.5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-royal-blue hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-royal-blue/15 dark:border-blue-900/60 dark:bg-slate-900 sm:p-5">
+                    <div class="absolute inset-x-0 top-0 h-1.5 bg-royal-blue"></div>
+                    <svg class="pointer-events-none absolute -bottom-5 -right-5 h-32 w-32 -rotate-12 text-royal-blue opacity-[0.07] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 dark:text-blue-300 dark:opacity-[0.08] sm:h-36 sm:w-36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm10 10v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75M19 8v6m-3-3h6" /></svg>
+                    <div class="relative z-10 flex items-start justify-between pt-1">
+                        <span class="flex h-10 w-10 items-center justify-center bg-blue-50 text-royal-blue transition-transform duration-300 group-hover:scale-110 dark:bg-blue-900/30 dark:text-blue-400 sm:h-12 sm:w-12">
+                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                        </span>
+                        <span class="text-[0.5625rem] font-black tracking-[0.2em] text-blue-300 dark:text-blue-700">01</span>
                     </div>
-                    <div>
-                        <h4 class="text-[11px] sm:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight mb-1 group-hover:text-royal-blue dark:group-hover:text-blue-400 transition-colors">
-                            Register Member
-                        </h4>
-                        <p class="text-[8px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
-                            Add GIP Beneficiary
-                        </p>
+                    <div class="relative z-10">
+                        <h4 class="text-[0.6875rem] font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-royal-blue dark:text-white sm:text-sm">Register Member</h4>
+                        <p class="mt-1 text-[0.5rem] font-bold uppercase tracking-wider text-slate-400 sm:text-[0.625rem]">Add GIP beneficiary</p>
+                        <span class="mt-3 inline-flex items-center gap-1 text-[0.5625rem] font-black uppercase tracking-widest text-royal-blue dark:text-blue-400">Open <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
                     </div>
                 </button>
 
-                <!-- Short 2: Beneficiary Lookup -->
-                <button onclick="window.location.href = basePath + 'frontend/LDN/index.php?focus_search=true'"
-                    class="aspect-square bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none p-3.5 sm:p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left focus:outline-none focus:ring-4 focus:ring-violet-500/10">
-                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-violet-500/5 rounded-full blur-2xl group-hover:bg-violet-500/10 transition-colors"></div>
-                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-violet-500 via-purple-600 to-fuchsia-600"></div>
-                    
-                    <div class="flex justify-between items-start mb-2 sm:mb-6">
-                        <div class="p-2 sm:p-3.5 bg-violet-50 dark:bg-violet-900/20 text-violet-500 dark:text-violet-400 rounded-2xl group-hover:-rotate-6 group-hover:scale-110 transition-transform border border-violet-100 dark:border-violet-900/30 shadow-inner">
-                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
+                <button onclick="window.location.href = basePath + 'frontend/GIP/index.php?focus_search=true'"
+                    class="group relative flex aspect-square cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-red-200 bg-white p-3.5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-philippine-red hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-red-500/15 dark:border-red-900/60 dark:bg-slate-900 sm:p-5">
+                    <div class="absolute inset-x-0 top-0 h-1.5 bg-philippine-red"></div>
+                    <svg class="pointer-events-none absolute -bottom-5 -right-5 h-32 w-32 rotate-12 text-philippine-red opacity-[0.07] transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110 dark:text-red-300 dark:opacity-[0.08] sm:h-36 sm:w-36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><circle cx="10" cy="9" r="4" /><path stroke-linecap="round" stroke-linejoin="round" d="M3 20a7 7 0 0 1 12-4.9m6 5.9-4.2-4.2m1.2-3.3a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" /></svg>
+                    <div class="relative z-10 flex items-start justify-between pt-1">
+                        <span class="flex h-10 w-10 items-center justify-center bg-red-50 text-philippine-red transition-transform duration-300 group-hover:scale-110 dark:bg-red-900/30 dark:text-red-400 sm:h-12 sm:w-12">
+                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="m21 21-4.35-4.35m1.35-5.15a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" /></svg>
+                        </span>
+                        <span class="text-[0.5625rem] font-black tracking-[0.2em] text-red-300 dark:text-red-800">02</span>
                     </div>
-                    <div>
-                        <h4 class="text-[11px] sm:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight mb-1 group-hover:text-violet-500 dark:group-hover:text-violet-400 transition-colors">
-                            Member Lookup
-                        </h4>
-                        <p class="text-[8px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
-                            View Logs & Docs
-                        </p>
+                    <div class="relative z-10">
+                        <h4 class="text-[0.6875rem] font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-philippine-red dark:text-white sm:text-sm">Member Lookup</h4>
+                        <p class="mt-1 text-[0.5rem] font-bold uppercase tracking-wider text-slate-400 sm:text-[0.625rem]">Search GIP records</p>
+                        <span class="mt-3 inline-flex items-center gap-1 text-[0.5625rem] font-black uppercase tracking-widest text-philippine-red dark:text-red-400">Search <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
                     </div>
                 </button>
 
-                <!-- Short 3: Report Generator -->
                 <button onclick="window.location.href = basePath + 'frontend/export/index.php'"
-                    class="aspect-square bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none p-3.5 sm:p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
-                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors"></div>
-                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-teal-600 to-green-600"></div>
-                    
-                    <div class="flex justify-between items-start mb-2 sm:mb-6">
-                        <div class="p-2 sm:p-3.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 dark:text-emerald-400 rounded-2xl group-hover:rotate-6 group-hover:scale-110 transition-transform border border-emerald-100 dark:border-emerald-900/30 shadow-inner">
-                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                        </div>
+                    class="group relative flex aspect-square cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-yellow-200 bg-white p-3.5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-golden-yellow hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-yellow-400/20 dark:border-yellow-900/60 dark:bg-slate-900 sm:p-5">
+                    <div class="absolute inset-x-0 top-0 h-1.5 bg-golden-yellow"></div>
+                    <svg class="pointer-events-none absolute -bottom-5 -right-5 h-32 w-32 -rotate-12 text-amber-500 opacity-[0.09] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 dark:text-yellow-300 dark:opacity-[0.08] sm:h-36 sm:w-36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 2h8l4 4v16H6V2Zm8 0v5h5M9 17v-4m3 4V9m3 8v-6" /></svg>
+                    <div class="relative z-10 flex items-start justify-between pt-1">
+                        <span class="flex h-10 w-10 items-center justify-center bg-yellow-50 text-amber-600 transition-transform duration-300 group-hover:scale-110 dark:bg-yellow-900/30 dark:text-yellow-300 sm:h-12 sm:w-12">
+                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.5L19 9.5V19a2 2 0 0 1-2 2Z" /></svg>
+                        </span>
+                        <span class="text-[0.5625rem] font-black tracking-[0.2em] text-yellow-500/60 dark:text-yellow-700">03</span>
                     </div>
-                    <div>
-                        <h4 class="text-[11px] sm:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight mb-1 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors">
-                            Report Generator
-                        </h4>
-                        <p class="text-[8px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
-                            Export Excel
-                        </p>
+                    <div class="relative z-10">
+                        <h4 class="text-[0.6875rem] font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-amber-600 dark:text-white sm:text-sm">Report Generator</h4>
+                        <p class="mt-1 text-[0.5rem] font-bold uppercase tracking-wider text-slate-400 sm:text-[0.625rem]">Export payroll data</p>
+                        <span class="mt-3 inline-flex items-center gap-1 text-[0.5625rem] font-black uppercase tracking-widest text-amber-600 dark:text-yellow-300">Generate <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
                     </div>
                 </button>
 
-                <!-- Short 4: My Profile & Settings -->
                 <button onclick="window.location.href = basePath + 'frontend/user/settings/index.php'"
-                    class="aspect-square bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none p-3.5 sm:p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left focus:outline-none focus:ring-4 focus:ring-orange-500/10">
-                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-orange-500/5 rounded-full blur-2xl group-hover:bg-orange-500/10 transition-colors"></div>
-                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-500 via-red-500 to-pink-600"></div>
-                    
-                    <div class="flex justify-between items-start mb-2 sm:mb-6">
-                        <div class="p-2 sm:p-3.5 bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400 rounded-2xl group-hover:-rotate-6 group-hover:scale-110 transition-transform border border-orange-100 dark:border-orange-900/30 shadow-inner">
-                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        </div>
+                    class="group relative flex aspect-square cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-emerald-200 bg-white p-3.5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/15 dark:border-emerald-900/60 dark:bg-slate-900 sm:p-5">
+                    <div class="absolute inset-x-0 top-0 h-1.5 bg-emerald-500"></div>
+                    <svg class="pointer-events-none absolute -bottom-5 -right-5 h-32 w-32 rotate-12 text-emerald-600 opacity-[0.07] transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110 dark:text-emerald-300 dark:opacity-[0.08] sm:h-36 sm:w-36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><circle cx="10" cy="8" r="4" /><path stroke-linecap="round" stroke-linejoin="round" d="M3 21a7 7 0 0 1 14 0m3.5-8.5 1 1m-5 0 1-1m1.5-2v-1m0 8v-1m-3.5-3h-1m8 0h-1m-.44-2.56.7-.7m-5.66 5.66.7-.7m3.26.7.7.7m-5.66-5.66.7.7" /></svg>
+                    <div class="relative z-10 flex items-start justify-between pt-1">
+                        <span class="flex h-10 w-10 items-center justify-center bg-emerald-50 text-emerald-600 transition-transform duration-300 group-hover:scale-110 dark:bg-emerald-900/30 dark:text-emerald-400 sm:h-12 sm:w-12">
+                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM5 21a7 7 0 0 1 14 0" /></svg>
+                        </span>
+                        <span class="text-[0.5625rem] font-black tracking-[0.2em] text-emerald-300 dark:text-emerald-800">04</span>
                     </div>
-                    <div>
-                        <h4 class="text-[11px] sm:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight mb-1 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
-                            My Account
-                        </h4>
-                        <p class="text-[8px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
-                            Profile Settings
-                        </p>
+                    <div class="relative z-10">
+                        <h4 class="text-[0.6875rem] font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-emerald-600 dark:text-white sm:text-sm">My Account</h4>
+                        <p class="mt-1 text-[0.5rem] font-bold uppercase tracking-wider text-slate-400 sm:text-[0.625rem]">Profile and settings</p>
+                        <span class="mt-3 inline-flex items-center gap-1 text-[0.5625rem] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Manage <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
                     </div>
                 </button>
-                <!-- Short 5: Salary Calculator -->
+
                 <button onclick="window.location.href = basePath + 'frontend/calculate/'"
-                    class="aspect-square bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none p-3.5 sm:p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between text-left focus:outline-none focus:ring-4 focus:ring-cyan-500/10">
-                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-cyan-500/5 rounded-full blur-2xl group-hover:bg-cyan-500/10 transition-colors"></div>
-                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan-500 via-sky-600 to-blue-700"></div>
-                    <div class="flex justify-between items-start mb-2 sm:mb-6">
-                        <div class="p-2 sm:p-3.5 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 rounded-2xl group-hover:scale-110 transition-transform border border-cyan-100 dark:border-cyan-900/30 shadow-inner">
-                            <svg class="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.5 21h13M12 21V7m0 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm2-1.8c3.073.661 2.467 2.8 5 2.8M5 8c3.359 0 2.192-2.115 5.012-2.793M7 9.556V7.75m0 1.806-1.95 4.393a.773.773 0 0 0 .37.962.785.785 0 0 0 .362.089h2.436a.785.785 0 0 0 .643-.335.776.776 0 0 0 .09-.716L7 9.556Zm10 0V7.313m0 2.243-1.95 4.393a.773.773 0 0 0 .37.962.786.786 0 0 0 .362.089h2.436a.785.785 0 0 0 .643-.335.775.775 0 0 0 .09-.716L17 9.556Z" />
-                            </svg>
-                        </div>
+                    class="group relative flex aspect-square cursor-pointer flex-col justify-between overflow-hidden rounded-none border border-cyan-200 bg-white p-3.5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-cyan-500/15 dark:border-cyan-900/60 dark:bg-slate-900 sm:p-5">
+                    <div class="absolute inset-x-0 top-0 h-1.5 bg-cyan-500"></div>
+                    <svg class="pointer-events-none absolute -bottom-5 -right-5 h-32 w-32 -rotate-12 text-cyan-600 opacity-[0.07] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 dark:text-cyan-300 dark:opacity-[0.08] sm:h-36 sm:w-36" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.25" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="1" /><path stroke-linecap="round" stroke-linejoin="round" d="M7 5h10v4H7V5Zm0 8h2m3 0h2m3 0h.01M7 17h2m3 0h2m3 0h.01" /></svg>
+                    <div class="relative z-10 flex items-start justify-between pt-1">
+                        <span class="flex h-10 w-10 items-center justify-center bg-cyan-50 text-cyan-600 transition-transform duration-300 group-hover:scale-110 dark:bg-cyan-900/30 dark:text-cyan-400 sm:h-12 sm:w-12">
+                            <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="M5 21h14M12 21V7m0 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm-5 2-2 5h4l-2-5Zm10 0-2 5h4l-2-5Z" /></svg>
+                        </span>
+                        <span class="text-[0.5625rem] font-black tracking-[0.2em] text-cyan-300 dark:text-cyan-800">05</span>
                     </div>
-                    <div><h4 class="text-[11px] sm:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight mb-1 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">Calculate Salary</h4><p class="text-[8px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">GIP Wage Estimate</p></div>
+                    <div class="relative z-10">
+                        <h4 class="text-[0.6875rem] font-black uppercase leading-tight text-slate-800 transition-colors group-hover:text-cyan-600 dark:text-white sm:text-sm">Calculate Salary</h4>
+                        <p class="mt-1 text-[0.5rem] font-bold uppercase tracking-wider text-slate-400 sm:text-[0.625rem]">GIP wage estimate</p>
+                        <span class="mt-3 inline-flex items-center gap-1 text-[0.5625rem] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400">Calculate <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m9 18 6-6-6-6" /></svg></span>
+                    </div>
                 </button>
             </div>
         </div>
-
         <footer class="mt-8 border-t border-slate-200 dark:border-slate-700 pt-8 pb-4">
             <!-- Top Row: Compliance Notice -->
             <div
@@ -1057,55 +852,6 @@ require_once __DIR__ . '/../../config/vite.php';
                     }, 500);
                 }
 
-                // Card Mode Toggle (Roles vs Status)
-                const cardToggle = document.getElementById('card-mode-toggle');
-                const rolesView = document.getElementById('roles-content-view');
-                const statusView = document.getElementById('status-content-view');
-                const toggleLabel = document.getElementById('toggle-label-text');
-                const modeDesc = document.getElementById('card-mode-desc');
-
-                if (cardToggle && rolesView && statusView) {
-                    cardToggle.addEventListener('click', function () {
-                        const topRoleEl = document.querySelector('.metric-top-role');
-                        const cardFooter = document.getElementById('card-mode-footer');
-                        const toggleIcon = document.getElementById('toggle-icon');
-
-                        const originalTopRole = topRoleEl?.dataset?.originalTopRole || topRoleEl?.textContent || 'N/A';
-                        if (topRoleEl && !topRoleEl.dataset.originalTopRole) {
-                            topRoleEl.dataset.originalTopRole = originalTopRole;
-                        }
-
-                        const isRolesActive = !rolesView.classList.contains('hidden');
-                        if (isRolesActive) {
-                            // Currently showing Roles -> Switch to Status
-                            rolesView.classList.add('hidden');
-                            statusView.classList.remove('hidden');
-                            toggleLabel.textContent = 'Role Distribution'; // Label to switch back
-                            modeDesc.textContent = 'Employment Status';    // Current visible mode
-                            if (topRoleEl) topRoleEl.textContent = 'EMPLOYMENT STATUS';
-
-                            // SWAP VISUAL POSITIONS
-                            if (cardFooter) cardFooter.classList.add('flex-row-reverse');
-                            if (toggleIcon) toggleIcon.classList.add('rotate-180', 'me-1.5', 'ms-0');
-                        } else {
-                            // Currently showing Status -> Switch to Roles
-                            statusView.classList.add('hidden');
-                            rolesView.classList.remove('hidden');
-                            toggleLabel.textContent = 'Employment Status'; // Label to switch forward
-                            modeDesc.textContent = 'Role Distribution';    // Current visible mode
-                            if (topRoleEl) topRoleEl.textContent = topRoleEl.dataset.originalTopRole || 'N/A';
-
-                            // RESTORE VISUAL POSITIONS
-                            if (cardFooter) cardFooter.classList.remove('flex-row-reverse');
-                            if (toggleIcon) toggleIcon.classList.remove('rotate-180', 'me-1.5', 'ms-0');
-                        }
-
-                        // Force a layout recalculation for ApexCharts
-                        setTimeout(() => {
-                            window.dispatchEvent(new Event('resize'));
-                        }, 100);
-                    });
-                }
             });
         </script>
 
