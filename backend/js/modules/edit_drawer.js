@@ -104,7 +104,7 @@ export function showEditBeneficiaryDrawer(data) {
                  <option value="RESIGNED" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-bold" ${data.remarks === 'RESIGNED' ? 'selected' : ''}>RESIGNED</option>
                  <option value="ABSORBED" class="bg-white dark:bg-slate-800 text-gray-900 dark:text-white font-bold" ${data.remarks === 'ABSORBED' ? 'selected' : ''}>ABSORBED</option>
              </select>
-             <div class="pointer-events-none absolute right-3 top-[28px] text-inherit">
+             <div class="pointer-events-none absolute right-5 top-[28px] text-inherit">
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
              </div>
         </div>
@@ -262,9 +262,9 @@ export function showEditBeneficiaryDrawer(data) {
     </div>
 </form>
 
-<div class="absolute bottom-0 left-0 right-0 w-full p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-100 dark:border-slate-800 flex justify-end gap-3 z-[60] shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-    <button type="button" id="edit-drawer-cancel-btn" class="px-6 py-3 rounded-none bg-gray-100 text-gray-600 font-black text-[0.625rem] cursor-pointer sm:text-xs uppercase tracking-widest hover:bg-gray-200 transition-all border border-transparent hover:border-gray-300">Cancel</button>
-    <button type="submit" form="edit-beneficiary-drawer-form" class="px-6 py-3 rounded-none bg-brand text-white font-black text-[0.625rem] cursor-pointer sm:text-xs uppercase tracking-widest hover:bg-brand-strong transition-all shadow-lg hover:shadow-brand/40 flex items-center justify-center gap-2">
+<div class="absolute bottom-0 left-0 right-0 grid w-full grid-cols-2 gap-3 border-t border-gray-100 bg-white/95 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 z-[60]">
+    <button type="button" id="edit-drawer-cancel-btn" class="order-2 h-12 rounded-none border border-transparent bg-gray-100 px-4 py-3 text-[0.625rem] font-black uppercase tracking-widest text-gray-600 transition-all hover:border-[#ce1126] hover:bg-[#ce1126] hover:text-white cursor-pointer sm:text-xs">Cancel</button>
+    <button type="submit" form="edit-beneficiary-drawer-form" class="order-1 flex h-12 items-center justify-center gap-2 rounded-none bg-brand px-4 py-3 text-[0.625rem] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-brand-strong hover:shadow-brand/40 cursor-pointer sm:text-xs">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
         Save Changes
     </button>
@@ -1167,7 +1167,7 @@ export function showEditBeneficiaryDrawer(data) {
                         if (window.viewBeneficiary) {
                             // pass ONLY the id. This forces window.viewBeneficiary in modal.js 
                             // to do a fresh fetch from Supabase/MySQL instead of using stale local memory.
-                            setTimeout(() => window.viewBeneficiary({ id: data.id }, 0), 100);
+                            window.viewBeneficiary({ ...beneficiaryData, id: data.id, gip_id: data.id }, 0);
                         }
                         Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Record Updated', showConfirmButton: false, timer: 3000 });
                     }

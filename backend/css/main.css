@@ -176,34 +176,45 @@ body {
     }
 }
 
-/* Skeleton Pulse Animation */
-@keyframes skeleton-pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.5;
-    }
-}
-
+/* Right-moving skeleton shimmer */
 .skeleton {
-    animation: skeleton-pulse 1.5s ease-in-out infinite;
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
-    animation: skeleton-loading 1.5s ease-in-out infinite;
+    animation: skeleton-loading 1.35s linear infinite;
 }
 
 @keyframes skeleton-loading {
-    0% {
-        background-position: 200% 0;
-    }
+    from { background-position: -200% 0; }
+    to { background-position: 200% 0; }
+}
 
-    100% {
-        background-position: -200% 0;
-    }
+.skeleton-wave {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.skeleton-wave::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    pointer-events: none;
+    transform: translateX(-110%);
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 70%), transparent);
+    animation: skeleton-wave-right 1.35s linear infinite;
+}
+
+.dark .skeleton-wave::after {
+    background: linear-gradient(90deg, transparent, rgb(148 163 184 / 18%), transparent);
+}
+
+@keyframes skeleton-wave-right {
+    to { transform: translateX(110%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton,
+    .skeleton-wave::after { animation: none; }
 }
 
 /* Content Fade In */

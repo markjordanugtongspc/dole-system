@@ -61,6 +61,8 @@ export default defineConfig({
         devSourcemap: true,
         postcss: {},
     },
+    // Development keeps diagnostics; production strips every console/debug statement.
+    esbuild: { drop: ['console', 'debugger'] },
     build: {
         outDir: 'dist',
         emptyOutDir: true,

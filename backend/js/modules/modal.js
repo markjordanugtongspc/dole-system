@@ -11,6 +11,44 @@ import { renderSearchStatsChart } from './charts.js';
 import { COMMON_ASSIGNED_UNITS } from './assigned-units.js';
 export { COMMON_ASSIGNED_UNITS };
 
+let drawerLogRealtimeChannel = null;
+let drawerLogRealtimeKey = null;
+let drawerLogRefreshTimer = null;
+
+function subscribeDrawerLogRealtime(gipId, beneficiaryDbId, beneficiaryData, page) {
+    if (!isSupabaseMode() || !supabase || !beneficiaryDbId) return;
+
+    const channelKey = String(beneficiaryDbId);
+    if (drawerLogRealtimeKey === channelKey) return;
+
+    if (drawerLogRealtimeChannel) {
+        supabase.removeChannel(drawerLogRealtimeChannel);
+        drawerLogRealtimeChannel = null;
+    }
+    drawerLogRealtimeKey = channelKey;
+
+    const refreshDrawerLogs = () => {
+        clearTimeout(drawerLogRefreshTimer);
+        drawerLogRefreshTimer = setTimeout(() => {
+            const drawer = document.getElementById('beneficiary-drawer-container');
+            if (drawer?.dataset.beneficiaryId === String(gipId) && window.viewBeneficiary) {
+                window.viewBeneficiary({ ...beneficiaryData, id: gipId }, page);
+            }
+        }, 100);
+    };
+
+    const changeFilter = `beneficiary_id=eq.${beneficiaryDbId}`;
+    drawerLogRealtimeChannel = supabase
+        .channel(`gip-drawer-logs-${channelKey}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_time_records', filter: changeFilter }, refreshDrawerLogs)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'accomplishment_reports', filter: changeFilter }, refreshDrawerLogs)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiary_documents', filter: changeFilter }, refreshDrawerLogs)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'absorption_logs', filter: changeFilter }, refreshDrawerLogs)
+        .subscribe((status) => {
+            console.info('[GIP Realtime] Drawer log subscription', { gipId, status });
+        });
+}
+
 export function initModalHandler() {
     // Expose the functions to the global window object
     window.showAddDataModal = showAddDataModal;
@@ -74,13 +112,8 @@ export function initModalHandler() {
             }
         }
 
-        const cacheKey = `logs_cache_${beneficiaryId}`;
-
-        // STEP 1: Open drawer IMMEDIATELY — use cache if available, else empty logs
-        const cachedLogs = (window.__doleDB?.getSecureCache)
-            ? await window.__doleDB.getSecureCache(cacheKey)
-            : null;
-        const hadCache = !!cachedLogs;
+        const cachedLogs = null;
+        const hadCache = false;
 
         beneficiaryData.arLogs = cachedLogs?.arLogs || [];
         beneficiaryData.dtrLogs = cachedLogs?.dtrLogs || [];
@@ -92,14 +125,54 @@ export function initModalHandler() {
 
         // STEP 2: Background network fetch (does not block drawer open)
         try {
-            // [HYBRID-BRIDGE] Use authorized PHP API for logs/docs to bypass RLS
-            const [arRes, dtrRes, docRes, absRes] = await Promise.all([
+            const unavailableResult = {
+                success: false,
+                error: 'Supabase browser read unavailable',
+                data: { success: false, logs: [] }
+            };
+            const getSupabaseLogs = async () => {
+                const { data: beneficiary, error } = await supabase.from('beneficiaries').select('beneficiary_id').eq('gip_id', beneficiaryId).maybeSingle();
+                if (error || !beneficiary?.beneficiary_id) {
+                    console.warn('[GIP Logs] Beneficiary lookup unavailable in Supabase; using API fallback.', {
+                        gipId: beneficiaryId,
+                        message: error?.message || 'No row visible to the browser role'
+                    });
+                    return [unavailableResult, unavailableResult, unavailableResult, unavailableResult];
+                }
+                const id = beneficiary.beneficiary_id;
+                subscribeDrawerLogRealtime(beneficiaryId, id, beneficiaryData, page);
+                const [ar, dtr, docs, absorption] = await Promise.all([
+                    supabase.from('accomplishment_reports').select('ar_id, period, date_submitted, status, created_at, updated_at').eq('beneficiary_id', id).order('date_submitted', { ascending: false }),
+                    supabase.from('daily_time_records').select('dtr_id, record_date, weekday, status, created_at, updated_at').eq('beneficiary_id', id).order('record_date', { ascending: false }),
+                    supabase.from('beneficiary_documents').select('doc_id, document_name, status, updated_at').eq('beneficiary_id', id).order('document_name'),
+                    supabase.from('absorption_logs').select('log_id, absorption_datetime, where, position, agency').eq('beneficiary_id', id).order('absorption_datetime', { ascending: false })
+                ]);
+                const result = (response, mapper) => ({ success: !response.error, data: { success: !response.error, logs: (response.data || []).map(mapper) } });
+                return [
+                    result(ar, row => ({ id: row.ar_id, period: row.period, date: row.date_submitted, status: row.status, created_at: row.created_at, updated_at: row.updated_at })),
+                    result(dtr, row => ({ id: row.dtr_id, date: row.record_date, day: row.weekday, period: row.record_date, status: row.status, created_at: row.created_at, updated_at: row.updated_at })),
+                    result(docs, row => ({ id: row.doc_id, name: row.document_name, status: row.status, updated_at: row.updated_at })),
+                    result(absorption, row => ({ id: row.log_id, absorption_datetime: row.absorption_datetime, where: row.where, position: row.position, agency: row.agency }))
+                ];
+            };
+            const fetchLogsFromApi = () => Promise.all([
                 apiGet(`api/logs.php?type=ar&gip_id=${encodeURIComponent(beneficiaryId)}`),
                 apiGet(`api/logs.php?type=dtr&gip_id=${encodeURIComponent(beneficiaryId)}`),
                 apiGet(`api/logs.php?type=docs&gip_id=${encodeURIComponent(beneficiaryId)}`),
                 apiGet(`api/logs.php?type=absorption&gip_id=${encodeURIComponent(beneficiaryId)}`)
             ]);
+            let logResponses = isSupabaseMode() && supabase
+                ? await getSupabaseLogs()
+                : await fetchLogsFromApi();
 
+            // RLS can deny the anonymous browser role even though the authenticated
+            // server route is allowed to read. Never replace real drawer data with
+            // empty arrays in that situation.
+            if (!logResponses.every((response) => response.success && response.data?.success)) {
+                console.warn('[GIP Logs] Supabase read unavailable; using the server route.');
+                logResponses = await fetchLogsFromApi();
+            }
+            const [arRes, dtrRes, docRes, absRes] = logResponses;
             const fetchedArLogs = (arRes.success && arRes.data?.success) ? arRes.data.logs : [];
             const fetchedDtrLogs = (dtrRes.success && dtrRes.data?.success) ? dtrRes.data.logs : [];
             const fetchedDocs = (docRes.success && docRes.data?.success) ? docRes.data.logs : [];
@@ -113,14 +186,6 @@ export function initModalHandler() {
                 beneficiaryData.absorb_agency = latest.agency || latest.absorb_agency;
             }
 
-            // Save fresh data to cache
-            if (window.__doleDB?.setSecureCache) {
-                await window.__doleDB.setSecureCache(cacheKey, {
-                    arLogs: fetchedArLogs,
-                    dtrLogs: fetchedDtrLogs,
-                    docs: fetchedDocs
-                });
-            }
 
             // STEP 3: Re-render when the fetched data differs from what is currently displayed.
             // Covers first visit (no cache) AND post-mutation refresh (cache now stale).

@@ -45,6 +45,27 @@ function isViteRunning()
 }
 
 /**
+ * Read the explicitly configured application mode from the project .env.
+ * This avoids cross-environment loopback probes failing when PHP runs in WSL
+ * while the Vite dev server runs on Windows.
+ */
+function isConfiguredDevelopmentMode()
+{
+    $envPath = __DIR__ . '/.env';
+    if (!file_exists($envPath)) {
+        return false;
+    }
+
+    foreach (file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        if (preg_match('/^\s*APP_ENV\s*=\s*["\']?([^"\'\s#]+)["\']?\s*$/i', trim($line), $matches)) {
+            return strtolower($matches[1]) === 'development';
+        }
+    }
+
+    return false;
+}
+
+/**
  * Get Base Path (e.g., /github/dole-system)
  */
 function getBaseUrl()
@@ -69,7 +90,7 @@ function vite($entry)
     $baseUrl = getBaseUrl();
     static $cssLoaded = false;
 
-    if (isViteRunning()) {
+    if (isConfiguredDevelopmentMode() || isViteRunning()) {
         // Development mode
         $viteHost = getViteHost();
         if (!$cssLoaded) {

@@ -465,16 +465,16 @@ require_once __DIR__ . '/../../config/vite.php';
                     </div>
                 </div>
 
-                <div class="overflow-hidden">
-                    <table class="w-full table-fixed text-[0.625rem] text-left text-body sm:text-xs lg:text-sm">
+                <div class="overflow-x-auto overscroll-x-contain">
+                    <table id="beneficiary-data-table" class="w-full min-w-[1180px] table-auto text-[0.625rem] text-left text-body sm:text-xs lg:text-sm xl:min-w-full">
                         <!-- Primary Color Header -->
                         <thead class="text-sm text-white bg-royal-blue border-b border-royal-blue/20">
                             <tr>
-                                <th scope="col" class="w-[32%] px-2 py-2.5 font-medium text-center md:w-[22%] lg:w-[18%] lg:px-4"
+                                <th scope="col" class="min-w-[280px] px-2 py-2.5 font-medium text-center lg:px-4"
                                     title="Last Name, First Name, Middle Initial">
                                     NAME
                                 </th>
-                                <th scope="col" class="hidden w-[24%] px-2 py-2.5 font-medium text-center lg:table-cell lg:px-4">
+                                <th scope="col" class="hidden min-w-[340px] px-2 py-2.5 font-medium text-center lg:table-cell lg:px-4">
                                     ADDRESS
                                 </th>
                                 <th scope="col" class="w-[12%] px-1 py-2.5 font-medium whitespace-nowrap text-center md:w-[8%] lg:w-[7%] lg:px-2">

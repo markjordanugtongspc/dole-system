@@ -82,7 +82,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                 d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                         </svg>
                         <span class="text-xs font-bold text-royal-blue"><span
-                                class="metric-total-beneficiaries"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span> Beneficiaries</span>
+                                class="metric-total-beneficiaries"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span> Beneficiaries</span>
                     </div>
 
                     <?php include __DIR__ . '/../components/notification.php'; ?>
@@ -176,7 +176,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                     Total Beneficiaries
                                 </p>
                                 <h3
-                                    class="text-3xl sm:text-4xl font-black text-royal-blue dark:text-blue-400 group-hover:translate-x-1 transition-transform duration-500 metric-total-beneficiaries"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h3>
+                                    class="text-3xl sm:text-4xl font-black text-royal-blue dark:text-blue-400 group-hover:translate-x-1 transition-transform duration-500 metric-total-beneficiaries"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h3>
                             </div>
                             <div
                                 class="shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:rotate-6 group-hover:scale-110 shadow-inner">
@@ -197,7 +197,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div class="relative z-10 flex items-center justify-between gap-4">
                             <div class="min-w-0">
                                 <p class="mb-1 whitespace-nowrap text-[0.5625rem] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 sm:text-[0.625rem]">Total Male</p>
-                                <h3 class="metric-male-ratio text-3xl font-black text-blue-600 transition-transform duration-500 group-hover:translate-x-1 dark:text-blue-400 sm:text-4xl"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h3>
+                                <h3 class="metric-male-ratio text-3xl font-black text-blue-600 transition-transform duration-500 group-hover:translate-x-1 dark:text-blue-400 sm:text-4xl"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h3>
                             </div>
                             <div class="flex h-12 w-12 shrink-0 items-center justify-center border border-blue-100 bg-blue-50 text-blue-600 shadow-inner transition-all duration-500 group-hover:rotate-6 group-hover:scale-110 dark:border-blue-900/50 dark:bg-blue-900/30 dark:text-blue-300 sm:h-14 sm:w-14">
                                 <svg class="h-7 w-7 sm:h-8 sm:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.25" aria-hidden="true">
@@ -216,7 +216,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         <div class="relative z-10 flex items-center justify-between gap-4">
                             <div class="min-w-0">
                                 <p class="mb-1 whitespace-nowrap text-[0.5625rem] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 sm:text-[0.625rem]">Total Female</p>
-                                <h3 class="metric-female-ratio text-3xl font-black text-pink-500 transition-transform duration-500 group-hover:translate-x-1 dark:text-pink-400 sm:text-4xl"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h3>
+                                <h3 class="metric-female-ratio text-3xl font-black text-pink-500 transition-transform duration-500 group-hover:translate-x-1 dark:text-pink-400 sm:text-4xl"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h3>
                             </div>
                             <div class="flex h-12 w-12 shrink-0 items-center justify-center border border-pink-100 bg-pink-50 text-pink-500 shadow-inner transition-all duration-500 group-hover:-rotate-6 group-hover:scale-110 dark:border-pink-900/50 dark:bg-pink-900/30 dark:text-pink-300 sm:h-14 sm:w-14">
                                 <svg class="h-7 w-7 sm:h-8 sm:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.25" aria-hidden="true">
@@ -239,8 +239,8 @@ require_once __DIR__ . '/../../config/vite.php';
                                     class="text-[0.5625rem] sm:text-[0.625rem] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 whitespace-nowrap">
                                     Highest Age Share
                                 </p>
-                                <h3 class="metric-top-age-label text-3xl sm:text-4xl font-black text-heading dark:text-white group-hover:translate-x-1 transition-transform duration-500"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h3>
-                                <p class="metric-top-age-share mt-1 text-[0.625rem] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></p>
+                                <h3 class="metric-top-age-label text-3xl sm:text-4xl font-black text-heading dark:text-white group-hover:translate-x-1 transition-transform duration-500"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h3>
+                                <p class="metric-top-age-share mt-1 text-[0.625rem] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></p>
                             </div>
                             <div
                                 class="shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-gray-100 dark:bg-slate-700/50 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:skew-x-3 group-hover:scale-110 shadow-inner">
@@ -273,7 +273,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                     class="text-[0.625rem] sm:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">
                                     Live Statistics</p>
                                 <h5 id="added-metric-value"
-                                    class="text-3xl sm:text-5xl font-black transition-colors duration-500 leading-none metric-added-count"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h5>
+                                    class="text-3xl sm:text-5xl font-black transition-colors duration-500 leading-none metric-added-count"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></h5>
                                 <p class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 mt-2">Total
                                     Added Beneficiaries</p>
                             </div>
@@ -284,7 +284,7 @@ require_once __DIR__ . '/../../config/vite.php';
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M12 6v13m0-13 4 4m-4-4-4 4" />
                                 </svg>
-                                <span class="metric-added-rate"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span>
+                                <span class="metric-added-rate"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span>
                             </div>
                         </div>
 
@@ -343,13 +343,13 @@ require_once __DIR__ . '/../../config/vite.php';
                                 <div
                                     class="flex items-center px-2 py-1 text-[0.625rem] font-black text-philippine-red bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-900/30 shadow-xs">
                                     <span class="w-2 h-2 rounded-full bg-philippine-red me-2 animate-pulse"></span>
-                                    <span class="metric-female-ratio uppercase"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span>
+                                    <span class="metric-female-ratio uppercase"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span>
                                 </div>
                                 <div
                                     class="flex items-center px-2 py-1 text-[0.625rem] font-black text-royal-blue bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-900/30 shadow-xs">
                                     <span
                                         class="w-2 h-2 rounded-full bg-royal-blue me-2 shadow-[0_0_8px_rgba(0,56,168,0.5)]"></span>
-                                    <span class="metric-male-ratio uppercase"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span>
+                                    <span class="metric-male-ratio uppercase"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span>
                                 </div>
                             </div>
                         </div>
@@ -502,7 +502,7 @@ require_once __DIR__ . '/../../config/vite.php';
                         </div>
                         <div class="shrink-0 border-l-4 border-royal-blue bg-blue-50 px-4 py-3 text-left dark:bg-blue-950/30 sm:text-right">
                             <span class="block text-[0.5625rem] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Data Year</span>
-                            <span id="age-chart-year" class="mt-1 block text-2xl font-black leading-none text-royal-blue dark:text-blue-400"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle motion-safe:animate-pulse dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span>
+                            <span id="age-chart-year" class="mt-1 block text-2xl font-black leading-none text-royal-blue dark:text-blue-400"><span role="status" aria-label="Loading" class="relative inline-block h-[0.72em] w-[2.5em] overflow-hidden rounded-sm bg-gray-200 align-middle dark:bg-gray-700"><span class="dashboard-skeleton-sweep absolute inset-y-0 -left-full w-full bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/20"></span><span class="sr-only">Loading</span></span></span>
                             <span class="mt-1 block text-[0.5625rem] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Latest recorded year</span>
                         </div>
                     </div>

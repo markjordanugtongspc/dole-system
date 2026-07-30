@@ -146,7 +146,7 @@ async function loadNotifications() {
  */
 function showLoadingState(container) {
     container.innerHTML = `
-        <div role="status" class="max-w-md p-4 space-y-4 border-b border-default divide-y divide-default rounded-base animate-pulse md:p-6 dark:divide-slate-700/50">
+        <div role="status" class="max-w-md p-4 space-y-4 border-b border-default divide-y divide-default rounded-base skeleton-wave md:p-6 dark:divide-slate-700/50">
             <div class="flex items-center justify-between pt-4 first:pt-0">
                 <div class="flex items-center gap-3">
                     <div class="w-11 h-11 skeleton-component rounded-full shrink-0"></div>

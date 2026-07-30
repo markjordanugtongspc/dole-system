@@ -167,7 +167,7 @@ class BeneficiaryDrawerViewController {
 // START: Create reusable animated rows for database-backed drawer loading states.
 function createDrawerSkeletonRows(count = 3) {
     return Array.from({ length: count }, (_, index) => `
-        <div class="animate-pulse border border-gray-100 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800" aria-hidden="true">
+        <div class="skeleton-wave border border-gray-100 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800" aria-hidden="true">
             <div class="h-2.5 ${index % 2 === 0 ? 'w-2/5' : 'w-1/3'} rounded-full bg-gray-200 dark:bg-slate-700"></div>
             <div class="mt-3 h-3.5 ${index % 2 === 0 ? 'w-4/5' : 'w-3/5'} rounded-full bg-gray-300 dark:bg-slate-600"></div>
         </div>
@@ -175,6 +175,32 @@ function createDrawerSkeletonRows(count = 3) {
 }
 // END: Create reusable animated rows for database-backed drawer loading states.
 
+// Keep profile labels stable while only database-backed values shimmer.
+function createProfileSkeletonRows() {
+    const labels = ['Contact No.', 'Address', 'Birthday', 'Age', 'Gender', 'Education', 'Designated Beneficiary', 'Relationship to Assured'];
+    return labels.map((label, index) => `
+        <div class="grid grid-cols-[8.5rem_minmax(0,1fr)] items-center gap-4">
+            <span class="whitespace-nowrap font-medium text-gray-500">${label}</span>
+            <span class="skeleton-wave block h-3.5 ${index % 3 === 0 ? 'w-2/3' : index % 3 === 1 ? 'w-full' : 'w-1/2'} rounded-full bg-gray-200 dark:bg-slate-700" aria-hidden="true"></span>
+        </div>
+    `).join('');
+}
+
+async function saveDrawerLog(type, payload) {
+    // Writes go through the authenticated server route. The browser uses Supabase
+    // Realtime to receive the resulting database change without a cache refresh.
+    const result = await apiPost(`api/logs.php?type=${encodeURIComponent(type)}`, payload);
+    const response = result.success ? result.data : null;
+
+    if (!result.success || !response?.success) {
+        const message = response?.error || result.error || 'The log could not be saved.';
+        console.error('[GIP Logs] Save failed', { type, gipId: payload.gip_id, message });
+        return { success: false, error: message };
+    }
+
+    console.info('[GIP Logs] Saved to database', { type, gipId: payload.gip_id, id: response.id });
+    return result;
+}
 export function showBeneficiaryDrawer(data, initialPage = 0) {
     const isProfileLoading = Boolean(data?._isLoadingProfile);
     const isLogsLoading = Boolean(data?._isLoadingLogs);
@@ -217,7 +243,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
     <div class="mt-5 min-w-0">
         ${isProfileLoading ? `
-            <div class="animate-pulse" aria-label="Loading beneficiary profile" role="status">
+            <div class="skeleton-wave" aria-label="Loading beneficiary profile" role="status">
                 <div class="h-5 w-3/5 rounded-full bg-gray-300 dark:bg-slate-700"></div>
                 <div class="mt-2 h-5 w-24 rounded-full border border-dashed border-gray-300 bg-gray-100 dark:border-slate-600 dark:bg-slate-800"></div>
                 <span class="sr-only">Loading beneficiary profile</span>
@@ -235,13 +261,13 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         <div class="min-w-0">
             <span class="mb-1.5 block text-[0.5625rem] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Remarks</span>
             ${isProfileLoading
-                ? '<span class="block h-8 w-full animate-pulse border border-gray-200 bg-gray-200 dark:border-slate-700 dark:bg-slate-700"></span>'
+                ? '<span class="skeleton-wave block h-8 w-full border border-gray-200 bg-gray-200 dark:border-slate-700 dark:bg-slate-700"></span>'
                 : `<span class="${getStatusClass(data.remarks)} block min-h-8 w-full truncate border border-l-4 ${data.remarks === 'ONGOING' || data.remarks === 'ABSORBED' ? 'border-l-emerald-600 dark:border-l-emerald-500' : 'border-l-red-600 dark:border-l-red-500'} px-2 py-1.5 text-center text-[0.5625rem] font-black uppercase tracking-wider shadow-sm" title="${data.remarks}">${data.remarks}</span>`}
         </div>
         <div class="min-w-0">
             <span class="mb-1.5 block text-[0.5625rem] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Office</span>
             ${isProfileLoading
-                ? '<span class="block h-8 w-full animate-pulse border border-gray-200 bg-gray-200 dark:border-slate-700 dark:bg-slate-700"></span>'
+                ? '<span class="skeleton-wave block h-8 w-full border border-gray-200 bg-gray-200 dark:border-slate-700 dark:bg-slate-700"></span>'
                 : `<span class="block min-h-8 w-full truncate border border-red-700 border-l-4 bg-red-600 px-2 py-1.5 text-center text-[0.5625rem] font-black uppercase tracking-wider text-white shadow-sm dark:border-red-800 dark:bg-red-700" title="${data.office}">${data.office}</span>`}
         </div>
     </div>
@@ -251,11 +277,11 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 <div class="flex justify-between items-end gap-3 mb-4 border-y border-default pt-2">
     <h4 id="drawer-section-title" class="mb-2 border-b-2 border-brand pb-1.5 text-sm font-bold text-heading uppercase tracking-widest">Personal Profile</h4>
     <div class="flex shrink-0 gap-2 pb-3">
-        <button type="button" id="drawer-prev-btn" class="hidden flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-default-medium bg-neutral-secondary-medium px-3 py-2 text-[0.5625rem] font-black uppercase tracking-widest text-heading shadow-sm transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-95 active:bg-red-100 dark:hover:border-red-800 dark:hover:bg-red-950/60 dark:hover:text-red-300 cursor-pointer">
+        <button type="button" id="drawer-prev-btn" class="hidden flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-default-medium bg-neutral-secondary-medium px-4 py-2 text-[0.5625rem] font-black uppercase tracking-widest text-heading shadow-sm transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-95 active:bg-red-100 dark:hover:border-red-800 dark:hover:bg-red-950/60 dark:hover:text-red-300 cursor-pointer">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
             PREV
         </button>
-        <button type="button" id="drawer-next-btn" class="flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-brand px-3 py-2 text-center text-[0.5625rem] font-black uppercase tracking-widest text-white shadow-sm shadow-brand-medium/50 transition-all hover:bg-brand-strong active:scale-95 cursor-pointer">
+        <button type="button" id="drawer-next-btn" class="flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-brand px-4 py-2 text-center text-[0.5625rem] font-black uppercase tracking-widest text-white shadow-sm shadow-brand-medium/50 transition-all hover:bg-brand-strong active:scale-95 cursor-pointer">
             NEXT
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
         </button>
@@ -264,7 +290,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
 <div id="personal-profile-section" class="transition-all duration-300">
     <div class="flex flex-col gap-4 sm:gap-y-4.5 text-sm mt-3 px-1 mb-8">
-        ${isProfileLoading ? createDrawerSkeletonRows(7) : `
+        ${isProfileLoading ? createProfileSkeletonRows() : `
         <div class="flex justify-between items-center gap-4 group sm:grid sm:grid-cols-[8.5rem_minmax(0,1fr)]">
             <span class="text-gray-500 font-medium whitespace-nowrap">Contact No.</span>
             <span class="${data.contact ? 'font-black text-heading font-mono' : 'font-bold text-gray-300 italic'} min-w-0 truncate text-right sm:text-left">${data.contact || 'NOT PROVIDED'}</span>
@@ -564,7 +590,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     </div>
                     <span class="drawer-doc-status ml-auto shrink-0 text-[0.5625rem] font-black uppercase tracking-wider ${documentTextColor}">${documentStatusLabel}</span>
                     <svg class="drawer-doc-cue ml-3 size-5 shrink-0 transition-transform group-hover/card:scale-110 ${documentTextColor}" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 12h.01M12 12h.01M18 12h.01"/></svg>
-                    <div class="drawer-doc-actions ml-3 hidden shrink-0 items-center gap-1.5" aria-hidden="true">
+                    <div class="drawer-doc-actions ml-3 hidden shrink-0 items-center gap-1.5">
                         <button type="button" class="doc-status-action group relative flex size-8 cursor-pointer items-center justify-center rounded-full border transition-all ${verifyActionClass}" data-status="COMPLETED" aria-label="Submit document" aria-pressed="${isCompleted}">
                             <svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="m5 13 4 4L19 7"/></svg>
                             <span class="pointer-events-none absolute bottom-full right-0 z-20 mb-2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">Submitted</span>
@@ -597,11 +623,11 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         background: transparent;
     }
     #beneficiary-drawer-container::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.05);
+        background: rgba(0, 0, 0, 0.025);
         border-radius: 20px;
     }
     .dark #beneficiary-drawer-container::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.025);
     }
     #beneficiary-drawer-container::-webkit-scrollbar-thumb:hover {
         background: rgba(0, 0, 0, 0.1);
@@ -687,7 +713,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
         // START: Measure whether a toast can fit directly beside the drawer.
         const getDrawerToastPlacement = () => {
-            const drawerRect = drawerContainer.getBoundingClientRect();
+            const activeDrawer = document.getElementById('beneficiary-drawer-container') || drawerContainer;
+            const drawerRect = activeDrawer.getBoundingClientRect();
             const availableLeftSpace = Math.max(0, drawerRect.left);
             return {
                 canDockBesideDrawer: window.innerWidth >= 640 && availableLeftSpace >= 280,
@@ -703,21 +730,24 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
             return Swal.fire({
                 toast: true,
-                position: placement.canDockBesideDrawer ? 'bottom-end' : 'bottom',
+                position: 'bottom-end',
                 icon,
                 title,
                 showConfirmButton: false,
                 timer,
                 didOpen: (toast) => {
-                    if (!placement.canDockBesideDrawer) return;
+                    const livePlacement = getDrawerToastPlacement();
+                    if (!livePlacement.canDockBesideDrawer) return;
 
                     const toastContainer = toast.closest('.swal2-container');
                     if (!toastContainer) return;
 
-                    toastContainer.style.right = `${placement.drawerOffset + 12}px`;
-                    toastContainer.style.left = '0';
+                    toastContainer.style.inset = 'auto';
+                    toastContainer.style.right = (livePlacement.drawerOffset + 12) + 'px';
+                    toastContainer.style.bottom = '12px';
+                    toastContainer.style.left = 'auto';
                     toastContainer.style.width = 'auto';
-                    toast.style.maxWidth = `${Math.min(352, placement.availableLeftSpace - 24)}px`;
+                    toast.style.maxWidth = `${Math.min(352, livePlacement.availableLeftSpace - 24)}px`;
                 }
             });
         };
@@ -766,7 +796,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
             try {
                 const apiMapping = { COMPLETED: 'VERIFIED', REJECTED: 'DECLINED', PENDING: 'PENDING' };
-                const result = await apiPost('api/logs.php?type=docs', {
+                const result = await saveDrawerLog('docs', {
                     gip_id: data.id,
                     doc_name: card.dataset.name,
                     status: apiMapping[newStatus] || newStatus
@@ -774,8 +804,10 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 const json = result.success ? result.data : { success: false, error: result.error };
 
                 if (!json.success) throw new Error(json.error || 'Failed to update document status.');
+                if (window.viewBeneficiary) {
+                    await window.viewBeneficiary(data, viewController.currentPage);
+                }
                 showInlineToast('success', 'Status updated!');
-                if (window.viewBeneficiary) window.viewBeneficiary(data, viewController.currentPage);
             } catch (error) {
                 card.dataset.loading = 'false';
                 card.removeAttribute('aria-busy');
@@ -950,16 +982,23 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 }
                 if (dbType === 'ar') payload.period = autoVal;
 
-                const result = await apiPost(`api/logs.php?type=${dbType}`, payload);
+                const result = await saveDrawerLog(dbType, payload);
                 const json = result.success ? result.data : { success: false, error: result.error };
 
                 if (json.success) {
-                    showInlineToast('success', 'Auto-Added!', 1500);
-                    if (window.viewBeneficiary) window.viewBeneficiary(data, viewController.currentPage);
+                    if (window.viewBeneficiary) {
+                        await window.viewBeneficiary(data, viewController.currentPage);
+                    }
+                    showInlineToast('success', 'Successfully Added', 1500);
                 } else {
-                    Swal.fire('Error', 'Failed to add log.', 'error');
+                    const message = json.error || 'Failed to add log.';
+                    console.error('[GIP Logs] Auto-add rejected', { type: dbType, gipId: data.id, message });
+                    Swal.fire('Error', message, 'error');
                 }
-            } catch (e) { Swal.fire('Error', e.message, 'error'); }
+            } catch (error) {
+                console.error('[GIP Logs] Auto-add threw', { type: dbType, gipId: data.id, error });
+                Swal.fire('Error', error.message || 'Failed to add log.', 'error');
+            }
         };
 
         // Edit Log Logic
@@ -1139,8 +1178,10 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             const editor = document.createElement('div');
             editor.className = 'inline-log-editor absolute inset-0 z-10 flex items-center gap-1 rounded-xl bg-white px-2 shadow-lg dark:bg-slate-900';
             editor.innerHTML = '<input type="text" class="inline-log-date w-[38%] min-w-0 shrink-0 rounded-lg border border-brand/40 bg-transparent px-2 py-1.5 text-xs font-black uppercase text-heading outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" value="' + initialDate + '" aria-label="Select log date">' +
-                '<button type="button" data-status="VERIFIED" class="inline-log-status rounded-md px-2.5 py-2 text-[0.5625rem] font-black uppercase tracking-wider transition-colors" aria-label="Set submitted status">SUBMITTED</button>' +
-                '<button type="button" data-status="PENDING" class="inline-log-status rounded-md px-2.5 py-2 text-[0.5625rem] font-black uppercase tracking-wider transition-colors" aria-label="Set pending status">PENDING</button>';
+                '<div class="ml-auto flex shrink-0 items-center gap-1">' +
+                    '<button type="button" data-status="VERIFIED" class="inline-log-status rounded-md px-2.5 py-2 text-[0.5625rem] font-black uppercase tracking-wider transition-colors" aria-label="Set submitted status">SUBMITTED</button>' +
+                    '<button type="button" data-status="PENDING" class="inline-log-status rounded-md px-2.5 py-2 text-[0.5625rem] font-black uppercase tracking-wider transition-colors" aria-label="Set pending status">PENDING</button>' +
+                '</div>';
             btn.appendChild(editor);
 
             const dateInput = editor.querySelector('.inline-log-date');
@@ -1269,5 +1310,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         });
         // END: Delete DTR/AR logs through inline confirm and loading states.
 
-    }).catch(console.error);
+    }).catch((error) => {
+        console.error('[GIP Drawer] Initialization failed', error);
+    });
 }

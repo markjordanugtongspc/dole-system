@@ -21,7 +21,6 @@ import { getBasePath } from './modules/auth.js';
 import { initNotifications } from './modules/notifications.js';
 import { initDarkMode } from './modules/darkmode.js';
 import { initTextSize } from './modules/textsize.js';
-import { initSyncIndicator, startSyncWorker } from './modules/sync-manager.js';
 import { initWageCalculator } from './modules/wage-calculator.js';
 
 // [HYBRID] Initialize Smart Loader immediately (handles FOUC & pre-loading state)
@@ -57,10 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadUserProfile();
     initNotifications();
     initWageCalculator();
-
-    // Offline-First: Initialize sync indicator pill and start background worker
-    initSyncIndicator();
-    startSyncWorker();
 
     // Page specific initialization
     if (path.includes('/export/') && !path.includes('log.php')) {

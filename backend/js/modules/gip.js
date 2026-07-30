@@ -3,15 +3,6 @@ import { createNotification } from './notifications.js';
 import { apiGet, apiPatch, apiRequest, reinitFlowbite, generateChecksum } from './ajax-manager.js';
 import { supabase } from './supabase-client.js';
 import { isSupabaseMode } from './auth.js';
-import {
-    cacheBeneficiaries,
-    getLocalBeneficiaries,
-    upsertLocalBeneficiary,
-    deleteLocalBeneficiary,
-    getTimeSinceLastSync,
-    enqueueSync,
-} from './db-manager.js';
-import { processQueue } from './sync-manager.js';
 import { showLogsExportModal } from './logs-export.js';
 import Swal from 'sweetalert2';
 
@@ -44,8 +35,6 @@ let currentPage = getPageFromUrl();
 const itemsPerPage = 10;
 let filteredDataGlobal = null; // Store current filtered state for pagination
 let isInitialDataHydrating = true;
-let lastSupabaseFetchTime = parseInt(localStorage.getItem('gip_last_supabase_fetch') || '0');
-const FETCH_THROTTLE_MS = 5 * 60 * 1000; // 5 minutes (persisted across navigations)
 let genderMap = {};
 let statusMap = {};
 let officeMap = {}; // keyed by offices.id → display name (e.g., "LGU - ILIGAN")
@@ -417,98 +406,29 @@ function populateYearFilter() {
     yearSelect.value = currentYearFilter;
 }
 /**
- * Load beneficiaries — Offline-First Strategy:
- * 1. Instantly serve from IndexedDB (local cache) — zero network wait
- * 2. Fetch fresh data from remote API in background
- * 3. If data changed, update local cache and re-render
+ * Load beneficiaries from the server source of truth. Supabase Realtime refreshes open clients after database changes.
  */
-export async function loadBeneficiaries(forceRemoteRefresh = false) {
-    // ── STEP 1: Serve from local cache immediately ───────────────────────────
-    let localData = await getLocalBeneficiaries();
-    // Cache migration: old records stored before officeId mapping was added have
-    // officeId=undefined. Force a fresh fetch so the filter works correctly.
-    if (localData.length > 0 && localData[0].officeId === undefined) {
-        await cacheBeneficiaries([]);
-        localData = [];
-        forceRemoteRefresh = true;
-    }
-    if (localData.length > 0) {
-        beneficiaries = localData;
-        syncExpiredStatusesLocally(beneficiaries);
-
-        // If the cached records are missing date fields, force a remote refresh
-        // (prevents stale `N/A` while the remote DB actually has values).
-        const hasMissingDates = beneficiaries.some(b =>
-            (!b.startDateFormatted && !b.startDate) || (!b.endDateFormatted && !b.endDate)
-        );
-        window.__gip_hasMissingDates = hasMissingDates;
-
-        // Initialize checksum so polling can correctly detect changes immediately.
-        lastDataChecksum = generateChecksum(beneficiaries);
-        populateYearFilter();
-        updateFilterUI();
-        const savedSort = localStorage.getItem('gip_sort_preference');
-        sortData(savedSort || 'name_asc', false);
-        console.log(`[Offline-First] Rendered ${localData.length} records from local cache`);
-    } else {
-        // Cache empty — show loading skeleton so user doesn't see "No beneficiaries found"
-        // while the remote fetch is in-flight.
-        const tbody = document.getElementById('beneficiary-table-body');
-        if (tbody) {
-            // ── SKELETON LOADING ────────────────────────────────────────────────
-            const skeletonRow = (widths) => `
-                <div class="flex items-center justify-between py-3">
-                    ${widths.map(w => `<div class="h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full ${w}"></div>`).join('')}
-                </div>`;
-            const skeletonRows = [
-                ['w-16', 'w-40', 'w-20', 'w-16', 'w-24', 'w-14', 'w-10'],
-                ['w-20', 'w-32', 'w-16', 'w-20', 'w-20', 'w-12', 'w-10'],
-                ['w-14', 'w-44', 'w-18', 'w-14', 'w-28', 'w-16', 'w-10'],
-                ['w-18', 'w-36', 'w-20', 'w-18', 'w-20', 'w-14', 'w-10'],
-                ['w-16', 'w-40', 'w-14', 'w-16', 'w-24', 'w-12', 'w-10'],
-                ['w-20', 'w-28', 'w-18', 'w-20', 'w-20', 'w-16', 'w-10'],
-                ['w-14', 'w-44', 'w-16', 'w-14', 'w-28', 'w-14', 'w-10'],
-                ['w-18', 'w-32', 'w-20', 'w-18', 'w-20', 'w-12', 'w-10'],
-            ];
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="8" class="px-6 pt-2 pb-1">
-                        <div role="status" class="animate-pulse">
-                            ${skeletonRows.map(skeletonRow).join('')}
-                            <span class="sr-only">Loading...</span>
-                        </div>
+export async function loadBeneficiaries() {
+    const tbody = document.getElementById('beneficiary-table-body');
+    if (tbody && beneficiaries.length === 0) {
+        const skeletonWidths = ['w-40', 'w-56', 'w-8', 'w-14', 'w-20', 'w-20', 'w-16', 'w-12'];
+        tbody.innerHTML = Array.from({ length: 8 }, () => `
+            <tr class="border-b border-blue-100 bg-blue-50/60" aria-hidden="true">
+                ${skeletonWidths.map(width => `
+                    <td class="px-3 py-4">
+                        <span class="skeleton-wave mx-auto block h-3 ${width} max-w-full rounded-full bg-gray-200 dark:bg-slate-700"></span>
                     </td>
-                </tr>`;
-            tbody.setAttribute('aria-busy', 'true');
-            // ── END SKELETON LOADING ────────────────────────────────────────────
-        }
+                `).join('')}
+            </tr>
+        `).join('');
+        tbody.setAttribute('aria-busy', 'true');
     }
-
-    // ── STEP 2: Check if we should refresh from remote ──────────────────────
-    const msSinceSync = await getTimeSinceLastSync();
-    const CACHE_TTL = 30 * 1000; // 30 seconds — only re-fetch if cache is stale
-
-    if (!forceRemoteRefresh && msSinceSync < CACHE_TTL && localData.length > 0) {
-        const hasMissingDates = window.__gip_hasMissingDates === true;
-        if (!hasMissingDates) {
-            console.log(`[Offline-First] Cache is fresh (${Math.round(msSinceSync / 1000)}s old), skipping remote fetch`);
-            isInitialDataHydrating = false;
-            return; // Cache is good — don't hit the slow database
-        }
-        console.log('[Offline-First] Cache fresh but missing dates detected — refreshing remote');
-    }
-
-    // ── STEP 3: Background refresh from remote API ───────────────────────────
     try {
         let remoteData = [];
         
         // [OPTIMIZATION] Fetch directly from Supabase if available for maximum speed
         if (isSupabaseMode() && supabase) {
-            const now = Date.now();
-            if (!forceRemoteRefresh && (now - lastSupabaseFetchTime < FETCH_THROTTLE_MS)) {
-                console.log('[Offline-First] Throttling Supabase fetch (using local cache)');
-            } else {
-                console.log('[Offline-First] Fetching directly from Supabase (Optimized)...');
+            console.debug('[Supabase] Fetching beneficiaries.');
 
                 // Fetch mappings and offices lookup if not already loaded
                 if (Object.keys(genderMap).length === 0) {
@@ -565,8 +485,6 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
                     .order('created_at', { ascending: false });
 
                 if (!error && data) {
-                    lastSupabaseFetchTime = now;
-                    localStorage.setItem('gip_last_supabase_fetch', String(now));
                     remoteData = data.map(b => ({
                         id: b.gip_id,
                         name: b.full_name,
@@ -587,9 +505,8 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
                         remarks: statusMap[b.status_id] || 'UNKNOWN',
                         createdAt: b.created_at
                     }));
-                } else if (error) {
-                    console.warn('[Offline-First] Supabase direct fetch failed, falling back to PHP Bridge:', error.message);
-                }
+            } else if (error) {
+                console.warn('[Supabase] Direct fetch failed; using the server bridge:', error.message);
             }
         }
 
@@ -603,27 +520,17 @@ export async function loadBeneficiaries(forceRemoteRefresh = false) {
             }
         }
 
-        // Only update if something actually changed
-        const localChecksum = generateChecksum(localData);
-        const remoteChecksum = generateChecksum(remoteData);
-
-            if (localChecksum !== remoteChecksum) {
-                await cacheBeneficiaries(remoteData); // Update local cache
-                beneficiaries = remoteData;
-                syncExpiredStatusesLocally(beneficiaries);
-                populateYearFilter();
-                updateFilterUI();
-                const savedSort = localStorage.getItem('gip_sort_preference');
-                sortData(savedSort || 'name_asc', false);
-                lastDataChecksum = remoteChecksum;
-                console.log(`[Offline-First] Remote data synced and rendered (${remoteData.length} records)`);
-            } else {
-                console.log(`[Offline-First] Remote data matches cache — no re-render needed`);
-                lastDataChecksum = remoteChecksum;
-            }
+        beneficiaries = remoteData;
+        syncExpiredStatusesLocally(beneficiaries);
+        populateYearFilter();
+        updateFilterUI();
+        const savedSort = localStorage.getItem('gip_sort_preference');
+        sortData(savedSort || 'name_asc', false);
+        lastDataChecksum = generateChecksum(remoteData);
+        console.debug('[Supabase] Beneficiaries rendered', { count: remoteData.length });
     } catch (error) {
-        // Network error — that's fine, we already rendered from local cache
-        console.warn('[Offline-First] Remote fetch failed (using local cache):', error.message);
+        // Keep the currently rendered server data visible if a later refresh fails.
+        console.warn('[Supabase] Beneficiary refresh failed:', error.message);
     } finally {
         isInitialDataHydrating = false;
     }
@@ -882,7 +789,7 @@ function initOfficeQuickFilter() {
 
     const showSkeleton = () => {
         list.innerHTML = [1,2,3,4,5].map(() =>
-            `<div class="h-7 w-20 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse shrink-0"></div>`
+            `<div class="skeleton-wave h-7 w-20 shrink-0 rounded-full bg-gray-200 dark:bg-gray-700"></div>`
         ).join('');
         scroll.scrollLeft = 0;
         setTimeout(updateArrows, 50);
@@ -1401,10 +1308,6 @@ export function initGIPPage() {
         });
     }
 
-    // Ensure table refreshes immediately after offline queue sync success.
-    window.addEventListener('dataSynced', () => {
-        loadBeneficiaries(true);
-    });
 }
 
 /**
@@ -1591,15 +1494,21 @@ export function renderTable(dataToRender = null) {
     const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
     const isSearchingContact = query !== "" && /\d/.test(query);
     const shouldShowContact = showPhoneNumbers || isSearchingContact;
+    const table = document.getElementById('beneficiary-data-table');
+    if (table) {
+        table.classList.toggle('min-w-[1240px]', shouldShowContact);
+        table.classList.toggle('min-w-[1180px]', !shouldShowContact);
+        table.classList.toggle('xl:min-w-full', !shouldShowContact);
+    }
 
     tbody.innerHTML = pagedData.map(data => `
         <tr class="bg-blue-50 border-b border-blue-100 hover:bg-blue-100 transition-colors group cursor-pointer"
             onclick='viewBeneficiary(${JSON.stringify(data)})'>
-            <th scope="row" class="w-[32%] px-2 py-3 font-bold text-royal-blue text-start md:w-[22%] lg:w-[18%] lg:px-4">
-                <div class="flex min-w-0 flex-nowrap items-center justify-start gap-1.5 whitespace-nowrap">
-                    <span class="shrink-0 whitespace-nowrap text-xs font-black leading-tight sm:text-sm" title="${data.name}">${data.name}</span>
+            <th scope="row" class="${shouldShowContact ? 'min-w-[310px]' : 'min-w-[280px]'} px-2 py-3 font-bold text-royal-blue text-start lg:px-4">
+                <div class="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 whitespace-nowrap">
+                    <span class="min-w-0 truncate whitespace-nowrap text-xs font-black leading-tight sm:text-sm" title="${data.name}">${data.name}</span>
                     ${shouldShowContact && data.contact ? `
-                        <span class="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded bg-royal-blue px-2 py-0.5 text-[0.5625rem] font-black tabular-nums text-white shadow-sm sm:text-[0.625rem]" title="Contact No: ${data.contact}">
+                        <span class="inline-flex shrink-0 items-center justify-self-end gap-1 whitespace-nowrap rounded bg-royal-blue px-2 py-0.5 text-[0.5625rem] font-black tabular-nums text-white shadow-sm sm:text-[0.625rem]" title="Contact No: ${data.contact}">
                             <svg class="w-2.5 h-2.5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                             </svg>
@@ -1608,7 +1517,7 @@ export function renderTable(dataToRender = null) {
                     ` : ''}
                 </div>
             </th>
-            <td class="hidden w-[24%] px-2 py-3 align-top text-center lg:table-cell lg:px-4">
+            <td class="hidden min-w-[340px] px-2 py-3 align-top text-center lg:table-cell lg:px-4">
                 <span class="block w-full whitespace-normal break-words text-[0.6875rem] font-semibold leading-relaxed text-gray-700 dark:text-gray-300">
                     ${data.address || 'N/A'}
                 </span>
@@ -1923,72 +1832,36 @@ export function sortData(criteria, saveToStorage = true) {
 
 }
 
-export async function addBeneficiary(data, awaitRemoteSync = false) {
-    // ── STEP 1: Capitalize fields ──────────────────────────────────────────────
+export async function addBeneficiary(data) {
     const capitalizedData = { ...data };
     const fieldsToCapitalize = ['name', 'address', 'education', 'designation', 'designatedBeneficiary', 'relationshipToAssured'];
-    fieldsToCapitalize.forEach(field => {
-        if (capitalizedData[field] && typeof capitalizedData[field] === 'string') {
+    fieldsToCapitalize.forEach((field) => {
+        if (typeof capitalizedData[field] === 'string') {
             capitalizedData[field] = capitalizedData[field].toUpperCase().trim();
         }
     });
 
-    const isTempId = (val) => typeof val === 'string' && val.startsWith('temp_');
-    const hasRealId = Boolean(capitalizedData.id) && !isTempId(capitalizedData.id);
+    const hasRealId = Boolean(capitalizedData.id || capitalizedData.gip_id);
     const method = hasRealId ? 'PUT' : 'POST';
+    const remoteResult = await apiRequest('api/beneficiaries.php', {
+        method,
+        body: JSON.stringify(capitalizedData)
+    });
 
-    // Edit drawers require confirmed persistence before reporting success.
-    if (awaitRemoteSync) {
-        const remoteResult = await apiRequest('api/beneficiaries.php', {
-            method,
-            body: JSON.stringify(capitalizedData)
-        });
-        if (!remoteResult.success || remoteResult.data?.success !== true) {
-            const message = remoteResult.data?.error || remoteResult.error || 'The beneficiary update was not saved.';
-            Swal.fire({ icon: 'error', title: 'Update Failed', text: message });
-            return false;
-        }
+    if (!remoteResult.success || remoteResult.data?.success !== true) {
+        const message = remoteResult.data?.error || remoteResult.error || 'The beneficiary could not be saved.';
+        console.error('[GIP] Beneficiary save failed', { method, id: capitalizedData.id || capitalizedData.gip_id, message });
+        Swal.fire({ icon: 'error', title: hasRealId ? 'Update Failed' : 'Save Failed', text: message });
+        return false;
     }
 
-    // ── STEP 2: Generate a temp id for new records so we can store locally ────
-    if (!capitalizedData.id && !capitalizedData.gip_id) {
-        capitalizedData._tempId = `temp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-        capitalizedData.id = capitalizedData._tempId;
-    }
-
-    // ── STEP 3: Save to local IndexedDB immediately (INSTANT) ─────────────────
-    try {
-        await upsertLocalBeneficiary(capitalizedData);
-        // Refresh in-memory array for immediate re-render
-        const localData = await getLocalBeneficiaries();
-        beneficiaries = localData;
-        syncExpiredStatusesLocally(beneficiaries);
-        renderTable();
-        console.log(`[Offline-First] ✓ Saved "${capitalizedData.name}" to local cache`);
-    } catch (e) {
-        console.error('[Offline-First] Local save failed:', e);
-    }
-
-    // ── STEP 4: Send notification optimistically for new records ──────────────
     if (method === 'POST') {
         createNotification(`New user <strong>${capitalizedData.name}</strong> added. pending "Required Documents" for review.`, 'success');
     }
 
-    // Keep add/offline operations queued, but do not duplicate a confirmed edit request.
-    if (!awaitRemoteSync) {
-        try {
-            // For POST, keep temp id locally but do NOT let it be treated as gip_id server-side.
-            // `_tempId` will be used by the sync worker to replace the local record once the server returns the real ROX id.
-            await enqueueSync(method, 'api/beneficiaries.php', capitalizedData);
-            processQueue();
-        } catch (e) {
-            console.error('[Offline-First] Failed to enqueue sync:', e);
-        }
-    }
-
+    await loadBeneficiaries();
     return true;
 }
-
 
 export async function archiveRecord(id) {
     // Show Modern Confirmation Modal
