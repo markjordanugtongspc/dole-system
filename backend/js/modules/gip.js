@@ -1467,14 +1467,14 @@ function updatePhoneVisibilityToggleUI() {
     toggle.setAttribute('aria-checked', String(showPhoneNumbers));
     toggle.setAttribute('aria-label', showPhoneNumbers ? 'Hide beneficiary phone numbers' : 'Show beneficiary phone numbers');
     toggle.className = showPhoneNumbers
-        ? 'grid w-full grid-cols-2 overflow-hidden rounded-lg border border-emerald-200 bg-emerald-50 p-1 text-xs font-black uppercase tracking-wider shadow-inner transition-colors dark:border-emerald-800 dark:bg-emerald-950/30 cursor-pointer'
-        : 'grid w-full grid-cols-2 overflow-hidden rounded-lg border border-red-200 bg-red-50 p-1 text-xs font-black uppercase tracking-wider shadow-inner transition-colors dark:border-red-800 dark:bg-red-950/30 cursor-pointer';
+        ? 'inline-flex h-10 w-full items-center overflow-hidden rounded-full border border-emerald-400 bg-emerald-50 p-1 text-xs font-black uppercase tracking-wider shadow-inner transition-colors dark:border-emerald-700 dark:bg-emerald-950/40 cursor-pointer'
+        : 'inline-flex h-10 w-full items-center overflow-hidden rounded-full border border-red-400 bg-red-50 p-1 text-xs font-black uppercase tracking-wider shadow-inner transition-colors dark:border-red-700 dark:bg-red-950/40 cursor-pointer';
     onLabel.className = showPhoneNumbers
-        ? 'bg-emerald-600 px-4 py-2 text-center text-white shadow-sm'
-        : 'px-4 py-2 text-center text-emerald-600 dark:text-emerald-400';
+        ? 'flex-1 rounded-full bg-emerald-600 px-4 py-2 text-center text-white shadow-sm transition-colors'
+        : 'flex-1 rounded-full px-4 py-2 text-center text-emerald-700 transition-colors dark:text-emerald-300';
     offLabel.className = showPhoneNumbers
-        ? 'px-4 py-2 text-center text-philippine-red dark:text-red-400'
-        : 'bg-philippine-red px-4 py-2 text-center text-white shadow-sm';
+        ? 'flex-1 rounded-full px-4 py-2 text-center text-red-700 transition-colors dark:text-red-300'
+        : 'flex-1 rounded-full bg-red-600 px-4 py-2 text-center text-white shadow-sm transition-colors';
 }
 
 function initPhoneVisibilityToggle() {
@@ -1597,7 +1597,7 @@ export function renderTable(dataToRender = null) {
             onclick='viewBeneficiary(${JSON.stringify(data)})'>
             <th scope="row" class="w-[32%] px-2 py-3 font-bold text-royal-blue text-start md:w-[22%] lg:w-[18%] lg:px-4">
                 <div class="flex min-w-0 flex-nowrap items-center justify-start gap-1.5 whitespace-nowrap">
-                    <span class="min-w-0 truncate text-xs font-black leading-tight sm:text-sm" title="${data.name}">${data.name}</span>
+                    <span class="shrink-0 whitespace-nowrap text-xs font-black leading-tight sm:text-sm" title="${data.name}">${data.name}</span>
                     ${shouldShowContact && data.contact ? `
                         <span class="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded bg-royal-blue px-2 py-0.5 text-[0.5625rem] font-black tabular-nums text-white shadow-sm sm:text-[0.625rem]" title="Contact No: ${data.contact}">
                             <svg class="w-2.5 h-2.5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1608,8 +1608,8 @@ export function renderTable(dataToRender = null) {
                     ` : ''}
                 </div>
             </th>
-            <td class="hidden w-[24%] px-2 py-3 text-center lg:table-cell lg:px-4">
-                <span class="inline-block max-w-xs whitespace-normal break-words text-[0.6875rem] font-semibold leading-relaxed text-gray-700 dark:text-gray-300">
+            <td class="hidden w-[24%] px-2 py-3 align-top text-center lg:table-cell lg:px-4">
+                <span class="block w-full whitespace-normal break-words text-[0.6875rem] font-semibold leading-relaxed text-gray-700 dark:text-gray-300">
                     ${data.address || 'N/A'}
                 </span>
             </td>

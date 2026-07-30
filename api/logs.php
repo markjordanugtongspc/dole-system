@@ -148,11 +148,12 @@ if ($method === 'GET') {
             echo json_encode(['success' => true, 'logs' => $logs, 'type' => 'absorption']);
         } else { // docs
             // Get Required Documents
-            $query = "SELECT doc_id as id, document_name as name, status, updated_at 
-                      FROM beneficiary_documents";
+            $query = "SELECT bd.doc_id as id, bd.beneficiary_id, b.gip_id, bd.document_name as name, bd.status, bd.updated_at
+                      FROM beneficiary_documents bd
+                      JOIN beneficiaries b ON bd.beneficiary_id = b.beneficiary_id";
 
             if ($beneficiaryId) {
-                $query .= " WHERE beneficiary_id = :beneficiary_id";
+                $query .= " WHERE bd.beneficiary_id = :beneficiary_id";
             }
 
             $query .= " ORDER BY document_name ASC";

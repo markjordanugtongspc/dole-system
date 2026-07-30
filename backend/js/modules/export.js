@@ -15,6 +15,9 @@ let currentFilters = {
     gender: 'ALL',
     assignedUnit: 'ALL',
     ageGroup: 'ALL',
+    dtrStatus: 'ALL',
+    arStatus: 'ALL',
+    documentStatus: 'ALL',
     year: 'ALL',
     search: '',
     sort: 'name',
@@ -61,7 +64,49 @@ async function loadBeneficiaryData() {
             ? payload.beneficiaries
             : (payload.data?.success && Array.isArray(payload.data.beneficiaries) ? payload.data.beneficiaries : []);
 
-        allBeneficiaries = beneficiaries;
+        // Enrich the export dataset with the same DTR, AR, and document status sources used by GIP.
+        const [dtrResponse, arResponse, docsResponse] = await Promise.all([
+            apiGet('api/logs.php?type=dtr'),
+            apiGet('api/logs.php?type=ar'),
+            apiGet('api/logs.php?type=docs')
+        ]);
+        const summaries = new Map();
+        const ensureSummary = (gipId) => {
+            const key = String(gipId || '');
+            if (!summaries.has(key)) summaries.set(key, { dtrStatus: 'NOT SUBMITTED', arStatus: 'NOT SUBMITTED', documentStatus: 'PENDING' });
+            return summaries.get(key);
+        };
+        const applyLatestStatus = (logs, field) => {
+            const seen = new Set();
+            (logs || []).forEach((log) => {
+                const key = String(log.gip_id || '');
+                if (seen.has(key)) return;
+                seen.add(key);
+                const summary = ensureSummary(key);
+                const status = String(log.status || 'PENDING').toUpperCase();
+                summary[field] = status === 'VERIFIED' || status === 'COMPLETED' ? 'SUBMITTED' : status;
+            });
+        };
+        applyLatestStatus(dtrResponse?.data?.logs, 'dtrStatus');
+        applyLatestStatus(arResponse?.data?.logs, 'arStatus');
+        const documentStates = new Map();
+        (docsResponse?.data?.logs || []).forEach((log) => {
+            const key = String(log.gip_id || '');
+            if (!documentStates.has(key)) documentStates.set(key, []);
+            documentStates.get(key).push(String(log.status || 'PENDING').toUpperCase());
+        });
+        documentStates.forEach((states, key) => {
+            const summary = ensureSummary(key);
+            summary.documentStatus = states.some((status) => status === 'DECLINED' || status === 'REJECTED')
+                ? 'REJECTED'
+                : (states.length > 0 && states.every((status) => status === 'VERIFIED' || status === 'COMPLETED')
+                    ? 'SUBMITTED'
+                    : 'PENDING');
+        });
+        allBeneficiaries = beneficiaries.map((beneficiary) => ({
+            ...beneficiary,
+            ...(summaries.get(String(beneficiary.id || beneficiary.gip_id || '')) || {})
+        }));
         // Expose year list for the config modal
         window.getExportYears = () => [...new Set(allBeneficiaries.map(b => {
             const d = new Date(b.startDate || b.createdAt || '');
@@ -156,6 +201,15 @@ window.handleFilterUpdate = function (filters) {
     // Age Group Filter
     if (currentFilters.ageGroup && currentFilters.ageGroup !== 'ALL') {
         filtered = filtered.filter((b) => getAgeGroup(b.age) === currentFilters.ageGroup);
+    }
+    if (currentFilters.dtrStatus && currentFilters.dtrStatus !== 'ALL') {
+        filtered = filtered.filter((b) => (b.dtrStatus || 'NOT SUBMITTED') === currentFilters.dtrStatus);
+    }
+    if (currentFilters.arStatus && currentFilters.arStatus !== 'ALL') {
+        filtered = filtered.filter((b) => (b.arStatus || 'NOT SUBMITTED') === currentFilters.arStatus);
+    }
+    if (currentFilters.documentStatus && currentFilters.documentStatus !== 'ALL') {
+        filtered = filtered.filter((b) => (b.documentStatus || 'PENDING') === currentFilters.documentStatus);
     }
 
     // Section Filter (Active / Archived)
@@ -296,6 +350,9 @@ window.exportToExcel = function () {
                     if (c === 'assignedunit') val = row.designation || '-';
                     if (c === 'startdate') val = row.startDateFormatted || row.startDate || '-';
                     if (c === 'enddate') val = row.endDateFormatted || row.endDate || '-';
+                    if (c === 'dtrstatus') val = row.dtrStatus || 'NOT SUBMITTED';
+                    if (c === 'arstatus') val = row.arStatus || 'NOT SUBMITTED';
+                    if (c === 'documentstatus') val = row.documentStatus || 'PENDING';
                     if (c === 'status') {
                         val = row.remarks || 'N/A';
                         let statusClass = 'status-' + val.toLowerCase();
@@ -346,6 +403,9 @@ const COL_MAP = {
     office: 'OFFICE',
     assignedunit: 'ASSIGNED UNIT',
     status: 'STATUS',
+    dtrstatus: 'DTR STATUS',
+    arstatus: 'AR STATUS',
+    documentstatus: 'REQUIRED DOCUMENTS',
     startdate: 'START DATE',
     enddate: 'END DATE'
 };
@@ -369,6 +429,9 @@ function generateTableRow(row, columns, isPrint = false) {
         if (c === 'startdate') val = row.startDateFormatted || row.startDate || '-';
         if (c === 'enddate') val = row.endDateFormatted || row.endDate || '-';
         if (c === 'status') val = row.remarks || 'N/A';
+        if (c === 'dtrstatus') val = row.dtrStatus || 'NOT SUBMITTED';
+        if (c === 'arstatus') val = row.arStatus || 'NOT SUBMITTED';
+        if (c === 'documentstatus') val = row.documentStatus || 'PENDING';
         if (c === 'age') val = row.age || '-';
 
         if (isPrint) {

@@ -277,9 +277,9 @@ require_once __DIR__ . '/../../config/vite.php';
                                             </div>
                                             <button id="phone-visibility-toggle" type="button" role="switch" aria-checked="false"
                                                 aria-label="Show beneficiary phone numbers"
-                                                class="grid w-full grid-cols-2 overflow-hidden rounded-lg border border-red-200 bg-red-50 p-1 text-xs font-black uppercase tracking-wider shadow-inner transition-colors dark:border-red-800 dark:bg-red-950/30 cursor-pointer">
-                                                <span id="phone-visibility-on" class="px-4 py-2 text-center text-emerald-600 dark:text-emerald-400">ON</span>
-                                                <span id="phone-visibility-off" class="bg-philippine-red px-4 py-2 text-center text-white shadow-sm">OFF</span>
+                                                class="inline-flex h-10 w-full items-center overflow-hidden rounded-full border border-slate-300 bg-slate-100 p-1 text-xs font-black uppercase tracking-wider shadow-inner transition-colors dark:border-slate-600 dark:bg-slate-800 cursor-pointer">
+                                                <span id="phone-visibility-on" class="flex-1 rounded-full px-4 py-2 text-center text-emerald-700 transition-colors dark:text-emerald-300">ON</span>
+                                                <span id="phone-visibility-off" class="flex-1 rounded-full px-4 py-2 text-center text-red-700 transition-colors dark:text-red-300">OFF</span>
                                             </button>
                                         </div>
                                     </div>

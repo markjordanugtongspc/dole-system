@@ -249,7 +249,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
 <!-- Persistent Section Header with Responsive Nav Buttons -->
 <div class="flex justify-between items-end gap-3 mb-4 border-y border-default pt-2">
-    <h4 id="drawer-section-title" class="mb-px border-b-2 border-brand pb-1.5 text-sm font-bold text-heading uppercase tracking-widest">Personal Profile</h4>
+    <h4 id="drawer-section-title" class="mb-2 border-b-2 border-brand pb-1.5 text-sm font-bold text-heading uppercase tracking-widest">Personal Profile</h4>
     <div class="flex shrink-0 gap-2 pb-3">
         <button type="button" id="drawer-prev-btn" class="hidden flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-default-medium bg-neutral-secondary-medium px-3 py-2 text-[0.5625rem] font-black uppercase tracking-widest text-heading shadow-sm transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-95 active:bg-red-100 dark:hover:border-red-800 dark:hover:bg-red-950/60 dark:hover:text-red-300 cursor-pointer">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
@@ -429,8 +429,15 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     ${dtrLogs.length ? dtrLogs.map(l => {
                 const s = l.status || 'PENDING';
                 let sColor = s === 'VERIFIED' || s === 'COMPLETED' ? 'text-green-500' : (s === 'REJECTED' || s === 'DECLINED' ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
+                const displayStatus = s === 'VERIFIED' || s === 'COMPLETED' ? 'SUBMITTED' : s;
                 let rawStr = l.date || l.createdAt;
                 let displayDate = rawStr;
+                const submittedAt = l.submittedAt || l.submitted_at || l.createdAt || l.created_at;
+                const submittedDetail = submittedAt ? new Date(submittedAt).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'long', timeZone: 'Asia/Manila' }) : 'Submission time unavailable';
+                const historyDetail = [
+                    (l.rejectedAt || l.rejected_at) ? 'Rejected: ' + new Date(l.rejectedAt || l.rejected_at).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'long', timeZone: 'Asia/Manila' }) : '',
+                    (l.updatedAt || l.updated_at) ? 'Updated: ' + new Date(l.updatedAt || l.updated_at).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'long', timeZone: 'Asia/Manila' }) : ''
+                ].filter(Boolean).map(detail => '\n' + detail).join('');
                 if (rawStr) {
                     // If pure ISO date (YYYY-MM-DD), parse as UTC to avoid timezone off-by-one
                     const isoDate = /^\d{4}-\d{2}-\d{2}$/.test(rawStr)
@@ -439,9 +446,9 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     if (!isNaN(isoDate)) displayDate = isoDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'Asia/Manila' }).toUpperCase();
                 }
                 return `
-                        <div class="edit-log-btn group relative flex cursor-pointer items-center justify-between overflow-visible rounded-xl border border-blue-200 bg-blue-100 p-4 shadow-sm transition-colors hover:bg-blue-200 dark:border-blue-800 dark:bg-blue-900 dark:hover:bg-blue-800" data-type="dtr" data-id="${l.id}" data-val="${l.day || rawStr}" data-status="${s}">
-                            <span class="text-sm font-black text-royal-blue dark:text-blue-400 capitalize whitespace-nowrap pointer-events-none">${l.day || displayDate}</span>
-                            <span class="log-status-label text-xs font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
+                        <div class="edit-log-btn group relative flex cursor-pointer items-center justify-between overflow-visible rounded-xl border border-blue-500 bg-transparent p-4 text-blue-700 shadow-sm transition-colors hover:border-blue-700 hover:bg-blue-600 hover:text-white dark:border-blue-400 dark:text-blue-300 dark:hover:border-blue-300 dark:hover:bg-blue-500 dark:hover:text-white" title="Submitted: ${submittedDetail}${historyDetail}" data-type="dtr" data-id="${l.id}" data-val="${l.day || rawStr}" data-status="${s}">
+                            <span class="text-sm font-black text-blue-700 group-hover:text-white dark:text-blue-300 dark:group-hover:text-white capitalize whitespace-nowrap pointer-events-none" title="Submitted: ${submittedDetail}${historyDetail}">${l.day || displayDate}</span>
+                            <span class="log-status-label text-xs font-bold ${sColor} group-hover:text-white dark:group-hover:text-white uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${displayStatus}</span>
                             <div class="delete-log-btn delete-log-control pointer-events-none absolute top-0 right-0 z-20 h-full w-11 opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100" data-type="dtr" data-id="${l.id}">
                                 <button type="button" class="delete-log-trigger group/delete relative flex h-full w-full cursor-pointer items-center justify-center rounded-r-xl bg-red-500 text-white hover:bg-red-600" aria-label="Delete DTR log"><svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18 18 6M6 6l12 12"/></svg><span class="pointer-events-none absolute bottom-full right-0 z-30 mb-2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover/delete:opacity-100">Delete</span></button>
                                 <div class="delete-confirm-actions hidden h-full w-full items-stretch overflow-visible">
@@ -464,8 +471,15 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     ${arLogs.length ? arLogs.map(l => {
                 const s = l.status || 'PENDING';
                 let sColor = s === 'VERIFIED' || s === 'COMPLETED' ? 'text-green-500' : (s === 'REJECTED' || s === 'DECLINED' ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
+                const displayStatus = s === 'VERIFIED' || s === 'COMPLETED' ? 'SUBMITTED' : s;
                 let rawStr = l.period || l.createdAt;
                 let displayDate = rawStr;
+                const submittedAt = l.submittedAt || l.submitted_at || l.createdAt || l.created_at;
+                const submittedDetail = submittedAt ? new Date(submittedAt).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'long', timeZone: 'Asia/Manila' }) : 'Submission time unavailable';
+                const historyDetail = [
+                    (l.rejectedAt || l.rejected_at) ? 'Rejected: ' + new Date(l.rejectedAt || l.rejected_at).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'long', timeZone: 'Asia/Manila' }) : '',
+                    (l.updatedAt || l.updated_at) ? 'Updated: ' + new Date(l.updatedAt || l.updated_at).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'long', timeZone: 'Asia/Manila' }) : ''
+                ].filter(Boolean).map(detail => '\n' + detail).join('');
                 if (rawStr) {
                     // If pure ISO date (YYYY-MM-DD), parse as UTC to avoid timezone off-by-one
                     const isoDate = /^\d{4}-\d{2}-\d{2}$/.test(rawStr)
@@ -474,9 +488,9 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     if (!isNaN(isoDate)) displayDate = isoDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'Asia/Manila' }).toUpperCase();
                 }
                 return `
-                        <div class="edit-log-btn group relative flex cursor-pointer items-center justify-between overflow-visible rounded-xl border border-orange-200 bg-orange-100 p-4 shadow-sm transition-colors hover:bg-orange-200 dark:border-orange-800 dark:bg-orange-900 dark:hover:bg-orange-800" data-type="ar" data-id="${l.id}" data-val="${rawStr}" data-status="${s}">
-                            <span class="text-sm font-black text-orange-600 dark:text-orange-400 capitalize whitespace-nowrap pointer-events-none">${rawStr || displayDate}</span>
-                            <span class="log-status-label text-xs font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
+                        <div class="edit-log-btn group relative flex cursor-pointer items-center justify-between overflow-visible rounded-xl border border-orange-500 bg-transparent p-4 text-orange-700 shadow-sm transition-colors hover:border-orange-700 hover:bg-orange-600 hover:text-white dark:border-orange-400 dark:text-orange-300 dark:hover:border-orange-300 dark:hover:bg-orange-500 dark:hover:text-white" title="Submitted: ${submittedDetail}${historyDetail}" data-type="ar" data-id="${l.id}" data-val="${rawStr}" data-status="${s}">
+                            <span class="text-sm font-black text-orange-700 group-hover:text-white dark:text-orange-300 dark:group-hover:text-white capitalize whitespace-nowrap pointer-events-none" title="Submitted: ${submittedDetail}${historyDetail}">${rawStr || displayDate}</span>
+                            <span class="log-status-label text-xs font-bold ${sColor} group-hover:text-white dark:group-hover:text-white uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${displayStatus}</span>
                             <div class="delete-log-btn delete-log-control pointer-events-none absolute top-0 right-0 z-20 h-full w-11 opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100" data-type="ar" data-id="${l.id}">
                                 <button type="button" class="delete-log-trigger group/delete relative flex h-full w-full cursor-pointer items-center justify-center rounded-r-xl bg-red-500 text-white hover:bg-red-600" aria-label="Delete AR log"><svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18 18 6M6 6l12 12"/></svg><span class="pointer-events-none absolute bottom-full right-0 z-30 mb-2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover/delete:opacity-100">Delete</span></button>
                                 <div class="delete-confirm-actions hidden h-full w-full items-stretch overflow-visible">
@@ -508,47 +522,59 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 const isRejected = status === 'REJECTED';
 
                 const isPending = status === 'PENDING';
-                const iconColor = isCompleted ? 'text-emerald-600' : (isRejected ? 'text-red-600' : 'text-orange-600');
+                const iconColor = isCompleted
+                    ? 'text-emerald-600 group-hover/card:text-emerald-800 dark:text-emerald-400 dark:group-hover/card:text-emerald-900'
+                    : (isRejected
+                        ? 'text-red-600 group-hover/card:text-red-800 dark:text-red-400 dark:group-hover/card:text-red-900'
+                        : 'text-orange-600 group-hover/card:text-orange-800 dark:text-orange-400 dark:group-hover/card:text-orange-900');
                 const bgColor = isCompleted
-                    ? 'border-emerald-400 bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-900'
+                    ? 'border-emerald-600 bg-transparent hover:border-emerald-700 hover:bg-emerald-600 dark:border-emerald-400 dark:bg-transparent dark:hover:border-emerald-300 dark:hover:bg-emerald-500'
                     : (isRejected
-                        ? 'border-red-400 bg-red-100 dark:border-red-700 dark:bg-red-900'
-                        : 'border-orange-400 bg-orange-100 dark:border-orange-700 dark:bg-orange-900');
+                        ? 'border-red-600 bg-transparent hover:border-red-700 hover:bg-red-600 dark:border-red-400 dark:bg-transparent dark:hover:border-red-300 dark:hover:bg-red-500'
+                        : 'border-orange-600 bg-transparent hover:border-orange-700 hover:bg-orange-600 dark:border-orange-400 dark:bg-transparent dark:hover:border-orange-300 dark:hover:bg-orange-500');
                 const documentTextColor = isCompleted
-                    ? 'text-emerald-700 dark:text-emerald-300'
+                    ? 'text-emerald-700 group-hover/card:text-white dark:text-emerald-300 dark:group-hover/card:text-white'
                     : (isRejected
-                        ? 'text-red-600 dark:text-red-300'
-                        : 'text-orange-700 dark:text-orange-300');
-                const verifyActionClass = isCompleted ? 'border-white bg-emerald-800 text-white ring-2 ring-white' : 'border-emerald-700 bg-white text-emerald-700 hover:bg-emerald-100';
-                const pendingActionClass = isPending ? 'border-white bg-orange-700 text-white ring-2 ring-white' : 'border-orange-700 bg-white text-orange-700 hover:bg-orange-100';
-                const rejectActionClass = isRejected ? 'border-white bg-red-800 text-white ring-2 ring-white' : 'border-red-700 bg-white text-red-700 hover:bg-red-100';
-                let iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                        ? 'text-red-700 group-hover/card:text-white dark:text-red-300 dark:group-hover/card:text-white'
+                        : 'text-orange-700 group-hover/card:text-white dark:text-orange-300 dark:group-hover/card:text-white');
+                const documentStatusLabel = isCompleted ? 'SUBMITTED' : status;
+                const verifyActionClass = isCompleted
+                    ? 'border-emerald-900 bg-emerald-700 text-white ring-2 ring-emerald-200 hover:bg-emerald-600'
+                    : 'border-emerald-500 bg-transparent text-emerald-700 group-hover/card:border-emerald-700 group-hover/card:bg-white group-hover/card:text-emerald-800 hover:border-emerald-700 hover:bg-emerald-600 hover:text-white';
+                const pendingActionClass = isPending
+                    ? 'border-orange-900 bg-orange-700 text-white ring-2 ring-orange-200 hover:bg-orange-600'
+                    : 'border-orange-500 bg-transparent text-orange-700 group-hover/card:border-orange-700 group-hover/card:bg-white group-hover/card:text-orange-800 hover:border-orange-700 hover:bg-orange-600 hover:text-white';
+                const rejectActionClass = isRejected
+                    ? 'border-red-900 bg-red-700 text-white ring-2 ring-red-200 hover:bg-red-600'
+                    : 'border-red-500 bg-transparent text-red-700 group-hover/card:border-red-700 group-hover/card:bg-white group-hover/card:text-red-800 hover:border-red-700 hover:bg-red-600 hover:text-white';
+                let iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
                 if (isCompleted) {
-                    iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+                    iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M5 13l4 4L19 7"></path></svg>`;
                 } else if (isRejected) {
-                    iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                    iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M6 18L18 6M6 6l12 12"></path></svg>`;
                 }
 
                 return `
-                <div class="drawer-doc-card group/card relative flex cursor-pointer items-center justify-between rounded-xl border p-3.5 shadow-sm transition-all hover:-translate-y-0.5 hover:brightness-95 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-brand/30 ${bgColor}" role="button" tabindex="0" data-id="${doc.id}" data-name="${doc.name}" data-status="${status}" aria-label="Change status for ${doc.name}" aria-expanded="false">
+                <div class="drawer-doc-card group/card relative flex cursor-pointer items-center justify-between rounded-xl border p-3.5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-brand/30 ${bgColor}" role="button" tabindex="0" data-id="${doc.id}" data-name="${doc.name}" data-status="${status}" aria-label="Change status for ${doc.name}" aria-expanded="false">
                     <div class="flex min-w-0 flex-1 items-center gap-3">
                         <div class="flex size-8 flex-shrink-0 items-center justify-center rounded-full border border-white bg-white shadow-sm ${iconColor}">
                             ${iconSvg}
                         </div>
                         <span class="flex-1 text-xs font-black uppercase tracking-tight sm:text-sm ${documentTextColor}">${doc.name}</span>
                     </div>
+                    <span class="drawer-doc-status ml-auto shrink-0 text-[0.5625rem] font-black uppercase tracking-wider ${documentTextColor}">${documentStatusLabel}</span>
                     <svg class="drawer-doc-cue ml-3 size-5 shrink-0 transition-transform group-hover/card:scale-110 ${documentTextColor}" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 12h.01M12 12h.01M18 12h.01"/></svg>
                     <div class="drawer-doc-actions ml-3 hidden shrink-0 items-center gap-1.5" aria-hidden="true">
-                        <button type="button" class="doc-status-action group relative flex size-8 cursor-pointer items-center justify-center rounded-full border transition-all ${verifyActionClass}" data-status="COMPLETED" aria-label="Verify document" aria-pressed="${isCompleted}">
-                            <svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="m5 13 4 4L19 7"/></svg>
-                            <span class="pointer-events-none absolute bottom-full right-0 z-20 mb-2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">Verify</span>
+                        <button type="button" class="doc-status-action group relative flex size-8 cursor-pointer items-center justify-center rounded-full border transition-all ${verifyActionClass}" data-status="COMPLETED" aria-label="Submit document" aria-pressed="${isCompleted}">
+                            <svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="m5 13 4 4L19 7"/></svg>
+                            <span class="pointer-events-none absolute bottom-full right-0 z-20 mb-2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">Submitted</span>
                         </button>
                         <button type="button" class="doc-status-action group relative flex size-8 cursor-pointer items-center justify-center rounded-full border transition-all ${pendingActionClass}" data-status="PENDING" aria-label="Set pending" aria-pressed="${isPending}">
-                            <svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                            <svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
                             <span class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">Pending</span>
                         </button>
                         <button type="button" class="doc-status-action group relative flex size-8 cursor-pointer items-center justify-center rounded-full border transition-all ${rejectActionClass}" data-status="REJECTED" aria-label="Reject document" aria-pressed="${isRejected}">
-                            <svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.75" d="M6 18 18 6M6 6l12 12"/></svg>
+                            <svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M6 18 18 6M6 6l12 12"/></svg>
                             <span class="pointer-events-none absolute bottom-full right-0 z-20 mb-2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">Reject</span>
                         </button>
                     </div>
@@ -960,7 +986,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                                     <input type="radio" name="swal-log-status" value="VERIFIED" class="peer sr-only" ${currentStatus === 'VERIFIED' ? 'checked' : ''}>
                                     <div class="${btnBase} border-gray-100 bg-gray-50 text-gray-400 dark:border-slate-700 dark:bg-slate-800/50 dark:text-gray-500 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-600 dark:peer-checked:border-green-500 dark:peer-checked:bg-green-900/20 dark:peer-checked:text-green-400 hover:bg-gray-100 dark:hover:bg-slate-700 group">
                                         ${checkIcon}
-                                        <span>Verify</span>
+                                        <span>Submitted</span>
                                     </div>
                                 </label>
                                 <label class="relative block cursor-pointer">
@@ -1096,6 +1122,85 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             });
         }
 
+        // START: Open an inline Flowbite date editor instead of the legacy edit modal.
+        const openInlineLogEditor = (btn) => {
+            if (!btn || btn.querySelector('.inline-log-editor')) return;
+
+            const dbType = btn.dataset.type;
+            const logId = btn.dataset.id;
+            const currentVal = btn.dataset.val || '';
+            const currentStatus = btn.dataset.status || 'PENDING';
+            let selectedStatus = currentStatus === 'VERIFIED' || currentStatus === 'COMPLETED' ? 'VERIFIED' : 'PENDING';
+            const periodMatch = currentVal.toUpperCase().match(/([A-Z]{3})\s+(\d+)-\d+,\s*(\d{4})/);
+            const initialDate = periodMatch
+                ? periodMatch[3] + '-' + String(MONTHS.indexOf(periodMatch[1]) + 1).padStart(2, '0') + '-' + String(periodMatch[2]).padStart(2, '0')
+                : new Date().toISOString().split('T')[0];
+
+            const editor = document.createElement('div');
+            editor.className = 'inline-log-editor absolute inset-0 z-10 flex items-center gap-1 rounded-xl bg-white px-2 shadow-lg dark:bg-slate-900';
+            editor.innerHTML = '<input type="text" class="inline-log-date w-[38%] min-w-0 shrink-0 rounded-lg border border-brand/40 bg-transparent px-2 py-1.5 text-xs font-black uppercase text-heading outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" value="' + initialDate + '" aria-label="Select log date">' +
+                '<button type="button" data-status="VERIFIED" class="inline-log-status rounded-md px-2.5 py-2 text-[0.5625rem] font-black uppercase tracking-wider transition-colors" aria-label="Set submitted status">SUBMITTED</button>' +
+                '<button type="button" data-status="PENDING" class="inline-log-status rounded-md px-2.5 py-2 text-[0.5625rem] font-black uppercase tracking-wider transition-colors" aria-label="Set pending status">PENDING</button>';
+            btn.appendChild(editor);
+
+            const dateInput = editor.querySelector('.inline-log-date');
+            dateInput.title = btn.querySelector('[title]')?.getAttribute('title') || 'Select the submitted date';
+            const PickerClass = window.Datepicker;
+            if (PickerClass && dateInput) {
+                dateInput._datepicker = new PickerClass(dateInput, { format: 'yyyy-mm-dd', autohide: true, orientation: 'bottom right' });
+            }
+
+            const refreshStatusButtons = () => {
+                editor.querySelectorAll('.inline-log-status').forEach(statusButton => {
+                    const active = statusButton.dataset.status === selectedStatus;
+                    const pending = statusButton.dataset.status === 'PENDING';
+                    statusButton.className = active
+                        ? 'inline-log-status cursor-pointer rounded-md ' + (pending ? 'bg-orange-600 hover:bg-orange-700' : 'bg-emerald-600 hover:bg-emerald-700') + ' px-2.5 py-2 text-[0.5625rem] font-black uppercase tracking-wider text-white shadow-sm transition-colors'
+                        : 'inline-log-status cursor-pointer rounded-md border ' + (pending ? 'border-orange-400 text-orange-700 hover:border-orange-600 hover:bg-orange-50' : 'border-emerald-400 text-emerald-700 hover:border-emerald-600 hover:bg-emerald-50') + ' bg-transparent px-2.5 py-2 text-[0.5625rem] font-black uppercase tracking-wider transition-colors dark:border-slate-600 dark:text-slate-300';
+                });
+            };
+            refreshStatusButtons();
+
+            editor.querySelectorAll('.inline-log-status').forEach(statusButton => statusButton.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                selectedStatus = statusButton.dataset.status;
+                refreshStatusButtons();
+                const selectedDate = dateInput?.value || initialDate;
+                const periodValue = computePeriodLabel(new Date(selectedDate + 'T00:00:00'));
+                editor.querySelectorAll('.inline-log-status').forEach(button => { button.disabled = true; });
+                statusButton.textContent = 'SAVING';
+
+                try {
+                    const payload = { type: dbType, id: logId, status: selectedStatus };
+                    if (dbType === 'dtr') {
+                        payload.record_date = selectedDate;
+                        payload.weekday = periodValue;
+                    } else {
+                        payload.period = periodValue;
+                    }
+                    const result = await apiPut('api/logs.php', payload);
+                    const json = result.success ? result.data : { success: false, error: result.error };
+                    if (!json.success) throw new Error(json.error || 'Failed to update log.');
+                    showInlineToast('success', 'Log submitted!', 1500);
+                    if (window.viewBeneficiary) window.viewBeneficiary(data, viewController.currentPage);
+                } catch (error) {
+                    editor.querySelectorAll('.inline-log-status').forEach(button => { button.disabled = false; });
+                    statusButton.textContent = selectedStatus === 'VERIFIED' ? 'SUBMITTED' : 'PENDING';
+                    showInlineToast('error', error.message);
+                }
+            }));
+
+            const closeOnOutsideClick = (event) => {
+                if (!editor.contains(event.target)) {
+                    dateInput?._datepicker?.hide();
+                    editor.remove();
+                    document.removeEventListener('click', closeOnOutsideClick, true);
+                }
+            };
+            setTimeout(() => document.addEventListener('click', closeOnOutsideClick, true), 0);
+        };
+        // END: Open an inline Flowbite date editor instead of the legacy edit modal.
+
         drawerContainer.querySelectorAll('.edit-log-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 if (e.target.closest('.delete-log-control')) return; // ignore inline delete actions
@@ -1103,7 +1208,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 const logId = btn.dataset.id;
                 const logVal = btn.dataset.val;
                 const logStatus = btn.dataset.status;
-                promptEditLog(logType.toUpperCase(), logType, logId, logVal, logStatus);
+                openInlineLogEditor(btn);
             });
         });
 

@@ -398,6 +398,9 @@ export function showExportConfigModal(callback) {
         gender: 'ALL',
         assignedUnit: 'ALL',
         ageGroup: 'ALL',
+        dtrStatus: 'ALL',
+        arStatus: 'ALL',
+        documentStatus: 'ALL',
         search: '',
         sort: 'name',
         section: 'ALL',
@@ -504,6 +507,16 @@ export function showExportConfigModal(callback) {
                     </div>
 
                     <div class="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2 min-[900px]:grid-cols-4 pt-4 border-t border-gray-100/50">
+                        <div class="min-[900px]:col-span-4">
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Submission Status</label>
+                            <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                                ${[
+                                    ['dtr', 'DTR STATUS', currentFilters.dtrStatus || 'ALL'],
+                                    ['ar', 'AR STATUS', currentFilters.arStatus || 'ALL'],
+                                    ['document', 'REQUIRED DOCUMENTS', currentFilters.documentStatus || 'ALL']
+                                ].map(([key, label, value]) => '<label class="flex items-center gap-2"><span class="w-24 shrink-0 text-[0.5625rem] font-black uppercase tracking-wider text-gray-500">' + label + '</span><select id="export-' + key + '-status" class="min-h-9 w-full cursor-pointer rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-[0.625rem] font-black uppercase text-heading dark:border-slate-600 dark:bg-slate-800"><option value="ALL" ' + (value === 'ALL' ? 'selected' : '') + '>ALL</option><option value="SUBMITTED" ' + (value === 'SUBMITTED' ? 'selected' : '') + '>SUBMITTED</option><option value="PENDING" ' + (value === 'PENDING' ? 'selected' : '') + '>PENDING</option><option value="REJECTED" ' + (value === 'REJECTED' ? 'selected' : '') + '>REJECTED</option><option value="NOT SUBMITTED" ' + (value === 'NOT SUBMITTED' ? 'selected' : '') + '>NOT SUBMITTED</option></select></label>').join('')}
+                            </div>
+                        </div>
                         <!-- Gender Filter -->
                         <div>
                             <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Gender Filter</label>
@@ -591,7 +604,7 @@ export function showExportConfigModal(callback) {
                     </div>
 
                     <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                        ${['ID', 'Name', 'Age', 'Office', 'Assigned Unit', 'Start Date', 'End Date', 'Status'].map(col => {
+                        ${['ID', 'Name', 'Age', 'Office', 'Assigned Unit', 'Start Date', 'End Date', 'Status', 'DTR Status', 'AR Status', 'Document Status'].map(col => {
             const val = col.toLowerCase().replace(' ', '');
             const isChecked = currentFilters.columns.includes(val);
             const id = `col-switch-${val}`;
@@ -719,6 +732,9 @@ export function showExportConfigModal(callback) {
                     assignedUnit: form.querySelector('#export-assigned-unit')?.value || 'ALL',
                     remarks: remarksRadio ? remarksRadio.value : (currentFilters.remarks || 'ALL'),
                     ageGroup: ageGroupRadio ? ageGroupRadio.value : (currentFilters.ageGroup || 'ALL'),
+                    dtrStatus: form.querySelector('#export-dtr-status')?.value || 'ALL',
+                    arStatus: form.querySelector('#export-ar-status')?.value || 'ALL',
+                    documentStatus: form.querySelector('#export-document-status')?.value || 'ALL',
                     search: form.querySelector('#export-search').value.trim().toLowerCase(),
                     sort: form.querySelector('#export-sort').value,
                     section: sectionRadio ? sectionRadio.value : 'ALL',
