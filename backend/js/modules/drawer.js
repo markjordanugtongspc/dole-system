@@ -70,16 +70,114 @@ function getOfficeClass(office) {
 }
 
 function getStatusClass(status) {
-    if (!status) return 'bg-gray-100 text-gray-600 border-gray-200 dark:text-gray-300';
+    if (!status) return 'bg-red-600 text-white border-red-700 dark:bg-red-700 dark:border-red-800';
     const s = status.toUpperCase();
-    if (s === 'ONGOING') return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800';
-    if (s === 'EXPIRED') return 'bg-red-400 text-white border-red-400 dark:bg-red-900/60 dark:border-red-800';
-    if (s === 'RESIGNED') return 'bg-[#ce1126] text-white border-[#ce1126] dark:bg-red-900/80 dark:border-red-900';
-    if (s === 'ABSORBED') return 'bg-[#2e7d32] text-white border-[#2e7d32] dark:bg-green-900/80 dark:border-green-900';
-    return 'bg-gray-100 text-gray-600 border-gray-200 dark:text-gray-300';
+    if (s === 'ONGOING' || s === 'ABSORBED') return 'bg-emerald-600 text-white border-emerald-700 dark:bg-emerald-700 dark:border-emerald-800';
+    return 'bg-red-600 text-white border-red-700 dark:bg-red-700 dark:border-red-800';
 }
 
+const DRAWER_EMPLOYMENT_DETAILS_KEY = 'gip-drawer-employment-details-expanded';
+
+class BeneficiaryDrawerViewController {
+    // START: Initialize the drawer page navigation and persisted employment-details accordion.
+    constructor(root, initialPage, maxPage) {
+        this.root = root;
+        this.maxPage = maxPage;
+        this.currentPage = Math.min(Math.max(Number(initialPage) || 0, 0), maxPage);
+        this.prevButton = root.querySelector('#drawer-prev-btn');
+        this.nextButton = root.querySelector('#drawer-next-btn');
+        this.detailsButton = root.querySelector('#drawer-employment-details-toggle');
+        this.detailsPanel = root.querySelector('#drawer-employment-details-panel');
+        this.detailsIcon = root.querySelector('#drawer-employment-details-icon');
+        this.pageTitles = ['Personal Profile', 'Submission Logs', 'Required Documents'];
+    }
+    // END: Initialize the drawer page navigation and persisted employment-details accordion.
+
+    // START: Read the user's saved accordion preference, defaulting to collapsed.
+    getSavedDetailsState() {
+        try {
+            return localStorage.getItem(DRAWER_EMPLOYMENT_DETAILS_KEY) === 'true';
+        } catch (error) {
+            return false;
+        }
+    }
+    // END: Read the user's saved accordion preference, defaulting to collapsed.
+
+    // START: Save the user's accordion preference for future drawer sessions.
+    saveDetailsState(isExpanded) {
+        try {
+            localStorage.setItem(DRAWER_EMPLOYMENT_DETAILS_KEY, String(isExpanded));
+        } catch (error) {
+            // Storage can be unavailable in privacy-restricted browser sessions.
+        }
+    }
+    // END: Save the user's accordion preference for future drawer sessions.
+
+    // START: Apply accordion visibility, accessibility state, and chevron rotation.
+    setDetailsExpanded(isExpanded, shouldPersist = false) {
+        if (!this.detailsButton || !this.detailsPanel) return;
+
+        this.detailsButton.setAttribute('aria-expanded', String(isExpanded));
+        this.detailsPanel.classList.toggle('hidden', !isExpanded);
+        this.detailsIcon?.classList.toggle('rotate-180', isExpanded);
+
+        if (shouldPersist) this.saveDetailsState(isExpanded);
+    }
+    // END: Apply accordion visibility, accessibility state, and chevron rotation.
+
+    // START: Display the active page and completely hide unavailable navigation actions.
+    renderNavigation() {
+        this.root.querySelectorAll('[id^=drawer-page-]').forEach((page, index) => {
+            page.classList.toggle('hidden', index !== this.currentPage);
+        });
+
+        const sectionTitle = this.root.querySelector('#drawer-section-title');
+        if (sectionTitle) sectionTitle.textContent = this.pageTitles[this.currentPage];
+
+        const profileSection = this.root.querySelector('#personal-profile-section');
+        profileSection?.classList.toggle('hidden', this.currentPage !== 0);
+
+        this.prevButton?.classList.toggle('hidden', this.currentPage === 0);
+        this.nextButton?.classList.toggle('hidden', this.currentPage === this.maxPage);
+    }
+    // END: Display the active page and completely hide unavailable navigation actions.
+
+    // START: Move to a valid drawer page and refresh the navigation controls.
+    goToPage(nextPage) {
+        this.currentPage = Math.min(Math.max(nextPage, 0), this.maxPage);
+        this.renderNavigation();
+    }
+    // END: Move to a valid drawer page and refresh the navigation controls.
+
+    // START: Bind navigation and accordion controls after the dynamic drawer is rendered.
+    bind() {
+        this.prevButton?.addEventListener('click', () => this.goToPage(this.currentPage - 1));
+        this.nextButton?.addEventListener('click', () => this.goToPage(this.currentPage + 1));
+        this.detailsButton?.addEventListener('click', () => {
+            const isExpanded = this.detailsButton.getAttribute('aria-expanded') === 'true';
+            this.setDetailsExpanded(!isExpanded, true);
+        });
+
+        this.setDetailsExpanded(this.getSavedDetailsState());
+        this.renderNavigation();
+    }
+    // END: Bind navigation and accordion controls after the dynamic drawer is rendered.
+}
+
+// START: Create reusable animated rows for database-backed drawer loading states.
+function createDrawerSkeletonRows(count = 3) {
+    return Array.from({ length: count }, (_, index) => `
+        <div class="animate-pulse border border-gray-100 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800" aria-hidden="true">
+            <div class="h-2.5 ${index % 2 === 0 ? 'w-2/5' : 'w-1/3'} rounded-full bg-gray-200 dark:bg-slate-700"></div>
+            <div class="mt-3 h-3.5 ${index % 2 === 0 ? 'w-4/5' : 'w-3/5'} rounded-full bg-gray-300 dark:bg-slate-600"></div>
+        </div>
+    `).join('');
+}
+// END: Create reusable animated rows for database-backed drawer loading states.
+
 export function showBeneficiaryDrawer(data, initialPage = 0) {
+    const isProfileLoading = Boolean(data?._isLoadingProfile);
+    const isLogsLoading = Boolean(data?._isLoadingLogs);
     data = {
         ...data,
         id: data?.id || data?.gip_id || 'N/A',
@@ -90,11 +188,6 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         designatedBeneficiary: data?.designatedBeneficiary || 'N/A',
         relationshipToAssured: data?.relationshipToAssured || 'N/A'
     };
-    const toastPosition = window.innerWidth < 640 ? 'top' : 'top-start';
-
-    // Current Page Index for the Right Grid (0 = Info, 1 = Documents/etc)
-    let rightGridPage = initialPage;
-
     // Use logs and docs fetched from database
     const arLogs = data.arLogs || [];
     const dtrLogs = data.dtrLogs || [];
@@ -113,43 +206,56 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
     });
 
     const drawerHtml = `
-<div class="border-b border-default pb-4 mb-5 flex flex-col relative w-full pt-4 font-montserrat user-select-none">
-    <div class="flex justify-between items-start pe-12">
-        <h3 class="text-xl sm:text-2xl font-black text-royal-blue leading-tight mb-1.5 tracking-tight break-words pr-2">${data.name}</h3>
-        <button type="button" id="close-drawer-btn" class="text-body bg-transparent hover:text-heading hover:bg-neutral-tertiary rounded-base w-9 h-9 absolute top-2 right-2 flex items-center justify-center transition-colors z-50 cursor-pointer">
-           <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
+<div class="pb-4 mb-4 flex flex-col relative w-full pt-3 font-montserrat user-select-none">
+    <div class="flex min-h-11 items-center justify-between border-b border-default pb-4 pe-14">
+        <h3 class="text-xl sm:text-2xl font-black text-heading leading-tight tracking-tight">GIP Information</h3>
+        <button type="button" id="close-drawer-btn" class="group absolute top-0.5 right-0 z-50 flex size-11 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition-all duration-200 hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-95 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-300 dark:hover:border-red-800 dark:hover:bg-red-950/60 dark:hover:text-red-300">
+           <svg class="w-6 h-6 transition-transform duration-200 group-hover:rotate-90" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="M6 18 17.94 6M18 18 6.06 6"/></svg>
            <span class="sr-only">Close drawer</span>
         </button>
     </div>
 
-    <div class="grid grid-cols-12 gap-4 mt-6 w-full">
-        <div class="col-span-5 flex flex-col gap-1 text-left">
-            <span class="text-[0.625rem] text-gray-500 font-bold uppercase tracking-widest pl-1">ID NO.</span>
-            <span class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 text-[0.625rem] sm:text-[0.6875rem] font-black px-2.5 py-1.5 rounded border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm border-l-4 border-l-gray-400 truncate">${data.id}</span>
-        </div>
-        <div class="col-span-7 flex justify-end overflow-hidden w-full">
-            <div class="flex flex-col gap-1 items-start w-auto">
-                <span class="text-[0.625rem] text-gray-500 font-bold uppercase tracking-widest pl-1 flex items-center font-montserrat">
-                    REMARKS / OFFICE
-                </span>
-                <div class="flex items-center gap-2 min-h-[30px] font-montserrat flex-nowrap">
-                    <span class="${getStatusClass(data.remarks)} text-[0.5625rem] sm:text-[0.625rem] font-black px-2.5 sm:px-4 py-2 rounded-lg border uppercase tracking-widest shadow-sm border-l-4 ${data.remarks === 'ONGOING' ? 'border-l-green-600' : 'border-l-red-600'} min-w-[80px] sm:min-w-[100px] text-center inline-block whitespace-nowrap">${data.remarks}</span>
-                    <span class="${getOfficeClass(data.office)} inline-block text-[0.5625rem] sm:text-[0.625rem] font-black px-2.5 sm:px-4 py-2 rounded-lg border shadow-sm min-w-[80px] sm:min-w-[100px] text-center whitespace-nowrap max-w-full truncate" title="${data.office}">${data.office}</span>
-                </div>
+    <div class="mt-5 min-w-0">
+        ${isProfileLoading ? `
+            <div class="animate-pulse" aria-label="Loading beneficiary profile" role="status">
+                <div class="h-5 w-3/5 rounded-full bg-gray-300 dark:bg-slate-700"></div>
+                <div class="mt-2 h-5 w-24 rounded-full border border-dashed border-gray-300 bg-gray-100 dark:border-slate-600 dark:bg-slate-800"></div>
+                <span class="sr-only">Loading beneficiary profile</span>
             </div>
+        ` : `
+            <p class="text-lg sm:text-xl font-black text-royal-blue dark:text-blue-300 leading-tight tracking-tight break-words">${data.name}</p>
+            <span class="mt-2 inline-flex max-w-full items-center gap-1.5 truncate rounded-full border border-dashed border-royal-blue/30 bg-blue-50/50 px-2.5 py-1 text-[0.5625rem] font-black uppercase tracking-wider text-royal-blue dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-200">
+                <span class="size-1.5 shrink-0 rounded-full bg-golden-yellow" aria-hidden="true"></span>
+                ${data.id}
+            </span>
+        `}
+    </div>
+
+    <div class="mt-5 grid w-full grid-cols-2 gap-x-2.5 sm:gap-x-3">
+        <div class="min-w-0">
+            <span class="mb-1.5 block text-[0.5625rem] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Remarks</span>
+            ${isProfileLoading
+                ? '<span class="block h-8 w-full animate-pulse border border-gray-200 bg-gray-200 dark:border-slate-700 dark:bg-slate-700"></span>'
+                : `<span class="${getStatusClass(data.remarks)} block min-h-8 w-full truncate border border-l-4 ${data.remarks === 'ONGOING' || data.remarks === 'ABSORBED' ? 'border-l-emerald-600 dark:border-l-emerald-500' : 'border-l-red-600 dark:border-l-red-500'} px-2 py-1.5 text-center text-[0.5625rem] font-black uppercase tracking-wider shadow-sm" title="${data.remarks}">${data.remarks}</span>`}
+        </div>
+        <div class="min-w-0">
+            <span class="mb-1.5 block text-[0.5625rem] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Office</span>
+            ${isProfileLoading
+                ? '<span class="block h-8 w-full animate-pulse border border-gray-200 bg-gray-200 dark:border-slate-700 dark:bg-slate-700"></span>'
+                : `<span class="block min-h-8 w-full truncate border border-red-700 border-l-4 bg-red-600 px-2 py-1.5 text-center text-[0.5625rem] font-black uppercase tracking-wider text-white shadow-sm dark:border-red-800 dark:bg-red-700" title="${data.office}">${data.office}</span>`}
         </div>
     </div>
 </div>
 
-<!-- Persistent Section Header with Small Nav Buttons -->
-<div class="flex justify-between items-center mb-4 pb-2 border-b border-default">
-    <h4 id="drawer-section-title" class="text-sm font-bold text-heading uppercase tracking-widest">Personal Profile</h4>
-    <div class="flex gap-2">
-        <button id="drawer-prev-btn" class="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-neutral-secondary-medium text-heading text-[0.5625rem] font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm border border-default-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-tertiary cursor-pointer">
+<!-- Persistent Section Header with Responsive Nav Buttons -->
+<div class="flex justify-between items-end gap-3 mb-4 border-y border-default pt-2">
+    <h4 id="drawer-section-title" class="mb-px border-b-2 border-brand pb-1.5 text-sm font-bold text-heading uppercase tracking-widest">Personal Profile</h4>
+    <div class="flex shrink-0 gap-2 pb-3">
+        <button type="button" id="drawer-prev-btn" class="hidden flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-default-medium bg-neutral-secondary-medium px-3 py-2 text-[0.5625rem] font-black uppercase tracking-widest text-heading shadow-sm transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-95 active:bg-red-100 dark:hover:border-red-800 dark:hover:bg-red-950/60 dark:hover:text-red-300 cursor-pointer">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
             PREV
         </button>
-        <button id="drawer-next-btn" class="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-brand text-white text-[0.5625rem] font-black transition-all active:scale-95 uppercase tracking-widest shadow-sm shadow-brand-medium/50 border border-transparent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-strong cursor-pointer text-center">
+        <button type="button" id="drawer-next-btn" class="flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-brand px-3 py-2 text-center text-[0.5625rem] font-black uppercase tracking-widest text-white shadow-sm shadow-brand-medium/50 transition-all hover:bg-brand-strong active:scale-95 cursor-pointer">
             NEXT
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
         </button>
@@ -157,44 +263,46 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 </div>
 
 <div id="personal-profile-section" class="transition-all duration-300">
-    <div class="flex flex-col gap-4 text-sm mt-3 px-1 mb-8">
-        <div class="flex justify-between items-center group">
-            <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Contact No.</span>
-            <span class="${data.contact ? 'font-black text-heading font-mono' : 'font-bold text-gray-300 italic'} truncate text-right">${data.contact || 'NOT PROVIDED'}</span>
+    <div class="flex flex-col gap-4 sm:gap-y-4.5 text-sm mt-3 px-1 mb-8">
+        ${isProfileLoading ? createDrawerSkeletonRows(7) : `
+        <div class="flex justify-between items-center gap-4 group sm:grid sm:grid-cols-[8.5rem_minmax(0,1fr)]">
+            <span class="text-gray-500 font-medium whitespace-nowrap">Contact No.</span>
+            <span class="${data.contact ? 'font-black text-heading font-mono' : 'font-bold text-gray-300 italic'} min-w-0 truncate text-right sm:text-left">${data.contact || 'NOT PROVIDED'}</span>
         </div>
-        <div class="flex justify-between items-start group">
-            <span class="text-gray-500 font-medium whitespace-nowrap mr-4 mt-1">Address</span>
-            <span class="font-bold text-heading text-right break-words leading-snug" title="${data.address}">${data.address || 'N/A'}</span>
+        <div class="flex justify-between items-start gap-4 group sm:grid sm:grid-cols-[8.5rem_minmax(0,1fr)]">
+            <span class="text-gray-500 font-medium whitespace-nowrap mt-1 sm:mt-0">Address</span>
+            <span class="min-w-0 font-bold text-heading text-right sm:text-left break-words whitespace-normal leading-relaxed" title="${data.address}">${data.address || 'N/A'}</span>
         </div>
-        <div class="flex justify-between items-center group">
-            <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Birthday</span>
-            <span class="${data.birthday ? 'font-black text-heading uppercase text-right' : 'font-bold text-gray-300 italic text-right'}">${data.birthday || 'N/A'}</span>
+        <div class="flex justify-between items-center gap-4 group sm:grid sm:grid-cols-[8.5rem_minmax(0,1fr)]">
+            <span class="text-gray-500 font-medium whitespace-nowrap">Birthday</span>
+            <span class="${data.birthday ? 'font-black text-heading uppercase' : 'font-bold text-gray-300 italic'} text-right sm:text-left">${data.birthday || 'N/A'}</span>
         </div>
-        <div class="flex justify-between items-center group">
-            <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Age</span>
-            <span class="${(data.age || calculateAge(data.birthday)) ? 'font-black text-heading' : 'font-bold text-gray-300 italic'} text-right">${data.age || calculateAge(data.birthday) || 'N/A'}</span>
+        <div class="flex justify-between items-center gap-4 group sm:grid sm:grid-cols-[8.5rem_minmax(0,1fr)]">
+            <span class="text-gray-500 font-medium whitespace-nowrap">Age</span>
+            <span class="${(data.age || calculateAge(data.birthday)) ? 'font-black text-heading' : 'font-bold text-gray-300 italic'} text-right sm:text-left">${data.age || calculateAge(data.birthday) || 'N/A'}</span>
         </div>
-        <div class="flex justify-between items-center group">
-            <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Gender</span>
-            <span class="font-black text-heading uppercase text-right">${data.gender || 'N/A'}</span>
+        <div class="flex justify-between items-center gap-4 group sm:grid sm:grid-cols-[8.5rem_minmax(0,1fr)]">
+            <span class="text-gray-500 font-medium whitespace-nowrap">Gender</span>
+            <span class="font-black text-heading uppercase text-right sm:text-left">${data.gender || 'N/A'}</span>
         </div>
-        <div class="flex justify-between items-center group pt-3 mt-1 border-t border-gray-50 dark:border-slate-800/60">
-            <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Education</span>
-            <div class="flex items-center gap-2 max-w-[60%] justify-end shrink-0 min-w-0">
+        <div class="flex justify-between items-center gap-4 group pt-1 mt-0 border-t border-gray-50 dark:border-slate-800/60 sm:grid sm:grid-cols-[8.5rem_minmax(0,1fr)]">
+            <span class="text-gray-500 font-medium whitespace-nowrap">Education</span>
+            <div class="flex items-center gap-2 max-w-[60%] justify-end shrink-0 min-w-0 sm:max-w-full sm:justify-start">
+                <span class="text-[0.6875rem] lg:text-sm font-black text-heading whitespace-nowrap tracking-tight truncate" title="${data.education}">${data.education || 'N/A'}</span>
                 <div class="w-6 h-6 rounded bg-golden-yellow/10 flex items-center justify-center text-golden-yellow border border-golden-yellow/20 shrink-0">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                 </div>
-                <span class="text-[0.6875rem] lg:text-sm font-black text-heading whitespace-nowrap tracking-tight truncate" title="${data.education}">${data.education || 'N/A'}</span>
             </div>
         </div>
-        <div class="flex justify-between items-start group pt-3 mt-1 border-t border-gray-50 dark:border-slate-800/60">
-            <span class="text-gray-500 font-medium whitespace-nowrap mr-4 mt-1">Designated Beneficiary</span>
-            <span class="${data.designatedBeneficiary !== 'N/A' ? 'font-black text-heading' : 'font-bold text-gray-300 italic'} text-right wrap-break-word leading-snug max-w-[60%] uppercase">${data.designatedBeneficiary}</span>
+        <div class="flex justify-between items-start gap-5 group pt-3 mt-1 border-t border-gray-50 dark:border-slate-800/60 sm:grid sm:grid-cols-[11.5rem_minmax(0,1fr)]">
+            <span class="text-gray-500 font-medium whitespace-nowrap mt-1 sm:mt-0">Designated Beneficiary</span>
+            <span class="${data.designatedBeneficiary !== 'N/A' ? 'font-black text-heading' : 'font-bold text-gray-300 italic'} max-w-[52%] text-right wrap-break-word leading-snug uppercase sm:max-w-full sm:pl-2 sm:text-left">${data.designatedBeneficiary}</span>
         </div>
-        <div class="flex justify-between items-center group">
-            <span class="text-gray-500 font-medium whitespace-nowrap mr-4">Relationship to Assured</span>
-            <span class="${data.relationshipToAssured !== 'N/A' ? 'font-black text-[#2e7d32] dark:text-green-400' : 'font-bold text-gray-300 italic'} text-right uppercase">${data.relationshipToAssured}</span>
+        <div class="flex justify-between items-center gap-5 group sm:grid sm:grid-cols-[11.5rem_minmax(0,1fr)]">
+            <span class="text-gray-500 font-medium whitespace-nowrap">Relationship to Assured</span>
+            <span class="${data.relationshipToAssured !== 'N/A' ? 'font-black text-[#2e7d32] dark:text-green-400' : 'font-bold text-gray-300 italic'} max-w-[52%] text-right uppercase sm:max-w-full sm:pl-2 sm:text-left">${data.relationshipToAssured}</span>
         </div>
+        `}
     </div>
 </div>
 
@@ -202,7 +310,17 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 <div class="relative">
     <!-- Pages Container -->
     <div id="drawer-page-0" class="flex-1 flex flex-col gap-4">
-        
+        <button type="button" id="drawer-employment-details-toggle" class="group flex min-h-14 w-full cursor-pointer items-center justify-between gap-4 border-y border-default bg-transparent py-4 text-left transition-colors hover:bg-gray-50/70 dark:hover:bg-slate-800/50" aria-expanded="false" aria-controls="drawer-employment-details-panel">
+            <span>
+                <span class="block text-base sm:text-lg font-black text-heading tracking-tight">Employment Details</span>
+                <span class="mt-1 block text-[0.5625rem] sm:text-[0.625rem] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Registry, assignment and history</span>
+            </span>
+            <span class="flex size-10 sm:size-11 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition-colors group-hover:border-royal-blue/30 group-hover:text-royal-blue dark:border-slate-700 dark:bg-slate-800 dark:text-gray-300 dark:group-hover:border-blue-700 dark:group-hover:text-blue-300">
+                <svg id="drawer-employment-details-icon" class="h-4 w-4 transition-transform duration-300" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m6 9 6 6 6-6"/></svg>
+            </span>
+        </button>
+
+        <div id="drawer-employment-details-panel" class="hidden flex flex-col gap-4 pt-1">
         <div class="bg-gray-50/50 dark:bg-slate-800/50 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm w-full">
             <p class="text-[0.5625rem] uppercase tracking-widest text-gray-400 dark:text-white font-black mb-3">Work Registry</p>
             <div class="flex items-center gap-3">
@@ -281,19 +399,19 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             </div>
         </div>
         ` : ''}
+        </div>
     </div>
     
     <div id="drawer-page-1" class="hidden flex-1 flex flex-col gap-6">
-         <div class="flex justify-between items-center border-b-2 border-brand pb-2">
-            <h4 class="text-sm font-bold text-heading uppercase tracking-widest">Submission Logs</h4>
-            <div class="flex gap-2">
-                <button type="button" id="add-dtr-log-btn" class="bg-blue-50 dark:bg-blue-900/40 text-royal-blue dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-600 dark:hover:text-white text-[0.625rem] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm whitespace-nowrap cursor-pointer">
+         <div class="flex flex-wrap items-center justify-center gap-2 border-b border-default pb-3">
+            <div class="flex flex-wrap gap-2">
+                <button type="button" id="add-dtr-log-btn" class="bg-blue-50 dark:bg-blue-900/40 text-royal-blue dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-600 dark:hover:text-white text-[0.6875rem] font-black tracking-widest uppercase px-4 py-2 rounded-lg transition-colors shadow-sm whitespace-nowrap cursor-pointer">
                     + DTR
                 </button>
-                <button type="button" id="add-ar-log-btn" class="bg-orange-50 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300 border border-orange-200 dark:border-orange-800 hover:bg-orange-500 hover:text-white text-[0.625rem] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap">
+                <button type="button" id="add-ar-log-btn" class="bg-orange-50 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300 border border-orange-200 dark:border-orange-800 hover:bg-orange-500 hover:text-white text-[0.6875rem] font-black tracking-widest uppercase px-4 py-2 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap">
                     + AR
                 </button>
-                <button type="button" id="export-log-btn" class="bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-500 hover:text-white text-[0.625rem] font-black tracking-widest uppercase px-3 py-1.5 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap flex items-center gap-1">
+                <button type="button" id="export-log-btn" class="bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-500 hover:text-white text-[0.6875rem] font-black tracking-widest uppercase px-4 py-2 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap flex items-center gap-1.5">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     EXPORT
                 </button>
@@ -301,6 +419,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
          </div>
 
          <div class="flex flex-col gap-5">
+            ${isLogsLoading ? createDrawerSkeletonRows(4) : `
             <div>
                 <h5 class="text-xs font-bold text-gray-500 uppercase tracking-widest pl-1 mb-3 flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -320,15 +439,19 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     if (!isNaN(isoDate)) displayDate = isoDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'Asia/Manila' }).toUpperCase();
                 }
                 return `
-                        <div class="flex justify-between items-center p-3 rounded-xl border border-blue-100 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors edit-log-btn" data-type="dtr" data-id="${l.id}" data-val="${l.day || rawStr}" data-status="${s}">
-                            <span class="text-xs font-black text-royal-blue dark:text-blue-400 capitalize whitespace-nowrap pointer-events-none">${l.day || displayDate}</span>
-                            <span class="text-[0.6875rem] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
-                            <button class="absolute top-0 right-0 h-full w-10 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform cursor-pointer delete-log-btn" data-type="dtr" data-id="${l.id}">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
+                        <div class="edit-log-btn group relative flex cursor-pointer items-center justify-between overflow-visible rounded-xl border border-blue-200 bg-blue-100 p-4 shadow-sm transition-colors hover:bg-blue-200 dark:border-blue-800 dark:bg-blue-900 dark:hover:bg-blue-800" data-type="dtr" data-id="${l.id}" data-val="${l.day || rawStr}" data-status="${s}">
+                            <span class="text-sm font-black text-royal-blue dark:text-blue-400 capitalize whitespace-nowrap pointer-events-none">${l.day || displayDate}</span>
+                            <span class="log-status-label text-xs font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
+                            <div class="delete-log-btn delete-log-control pointer-events-none absolute top-0 right-0 z-20 h-full w-11 opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100" data-type="dtr" data-id="${l.id}">
+                                <button type="button" class="delete-log-trigger group/delete relative flex h-full w-full cursor-pointer items-center justify-center rounded-r-xl bg-red-500 text-white hover:bg-red-600" aria-label="Delete DTR log"><svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18 18 6M6 6l12 12"/></svg><span class="pointer-events-none absolute bottom-full right-0 z-30 mb-2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover/delete:opacity-100">Delete</span></button>
+                                <div class="delete-confirm-actions hidden h-full w-full items-stretch overflow-visible">
+                                    <button type="button" class="delete-log-confirm group/confirm relative flex flex-1 cursor-pointer items-center justify-center rounded-l-xl bg-emerald-600 text-white hover:bg-emerald-700" aria-label="Confirm delete DTR log"><svg class="delete-confirm-icon size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="m5 13 4 4L19 7"/></svg><svg class="delete-loading-icon hidden size-4 animate-spin" aria-label="Deleting DTR log" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z"/></svg><span class="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover/confirm:opacity-100">Confirm delete</span></button>
+                                    <button type="button" class="delete-log-cancel group/cancel relative flex flex-1 cursor-pointer items-center justify-center rounded-r-xl bg-red-600 text-white hover:bg-red-700 active:bg-red-800" aria-label="Cancel delete DTR log"><svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18 18 6M6 6l12 12"/></svg><span class="pointer-events-none absolute bottom-full right-0 z-30 mb-2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover/cancel:opacity-100">Cancel</span></button>
+                                </div>
+                            </div>
                         </div>
                     `;
-            }).join('') : `<p class="text-[0.6875rem] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No DTR logs submitted.</p>`}
+            }).join('') : `<p class="text-xs text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-4 rounded-xl border border-gray-100 dark:border-slate-700">No DTR logs submitted.</p>`}
                 </div>
             </div>
 
@@ -351,24 +474,28 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     if (!isNaN(isoDate)) displayDate = isoDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric', timeZone: 'Asia/Manila' }).toUpperCase();
                 }
                 return `
-                        <div class="flex justify-between items-center p-3 rounded-xl border border-orange-100 dark:border-orange-900/50 bg-orange-50/50 dark:bg-orange-900/10 shadow-sm relative group overflow-hidden cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors edit-log-btn" data-type="ar" data-id="${l.id}" data-val="${rawStr}" data-status="${s}">
-                            <span class="text-xs font-black text-orange-600 dark:text-orange-400 capitalize whitespace-nowrap pointer-events-none">${rawStr || displayDate}</span>
-                            <span class="text-[0.6875rem] font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
-                            <button class="absolute top-0 right-0 h-full w-10 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center translate-x-full group-hover:translate-x-0 transition-transform cursor-pointer delete-log-btn" data-type="ar" data-id="${l.id}">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
+                        <div class="edit-log-btn group relative flex cursor-pointer items-center justify-between overflow-visible rounded-xl border border-orange-200 bg-orange-100 p-4 shadow-sm transition-colors hover:bg-orange-200 dark:border-orange-800 dark:bg-orange-900 dark:hover:bg-orange-800" data-type="ar" data-id="${l.id}" data-val="${rawStr}" data-status="${s}">
+                            <span class="text-sm font-black text-orange-600 dark:text-orange-400 capitalize whitespace-nowrap pointer-events-none">${rawStr || displayDate}</span>
+                            <span class="log-status-label text-xs font-bold ${sColor} uppercase tracking-widest truncate max-w-[50%] text-right pr-6 group-hover:pr-12 pointer-events-none transition-all">${s}</span>
+                            <div class="delete-log-btn delete-log-control pointer-events-none absolute top-0 right-0 z-20 h-full w-11 opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100" data-type="ar" data-id="${l.id}">
+                                <button type="button" class="delete-log-trigger group/delete relative flex h-full w-full cursor-pointer items-center justify-center rounded-r-xl bg-red-500 text-white hover:bg-red-600" aria-label="Delete AR log"><svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18 18 6M6 6l12 12"/></svg><span class="pointer-events-none absolute bottom-full right-0 z-30 mb-2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover/delete:opacity-100">Delete</span></button>
+                                <div class="delete-confirm-actions hidden h-full w-full items-stretch overflow-visible">
+                                    <button type="button" class="delete-log-confirm group/confirm relative flex flex-1 cursor-pointer items-center justify-center rounded-l-xl bg-emerald-600 text-white hover:bg-emerald-700" aria-label="Confirm delete AR log"><svg class="delete-confirm-icon size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="m5 13 4 4L19 7"/></svg><svg class="delete-loading-icon hidden size-4 animate-spin" aria-label="Deleting AR log" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z"/></svg><span class="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover/confirm:opacity-100">Confirm delete</span></button>
+                                    <button type="button" class="delete-log-cancel group/cancel relative flex flex-1 cursor-pointer items-center justify-center rounded-r-xl bg-red-600 text-white hover:bg-red-700 active:bg-red-800" aria-label="Cancel delete AR log"><svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18 18 6M6 6l12 12"/></svg><span class="pointer-events-none absolute bottom-full right-0 z-30 mb-2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover/cancel:opacity-100">Cancel</span></button>
+                                </div>
+                            </div>
                         </div>
                     `;
-            }).join('') : `<p class="text-[0.6875rem] text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-3 rounded-xl border border-gray-100 dark:border-slate-700">No AR logs submitted.</p>`}
+            }).join('') : `<p class="text-xs text-gray-400 dark:text-gray-500 italic font-medium bg-gray-50 dark:bg-slate-800/50 p-4 rounded-xl border border-gray-100 dark:border-slate-700">No AR logs submitted.</p>`}
                 </div>
             </div>
+            `}
          </div>
     </div>
     
     <div id="drawer-page-2" class="hidden flex-1 flex flex-col gap-4">
-        <h4 class="text-sm font-bold text-heading mb-2 border-b-2 border-brand pb-2 inline-block max-w-max">Required Documents</h4>
         <div class="flex flex-col gap-3">
-            ${displayDocs.map(doc => {
+            ${isLogsLoading ? createDrawerSkeletonRows(5) : displayDocs.map(doc => {
                 const dbStatus = doc.status.toUpperCase();
                 const uiMapping = {
                     'VERIFIED': 'COMPLETED',
@@ -380,14 +507,21 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 const isCompleted = status === 'COMPLETED';
                 const isRejected = status === 'REJECTED';
 
-                const iconColor = isCompleted ? 'text-green-500' : (isRejected ? 'text-red-500' : 'text-gray-400 dark:text-gray-500');
-                const bgColor = isCompleted ? 'bg-green-50/50 dark:bg-green-900/10' : (isRejected ? 'bg-red-50/50 dark:bg-red-900/10' : 'bg-gray-50/50 dark:bg-slate-800/50');
-                const badgeClass = isCompleted
-                    ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800 hover:bg-green-200 cursor-pointer'
+                const isPending = status === 'PENDING';
+                const iconColor = isCompleted ? 'text-emerald-600' : (isRejected ? 'text-red-600' : 'text-orange-600');
+                const bgColor = isCompleted
+                    ? 'border-emerald-400 bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-900'
                     : (isRejected
-                        ? 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800 hover:bg-red-200 cursor-pointer'
-                        : 'bg-white text-gray-500 border-gray-200 dark:bg-slate-700 dark:text-gray-400 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-600 cursor-pointer');
-
+                        ? 'border-red-400 bg-red-100 dark:border-red-700 dark:bg-red-900'
+                        : 'border-orange-400 bg-orange-100 dark:border-orange-700 dark:bg-orange-900');
+                const documentTextColor = isCompleted
+                    ? 'text-emerald-700 dark:text-emerald-300'
+                    : (isRejected
+                        ? 'text-red-600 dark:text-red-300'
+                        : 'text-orange-700 dark:text-orange-300');
+                const verifyActionClass = isCompleted ? 'border-white bg-emerald-800 text-white ring-2 ring-white' : 'border-emerald-700 bg-white text-emerald-700 hover:bg-emerald-100';
+                const pendingActionClass = isPending ? 'border-white bg-orange-700 text-white ring-2 ring-white' : 'border-orange-700 bg-white text-orange-700 hover:bg-orange-100';
+                const rejectActionClass = isRejected ? 'border-white bg-red-800 text-white ring-2 ring-white' : 'border-red-700 bg-white text-red-700 hover:bg-red-100';
                 let iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
                 if (isCompleted) {
                     iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
@@ -396,16 +530,29 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 }
 
                 return `
-                <div class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm transition-all hover:-translate-y-0.5 ${bgColor}">
-                    <div class="flex items-center gap-3 w-full">
-                        <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white dark:bg-slate-800 shadow-sm border border-gray-100 dark:border-slate-700 ${iconColor}">
+                <div class="drawer-doc-card group/card relative flex cursor-pointer items-center justify-between rounded-xl border p-3.5 shadow-sm transition-all hover:-translate-y-0.5 hover:brightness-95 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-brand/30 ${bgColor}" role="button" tabindex="0" data-id="${doc.id}" data-name="${doc.name}" data-status="${status}" aria-label="Change status for ${doc.name}" aria-expanded="false">
+                    <div class="flex min-w-0 flex-1 items-center gap-3">
+                        <div class="flex size-8 flex-shrink-0 items-center justify-center rounded-full border border-white bg-white shadow-sm ${iconColor}">
                             ${iconSvg}
                         </div>
-                        <span class="text-xs sm:text-sm font-black ${isCompleted ? 'text-heading' : 'text-gray-500 dark:text-gray-400'} uppercase tracking-tight flex-1">${doc.name}</span>
+                        <span class="flex-1 text-xs font-black uppercase tracking-tight sm:text-sm ${documentTextColor}">${doc.name}</span>
                     </div>
-                    <button type="button" class="ml-3 ${badgeClass} text-[0.625rem] font-black px-3 py-1.5 rounded-full border uppercase tracking-widest transition-colors flex-shrink-0 drawer-doc-btn" data-id="${doc.id}" data-name="${doc.name}" data-status="${status} cursosr-pointer">
-                        ${status}
-                    </button>
+                    <svg class="drawer-doc-cue ml-3 size-5 shrink-0 transition-transform group-hover/card:scale-110 ${documentTextColor}" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 12h.01M12 12h.01M18 12h.01"/></svg>
+                    <div class="drawer-doc-actions ml-3 hidden shrink-0 items-center gap-1.5" aria-hidden="true">
+                        <button type="button" class="doc-status-action group relative flex size-8 cursor-pointer items-center justify-center rounded-full border transition-all ${verifyActionClass}" data-status="COMPLETED" aria-label="Verify document" aria-pressed="${isCompleted}">
+                            <svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="m5 13 4 4L19 7"/></svg>
+                            <span class="pointer-events-none absolute bottom-full right-0 z-20 mb-2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">Verify</span>
+                        </button>
+                        <button type="button" class="doc-status-action group relative flex size-8 cursor-pointer items-center justify-center rounded-full border transition-all ${pendingActionClass}" data-status="PENDING" aria-label="Set pending" aria-pressed="${isPending}">
+                            <svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                            <span class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">Pending</span>
+                        </button>
+                        <button type="button" class="doc-status-action group relative flex size-8 cursor-pointer items-center justify-center rounded-full border transition-all ${rejectActionClass}" data-status="REJECTED" aria-label="Reject document" aria-pressed="${isRejected}">
+                            <svg class="size-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.75" d="M6 18 18 6M6 6l12 12"/></svg>
+                            <span class="pointer-events-none absolute bottom-full right-0 z-20 mb-2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-[0.5625rem] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">Reject</span>
+                        </button>
+                    </div>
+                    <svg class="drawer-doc-loading ml-3 hidden size-5 shrink-0 animate-spin text-brand" aria-label="Updating document" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z"/></svg>
                 </div>
                 `;
             }).join('')}
@@ -483,6 +630,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 edgeOffset: '',
                 backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-50',
                 onHide: () => {
+                    drawerContainer.__inlineActionAbort?.abort();
                     document.documentElement.classList.remove('overflow-hidden');
                     document.body.classList.remove('overflow-hidden');
                     setTimeout(() => {
@@ -502,135 +650,150 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
         const closeBtn = drawerContainer.querySelector('#close-drawer-btn');
         closeBtn.addEventListener('click', () => drawer.hide());
 
-        // Navigation logic
-        const prevBtn = drawerContainer.querySelector('#drawer-prev-btn');
-        const nextBtn = drawerContainer.querySelector('#drawer-next-btn');
-        const maxPage = 2; // Because we have page-0, page-1, page-2
+        // START: Initialize OOP-managed navigation and persisted accordion behavior.
+        const viewController = new BeneficiaryDrawerViewController(drawerContainer, initialPage, 2);
+        viewController.bind();
+        // END: Initialize OOP-managed navigation and persisted accordion behavior.
 
-        const updateNav = () => {
-            drawerContainer.querySelectorAll('[id^=drawer-page-]').forEach((p, i) => {
-                p.classList.toggle('hidden', i !== rightGridPage);
-            });
+        drawerContainer.__inlineActionAbort?.abort();
+        const inlineActionAbort = new AbortController();
+        drawerContainer.__inlineActionAbort = inlineActionAbort;
 
-            // Show title only on Personal Profile page
-            const sectionTitle = drawerContainer.querySelector('#drawer-section-title');
-            if (sectionTitle) {
-                sectionTitle.classList.toggle('invisible', rightGridPage !== 0);
-            }
-
-            // Toggle Personal Profile Section visibility (only on Page 0)
-            const profileSection = drawerContainer.querySelector('#personal-profile-section');
-            if (profileSection) {
-                profileSection.classList.toggle('hidden', rightGridPage !== 0);
-            }
-
-            prevBtn.disabled = rightGridPage === 0;
-            nextBtn.disabled = rightGridPage === maxPage;
-
-            prevBtn.classList.toggle('opacity-50', rightGridPage === 0);
-            nextBtn.classList.toggle('opacity-50', rightGridPage === maxPage);
+        // START: Measure whether a toast can fit directly beside the drawer.
+        const getDrawerToastPlacement = () => {
+            const drawerRect = drawerContainer.getBoundingClientRect();
+            const availableLeftSpace = Math.max(0, drawerRect.left);
+            return {
+                canDockBesideDrawer: window.innerWidth >= 640 && availableLeftSpace >= 280,
+                drawerOffset: Math.max(0, window.innerWidth - drawerRect.left),
+                availableLeftSpace
+            };
         };
+        // END: Measure whether a toast can fit directly beside the drawer.
 
-        prevBtn.addEventListener('click', () => {
-            if (rightGridPage > 0) rightGridPage--;
-            updateNav();
-        });
+        // START: Show compact feedback immediately beside the drawer on supported screens.
+        const showInlineToast = (icon, title, timer = 1800) => {
+            const placement = getDrawerToastPlacement();
 
-        nextBtn.addEventListener('click', () => {
-            if (rightGridPage < maxPage) rightGridPage++;
-            updateNav();
-        });
+            return Swal.fire({
+                toast: true,
+                position: placement.canDockBesideDrawer ? 'bottom-end' : 'bottom',
+                icon,
+                title,
+                showConfirmButton: false,
+                timer,
+                didOpen: (toast) => {
+                    if (!placement.canDockBesideDrawer) return;
 
-        updateNav(); // initialize nav
+                    const toastContainer = toast.closest('.swal2-container');
+                    if (!toastContainer) return;
 
-        // Document Toggle Logic
-        drawerContainer.querySelectorAll('.drawer-doc-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const docName = btn.dataset.name;
-                const currentStatus = btn.dataset.status;
-
-                const btnBase = "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all cursor-pointer font-black uppercase tracking-widest text-[0.5625rem] gap-2 transition-all duration-300 ";
-
-                const result = await Swal.fire({
-                    title: '<span class="text-xl font-black text-heading uppercase tracking-tight">Update Document</span>',
-                    html: `
-                        <div class="font-montserrat text-left">
-                            <label class="text-[0.625rem] font-bold text-gray-400 uppercase tracking-widest block mb-4 ps-1">Set status for <span class="text-brand font-black">${docName}</span></label>
-                            
-                            <div class="grid grid-cols-3 gap-3">
-                                <label class="relative block cursor-pointer">
-                                    <input type="radio" name="swal-doc-status" value="PENDING" class="peer sr-only" ${currentStatus === 'PENDING' ? 'checked' : ''}>
-                                    <div class="${btnBase} border-gray-100 bg-gray-50 text-gray-400 dark:border-slate-700 dark:bg-slate-800/50 dark:text-gray-500 peer-checked:border-amber-400 peer-checked:bg-amber-50 peer-checked:text-amber-600 dark:peer-checked:bg-amber-900/20 dark:peer-checked:text-amber-400 hover:bg-amber-50/50 dark:hover:bg-slate-700">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        <span>Pending</span>
-                                    </div>
-                                </label>
-
-                                <label class="relative block cursor-pointer">
-                                    <input type="radio" name="swal-doc-status" value="COMPLETED" class="peer sr-only" ${currentStatus === 'COMPLETED' ? 'checked' : ''}>
-                                    <div class="${btnBase} border-gray-100 bg-gray-50 text-gray-400 dark:border-slate-700 dark:bg-slate-800/50 dark:text-gray-500 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-600 dark:peer-checked:bg-green-900/20 dark:peer-checked:text-green-400 hover:bg-green-50/50 dark:hover:bg-slate-700">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                        <span>Verify</span>
-                                    </div>
-                                </label>
-
-                                <label class="relative block cursor-pointer">
-                                    <input type="radio" name="swal-doc-status" value="REJECTED" class="peer sr-only" ${currentStatus === 'REJECTED' ? 'checked' : ''}>
-                                    <div class="${btnBase} border-gray-100 bg-gray-50 text-gray-400 dark:border-slate-700 dark:bg-slate-800/50 dark:text-gray-500 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-600 dark:peer-checked:bg-red-900/20 dark:peer-checked:text-red-400 hover:bg-red-50/50 dark:hover:bg-slate-700">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
-                                        <span>Reject</span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-                    `,
-                    showCancelButton: true,
-                    confirmButtonText: '<span class="font-black uppercase tracking-widest cursor-pointer">Update Status</span>',
-                    cancelButtonText: '<span class="font-black uppercase tracking-widest cursor-pointer">Cancel</span>',
-                    customClass: {
-                        container: 'font-montserrat',
-                        popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100 dark:border-slate-800 dark:bg-slate-900',
-                        confirmButton: 'bg-brand text-white hover:bg-brand-strong text-xs px-6 py-2.5 rounded-xl border border-transparent shadow-sm mx-2',
-                        cancelButton: 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 text-xs px-6 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 shadow-sm mx-2'
-                    },
-                    buttonsStyling: false,
-                    preConfirm: () => {
-                        const selected = document.querySelector('input[name="swal-doc-status"]:checked');
-                        return selected ? selected.value : null;
-                    }
-                });
-
-                if (result.isConfirmed) {
-                    const newStatus = result.value;
-                    if (newStatus === currentStatus) return;
-
-                    try {
-                        const apiMapping = {
-                            'COMPLETED': 'VERIFIED',
-                            'REJECTED': 'DECLINED',
-                            'PENDING': 'PENDING'
-                        };
-                        const dbStatus = apiMapping[newStatus] || newStatus;
-
-                        const result = await apiPost(`api/logs.php?type=docs`, {
-                            gip_id: data.id,
-                            doc_name: docName,
-                            status: dbStatus
-                        });
-
-                        const json = result.success ? result.data : { success: false, error: result.error };
-
-                        if (json.success) {
-                            Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Status updated!', showConfirmButton: false, timer: 1500 });
-                            // Refresh data from source (Supabase/MySQL) to ensure everything is in sync
-                            if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
-                        } else {
-                            Swal.fire('Error', json.error || 'Failed to update', 'error');
-                        }
-                    } catch (e) { Swal.fire('Error', e.message, 'error'); }
+                    toastContainer.style.right = `${placement.drawerOffset + 12}px`;
+                    toastContainer.style.left = '0';
+                    toastContainer.style.width = 'auto';
+                    toast.style.maxWidth = `${Math.min(352, placement.availableLeftSpace - 24)}px`;
                 }
             });
+        };
+        // END: Show compact feedback immediately beside the drawer on supported screens.
+
+        // START: Reset a log delete button to its initial X action.
+        const resetDeleteButton = (control) => {
+            if (!control || control.dataset.loading === 'true') return;
+            control.dataset.confirming = 'false';
+            control.classList.remove('w-22', 'opacity-100', 'pointer-events-auto');
+            control.classList.add('w-11', 'opacity-0', 'pointer-events-none');
+            control.closest('.edit-log-btn')?.querySelector('.log-status-label')?.classList.remove('!pr-24');
+            control.querySelector('.delete-log-trigger')?.classList.replace('hidden', 'flex');
+            control.querySelector('.delete-confirm-actions')?.classList.replace('flex', 'hidden');
+        };
+        // END: Reset a log delete button to its initial X action.
+
+        // START: Close all document and delete inline actions except an optional active control.
+        const closeInlineActions = (except = null) => {
+            drawerContainer.querySelectorAll('.drawer-doc-card').forEach(card => {
+                if (card === except || card.dataset.loading === 'true') return;
+                card.setAttribute('aria-expanded', 'false');
+                card.querySelector('.drawer-doc-actions')?.classList.replace('flex', 'hidden');
+                card.querySelector('.drawer-doc-cue')?.classList.remove('hidden');
+            });
+            drawerContainer.querySelectorAll('.delete-log-control').forEach(control => {
+                if (control !== except) resetDeleteButton(control);
+            });
+        };
+        // END: Close all document and delete inline actions except an optional active control.
+
+        // START: Persist a selected document status without opening a modal.
+        const updateDocumentStatus = async (card, newStatus) => {
+            const currentStatus = card.dataset.status;
+            if (newStatus === currentStatus) {
+                closeInlineActions();
+                return;
+            }
+
+            const actions = card.querySelector('.drawer-doc-actions');
+            const loading = card.querySelector('.drawer-doc-loading');
+            card.dataset.loading = 'true';
+            card.setAttribute('aria-busy', 'true');
+            actions?.classList.replace('flex', 'hidden');
+            loading?.classList.replace('hidden', 'block');
+
+            try {
+                const apiMapping = { COMPLETED: 'VERIFIED', REJECTED: 'DECLINED', PENDING: 'PENDING' };
+                const result = await apiPost('api/logs.php?type=docs', {
+                    gip_id: data.id,
+                    doc_name: card.dataset.name,
+                    status: apiMapping[newStatus] || newStatus
+                });
+                const json = result.success ? result.data : { success: false, error: result.error };
+
+                if (!json.success) throw new Error(json.error || 'Failed to update document status.');
+                showInlineToast('success', 'Status updated!');
+                if (window.viewBeneficiary) window.viewBeneficiary(data, viewController.currentPage);
+            } catch (error) {
+                card.dataset.loading = 'false';
+                card.removeAttribute('aria-busy');
+                loading?.classList.replace('block', 'hidden');
+                actions?.classList.replace('hidden', 'flex');
+                showInlineToast('error', error.message);
+            }
+        };
+        // END: Persist a selected document status without opening a modal.
+
+        drawerContainer.querySelectorAll('.drawer-doc-card').forEach(card => {
+            // START: Toggle one document card's inline status actions.
+            const toggleCardActions = () => {
+                const willOpen = card.getAttribute('aria-expanded') !== 'true';
+                closeInlineActions(willOpen ? card : null);
+                card.setAttribute('aria-expanded', String(willOpen));
+                card.querySelector('.drawer-doc-actions')?.classList.toggle('hidden', !willOpen);
+                card.querySelector('.drawer-doc-actions')?.classList.toggle('flex', willOpen);
+                card.querySelector('.drawer-doc-cue')?.classList.toggle('hidden', willOpen);
+            };
+            // END: Toggle one document card's inline status actions.
+
+            card.addEventListener('click', (event) => {
+                if (event.target.closest('.doc-status-action')) return;
+                toggleCardActions();
+            });
+            card.addEventListener('keydown', (event) => {
+                if (event.target.closest('.doc-status-action')) return;
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    toggleCardActions();
+                }
+            });
+            card.querySelectorAll('.doc-status-action').forEach(action => {
+                action.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    updateDocumentStatus(card, action.dataset.status);
+                });
+            });
         });
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.drawer-doc-card, .delete-log-control')) closeInlineActions();
+        }, { signal: inlineActionAbort.signal });
 
         // Philippine Public Holidays 2026 (ISO date strings)
         const PH_HOLIDAYS = new Set([
@@ -765,8 +928,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 const json = result.success ? result.data : { success: false, error: result.error };
 
                 if (json.success) {
-                    Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Auto-Added!', showConfirmButton: false, timer: 1500 });
-                    if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
+                    showInlineToast('success', 'Auto-Added!', 1500);
+                    if (window.viewBeneficiary) window.viewBeneficiary(data, viewController.currentPage);
                 } else {
                     Swal.fire('Error', 'Failed to add log.', 'error');
                 }
@@ -855,8 +1018,8 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                     const json = result.success ? result.data : { success: false, error: result.error };
 
                     if (json.success) {
-                        Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Log Updated!', showConfirmButton: false, timer: 1500 });
-                        if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
+                        showInlineToast('success', 'Log Updated!', 1500);
+                        if (window.viewBeneficiary) window.viewBeneficiary(data, viewController.currentPage);
                     } else {
                         Swal.fire('Error', json.error || 'Failed to update log.', 'error');
                     }
@@ -935,7 +1098,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
 
         drawerContainer.querySelectorAll('.edit-log-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                if (e.target.closest('.delete-log-btn')) return; // ignore if delete button matched
+                if (e.target.closest('.delete-log-control')) return; // ignore inline delete actions
                 const logType = btn.dataset.type;
                 const logId = btn.dataset.id;
                 const logVal = btn.dataset.val;
@@ -944,46 +1107,62 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             });
         });
 
-        // Delete Log Logic
-        drawerContainer.querySelectorAll('.delete-log-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const logId = btn.dataset.id;
-                const logType = btn.dataset.type;
+        // START: Delete DTR/AR logs through inline confirm and loading states.
+        drawerContainer.querySelectorAll('.delete-log-control').forEach(control => {
+            const trigger = control.querySelector('.delete-log-trigger');
+            const confirmButton = control.querySelector('.delete-log-confirm');
+            const cancelButton = control.querySelector('.delete-log-cancel');
 
-                const result = await Swal.fire({
-                    title: '<span class="text-xl font-black text-philippine-red uppercase tracking-tight">Delete item?</span>',
-                    text: 'This action cannot be undone.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: '<span class="font-black tracking-widest uppercase">Delete</span>',
-                    cancelButtonText: '<span class="font-black tracking-widest uppercase">Wait</span>',
-                    customClass: {
-                        container: 'font-montserrat',
-                        popup: 'rounded-[1.5rem] shadow-2xl border border-gray-100',
-                        confirmButton: 'bg-philippine-red text-white hover:bg-red-700 text-xs px-6 py-2.5 rounded-xl border border-transparent shadow-sm mx-2 cursor-pointer',
-                        cancelButton: 'bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs px-6 py-2.5 rounded-xl border border-gray-200 shadow-sm mx-2 cursor-pointer'
-                    },
-                    buttonsStyling: false
-                });
+            trigger?.addEventListener('click', (event) => {
+                event.stopPropagation();
+                closeInlineActions(control);
+                control.dataset.confirming = 'true';
+                control.classList.remove('w-11', 'opacity-0', 'pointer-events-none');
+                control.classList.add('w-22', 'opacity-100', 'pointer-events-auto');
+                control.closest('.edit-log-btn')?.querySelector('.log-status-label')?.classList.add('!pr-24');
+                trigger.classList.replace('flex', 'hidden');
+                control.querySelector('.delete-confirm-actions')?.classList.replace('hidden', 'flex');
+            });
 
-                if (result.isConfirmed) {
-                    try {
-                        const result = await apiPost(`api/logs.php?type=${logType}`, {
-                            log_id: logId,
-                            action: 'delete'
-                        });
-                        const json = result.success ? result.data : { success: false, error: result.error };
+            cancelButton?.addEventListener('click', (event) => {
+                event.stopPropagation();
+                resetDeleteButton(control);
+            });
 
-                        if (json.success) {
-                            Swal.fire({ toast: true, position: toastPosition, icon: 'success', title: 'Deleted', showConfirmButton: false, timer: 1500 });
-                            if (window.viewBeneficiary) window.viewBeneficiary(data, rightGridPage);
-                        } else {
-                            Swal.fire('Error', 'Failed to delete data.', 'error');
-                        }
-                    } catch (e) { Swal.fire('Error', e.message, 'error'); }
+            confirmButton?.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                if (control.dataset.loading === 'true') return;
+
+                const logId = control.dataset.id;
+                const logType = control.dataset.type;
+                control.dataset.loading = 'true';
+                confirmButton.disabled = true;
+                cancelButton.disabled = true;
+                confirmButton.querySelector('.delete-confirm-icon')?.classList.add('hidden');
+                confirmButton.querySelector('.delete-loading-icon')?.classList.replace('hidden', 'block');
+
+                try {
+                    const result = await apiPost(`api/logs.php?type=${logType}`, {
+                        log_id: logId,
+                        action: 'delete'
+                    });
+                    const json = result.success ? result.data : { success: false, error: result.error };
+                    if (!json.success) throw new Error(json.error || 'Failed to delete data.');
+
+                    showInlineToast('success', 'Deleted');
+                    if (window.viewBeneficiary) window.viewBeneficiary(data, viewController.currentPage);
+                } catch (error) {
+                    control.dataset.loading = 'false';
+                    confirmButton.disabled = false;
+                    cancelButton.disabled = false;
+                    confirmButton.querySelector('.delete-loading-icon')?.classList.replace('block', 'hidden');
+                    confirmButton.querySelector('.delete-confirm-icon')?.classList.remove('hidden');
+                    resetDeleteButton(control);
+                    showInlineToast('error', error.message);
                 }
             });
         });
+        // END: Delete DTR/AR logs through inline confirm and loading states.
 
     }).catch(console.error);
 }

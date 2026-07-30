@@ -54,7 +54,19 @@ export function initModalHandler() {
 
         // If caller passed partial payload (e.g. only {id}), hydrate from API first.
         const hasCoreFields = Boolean(data?.name && data?.office && data?.remarks);
+        const showedProfileSkeleton = !hasCoreFields;
         let beneficiaryData = { ...data, id: beneficiaryId };
+
+        // START: Show a real drawer skeleton while the beneficiary profile is fetched.
+        if (showedProfileSkeleton) {
+            showBeneficiaryDrawer({
+                id: beneficiaryId,
+                _isLoadingProfile: true,
+                _isLoadingLogs: true
+            }, page);
+        }
+        // END: Show a real drawer skeleton while the beneficiary profile is fetched.
+
         if (!hasCoreFields) {
             const infoRes = await apiGet(`api/beneficiaries.php?id=${encodeURIComponent(beneficiaryId)}`);
             if (infoRes.success && infoRes.data?.success && infoRes.data?.beneficiary) {
@@ -73,6 +85,9 @@ export function initModalHandler() {
         beneficiaryData.arLogs = cachedLogs?.arLogs || [];
         beneficiaryData.dtrLogs = cachedLogs?.dtrLogs || [];
         beneficiaryData.docs = cachedLogs?.docs || [];
+        beneficiaryData._isLoadingProfile = false;
+        beneficiaryData._isLoadingLogs = !hadCache;
+        beneficiaryData._noAnimation = showedProfileSkeleton;
         showBeneficiaryDrawer(beneficiaryData, page);
 
         // STEP 2: Background network fetch (does not block drawer open)
@@ -113,20 +128,36 @@ export function initModalHandler() {
             const displayed = JSON.stringify({
                 ar: cachedLogs?.arLogs || [],
                 dtr: cachedLogs?.dtrLogs || [],
-                docs: cachedLogs?.docs || []
+                docs: cachedLogs?.docs || [],
+                absorption: []
             });
-            const fresh = JSON.stringify({ ar: fetchedArLogs, dtr: fetchedDtrLogs, docs: fetchedDocs });
+            const fresh = JSON.stringify({
+                ar: fetchedArLogs,
+                dtr: fetchedDtrLogs,
+                docs: fetchedDocs,
+                absorption: absorptionLogs
+            });
             if (!hadCache || displayed !== fresh) {
                 const drawerContainer = document.getElementById('beneficiary-drawer-container');
                 if (drawerContainer && drawerContainer.dataset.beneficiaryId === String(beneficiaryId)) {
                     beneficiaryData.arLogs = fetchedArLogs;
                     beneficiaryData.dtrLogs = fetchedDtrLogs;
                     beneficiaryData.docs = fetchedDocs;
+                    beneficiaryData._isLoadingProfile = false;
+                    beneficiaryData._isLoadingLogs = false;
                     showBeneficiaryDrawer({ ...beneficiaryData, _noAnimation: true }, page);
                 }
             }
         } catch (error) {
             console.error('Error fetching logs/docs:', error);
+            if (!hadCache) {
+                const drawerContainer = document.getElementById('beneficiary-drawer-container');
+                if (drawerContainer && drawerContainer.dataset.beneficiaryId === String(beneficiaryId)) {
+                    beneficiaryData._isLoadingProfile = false;
+                    beneficiaryData._isLoadingLogs = false;
+                    showBeneficiaryDrawer({ ...beneficiaryData, _noAnimation: true }, page);
+                }
+            }
         }
     };
     window.showAddDataModal = function (data) {
