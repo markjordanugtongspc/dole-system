@@ -102,18 +102,24 @@ require_once __DIR__ . '/../../../config/vite.php';
     </style>
 
     <div class="p-4 sm:p-6 sm:ml-64 mt-20">
-        <div class="max-w-7xl mx-auto">
+        <div class="max-w-6xl mx-auto">
 
 
 
             <!-- Page Title Block -->
-            <div class="mb-6 px-1">
-                <h1 class="text-3xl font-black text-heading leading-tight mb-0.5">Setting</h1>
-                <p class="text-xs text-gray-400 dark:text-slate-500 font-bold uppercase tracking-wider">DOLE LDNPFO GIP System Settings</p>
+            <div class="mb-6 px-1 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h1 class="text-3xl font-black text-heading leading-tight mb-0.5">Settings</h1>
+                    <p class="text-xs text-gray-400 dark:text-slate-500 font-bold uppercase tracking-wider">DOLE LDNPFO GIP System Settings</p>
+                </div>
+                <button type="button" id="save-settings-btn" class="w-full sm:w-auto inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-royal-blue px-5 py-2.5 text-[0.6875rem] font-bold uppercase tracking-widest text-white shadow-md transition-all hover:bg-blue-800 active:scale-95 dark:bg-blue-600 dark:hover:bg-blue-700">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+                    Save Settings
+                </button>
             </div>
 
             <!-- Tab Switcher (Mockup Style Underlined) -->
-            <div class="flex border-b border-slate-200 dark:border-slate-800 mb-8 w-full">
+            <div class="hidden" aria-hidden="true">
                 <button data-tab-target="profile"
                     class="tab-link active border-b-2 border-transparent font-extrabold text-[0.625rem] sm:text-xs uppercase tracking-widest text-slate-500 hover:text-royal-blue dark:text-slate-400 dark:hover:text-blue-400 py-3.5 px-5 select-none focus:outline-none cursor-pointer flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
@@ -126,31 +132,32 @@ require_once __DIR__ . '/../../../config/vite.php';
                 </button>
                 <button data-tab-target="preferences"
                     class="tab-link border-b-2 border-transparent font-extrabold text-[0.625rem] sm:text-xs uppercase tracking-widest text-slate-500 hover:text-royal-blue dark:text-slate-400 dark:hover:text-blue-400 py-3.5 px-5 select-none focus:outline-none cursor-pointer flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 48 48"><path fill="currentColor" d="m24 34c2.4188915 0 4.4366008 1.7176654 4.8999437 3.999812l15.1000563.000188v2l-15.1002591.0011864c-.4637287 2.2816492-2.4812022 3.9988136-4.8997409 3.9988136s-4.4360122-1.7171644-4.8997409-3.9988136l-15.1002591-.0011864v-2l15.1000563-.000188c.4633429-2.2821466 2.4810522-3.999812 4.8999437-3.999812zm0 2c-1.6568542 0-3 1.3431458-3 3s1.3431458 3 3 3 3-1.3431458 3-3-1.3431458-3-3-3zm10-17c2.4188915 0 4.4366008 1.7176654 4.8999437 3.999812l5.1000563.000188v2l-5.1002591.0011864c-.4637287 2.2816492-2.4812022 3.9988136-4.8997409 3.9988136s-4.4360122-1.7171644-4.8997409-3.9988136l-25.1002591-.0011864v-2l25.1000563-.000188c.4633429-2.2821466 2.4810522-3.999812 4.8999437-3.999812zm0 2c-1.6568542 0-3 1.3431458-3 3s1.3431458 3 3 3 3-1.3431458 3-3-1.3431458-3-3-3zm-20-17c2.4188915 0 4.4366008 1.71766536 4.8999437 3.99981203l25.1000563.00018797v2l-25.1002591.0011864c-.4637287 2.2816492-2.4812022 3.9988136-4.8997409 3.9988136s-4.43601224-1.7171644-4.89974091-3.9988136l-5.10025909-.0011864v-2l5.10005628-.00018797c.46334296-2.28214667 2.48105222-3.99981203 4.89994372-3.99981203zm0 2c-1.6568542 0-3 1.3431458-3 3 0 1.6568542 1.3431458 3 3 3s3-1.3431458 3-3c0-1.65685425-1.3431458-3-3-3z"/></svg>
                     Preferences
                 </button>
             </div>
 
             <!-- Unified Content Area (Takes full width) -->
-            <div class="w-full">
+            <div class="w-full flex flex-col gap-6">
 
                 <!-- Profile Tab Panel -->
-                <div id="tab-profile" class="tab-content animate-slide-in">
+                <div id="tab-profile" class="tab-content animate-slide-in order-1">
                     <form id="settings-form" class="space-y-6">
 
-                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                            
-                            <!-- Card 1: Personal Details (Left Card, 7 Columns) -->
-                            <div class="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6 shadow-xs relative">
+                        <div class="grid grid-cols-1 gap-6 items-start">
+
+                            <!-- Unified Profile Details -->
+                            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 sm:p-6 shadow-xs relative">
                                 <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
-                                    <h3 class="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-wider">Personal Details</h3>
+                                    <h3 class="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-wider">Profile Details</h3>
                                     <button type="button" class="text-gray-400 hover:text-royal-blue dark:hover:text-blue-400 cursor-pointer">
                                         <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                     </button>
                                 </div>
 
-                                <!-- Integrated Avatar Display & Basic Info -->
-                                <div class="flex items-center gap-4 mb-6">
+                                <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_18rem] gap-6 items-start">
+                                    <!-- Integrated Avatar Display & Basic Info -->
+                                <div class="flex items-center gap-4 mb-6 lg:order-2 lg:justify-self-center lg:pt-12">
                                     <div class="relative group shrink-0 select-none">
                                         <div id="settings-avatar-preview"
                                             class="w-20 h-20 rounded-full border border-slate-200 dark:border-slate-700 shadow-xs overflow-hidden bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-royal-blue dark:text-blue-400 text-2xl font-black transition-all">
@@ -170,7 +177,7 @@ require_once __DIR__ . '/../../../config/vite.php';
                                 </div>
 
                                 <!-- Personal Details Inputs -->
-                                <div class="space-y-4">
+                                <div class="space-y-4 lg:order-1">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-[0.625rem] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Full Name</label>
@@ -195,12 +202,21 @@ require_once __DIR__ . '/../../../config/vite.php';
                                         </div>
                                         <div>
                                             <label class="block text-[0.625rem] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Gender</label>
-                                            <select id="set-gender" name="gender"
-                                                class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs font-semibold text-gray-700 dark:text-slate-200 outline-none transition-all cursor-pointer">
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
-                                                <option value="Other">Other</option>
-                                            </select>
+                                            <input type="hidden" id="set-gender" name="gender" value="Male">
+                                            <div id="gender-picker" class="grid grid-cols-3 gap-1" role="radiogroup" aria-label="Gender">
+                                                <button type="button" class="gender-option whitespace-nowrap rounded-md border px-1.5 py-1 text-[0.5625rem] font-bold transition-all cursor-pointer bg-blue-600 text-white border-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-500" data-gender="Male" aria-pressed="true">
+                                                    <svg class="mx-auto mb-0.5 h-3 w-3" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="14" r="4" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M13 11l6-6m0 0h-4m4 0v4"/></svg>
+                                                    Male
+                                                </button>
+                                                <button type="button" class="gender-option whitespace-nowrap rounded-md border px-1.5 py-1 text-[0.5625rem] font-bold transition-all cursor-pointer bg-pink-600 text-white border-pink-600 hover:bg-pink-700 dark:bg-pink-600 dark:text-white dark:hover:bg-pink-500" data-gender="Female" aria-pressed="false">
+                                                    <svg class="mx-auto mb-0.5 h-3 w-3" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M12 12v8m-3-3h6"/></svg>
+                                                    Female
+                                                </button>
+                                                <button type="button" class="gender-option whitespace-nowrap rounded-md border px-1.5 py-1 text-[0.5625rem] font-bold transition-all cursor-pointer bg-gray-600 text-white border-gray-600 hover:bg-gray-700 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500" data-gender="Other" aria-pressed="false">
+                                                    <svg class="mx-auto mb-0.5 h-3 w-3" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M12 3v18m-9-9h18"/><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/></svg>
+                                                    Other
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -211,11 +227,10 @@ require_once __DIR__ . '/../../../config/vite.php';
                                             placeholder="Tell us about yourself..."></textarea>
                                     </div>
                                 </div>
-                            </div>
+                                </div>
 
-                            <!-- Card 2: Additional Details (Right Card, 5 Columns) -->
-                            <div class="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6 shadow-xs relative">
-                                <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+                                <div class="flex items-center justify-between mb-6">
                                     <h3 class="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-wider">Additional Details</h3>
                                     <button type="button" class="text-gray-400 hover:text-royal-blue dark:hover:text-blue-400 cursor-pointer">
                                         <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
@@ -251,44 +266,19 @@ require_once __DIR__ . '/../../../config/vite.php';
                                             placeholder="English, Tagalog, Cebuano">
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                                </div>
+                                <!-- Change Password Section -->
+                <div id="tab-security" class="border-t border-slate-200 dark:border-slate-800 mt-6 pt-6">
 
-                        <!-- Save Profile Changes Button (Clean rectangular block under both cards) -->
-                        <div class="flex items-center justify-between pt-4">
-                            <div id="save-status" class="hidden flex items-center gap-2 text-emerald-600">
-                                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <span class="text-xs font-bold animate-pulse">Syncing profile...</span>
-                            </div>
-                            <div class="flex-1"></div>
-                            <button type="submit"
-                                class="btn-save text-white px-8 py-3 rounded-lg font-bold text-[0.6875rem] uppercase tracking-widest shadow-md flex items-center gap-2 cursor-pointer border-none bg-royal-blue hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 transition-all active:scale-95">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
-                                Save Profile Changes
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Security Tab Panel -->
-                <div id="tab-security" class="tab-content hidden animate-slide-in">
-                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6 shadow-xs">
                         <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
-                            <div class="w-8 h-8 bg-royal-blue/10 rounded-md flex items-center justify-center text-royal-blue shrink-0">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                            </div>
+                            <svg class="w-5 h-5 text-royal-blue dark:text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                             <div>
                                 <h3 class="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-wider">Change Password</h3>
                                 <p class="text-[10px] text-gray-400 dark:text-slate-500 font-bold mt-0.5">Update your authentication credentials</p>
                             </div>
                         </div>
 
-                        <form id="password-form" class="space-y-4">
+                        <div id="password-form" class="space-y-4">
                             <div>
                                 <label class="block text-[0.625rem] font-bold text-gray-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Current Password</label>
                                 <input type="password" id="current_password" name="current_password"
@@ -311,24 +301,40 @@ require_once __DIR__ . '/../../../config/vite.php';
                                 </div>
                             </div>
 
-                            <button type="submit"
+                            <button type="button" id="update-password-btn"
                                 class="btn-save w-full text-white py-3 rounded-lg font-bold text-[0.6875rem] uppercase tracking-widest shadow-md flex items-center justify-center gap-2 cursor-pointer mt-6 border-none bg-royal-blue hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 transition-all active:scale-95">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
                                 Update Password
                             </button>
-                        </form>
-                    </div>
+                        </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save Profile Changes Button (Clean rectangular block under both cards) -->
+                        <div class="hidden flex items-center justify-between pt-4">
+                            <div id="save-status" class="hidden flex items-center gap-2 text-emerald-600">
+                                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span class="text-xs font-bold animate-pulse">Syncing profile...</span>
+                            </div>
+                            <div class="flex-1"></div>
+                            <button type="submit"
+                                class="btn-save text-white px-8 py-3 rounded-lg font-bold text-[0.6875rem] uppercase tracking-widest shadow-md flex items-center gap-2 cursor-pointer border-none bg-royal-blue hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 transition-all active:scale-95">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+                                Save Profile Changes
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
                 <!-- Preferences Tab Panel -->
-                <div id="tab-preferences" class="tab-content hidden animate-slide-in">
+                <div id="tab-preferences" class="tab-content animate-slide-in order-3">
                     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6 shadow-xs">
                         <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
-                            <div class="w-8 h-8 bg-royal-blue/10 rounded-md flex items-center justify-center text-royal-blue shrink-0">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                </svg>
-                            </div>
+                            <svg class="w-5 h-5 text-royal-blue dark:text-blue-400 shrink-0" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="m24 34c2.4188915 0 4.4366008 1.7176654 4.8999437 3.999812l15.1000563.000188v2l-15.1002591.0011864c-.4637287 2.2816492-2.4812022 3.9988136-4.8997409 3.9988136s-4.4360122-1.7171644-4.8997409-3.9988136l-15.1002591-.0011864v-2l15.1000563-.000188c.4633429-2.2821466 2.4810522-3.999812 4.8999437-3.999812zm0 2c-1.6568542 0-3 1.3431458-3 3s1.3431458 3 3 3 3-1.3431458 3-3-1.3431458-3-3-3zm10-17c2.4188915 0 4.4366008 1.7176654 4.8999437 3.999812l5.1000563.000188v2l-5.1002591.0011864c-.4637287 2.2816492-2.4812022 3.9988136-4.8997409 3.9988136s-4.4360122-1.7171644-4.8997409-3.9988136l-25.1002591-.0011864v-2l25.1000563-.000188c.4633429-2.2821466 2.4810522-3.999812 4.8999437-3.999812zm0 2c-1.6568542 0-3 1.3431458-3 3s1.3431458 3 3 3 3-1.3431458 3-3-1.3431458-3-3-3zm-20-17c2.4188915 0 4.4366008 1.71766536 4.8999437 3.99981203l25.1000563.00018797v2l-25.1002591.0011864c-.4637287 2.2816492-2.4812022 3.9988136-4.8997409 3.9988136s-4.43601224-1.7171644-4.89974091-3.9988136l-5.10025909-.0011864v-2l5.10005628-.00018797c.46334296-2.28214667 2.48105222-3.99981203 4.89994372-3.99981203zm0 2c-1.6568542 0-3 1.3431458-3 3 0 1.6568542 1.3431458 3 3 3s3-1.3431458 3-3c0-1.65685425-1.3431458-3-3-3z"/></svg>
                             <div>
                                 <h3 class="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-wider">System Preferences</h3>
                                 <p class="text-[10px] text-gray-400 dark:text-slate-500 font-bold mt-0.5">Customize your experience</p>
@@ -378,7 +384,7 @@ require_once __DIR__ . '/../../../config/vite.php';
                             </div>
                         </div>
 
-                        <div class="flex justify-end mt-6">
+                        <div class="hidden flex justify-end mt-6">
                             <button type="button" id="save-pref-btn"
                                 class="btn-save text-white px-8 py-2.5 rounded-lg font-bold text-[0.6875rem] uppercase tracking-widest shadow-md flex items-center gap-2 cursor-pointer border-none bg-royal-blue hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 transition-all active:scale-95">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
@@ -391,7 +397,6 @@ require_once __DIR__ . '/../../../config/vite.php';
             </div>
         </div>
     </div>
-
     <script>
         // Security check
         if (localStorage.getItem('isLoggedIn') !== 'true') {

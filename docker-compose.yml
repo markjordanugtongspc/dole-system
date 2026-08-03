@@ -5,51 +5,30 @@ services:
       dockerfile: Dockerfile
     container_name: dole-system-app
     ports:
-      - "8080:80"
-    volumes:
-      - .:/var/www/html
-      - /var/www/html/node_modules
-      - /var/www/html/vendor
+      - "80:80"
+      - "443:443"
     environment:
-      # These flags tell the richarvey image to skip composer/npm if we want
-      - SKIP_COMPOSER=1
-      - WEBROOT=/var/www/html
-      - APP_ENV=development
-      - APP_DEBUG=true
-      - PHP_MEMORY_LIMIT=256M
-      - PHP_FPM_MAX_CHILDREN=10
-      - PHP_FPM_START_SERVERS=2
-      - PHP_FPM_MIN_SPARE_SERVERS=1
-      - PHP_FPM_MAX_SPARE_SERVERS=3
-      # Database connection for Docker
-      - DB_CONNECTION=mysql
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_DATABASE=dole_db
-      - DB_USERNAME=root
-      - DB_PASSWORD=root
-    depends_on:
-      - db
+      SKIP_COMPOSER: "1"
+      WEBROOT: /var/www/html
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DEBUG_MODE: "false"
+      VITE_DEBUG: "false"
+      LOG_LEVEL: error
+      PHP_MEMORY_LIMIT: 256M
+      PHP_FPM_MAX_CHILDREN: 10
+      PHP_FPM_START_SERVERS: 2
+      PHP_FPM_MIN_SPARE_SERVERS: 1
+      PHP_FPM_MAX_SPARE_SERVERS: 3
+    networks:
+      - dole-internal
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
         reservations:
-          memory: 256M
+          memory: 512M
 
-  db:
-    image: mariadb:10.11
-    container_name: dole-system-db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: dole_db
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./config/database_schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
-      - ./config/sample_data.sql:/docker-entrypoint-initdb.d/2-data.sql
-      - dole-system-db-data:/var/lib/mysql
-
-volumes:
-  dole-system-db-data:
+networks:
+  dole-internal:
+    driver: bridge

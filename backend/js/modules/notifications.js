@@ -130,6 +130,8 @@ async function loadNotifications() {
         const result = response.data;
 
         if (response.success && result.success) {
+            const detectedCount = Number(result.skeleton_count ?? result.notification_count ?? (Array.isArray(result.notifications) ? result.notifications.length : 0));
+            notificationList.dataset.notificationCount = Math.min(Math.max(detectedCount, 1), 3);
             renderNotifications(result.notifications);
             updateBadgeCount(result.unread_count);
         } else {
@@ -142,49 +144,19 @@ async function loadNotifications() {
 }
 
 /**
- * Show loading state with Flowbite Skeleton Component
+ * Show a bounded skeleton count based on the last detected notification count.
+ * The first load defaults to three because the server response has not arrived yet.
  */
 function showLoadingState(container) {
-    container.innerHTML = `
-        <div role="status" class="max-w-md p-4 space-y-4 border-b border-default divide-y divide-default rounded-base skeleton-wave md:p-6 dark:divide-slate-700/50">
-            <div class="flex items-center justify-between pt-4 first:pt-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 skeleton-component rounded-full shrink-0"></div>
-                    <div>
-                        <div class="h-2.5 skeleton-component rounded-full w-32 mb-2"></div>
-                        <div class="w-48 h-2 skeleton-component opacity-60 rounded-full"></div>
-                    </div>
-                </div>
-                <div class="h-5 skeleton-component opacity-40 rounded-md w-16"></div>
-            </div>
-            <div class="flex items-center justify-between pt-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 skeleton-component rounded-full shrink-0"></div>
-                    <div>
-                        <div class="h-2.5 skeleton-component rounded-full w-24 mb-2"></div>
-                        <div class="w-56 h-2 skeleton-component opacity-60 rounded-full"></div>
-                    </div>
-                </div>
-                <div class="h-5 skeleton-component opacity-40 rounded-md w-12"></div>
-            </div>
-            <div class="flex items-center justify-between pt-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 skeleton-component rounded-full shrink-0"></div>
-                    <div>
-                        <div class="h-2.5 skeleton-component rounded-full w-28 mb-2"></div>
-                        <div class="w-40 h-2 skeleton-component opacity-60 rounded-full"></div>
-                    </div>
-                </div>
-                <div class="h-5 skeleton-component opacity-40 rounded-md w-20"></div>
-            </div>
-            <span class="sr-only">Loading notifications...</span>
-        </div>
-    `;
+    const detectedCount = Number(container.dataset.notificationCount || 3);
+    const count = Math.min(Math.max(Number.isFinite(detectedCount) ? detectedCount : 3, 1), 3);
+    const widths = ['w-32', 'w-24', 'w-28'];
+    container.innerHTML = Array.from({ length: count }, (_, index) => `
+        <div role="status" class="flex items-center justify-between p-4 border-b border-default skeleton-wave dark:border-slate-700/50">
+            <div class="flex items-center gap-3"><div class="w-11 h-11 skeleton-component rounded-full shrink-0"></div><div><div class="h-2.5 skeleton-component rounded-full ${widths[index]} mb-2"></div><div class="w-48 h-2 skeleton-component opacity-60 rounded-full"></div></div></div>
+            <div class="h-5 skeleton-component opacity-40 rounded-md w-16"></div><span class="sr-only">Loading notifications...</span>
+        </div>`).join('');
 }
-
-/**
- * Show error state
- */
 function showErrorState(container) {
     container.innerHTML = `
         <div class="flex items-center justify-center py-8 text-gray-500 text-sm">

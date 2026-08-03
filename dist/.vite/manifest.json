@@ -29,7 +29,7 @@
     ]
   },
   "backend/js/main.js": {
-    "file": "assets/main-CMuCieHV.js",
+    "file": "assets/main-HL3PMiEs.js",
     "name": "main",
     "src": "backend/js/main.js",
     "isEntry": true,
@@ -45,7 +45,7 @@
     ]
   },
   "backend/js/modules/settings.js": {
-    "file": "assets/settings-C1wGXu8Q.js",
+    "file": "assets/settings-CkylUUgz.js",
     "name": "settings",
     "src": "backend/js/modules/settings.js",
     "isEntry": true,
@@ -63,7 +63,7 @@
     "isDynamicEntry": true
   },
   "style.css": {
-    "file": "assets/style-GqJDuWBH.css",
+    "file": "assets/style-Dnx63JHw.css",
     "src": "style.css"
   }
 }

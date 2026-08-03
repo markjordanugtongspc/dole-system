@@ -13,41 +13,11 @@ import"./vendor-DpcThRKv.js";import{i as Ke,D as Xe,a as Qe}from"./vendor-flowbi
                     </ul>
                     <p class="text-xs text-gray-500 italic">Recommended for better user experience</p>
                 </div>
-            `,icon:"question",showCancelButton:!0,confirmButtonText:"Allow Notifications",cancelButtonText:"Maybe Later",confirmButtonColor:"#10b981",cancelButtonColor:"#6b7280",customClass:{popup:"rounded-2xl",confirmButton:"font-bold",cancelButton:"font-bold"}})).isConfirmed){const r=await Notification.requestPermission();pe=r,r==="granted"&&s.fire({icon:"success",title:"Notifications Enabled!",text:"You will now receive real-time updates.",timer:3e3,showConfirmButton:!1})}}else pe=Notification.permission}function ht(){const s=document.getElementById("notificationBellButton"),e=document.getElementById("notificationDropdown");!s||!e||s.addEventListener("click",()=>{ae()})}async function ae(){N(),document.getElementById("notificationDropdown");const s=document.getElementById("notificationList");if(s){yt(s);try{const e=await P("api/notifications.php"),r=e.data;e.success&&r.success?(Re(r.notifications),j(r.unread_count)):Ee(s)}catch{Ee(s)}}}function yt(s){s.innerHTML=`
-        <div role="status" class="max-w-md p-4 space-y-4 border-b border-default divide-y divide-default rounded-base skeleton-wave md:p-6 dark:divide-slate-700/50">
-            <div class="flex items-center justify-between pt-4 first:pt-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 skeleton-component rounded-full shrink-0"></div>
-                    <div>
-                        <div class="h-2.5 skeleton-component rounded-full w-32 mb-2"></div>
-                        <div class="w-48 h-2 skeleton-component opacity-60 rounded-full"></div>
-                    </div>
-                </div>
-                <div class="h-5 skeleton-component opacity-40 rounded-md w-16"></div>
-            </div>
-            <div class="flex items-center justify-between pt-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 skeleton-component rounded-full shrink-0"></div>
-                    <div>
-                        <div class="h-2.5 skeleton-component rounded-full w-24 mb-2"></div>
-                        <div class="w-56 h-2 skeleton-component opacity-60 rounded-full"></div>
-                    </div>
-                </div>
-                <div class="h-5 skeleton-component opacity-40 rounded-md w-12"></div>
-            </div>
-            <div class="flex items-center justify-between pt-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 skeleton-component rounded-full shrink-0"></div>
-                    <div>
-                        <div class="h-2.5 skeleton-component rounded-full w-28 mb-2"></div>
-                        <div class="w-40 h-2 skeleton-component opacity-60 rounded-full"></div>
-                    </div>
-                </div>
-                <div class="h-5 skeleton-component opacity-40 rounded-md w-20"></div>
-            </div>
-            <span class="sr-only">Loading notifications...</span>
-        </div>
-    `}function Ee(s){s.innerHTML=`
+            `,icon:"question",showCancelButton:!0,confirmButtonText:"Allow Notifications",cancelButtonText:"Maybe Later",confirmButtonColor:"#10b981",cancelButtonColor:"#6b7280",customClass:{popup:"rounded-2xl",confirmButton:"font-bold",cancelButton:"font-bold"}})).isConfirmed){const r=await Notification.requestPermission();pe=r,r==="granted"&&s.fire({icon:"success",title:"Notifications Enabled!",text:"You will now receive real-time updates.",timer:3e3,showConfirmButton:!1})}}else pe=Notification.permission}function ht(){const s=document.getElementById("notificationBellButton"),e=document.getElementById("notificationDropdown");!s||!e||s.addEventListener("click",()=>{ae()})}async function ae(){N(),document.getElementById("notificationDropdown");const s=document.getElementById("notificationList");if(s){yt(s);try{const e=await P("api/notifications.php"),r=e.data;if(e.success&&r.success){const t=Number(r.skeleton_count??r.notification_count??(Array.isArray(r.notifications)?r.notifications.length:0));s.dataset.notificationCount=Math.min(Math.max(t,1),3),Re(r.notifications),j(r.unread_count)}else Ee(s)}catch{Ee(s)}}}function yt(s){const e=Number(s.dataset.notificationCount||3),r=Math.min(Math.max(Number.isFinite(e)?e:3,1),3),t=["w-32","w-24","w-28"];s.innerHTML=Array.from({length:r},(n,i)=>`
+        <div role="status" class="flex items-center justify-between p-4 border-b border-default skeleton-wave dark:border-slate-700/50">
+            <div class="flex items-center gap-3"><div class="w-11 h-11 skeleton-component rounded-full shrink-0"></div><div><div class="h-2.5 skeleton-component rounded-full ${t[i]} mb-2"></div><div class="w-48 h-2 skeleton-component opacity-60 rounded-full"></div></div></div>
+            <div class="h-5 skeleton-component opacity-40 rounded-md w-16"></div><span class="sr-only">Loading notifications...</span>
+        </div>`).join("")}function Ee(s){s.innerHTML=`
         <div class="flex items-center justify-center py-8 text-gray-500 text-sm">
             <p>Unable to load notifications</p>
         </div>

@@ -12,11 +12,16 @@ async function initSettings() {
     const basePath = getBasePath();
     const settingsForm = document.getElementById('settings-form');
     const passwordForm = document.getElementById('password-form');
+    const updatePasswordBtn = document.getElementById('update-password-btn');
     const tabButtons = document.querySelectorAll('.tab-link');
     const tabContents = document.querySelectorAll('.tab-content');
     const avatarInput = document.getElementById('settings-pic-input');
     const avatarPreview = document.getElementById('settings-avatar-preview');
     const saveStatus = document.getElementById('save-status');
+
+    initBottomScrollControl();
+    initGenderPicker();
+    initProfileDropdownOnSettings();
 
     // 1. Fetch Current Data
     // Resolve user_id for Vercel serverless (no PHP sessions)
@@ -62,7 +67,7 @@ async function initSettings() {
     });
 
     // 3. Avatar Preview
-    avatarInput.addEventListener('change', (e) => {
+    if (avatarInput) avatarInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
@@ -74,7 +79,7 @@ async function initSettings() {
     });
 
     // 4. Submit Profile Updates
-    settingsForm.addEventListener('submit', async (e) => {
+    if (settingsForm) settingsForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         saveStatus.classList.remove('hidden');
@@ -116,7 +121,7 @@ async function initSettings() {
                     timer: 3000,
                     showConfirmButton: false,
                     customClass: {
-                        popup: 'rounded-xl border border-blue-50'
+                        popup: 'rounded-xl !bg-emerald-600 !text-white dark:!bg-emerald-700 border border-emerald-500 dark:border-emerald-600'
                     }
                 });
             } else {
@@ -156,8 +161,16 @@ async function initSettings() {
         });
     }
 
+    const saveSettingsBtn = document.getElementById('save-settings-btn');
+    if (saveSettingsBtn) {
+        saveSettingsBtn.addEventListener('click', () => {
+            document.dispatchEvent(new CustomEvent('preferencesSaved'));
+            if (settingsForm) settingsForm.requestSubmit();
+        });
+    }
+
     // 6. Submit Password Change
-    passwordForm.addEventListener('submit', async (e) => {
+    if (updatePasswordBtn) updatePasswordBtn.addEventListener('click', async (e) => {
         e.preventDefault();
 
         const currentPass = document.getElementById('current_password').value;
@@ -207,7 +220,7 @@ async function initSettings() {
             const result = await response.json();
 
             if (result.success) {
-                passwordForm.reset();
+                ['current_password', 'new_password', 'confirm_password'].forEach((id) => { document.getElementById(id).value = ''; });
                 Swal.fire({
                     toast: true,
                     position: window.innerWidth < 768 ? 'top-end' : 'bottom-end',
@@ -234,6 +247,92 @@ async function initSettings() {
     });
 }
 
+
+
+// START: Settings profile dropdown activation
+function initProfileDropdownOnSettings() {
+    if (!window.location.pathname.includes('/frontend/user/settings')) return;
+    const profileButton = document.getElementById('profileDropdownButton');
+    const profileDropdown = document.getElementById('profileDropdown');
+    if (!profileButton || !profileDropdown) return;
+
+    window.setTimeout(() => {
+        if (!profileDropdown.classList.contains('hidden')) return;
+        profileButton.click();
+    }, 0);
+}
+// END: Settings profile dropdown activation
+// START: Bottom-of-page scroll control
+function initBottomScrollControl() {
+    const control = document.createElement('button');
+    const defaultIcon = `<svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16 14-4-4-4 4"/></svg>`;
+    const hoverIcon = `<svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16 17-4-4-4 4m8-6-4-4-4 4"/></svg>`;
+
+    control.type = 'button';
+    control.id = 'settings-scroll-top';
+    control.setAttribute('aria-label', 'Scroll to top');
+    control.className = 'fixed bottom-5 left-1/2 z-40 flex h-11 w-11 -translate-x-1/2 translate-y-2 items-center justify-center rounded-full bg-royal-blue text-white opacity-0 pointer-events-none shadow-lg transition-all duration-300 ease-out hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-500 dark:focus:ring-blue-800 cursor-pointer touch-manipulation sm:bottom-6 sm:left-auto sm:right-4 sm:translate-x-0';
+    control.innerHTML = defaultIcon;
+    document.body.appendChild(control);
+
+    const updateVisibility = () => {
+        const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
+        control.classList.toggle('opacity-100', atBottom);
+        control.classList.toggle('opacity-0', !atBottom);
+        control.classList.toggle('pointer-events-auto', atBottom);
+        control.classList.toggle('pointer-events-none', !atBottom);
+        control.classList.toggle('translate-y-0', atBottom);
+        control.classList.toggle('translate-y-2', !atBottom);
+    };
+
+    control.addEventListener('mouseenter', () => { control.innerHTML = hoverIcon; });
+    control.addEventListener('mouseleave', () => { control.innerHTML = defaultIcon; });
+    const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    control.addEventListener('click', scrollToTop);
+    control.addEventListener('touchend', scrollToTop, { passive: true });
+    window.addEventListener('scroll', updateVisibility, { passive: true });
+    window.addEventListener('resize', updateVisibility);
+    updateVisibility();
+}
+// END: Bottom-of-page scroll control
+
+// START: Gender button picker
+function initGenderPicker() {
+    const picker = document.getElementById('gender-picker');
+    if (!picker) return;
+    picker.querySelectorAll('.gender-option').forEach((button) => {
+        button.addEventListener('click', () => setGenderValue(button.dataset.gender));
+    });
+    setGenderValue(document.getElementById('set-gender')?.value || 'Male');
+}
+
+function setGenderValue(value) {
+    const hiddenInput = document.getElementById('set-gender');
+    const picker = document.getElementById('gender-picker');
+    if (!hiddenInput || !picker) return;
+
+    const styles = {
+        Male: ['bg-blue-600', 'text-white', 'border-blue-600', 'hover:bg-blue-700', 'dark:bg-blue-600', 'dark:text-white', 'dark:hover:bg-blue-500'],
+        Female: ['bg-pink-600', 'text-white', 'border-pink-600', 'hover:bg-pink-700', 'dark:bg-pink-600', 'dark:text-white', 'dark:hover:bg-pink-500'],
+        Other: ['bg-gray-600', 'text-white', 'border-gray-600', 'hover:bg-gray-700', 'dark:bg-gray-600', 'dark:text-white', 'dark:hover:bg-gray-500']
+    };
+    const selected = styles[value] ? value : 'Male';
+    hiddenInput.value = selected;
+
+    picker.querySelectorAll('.gender-option').forEach((button) => {
+        const isSelected = button.dataset.gender === selected;
+        const colorClasses = styles[button.dataset.gender] || styles.Other;
+        const selectedTextClasses = { Male: ['text-blue-700', 'dark:text-blue-300'], Female: ['text-pink-700', 'dark:text-pink-300'], Other: ['text-gray-700', 'dark:text-gray-300'] }[button.dataset.gender] || [];
+        button.classList.toggle('ring-2', isSelected);
+        button.classList.toggle('ring-current', isSelected);
+        button.classList.toggle('ring-offset-1', isSelected);
+        button.classList.toggle('bg-transparent', isSelected);
+        button.setAttribute('aria-pressed', String(isSelected));
+        colorClasses.forEach((className) => button.classList.toggle(className, !isSelected));
+        selectedTextClasses.forEach((className) => button.classList.toggle(className, isSelected));
+    });
+}
+// END: Gender button picker
 function populateSettings(profile) {
     const basePath = getBasePath();
 
@@ -263,7 +362,7 @@ function populateSettings(profile) {
     document.getElementById('set-phone').value = profile.phone_number || '';
     document.getElementById('set-languages').value = profile.languages || '';
     document.getElementById('set-dob').value = profile.date_of_birth || '';
-    document.getElementById('set-gender').value = profile.gender || 'Male';
+    setGenderValue(profile.gender || 'Male');
     document.getElementById('set-religion').value = profile.religion || '';
 
     // Preferences

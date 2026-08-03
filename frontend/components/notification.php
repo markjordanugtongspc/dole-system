@@ -40,7 +40,7 @@
     </div>
 
     <!-- Notification List -->
-    <div id="notificationList" class="divide-y divide-gray-100 max-h-96 overflow-y-auto custom-scrollbar">
+    <div id="notificationList" data-notification-count="3" class="divide-y divide-gray-100 max-h-96 overflow-y-auto custom-scrollbar">
         <!-- Notifications will be dynamically loaded here -->
         <div class="flex items-center justify-center py-8">
             <span

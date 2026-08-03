@@ -28,10 +28,8 @@ function getViteHost()
  */
 function isViteRunning()
 {
-    // Always check localhost (127.0.0.1) for the dev server
-    // This works regardless of whether the page is accessed via localhost or LAN IP
-    // because the Vite dev server runs on the same machine as the PHP server
-    $host = '127.0.0.1';
+    // In Docker compose environment, the vite container service is named 'vite'
+    $host = getenv('VITE_CONTAINER_HOST') ?: (file_exists('/.dockerenv') ? 'vite' : '127.0.0.1');
     $port = 5173;
 
     $handle = @fsockopen($host, $port, $errno, $errstr, 0.1);
@@ -51,6 +49,11 @@ function isViteRunning()
  */
 function isConfiguredDevelopmentMode()
 {
+    $configuredEnv = getenv('APP_ENV');
+    if ($configuredEnv !== false && strtolower(trim((string) $configuredEnv)) !== 'development') {
+        return false;
+    }
+
     $envPath = __DIR__ . '/.env';
     if (!file_exists($envPath)) {
         return false;
@@ -90,7 +93,7 @@ function vite($entry)
     $baseUrl = getBaseUrl();
     static $cssLoaded = false;
 
-    if (isConfiguredDevelopmentMode() || isViteRunning()) {
+    if (isConfiguredDevelopmentMode() && isViteRunning()) {
         // Development mode
         $viteHost = getViteHost();
         if (!$cssLoaded) {

@@ -33,23 +33,14 @@ export default defineConfig({
         },
     ],
     server: {
-        // Listen on all network interfaces (0.0.0.0) to allow LAN access
-        // This makes the dev server accessible from other devices on the same network
-        // host: true enables Vite to listen on all local IPv4 and IPv6 addresses.
-        host: true,
+        host: '0.0.0.0',
         port: 5173,
-        strictPort: true, // Use exactly 5173 or error (prevents hidden port jumping)
+        strictPort: true,
         cors: true,
-
-        // Allow all hostnames (critical for cross-laptop access)
         allowedHosts: true,
-
-        // Restore the dynamic origin check
-        origin: process.env.VITE_ORIGIN || undefined,
-
         hmr: {
-            // Removing the hardcoded 'host: localhost' so that external devices (like your phone)
-            // can connect to the HMR WebSocket using the network IP (192.168.x.x)
+            // Omitting hardcoded host allows client browser to automatically connect
+            // to the exact IP/hostname used in the address bar (e.g. 192.168.1.24)
             clientPort: 5173,
         },
         watch: {

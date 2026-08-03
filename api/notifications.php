@@ -110,6 +110,8 @@ try {
         echo json_encode([
             'success' => true,
             'notifications' => $notifications,
+            'notification_count' => count($notifications),
+            'skeleton_count' => min(max(count($notifications), 1), 3),
             'unread_count' => $unreadCount
         ]);
         exit;
