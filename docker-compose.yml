@@ -7,6 +7,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - .:/var/www/html
     environment:
       SKIP_COMPOSER: "1"
       WEBROOT: /var/www/html
