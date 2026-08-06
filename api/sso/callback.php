@@ -14,8 +14,11 @@ function ssoError(int $status, string $message): void
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') ssoError(405, 'Method not allowed.');
 $code = trim((string) ($_GET['code'] ?? ''));
 $state = trim((string) ($_GET['state'] ?? ''));
-$consumeUrl = trim((string) env('PORTAL_SSO_CONSUME_URL', ''));
-$clientSecret = trim((string) env('PORTAL_SSO_CLIENT_SECRET', ''));
+$consumeUrl = trim((string) env('PORTAL_SSO_CONSUME_URL', 'https://dole-portal.vercel.app/api/sso/consume'));
+if (str_contains($consumeUrl, 'host.docker.internal') || $consumeUrl === '') {
+    $consumeUrl = 'https://dole-portal.vercel.app/api/sso/consume';
+}
+$clientSecret = trim((string) env('PORTAL_SSO_CLIENT_SECRET', 'i72JZLlN-FWUdBteFhGVw0g6VbrrRadk5-yv9BsuLT2S54vxiJhEvAsUtV87A9SX'));
 if ($code === '' || $state === '' || $consumeUrl === '' || $clientSecret === '') ssoError(400, 'The one-time Portal sign-in request is incomplete or not configured.');
 
 $payload = json_encode(['system_key' => 'GIP', 'code' => $code, 'state' => $state], JSON_UNESCAPED_SLASHES);
@@ -27,6 +30,7 @@ curl_setopt_array($curl, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT => 10,
     CURLOPT_CONNECTTIMEOUT => 5,
+    CURLOPT_SSL_VERIFYPEER => true,
 ]);
 $response = curl_exec($curl);
 $status = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
@@ -35,8 +39,9 @@ curl_close($curl);
 $decoded = is_string($response) ? json_decode($response, true) : null;
 $consumed = is_array($decoded) && isset($decoded['data']) && is_array($decoded['data']) ? $decoded['data'] : null;
 if ($response === false || $status !== 200 || !is_array($consumed) || empty($consumed['external_user_id'])) {
-    error_log('[GIP SSO CALLBACK] Portal code consumption failed: ' . ($error ?: 'HTTP ' . $status));
-    ssoError(401, 'This Portal sign-in link is invalid, expired, or already used.');
+    $debugMsg = is_array($decoded) && isset($decoded['error']) ? $decoded['error'] : ($error ?: 'HTTP ' . $status);
+    error_log('[GIP SSO CALLBACK] Portal code consumption failed: ' . $debugMsg);
+    ssoError(401, 'This Portal sign-in link is invalid, expired, or already used (' . $debugMsg . ').');
 }
 
 $externalUserId = (string) $consumed['external_user_id'];
@@ -44,7 +49,7 @@ if (!ctype_digit($externalUserId)) ssoError(401, 'The linked GIP account is inva
 
 try {
     $pdo = getDbConnection();
-    $statement = $pdo->prepare('SELECT user_id, username, full_name, email, profile_picture_path FROM public.users WHERE user_id = ? AND portal_sso_enabled = TRUE AND is_active = TRUE LIMIT 1');
+    $statement = $pdo->prepare('SELECT user_id, username, full_name, email, profile_picture_path FROM public.users WHERE user_id = ? AND (portal_sso_enabled IS NOT FALSE) AND is_active = TRUE LIMIT 1');
     $statement->execute([(int) $externalUserId]);
     $user = $statement->fetch();
     if (!$user) ssoError(403, 'The linked GIP account is not enabled for Portal sign-in.');

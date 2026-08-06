@@ -29,10 +29,10 @@ try {
             echo json_encode(['error' => 'Invalid account ID.']);
             exit;
         }
-        $statement = $pdo->prepare('SELECT user_id, full_name, username, email FROM public.users WHERE user_id = ? AND portal_sso_enabled = TRUE AND is_active = TRUE LIMIT 1');
+        $statement = $pdo->prepare('SELECT user_id, full_name, username, email FROM public.users WHERE user_id = ? AND (portal_sso_enabled IS NOT FALSE) AND is_active = TRUE LIMIT 1');
         $statement->execute([(int) $id]);
     } else {
-        $statement = $pdo->prepare('SELECT user_id, full_name, username, email FROM public.users WHERE portal_sso_enabled = TRUE AND is_active = TRUE AND (full_name ILIKE ? OR username ILIKE ?) ORDER BY full_name ASC LIMIT 10');
+        $statement = $pdo->prepare('SELECT user_id, full_name, username, email FROM public.users WHERE (portal_sso_enabled IS NOT FALSE) AND is_active = TRUE AND (full_name ILIKE ? OR username ILIKE ?) ORDER BY full_name ASC LIMIT 10');
         $statement->execute(['%' . $query . '%', '%' . $query . '%']);
     }
 
