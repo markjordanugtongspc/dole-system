@@ -32,7 +32,7 @@ require_once __DIR__ . '/../../../config/vite.php';
                 var match = document.cookie.match(/(?:^|; )color-theme=([^;]*)/);
                 theme = match ? decodeURIComponent(match[1]) : null;
             }
-            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            if (theme === 'dark') {
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');

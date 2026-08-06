@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../config/vite.php';
     <script>
         (function () {
             var theme = localStorage.getItem('color-theme');
-            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+            if (theme === 'dark') document.documentElement.classList.add('dark');
         })();
     </script>
 </head>

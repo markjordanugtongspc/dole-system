@@ -119,15 +119,6 @@ export function initDarkMode() {
     document.querySelectorAll('[data-theme-toggle]').forEach(el => {
         el.addEventListener('click', toggleTheme);
     });
-
-    // Listen for OS theme changes (if no manual preference is set)
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        // Only auto-switch if the user hasn't manually set a preference
-        const manual = localStorage.getItem(THEME_KEY) || getCookie(THEME_KEY);
-        if (!manual) {
-            applyTheme(e.matches ? 'dark' : 'light');
-        }
-    });
 }
 
 // ─── Theme Query Helper ──────────────────────────────────────────────────────
