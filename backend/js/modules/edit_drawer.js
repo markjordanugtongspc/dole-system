@@ -3,7 +3,7 @@ import { getBasePath, isSupabaseMode } from './auth.js';
 import { apiGet, apiRequest } from './ajax-manager.js';
 import { supabase } from './supabase-client.js';
 import Swal from 'sweetalert2';
-import { ASSURED_RELATIONSHIPS, COMMON_COURSES, COMMON_ASSIGNED_UNITS } from './modal.js';
+import { ASSURED_RELATIONSHIPS, COMMON_COURSES, COMMON_ASSIGNED_UNITS, calculateContractDuration } from './modal.js';
 
 // START: showEditBeneficiaryDrawer - Opens slide-over drawer to edit GIP beneficiary details
 export function showEditBeneficiaryDrawer(data) {
@@ -205,7 +205,10 @@ export function showEditBeneficiaryDrawer(data) {
     </section>
 
     <!-- Contract & Work Info Tab -->
-    <h4 class="text-sm font-bold text-heading mt-8 pb-2 border-b border-default whitespace-nowrap">Contract & Work Details</h4>
+    <div class="flex items-center justify-between border-b border-default pb-2 mt-8">
+        <h4 class="text-sm font-bold text-heading whitespace-nowrap">Contract & Work Details</h4>
+        <span id="edit-contract-duration-badge" class="text-[0.5625rem] font-bold text-royal-blue dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800 transition-all hidden"></span>
+    </div>
     
     <div class="flex flex-col gap-4 text-sm mt-4 px-1">
         <div id="edit-date-range-picker" class="grid grid-cols-2 gap-3 mb-2">
@@ -628,16 +631,36 @@ export function showEditBeneficiaryDrawer(data) {
         };
 
 
+        // START: updateEditContractDurationDisplay - Updates contract duration indicator (months and days) in edit drawer
+        const updateEditContractDurationDisplay = () => {
+            const badge = drawerContainer.querySelector('#edit-contract-duration-badge');
+            if (!badge || !startDateInput || !endDateInput) return;
+
+            const startVal = startDateInput.value;
+            const endVal = endDateInput.value;
+
+            const duration = calculateContractDuration(startVal, endVal);
+            if (duration.text) {
+                badge.textContent = duration.text;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        };
+        // END: updateEditContractDurationDisplay - Updates contract duration indicator (months and days) in edit drawer
+
         if (startDateInput) {
             setupDateMask(startDateInput, (start) => {
                 if (endDateInput) {
                     const end = new Date(start);
-                    end.setDate(end.getDate() + 243);
+                    end.setMonth(end.getMonth() + 6);
+                    end.setDate(end.getDate() - 1);
                     const m = String(end.getMonth() + 1).padStart(2, '0');
                     const d = String(end.getDate()).padStart(2, '0');
                     const y = end.getFullYear();
                     endDateInput.value = `${m}/${d}/${y}`;
                 }
+                updateEditContractDurationDisplay();
 
                 const selectedYear = start.getFullYear();
                 if (selectedYear > 1900 && gipIdInput && seriesNoInput) {
@@ -665,7 +688,9 @@ export function showEditBeneficiaryDrawer(data) {
                 }
             });
         }
-        if (endDateInput) setupDateMask(endDateInput);
+        if (endDateInput) {
+            setupDateMask(endDateInput, () => updateEditContractDurationDisplay());
+        }
 
         // --- Flowbite Picker Initialization ---
         const PickerClass = window.Datepicker || (typeof Datepicker !== 'undefined' ? Datepicker : null);
@@ -705,6 +730,7 @@ export function showEditBeneficiaryDrawer(data) {
                             if (endDateInput._datepicker) endDateInput._datepicker.setDate(parsedEnd);
                         }
                     }
+                    updateEditContractDurationDisplay();
                 }
                 setTimeout(() => { blockAutoCompute = false; }, 100);
             }).catch(err => {

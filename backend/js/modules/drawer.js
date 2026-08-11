@@ -2,6 +2,7 @@ import { getBasePath } from './auth.js';
 import { isDarkMode } from './darkmode.js';
 import { apiPost, apiPut, apiRequest } from './ajax-manager.js';
 import { generateExcelExport } from './logs-export.js';
+import { calculateContractDuration } from './modal.js';
 import Swal from 'sweetalert2';
 
 function calculateAge(birthday) {
@@ -504,7 +505,10 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                         Contract Period
                     </p>
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.5625rem] font-bold uppercase tracking-wider bg-blue-100 text-royal-blue dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                        GIP Duration
+                        ${(() => {
+                            const d = calculateContractDuration(data.startDate, data.endDate);
+                            return d.text || 'GIP Duration';
+                        })()}
                     </span>
                 </div>
                 <div class="grid grid-cols-2 gap-3">

@@ -52,7 +52,16 @@ export async function apiRequest(endpoint, options = {}) {
             const response = await fetch(url, defaultOptions);
 
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                let errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+                try {
+                    const errJson = await response.json();
+                    if (errJson && errJson.error) {
+                        errorMsg = errJson.error;
+                    } else if (errJson && errJson.message) {
+                        errorMsg = errJson.message;
+                    }
+                } catch (e) { /* non-JSON response */ }
+                throw new Error(errorMsg);
             }
 
             const data = await response.json();

@@ -4,6 +4,7 @@ import { apiGet, apiPatch, apiRequest, reinitFlowbite, generateChecksum } from '
 import { supabase } from './supabase-client.js';
 import { isSupabaseMode } from './auth.js';
 import { showLogsExportModal } from './logs-export.js';
+import { calculateContractDuration } from './modal.js';
 import Swal from 'sweetalert2';
 
 /**
@@ -2125,6 +2126,7 @@ export function sortData(criteria, saveToStorage = true) {
 
 }
 
+// START: addBeneficiary - Saves or updates beneficiary record on the backend API and reloads list
 export async function addBeneficiary(data) {
     const capitalizedData = { ...data };
     const fieldsToCapitalize = ['name', 'address', 'education', 'designation', 'designatedBeneficiary', 'relationshipToAssured'];
@@ -2133,6 +2135,13 @@ export async function addBeneficiary(data) {
             capitalizedData[field] = capitalizedData[field].toUpperCase().trim();
         }
     });
+
+    if (capitalizedData.startDate && capitalizedData.endDate) {
+        const duration = calculateContractDuration(capitalizedData.startDate, capitalizedData.endDate);
+        if (duration.text) {
+            capitalizedData.contractDuration = duration.text;
+        }
+    }
 
     // `gip_id` is generated for a new record before it is saved. Only the
     // hidden persisted ID identifies an existing beneficiary for an update.
@@ -2157,6 +2166,7 @@ export async function addBeneficiary(data) {
     await loadBeneficiaries();
     return true;
 }
+// END: addBeneficiary - Saves or updates beneficiary record on the backend API and reloads list
 
 export async function archiveRecord(id) {
     // Show Modern Confirmation Modal

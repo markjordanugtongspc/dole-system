@@ -722,7 +722,7 @@ if ($method === 'GET') {
             $insertAttempts++;
             $params = [
                 'gip_id' => $gipId,
-                'name' => $data['name'],
+                'name' => $data['name'] ?? $data['full_name'] ?? '',
                 'contact' => $data['contact'] ?? null,
                 'address' => $data['address'] ?? null,
                 'birthday' => !empty($data['birthday']) ? $data['birthday'] : null,
@@ -731,16 +731,16 @@ if ($method === 'GET') {
                 'education' => $data['education'] ?? null,
                 'start_date' => !empty($data['startDate']) ? $data['startDate'] : null,
                 'end_date' => !empty($data['endDate']) ? $data['endDate'] : null,
-                'designation' => $data['designation'],
-                'replacement' => (isset($data['replacement']) && trim($data['replacement']) !== '') ? trim($data['replacement']) : null,
+                'designation' => $data['designation'] ?? null,
+                'replacement' => (isset($data['replacement']) && trim((string)$data['replacement']) !== '') ? trim((string)$data['replacement']) : null,
                 'status_id' => $statusId,
                 'absorption_log_id' => $absorptionLogId,
                 'resigned_log_id' => $resignedLogId
             ];
             if ($hasOfficeIdInBeneficiaries) $params['office_id'] = $officeId;
             if ($hasOfficeNameInBeneficiaries) $params['office_name'] = $data['office'] ?? null;
-            if ($hasDesignatedBeneficiary) $params['designated_beneficiary'] = ($data['designatedBeneficiary'] ?? '') !== '' ? $data['designatedBeneficiary'] : null;
-            if ($hasRelationshipToAssured) $params['relationship_to_assured'] = ($data['relationshipToAssured'] ?? '') !== '' ? $data['relationshipToAssured'] : null;
+            if ($hasDesignatedBeneficiary) $params['designated_beneficiary'] = ($data['designatedBeneficiary'] ?? $data['designated_beneficiary'] ?? '') !== '' ? ($data['designatedBeneficiary'] ?? $data['designated_beneficiary']) : null;
+            if ($hasRelationshipToAssured) $params['relationship_to_assured'] = ($data['relationshipToAssured'] ?? $data['relationship_to_assured'] ?? '') !== '' ? ($data['relationshipToAssured'] ?? $data['relationship_to_assured']) : null;
             if ($hasCreatedBy) $params['created_by'] = $current_user_id;
             if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
 
@@ -949,7 +949,7 @@ if ($method === 'GET') {
         $params = [
             'old_id' => $data['id'],
             'new_gip_id' => $data['gip_id'] ?? $data['id'],
-            'name' => $data['name'],
+            'name' => $data['name'] ?? $data['full_name'] ?? '',
             'contact' => $data['contact'] ?? null,
             'address' => $data['address'] ?? null,
             'birthday' => !empty($data['birthday']) ? $data['birthday'] : null,
@@ -958,21 +958,22 @@ if ($method === 'GET') {
             'education' => $data['education'] ?? null,
             'start_date' => !empty($data['startDate']) ? $data['startDate'] : null,
             'end_date' => !empty($data['endDate']) ? $data['endDate'] : null,
-            'designation' => $data['designation'],
-            'replacement' => (isset($data['replacement']) && trim($data['replacement']) !== '') ? trim($data['replacement']) : null,
+            'designation' => $data['designation'] ?? null,
+            'replacement' => (isset($data['replacement']) && trim((string)$data['replacement']) !== '') ? trim((string)$data['replacement']) : null,
             'status_id' => $statusId,
             'absorption_log_id' => $absorptionLogId,
             'resigned_log_id' => $resignedLogId
         ];
         if ($hasOfficeIdInBeneficiaries) $params['office_id'] = $officeId;
         if ($hasOfficeNameInBeneficiaries) $params['office_name'] = $data['office'] ?? null;
-        if ($hasDesignatedBeneficiary) $params['designated_beneficiary'] = ($data['designatedBeneficiary'] ?? '') !== '' ? $data['designatedBeneficiary'] : null;
-        if ($hasRelationshipToAssured) $params['relationship_to_assured'] = ($data['relationshipToAssured'] ?? '') !== '' ? $data['relationshipToAssured'] : null;
+        if ($hasDesignatedBeneficiary) $params['designated_beneficiary'] = ($data['designatedBeneficiary'] ?? $data['designated_beneficiary'] ?? '') !== '' ? ($data['designatedBeneficiary'] ?? $data['designated_beneficiary']) : null;
+        if ($hasRelationshipToAssured) $params['relationship_to_assured'] = ($data['relationshipToAssured'] ?? $data['relationship_to_assured'] ?? '') !== '' ? ($data['relationshipToAssured'] ?? $data['relationship_to_assured']) : null;
         if ($hasUpdatedBy) $params['updated_by'] = $current_user_id;
         $stmt->execute($params);
 
         echo json_encode(['success' => true, 'message' => 'Beneficiary updated successfully']);
-    } catch (PDOException $e) {
+    } catch (Throwable $e) {
+        error_log("PUT EXCEPTION: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
         http_response_code(500);
         echo json_encode(['success' => false, 'error' => 'Failed to update beneficiary: ' . $e->getMessage()]);
     }

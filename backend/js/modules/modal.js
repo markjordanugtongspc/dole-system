@@ -76,6 +76,7 @@ export function initModalHandler() {
         return null;
     };
 
+    // START: calculateAge - Calculates age in years from birthday
     window.calculateAge = function(birthday) {
         if (!birthday) return '';
         const birthDate = (birthday instanceof Date) ? birthday : new Date(birthday);
@@ -85,6 +86,11 @@ export function initModalHandler() {
         if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
         return age >= 0 ? age : 0;
     };
+    // END: calculateAge - Calculates age in years from birthday
+
+    // START: calculateContractDuration - Exposes contract duration calculator to window
+    window.calculateContractDuration = calculateContractDuration;
+    // END: calculateContractDuration - Exposes contract duration calculator to window
 
     window.viewBeneficiary = async function (data, page = 0) {
         const beneficiaryId = data?.id || data?.gip_id || null;
@@ -873,6 +879,7 @@ export const ASSURED_RELATIONSHIPS = [
     "SISTER",
     "GRANDFATHER",
     "GRANDMOTHER",
+    "HUSBAND",
     "SPOUSE",
     "SON",
     "DAUGHTER",
@@ -996,7 +1003,7 @@ export function showAddDataModal(data = null) {
         </style>
         <div class="text-left font-montserrat user-select-none relative p-0 max-w-full overflow-x-hidden">
             <!-- Modal Header -->
-            <div class="mb-4 pb-3 border-b ${t.borderBase} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="mb-3 pb-3 border-b ${t.borderBase} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h3 class="text-xl font-black ${t.textHeading} flex items-center gap-2.5">
                         <div class="p-2 ${t.iconBg} rounded-lg ${t.iconText} border ${t.iconBorder} shadow-sm">
@@ -1007,83 +1014,93 @@ export function showAddDataModal(data = null) {
                     <p class="text-[0.625rem] ${t.textSubtitle} font-bold mt-1 uppercase tracking-widest pl-11">Enter the details of the GIP beneficiary below.</p>
                 </div>
                 ${!isEdit && !data?._isBulk ? `
-                <button type="button" id="bulk-add-btn" class="group flex items-center justify-center gap-2 px-3 py-2 ${t.bgCard} border ${t.borderCard} rounded-lg hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-300 w-full sm:w-auto sm:mr-4 focus:ring-4 focus:ring-blue-500/20 active:scale-95 cursor-pointer shadow-sm">
+                <button type="button" id="bulk-add-btn" class="group flex items-center justify-center gap-2 px-3.5 py-2 ${t.bgCard} border ${t.borderCard} rounded-lg hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-300 w-full sm:w-auto focus:ring-4 focus:ring-blue-500/20 active:scale-95 cursor-pointer shadow-sm">
                     <svg class="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     <span class="text-[0.625rem] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">Bulk Add</span>
                 </button>
                 ` : ''}
             </div>
+            <div class="mb-4 pb-1 border-b border-gray-200 dark:border-slate-700/80 grid grid-cols-2 gap-2 text-[0.6875rem] sm:text-xs font-black uppercase tracking-wider">
+                <button type="button" id="tab-btn-general" class="py-2.5 px-2 text-royal-blue dark:text-blue-400 border-b-2 border-royal-blue dark:border-blue-400 flex items-center justify-center gap-1.5 cursor-pointer text-center transition-all outline-none w-full text-xs font-black">
+                    <span class="w-2 h-2 rounded-full bg-royal-blue dark:bg-blue-400 flex-shrink-0"></span>
+                    <span class="truncate">GENERAL INFORMATION</span>
+                </button>
+                <button type="button" id="tab-btn-employee" class="py-2.5 px-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 border-b-2 border-transparent flex items-center justify-center gap-1.5 cursor-pointer text-center transition-all outline-none w-full text-xs font-black">
+                    <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 flex-shrink-0"></span>
+                    <span class="truncate">EMPLOYEE INFORMATION</span>
+                </button>
+            </div>
 
-            <form id="add-beneficiary-form" class="grid grid-cols-1 lg:grid-cols-2 gap-6" data-is-edit="${isEdit}">
-                <!-- LEFT COLUMN: Personal Info Card -->
-                <div class="${t.bgCard} rounded-xl p-4 sm:p-5 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
-                    <div class="flex items-center gap-2 mb-1">
-                        <div class="w-1 h-5 ${t.dotGreen} rounded-full"></div>
-                        <p class="text-[0.5625rem] uppercase font-black ${t.textSectionTitle} tracking-widest dark:text-white!">Personal & Educational Information</p>
+            <form id="add-beneficiary-form" class="space-y-5" autocomplete="off" data-is-edit="${isEdit}">
+                <!-- TAB 1: GENERAL INFORMATION (Personal & Educational Information) -->
+                <div id="tab-content-general" class="space-y-4">
+                    <div class="flex items-center gap-2 mb-2 px-1">
+                        <div class="w-1.5 h-5 ${t.dotGreen} rounded-full"></div>
+                        <p class="text-[0.6875rem] uppercase font-black ${t.textSectionTitle} tracking-widest dark:text-white!">Personal & Educational Information</p>
                     </div>
                     
-                    <div class="space-y-3.5">
+                    <div class="space-y-4">
                         <div class="group">
-                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
-                            <input type="text" name="name" id="name-input-field" value="${data?.name || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} dark:text-white!" placeholder="e.g. Dela Cruz, Juan M.">
-                            <div id="duplicate-warning" class="hidden mt-1 text-[0.625rem] font-bold items-center gap-1.5 animate-pulse">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                            <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5 transition-colors ${t.gfGreen} dark:text-white!">Full Name (Last, First, MI) <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" id="name-input-field" autocomplete="off" value="${data?.name || ''}" required class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3.5 py-2.5 text-[0.8125rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} dark:text-white!" placeholder="e.g. Dela Cruz, Juan M.">
+                            <div id="duplicate-warning" class="hidden mt-1.5 text-[0.6875rem] font-bold items-center gap-1.5 animate-pulse">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 <span>Beneficiary already exist</span>
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="group">
-                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Contact No.</label>
-                                <input type="text" name="contact" value="${data?.contact || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} font-mono" placeholder="09XX-XXX-XXXX">
+                                <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5 transition-colors ${t.gfGreen} dark:text-white!">Contact No.</label>
+                                <input type="text" name="contact" autocomplete="off" value="${data?.contact || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3.5 py-2.5 text-[0.8125rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder} font-mono" placeholder="09XX-XXX-XXXX">
                             </div>
                             <div class="group">
-                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Address</label>
-                                <input type="text" name="address" value="${data?.address || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="Barangay, City">
+                                <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5 transition-colors ${t.gfGreen} dark:text-white!">Address</label>
+                                <input type="text" name="address" autocomplete="off" value="${data?.address || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3.5 py-2.5 text-[0.8125rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="Barangay, City">
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="group">
-                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Birthday</label>
+                                <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5 transition-colors ${t.gfGreen} dark:text-white!">Birthday</label>
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
                                         <svg class="w-4 h-4 ${t.iconColor}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
                                     </div>
-                                    <input type="text" name="birthday" value="${data?.birthday || ''}" id="birthday-input" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY">
+                                    <input type="text" name="birthday" autocomplete="off" value="${data?.birthday || ''}" id="birthday-input" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-10 pr-3.5 py-2.5 text-[0.8125rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm font-mono cursor-pointer" placeholder="MM/DD/YYYY">
                                 </div>
                             </div>
                             <div class="group">
-                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Age</label>
-                                <input type="text" name="age" value="${data?.age || ''}" id="age-display" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-black ${t.textAge} outline-none font-mono focus:ring-4 ${t.focusGreen}" placeholder="Auto/Manual">
-                                <div id="age-warning" class="hidden mt-1 text-[0.625rem] font-bold items-center gap-1.5 animate-pulse">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5 transition-colors ${t.gfGreen} dark:text-white!">Age</label>
+                                <input type="text" name="age" autocomplete="off" value="${data?.age || ''}" id="age-display" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3.5 py-2.5 text-[0.8125rem] font-black ${t.textAge} outline-none font-mono focus:ring-4 ${t.focusGreen}" placeholder="Auto/Manual">
+                                <div id="age-warning" class="hidden mt-1.5 text-[0.6875rem] font-bold items-center gap-1.5 animate-pulse">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                     <span>Age must be between 18 and 29 years old</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="group">
-                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Gender</label>
-                                <select name="gender" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm cursor-pointer appearance-none">
+                                <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5 transition-colors ${t.gfGreen} dark:text-white!">Gender</label>
+                                <select name="gender" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3.5 py-2.5 text-[0.8125rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm cursor-pointer appearance-none">
                                     <option value="Male" ${data?.gender === 'Male' ? 'selected' : ''}>Male</option>
                                     <option value="Female" ${data?.gender === 'Female' ? 'selected' : ''}>Female</option>
                                 </select>
                             </div>
                             <div class="group">
-                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Education</label>
+                                <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5 transition-colors ${t.gfGreen} dark:text-white!">Education</label>
                                 <div class="relative" id="education-container">
                                     <input type="text" name="education" id="education-input" autocomplete="off"
                                         value="${data?.education || ''}" 
-                                        class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 pl-9 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" 
+                                        class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3.5 py-2.5 pl-10 text-[0.8125rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" 
                                         placeholder="Course/Level...">
-                                    <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                                     </div>
-                                    <div id="course-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
+                                    <div id="course-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
                                         ${COMMON_COURSES.map(course => `
-                                            <div class="course-option px-3 py-2 text-[0.625rem] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
+                                            <div class="course-option px-3 py-2 text-[0.6875rem] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-md cursor-pointer transition-colors flex items-center gap-2.5 active:scale-[0.98]">
                                                 ${course.icon}
                                                 <span class="option-text">${course.name}</span>
                                             </div>
@@ -1093,14 +1110,14 @@ export function showAddDataModal(data = null) {
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t ${dk ? 'border-slate-800/70' : 'border-gray-100'}">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t ${dk ? 'border-slate-800/70' : 'border-gray-100'}">
                             <div class="group">
-                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Designated Beneficiary</label>
-                                <input type="text" name="designatedBeneficiary" value="${data?.designatedBeneficiary || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="Assured family member">
+                                <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5 transition-colors ${t.gfGreen} dark:text-white!">Designated Beneficiary</label>
+                                <input type="text" name="designatedBeneficiary" autocomplete="off" value="${data?.designatedBeneficiary || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3.5 py-2.5 text-[0.8125rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm ${t.placeholder}" placeholder="Assured family member">
                             </div>
                             <div class="group">
-                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfGreen} dark:text-white!">Relationship to Assured</label>
-                                <select name="relationshipToAssured" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm cursor-pointer appearance-none uppercase">
+                                <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5 transition-colors ${t.gfGreen} dark:text-white!">Relationship to Assured</label>
+                                <select name="relationshipToAssured" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3.5 py-2.5 text-[0.8125rem] font-bold ${t.textInput} focus:ring-4 ${t.focusGreen} outline-none transition-all shadow-sm cursor-pointer appearance-none uppercase">
                                     <option value="">SELECT RELATIONSHIP</option>
                                     ${ASSURED_RELATIONSHIPS.map((relationship) => `
                                         <option value="${relationship}" ${data?.relationshipToAssured === relationship ? 'selected' : ''}>${relationship}</option>
@@ -1109,110 +1126,116 @@ export function showAddDataModal(data = null) {
                             </div>
                         </div>
                     </div>
-
-                    <div class="pt-1">
-                        <div class="flex items-center gap-2 mb-2">
-                            <div class="w-1 h-5 bg-golden-yellow rounded-full"></div>
-                            <p class="text-[0.5625rem] uppercase font-black ${t.textSectionTitle} tracking-widest">Contract Duration</p>
-                        </div>
-                        <div id="date-range-picker" class="grid grid-cols-2 gap-3">
-                            <div class="group">
-                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1">Start Date</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <svg class="w-4 h-4 ${t.iconColor}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
-                                    </div>
-                                    <input type="text" name="startDate" id="datepicker-range-start" value="${data?.startDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusYellow} outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY">
-                                </div>
-                            </div>
-                            <div class="group">
-                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1">End Date</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <svg class="w-4 h-4 ${t.iconColor}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
-                                    </div>
-                                    <input type="text" name="endDate" id="datepicker-range-end" value="${data?.endDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusRed} outline-none transition-all shadow-sm font-mono" placeholder="MM/DD/YYYY">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- RIGHT COLUMN: Work Details Card -->
-                <div class="${t.bgCard} rounded-xl p-4 sm:p-5 border ${t.borderCard} shadow-sm flex flex-col space-y-4">
-                    <div class="flex items-center gap-2 mb-1">
-                        <div class="w-1 h-5 ${t.dotBlue} rounded-full"></div>
-                        <p class="text-[0.5625rem] uppercase font-black ${t.textSectionTitle} tracking-widest">Work & Administrative Data</p>
+                <!-- TAB 2: EMPLOYEE INFORMATION (Work, Contract, Status & History) -->
+                <div id="tab-content-employee" class="space-y-4 hidden">
+                    <div class="flex items-center gap-2 mb-2 px-1">
+                        <div class="w-1.5 h-5 ${t.dotBlue} rounded-full"></div>
+                        <p class="text-[0.6875rem] uppercase font-black ${t.textSectionTitle} tracking-widest">Work & Administrative Data</p>
                     </div>
                     
-                    <div class="space-y-3.5">
-                         <div class="group">
-                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">ID Number</label>
-                            <input type="text" name="gip_id" id="full-id-input" 
+                    <div class="space-y-4">
+                        <div class="group">
+                            <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5 transition-colors ${t.gfBlue}">ID Number</label>
+                            <input type="text" name="gip_id" id="full-id-input" autocomplete="off"
                                 value="${data?.id || ''}" 
-                                class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.6875rem] font-black ${t.idText} font-mono outline-none focus:ring-4 ${t.focusBlue} transition-all uppercase" 
-                                placeholder="ROX-RD-ESIG-2025-0001" ${!isEdit ? 'readonly aria-readonly="true"' : ''}>
+                                class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3.5 py-2.5 text-[0.75rem] font-black ${t.idText} font-mono outline-none focus:ring-4 ${t.focusBlue} transition-all uppercase cursor-text" 
+                                placeholder="ROX-RD-ESIG-2025-0001">
                             <input type="hidden" name="id" value="${data?.id || ''}">
                         </div>
 
-                        <div class="group">
-                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Assigned Office</label>
-                            <div class="relative" id="office-container">
-                                <input type="text" name="office" id="office-input" autocomplete="off"
-                                    value="${data?.office || ''}" 
-                                    class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
-                                    placeholder="e.g. DOLE Field Office">
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                    <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                                </div>
-                                <div id="office-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
-                                    <!-- Will be populated by JS -->
-                                    <div class="px-3 py-4 text-center text-[0.625rem] font-bold ${t.textLabel} animate-pulse">Loading offices...</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="group">
-                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 tracking-widest ${dk ? '' : 'transition-colors'} ${dk ? '' : 'group-focus-within:text-royal-blue'}">Assigned Unit</label>
-                            <div class="relative" id="work-container">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="w-3.5 h-3.5 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                                </div>
-                                <input type="text" name="designation" id="designation-input" autocomplete="off"
-                                    value="${data?.designation || 'N/A'}"
-                                    class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-9 pr-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
-                                    placeholder="N/A">
-                                <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2 transform origin-top transition-all duration-200">
-                                    <div class="px-2 py-1.5 mb-1.5 border-b ${t.borderSuggHead}">
-                                        <p class="text-[0.5625rem] font-black ${t.textWorkSuggHead} uppercase tracking-widest">Quick Select Units</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="group">
+                                <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5 transition-colors ${t.gfBlue}">Assigned Office</label>
+                                <div class="relative" id="office-container">
+                                    <input type="text" name="office" id="office-input" autocomplete="off"
+                                        value="${data?.office || ''}" 
+                                        class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3.5 py-2.5 text-[0.8125rem] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
+                                        placeholder="e.g. DOLE Field Office">
+                                    <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+                                        <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                     </div>
-                                    ${COMMON_ASSIGNED_UNITS.map(work => `
-                                        <div class="work-option px-3 py-2.5 text-[0.625rem] font-black ${t.textWorkOpt} ${t.workHover} rounded-lg cursor-pointer transition-all flex items-center justify-between group/opt active:scale-[0.98]">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-1.5 h-1.5 rounded-full ${t.workDot} transition-colors"></div>
-                                                <span class="option-text">${work}</span>
-                                            </div>
-                                            <svg class="w-3 h-3 opacity-0 group-hover/opt:opacity-100 transition-opacity ${t.workArrow}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                    <div id="office-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
+                                        <!-- Will be populated by JS -->
+                                        <div class="px-3 py-4 text-center text-[0.625rem] font-bold ${t.textLabel} animate-pulse">Loading offices...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="group">
+                                <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5 tracking-widest ${dk ? '' : 'transition-colors'} ${dk ? '' : 'group-focus-within:text-royal-blue'}">Assigned Unit</label>
+                                <div class="relative" id="work-container">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                        <svg class="w-3.5 h-3.5 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    </div>
+                                    <input type="text" name="designation" id="designation-input" autocomplete="off"
+                                        value="${data?.designation || 'N/A'}"
+                                        class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-10 pr-3.5 py-2.5 text-[0.8125rem] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
+                                        placeholder="N/A">
+                                    <div id="work-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2 transform origin-top transition-all duration-200">
+                                        <div class="px-2 py-1.5 mb-1.5 border-b ${t.borderSuggHead}">
+                                            <p class="text-[0.5625rem] font-black ${t.textWorkSuggHead} uppercase tracking-widest">Quick Select Units</p>
                                         </div>
-                                    `).join('')}
+                                        ${COMMON_ASSIGNED_UNITS.map(work => `
+                                            <div class="work-option px-3 py-2.5 text-[0.6875rem] font-black ${t.textWorkOpt} ${t.workHover} rounded-lg cursor-pointer transition-all flex items-center justify-between group/opt active:scale-[0.98]">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-1.5 h-1.5 rounded-full ${t.workDot} transition-colors"></div>
+                                                    <span class="option-text">${work}</span>
+                                                </div>
+                                                <svg class="w-3 h-3 opacity-0 group-hover/opt:opacity-100 transition-opacity ${t.workArrow}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                            </div>
+                                        `).join('')}
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="group">
-                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1">Replacement History (Optional)</label>
+                        <!-- Contract Duration Block -->
+                        <div class="pt-3 border-t ${dk ? 'border-slate-800/70' : 'border-gray-100'}">
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-1.5 h-5 bg-golden-yellow rounded-full"></div>
+                                    <p class="text-[0.625rem] uppercase font-black ${t.textSectionTitle} tracking-widest">Contract Duration</p>
+                                </div>
+                                <span id="contract-duration-badge" class="text-[0.625rem] font-bold text-royal-blue dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-0.5 rounded-full border border-blue-200 dark:border-blue-800 transition-all hidden"></span>
+                            </div>
+                            <div id="date-range-picker" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="group">
+                                    <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5">Start Date</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                                            <svg class="w-4 h-4 ${t.iconColor}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
+                                        </div>
+                                        <input type="text" name="startDate" autocomplete="off" id="datepicker-range-start" value="${data?.startDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-10 pr-3.5 py-2.5 text-[0.8125rem] font-bold ${t.textInput} focus:ring-4 ${t.focusYellow} outline-none transition-all shadow-sm font-mono cursor-pointer" placeholder="MM/DD/YYYY">
+                                    </div>
+                                </div>
+                                <div class="group">
+                                    <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5">End Date</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                                            <svg class="w-4 h-4 ${t.iconColor}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/></svg>
+                                        </div>
+                                        <input type="text" name="endDate" autocomplete="off" id="datepicker-range-end" value="${data?.endDate || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg pl-10 pr-3.5 py-2.5 text-[0.8125rem] font-bold ${t.textInput} focus:ring-4 ${t.focusRed} outline-none transition-all shadow-sm font-mono cursor-pointer" placeholder="MM/DD/YYYY">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="group pt-2 border-t ${dk ? 'border-slate-800/70' : 'border-gray-100'}">
+                            <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-1.5">Replacement History (Optional)</label>
                             <input type="hidden" name="replacement" id="replacement-hidden" value="${data?.replacement || ''}">
                             <div class="relative" id="replacement-container">
                                 <input type="text" id="replacement-search-input" autocomplete="off"
                                     value="${data?.replacement || ''}"
-                                    class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.6875rem] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}"
+                                    class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3.5 py-2.5 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}"
                                     placeholder="Search beneficiary name...">
-                                <div id="replacement-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2"></div>
+                                <div id="replacement-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-[100] max-h-56 overflow-y-auto font-montserrat ${t.borderDivide} p-2"></div>
                             </div>
                         </div>
 
                         <div class="group">
-                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-2">Employment Status Record</label>
+                            <label class="text-[0.625rem] ${t.textLabel} font-black uppercase block mb-2">Employment Status Record</label>
                             <div class="flex flex-wrap gap-2 items-center">
                                 <div class="flex flex-wrap gap-2 p-1.5 ${t.bgStatusWrap} border ${t.borderStatus} rounded-xl shadow-inner flex-1">
                                     ${(() => {
@@ -1234,50 +1257,54 @@ export function showAddDataModal(data = null) {
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <button type="button" id="absorb-btn" 
-                                        class="px-3 py-3 rounded-xl bg-[#2e7d32] text-white text-[0.625rem] font-black hover:bg-[#1b5e20] transition-all duration-300 shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
+                                        class="px-3.5 py-3 rounded-xl bg-[#2e7d32] text-white text-[0.625rem] font-black hover:bg-[#1b5e20] transition-all duration-300 shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
                                         ABSORB
                                     </button>
                                     <button type="button" id="resign-btn" 
-                                        class="px-3 py-3 rounded-xl bg-[#ce1126] text-white text-[0.625rem] font-black hover:bg-[#b71c1c] transition-all duration-300 shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
+                                        class="px-3.5 py-3 rounded-xl bg-[#ce1126] text-white text-[0.625rem] font-black hover:bg-[#b71c1c] transition-all duration-300 shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
                                         RESIGN
                                     </button>
                                 </div>
                             </div>
                         </div>
+
+                        <div id="extension-log-container" class="mt-auto transition-all duration-300">
+                            <!-- Absorption Log will be injected here via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2-Grid Action Footer Buttons (OUTSIDE tabs: Always visible on both General and Employee tabs) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 pt-4 border-t ${t.actionBarBorder}">
+                    <div class="flex items-center w-full order-2 sm:order-1">
+                        <button type="button" id="cancel-modal-btn"
+                            class="w-full h-11 group flex items-center justify-center gap-2 px-6 ${t.bgCancelBtn} ${t.textCancel} font-black rounded-xl hover:bg-[#ce1126] hover:text-white transition-all duration-300 shadow-sm border ${t.cancelBorder} hover:border-[#ce1126] cursor-pointer text-xs uppercase tracking-wider active:scale-[0.99] whitespace-nowrap">
+                            <svg class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                            <span>CANCEL</span>
+                        </button>
                     </div>
 
-                    <div id="extension-log-container" class="mt-auto transition-all duration-300">
-                        <!-- Absorption Log will be injected here via JS -->
+                    <div class="flex items-center w-full order-1 sm:order-2">
+                        <button type="submit" form="add-beneficiary-form" id="submit-beneficiary-btn"
+                            class="w-full h-11 group flex items-center justify-center gap-2 px-6 ${t.bgSaveBtn} text-white font-black rounded-xl transition-all duration-300 shadow-lg ${t.saveShadow} cursor-pointer text-xs transform active:scale-[0.99] uppercase tracking-wider whitespace-nowrap">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                            <span>${isEdit ? 'UPDATE RECORD' : 'SAVE RECORD'}</span>
+                        </button>
                     </div>
                 </div>
             </form>
-
-            <!-- Action Bar -->
-            <div class="mt-6 flex flex-wrap lg:justify-end items-center gap-3 pt-6 rounded-b-3xl ${t.bgActionBar} border-t ${t.actionBarBorder}">
-                <button type="button" id="cancel-modal-btn"
-                    class="group flex items-center justify-center gap-2.5 px-4 lg:px-6 py-3 lg:py-3.5 ${t.bgCancelBtn} ${t.textCancel} font-black rounded-xl hover:bg-[#ce1126] hover:text-white transition-all duration-300 shadow-sm border ${t.cancelBorder} hover:border-[#ce1126] cursor-pointer text-[0.625rem] lg:text-[0.75rem] active:scale-[0.98] uppercase tracking-wider whitespace-nowrap order-1 lg:order-2">
-                    <svg class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
-                    <span>CANCEL</span>
-                </button>
-
-                <button type="submit" form="add-beneficiary-form" id="submit-beneficiary-btn"
-                    class="group flex items-center justify-center gap-2.5 px-4 lg:px-6 py-3 lg:py-3.5 ${t.bgSaveBtn} text-white font-black rounded-xl transition-all duration-300 shadow-lg ${t.saveShadow} cursor-pointer text-[0.625rem] lg:text-[0.75rem] transform active:scale-[0.98] uppercase tracking-wider whitespace-nowrap order-2 lg:order-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-                    <span>${isEdit ? 'UPDATE RECORD' : 'SAVE RECORD'}</span>
-                </button>
-            </div>
         </div>
     `;
 
     Swal.fire({
         html: formContent,
-        width: window.innerWidth < 640 ? '96vw' : window.innerWidth < 1024 ? '90vw' : '1120px',
+        width: window.innerWidth < 640 ? '100vw' : '820px',
         showConfirmButton: false,
         showCloseButton: false,
-        padding: window.innerWidth < 640 ? '0.75rem' : window.innerWidth < 1024 ? '1.25rem' : '2rem',
+        padding: window.innerWidth < 640 ? '1rem' : '1.5rem',
         customClass: {
-            container: 'font-montserrat',
-            popup: 'rounded-2xl ldn-modal-popup'
+            container: 'font-montserrat p-0 sm:p-4',
+            popup: 'rounded-none sm:rounded-2xl ldn-modal-popup max-w-full sm:max-w-4xl w-full m-0 sm:m-auto min-h-screen sm:min-h-0'
         },
         willOpen: () => {
             document.documentElement.classList.add('overflow-hidden');
@@ -1290,6 +1317,38 @@ export function showAddDataModal(data = null) {
         didOpen: (popup) => {
             // [FLOWBITE FIX] Initialize Flowbite for dynamic modal content
             if (window.initFlowbite) window.initFlowbite();
+
+            // START: switchModalTab - Switches between General Information and Employee Information views in Add/Edit modal
+            const switchModalTab = (tabName) => {
+                const generalTabBtn = popup.querySelector('#tab-btn-general');
+                const employeeTabBtn = popup.querySelector('#tab-btn-employee');
+                const generalContent = popup.querySelector('#tab-content-general');
+                const employeeContent = popup.querySelector('#tab-content-employee');
+
+                const activeTabClass = 'py-2.5 px-2 text-royal-blue dark:text-blue-400 border-b-2 border-royal-blue dark:border-blue-400 flex items-center justify-center gap-1.5 cursor-pointer text-center transition-all outline-none w-full text-xs font-black';
+                const inactiveTabClass = 'py-2.5 px-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 border-b-2 border-transparent flex items-center justify-center gap-1.5 cursor-pointer text-center transition-all outline-none w-full text-xs font-black';
+
+                if (tabName === 'general') {
+                    if (generalContent) generalContent.classList.remove('hidden');
+                    if (employeeContent) employeeContent.classList.add('hidden');
+                    
+                    if (generalTabBtn) generalTabBtn.className = activeTabClass;
+                    if (employeeTabBtn) employeeTabBtn.className = inactiveTabClass;
+                } else if (tabName === 'employee') {
+                    if (generalContent) generalContent.classList.add('hidden');
+                    if (employeeContent) employeeContent.classList.remove('hidden');
+
+                    if (generalTabBtn) generalTabBtn.className = inactiveTabClass;
+                    if (employeeTabBtn) employeeTabBtn.className = activeTabClass;
+                }
+            };
+            // END: switchModalTab - Switches between General Information and Employee Information views in Add/Edit modal
+
+            const generalTabBtn = popup.querySelector('#tab-btn-general');
+            const employeeTabBtn = popup.querySelector('#tab-btn-employee');
+
+            if (generalTabBtn) generalTabBtn.addEventListener('click', () => switchModalTab('general'));
+            if (employeeTabBtn) employeeTabBtn.addEventListener('click', () => switchModalTab('employee'));
 
             // Cancel button functionality
             const cancelBtn = popup.querySelector('#cancel-modal-btn');
@@ -1315,14 +1374,14 @@ export function showAddDataModal(data = null) {
                 });
             }
 
-            // --- Robust Date Input Logic ---
+            // START: setupInputDateBehavior - Configures date input formatting, paste handling, and typing auto-hide
             const setupInputDateBehavior = (input, onDateFound) => {
                 input.addEventListener('paste', (e) => {
                     e.preventDefault();
                     let pasteData = (e.clipboardData || window.clipboardData).getData('text');
                     if (pasteData) {
                         // Standardize separators to '/'
-                        pasteData = pasteData.replace(/[-.\s]/g, '/');
+                        pasteData = pasteData.trim().replace(/[-.\s]/g, '/');
                         const parts = pasteData.split('/');
                         if (parts.length === 3) {
                             const m = parts[0].padStart(2, '0');
@@ -1338,19 +1397,12 @@ export function showAddDataModal(data = null) {
                             const formatted = `${m}/${d}/${y}`;
                             input.value = formatted;
                             
-                            // Trigger input event
-                            const inputEvent = new Event('input', { bubbles: true });
-                            input.dispatchEvent(inputEvent);
-                            
                             const parsed = window.__parseFormattedDate(formatted);
                             if (parsed && onDateFound) {
                                 onDateFound(parsed);
-                                if (document.activeElement === input) {
-                                    input.blur();
-                                }
                             }
                             
-                            // Close datepicker
+                            // Hide datepicker popup on paste completion
                             const picker = input._datepicker || (input.parentNode && input.parentNode._datepicker);
                             if (picker && typeof picker.hide === 'function') {
                                 picker.hide();
@@ -1360,6 +1412,12 @@ export function showAddDataModal(data = null) {
                 });
 
                 input.addEventListener('input', (e) => {
+                    // Auto-hide Flowbite datepicker popup when user starts typing
+                    const picker = input._datepicker || (input.parentNode && input.parentNode._datepicker);
+                    if (picker && typeof picker.hide === 'function') {
+                        picker.hide();
+                    }
+
                     const masked = window.__maskDate(e.target.value);
                     if (e.target.value !== masked) e.target.value = masked;
                     
@@ -1367,14 +1425,6 @@ export function showAddDataModal(data = null) {
                         const parsed = window.__parseFormattedDate(masked);
                         if (parsed && onDateFound) {
                             onDateFound(parsed);
-                            if (document.activeElement === input) {
-                                input.blur();
-                            }
-                            // Close datepicker
-                            const picker = input._datepicker || (input.parentNode && input.parentNode._datepicker);
-                            if (picker && typeof picker.hide === 'function') {
-                                picker.hide();
-                            }
                         }
                     }
                 });
@@ -1390,6 +1440,7 @@ export function showAddDataModal(data = null) {
                     }
                 });
             };
+            // END: setupInputDateBehavior - Configures date input formatting, paste handling, and typing auto-hide
 
             const bdayInput = popup.querySelector('#birthday-input');
             const ageDisplay = popup.querySelector('#age-display');
@@ -1722,13 +1773,32 @@ export function showAddDataModal(data = null) {
                 }
             };
 
+            // START: updateContractDurationDisplay - Updates contract duration indicator (months and days)
+            const updateContractDurationDisplay = () => {
+                const badge = popup.querySelector('#contract-duration-badge');
+                if (!badge || !startDateInput || !endDateInput) return;
+
+                const startVal = startDateInput.value;
+                const endVal = endDateInput.value;
+
+                const duration = calculateContractDuration(startVal, endVal);
+                if (duration.text) {
+                    badge.textContent = duration.text;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            };
+            // END: updateContractDurationDisplay - Updates contract duration indicator (months and days)
+
             if (startDateInput) {
                 let lastYear = null;
                 setupInputDateBehavior(startDateInput, (parsed) => {
                     const selectedYear = parsed.getFullYear();
                     if (endDateInput) {
                         const end = new Date(parsed);
-                        end.setDate(end.getDate() + 243);
+                        end.setMonth(end.getMonth() + 6);
+                        end.setDate(end.getDate() - 1);
                         
                         const m = String(end.getMonth() + 1).padStart(2, '0');
                         const d = String(end.getDate()).padStart(2, '0');
@@ -1736,6 +1806,7 @@ export function showAddDataModal(data = null) {
                         endDateInput.value = `${m}/${d}/${y}`;
                     }
                     updateRemarks();
+                    updateContractDurationDisplay();
 
                     if (selectedYear > 1900 && selectedYear !== lastYear) {
                         lastYear = selectedYear;
@@ -1744,7 +1815,10 @@ export function showAddDataModal(data = null) {
                 });
 
                 if (endDateInput) {
-                    setupInputDateBehavior(endDateInput, () => updateRemarks());
+                    setupInputDateBehavior(endDateInput, () => {
+                        updateRemarks();
+                        updateContractDurationDisplay();
+                    });
                 }
 
                 // Picker Init
@@ -1796,6 +1870,7 @@ export function showAddDataModal(data = null) {
             // Initial UI state
             updateRemarks();
             updateAbsorptionLog();
+            updateContractDurationDisplay();
 
             // Setup Suggestions
             setupSuggestions('education-input', 'course-suggestions', 'course-option');
@@ -2892,3 +2967,79 @@ async function performStatsSearch(searchParams) {
         resultDiv.classList.add('grid');
     }, 400); // UI breathing room
 }
+
+// START: calculateContractDuration - Calculates exact months and total calendar days count between start and end dates
+export function calculateContractDuration(startInput, endInput) {
+    if (!startInput || !endInput) {
+        return { months: 0, days: 0, text: '' };
+    }
+
+    const parseDateHelper = (val) => {
+        if (!val) return null;
+        if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+        const str = String(val).trim();
+        if (!str) return null;
+
+        // MM/DD/YYYY
+        if (str.includes('/')) {
+            const parts = str.split('/');
+            if (parts.length === 3) {
+                const m = parseInt(parts[0], 10) - 1;
+                const d = parseInt(parts[1], 10);
+                const y = parseInt(parts[2], 10);
+                if (y > 1000 && m >= 0 && m < 12 && d > 0 && d <= 31) {
+                    return new Date(y, m, d);
+                }
+            }
+        }
+        // YYYY-MM-DD
+        if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+            const parts = str.split('T')[0].split('-');
+            if (parts.length === 3) {
+                const y = parseInt(parts[0], 10);
+                const m = parseInt(parts[1], 10) - 1;
+                const d = parseInt(parts[2], 10);
+                if (y > 1000 && m >= 0 && m < 12 && d > 0 && d <= 31) {
+                    return new Date(y, m, d);
+                }
+            }
+        }
+        const d = new Date(str);
+        return isNaN(d.getTime()) ? null : d;
+    };
+
+    const start = parseDateHelper(startInput);
+    const end = parseDateHelper(endInput);
+
+    if (!start || !end || end < start) {
+        return { months: 0, days: 0, text: '' };
+    }
+
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const diffMs = Math.abs(end.getTime() - start.getTime());
+    const exactDays = Math.round(diffMs / msPerDay);
+    const totalDays = exactDays + 1; // Inclusive contract calendar days
+
+    // Calculate full months difference
+    let months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+    if (end.getDate() < start.getDate() - 1) {
+        months--;
+    }
+    if (months < 0) months = 0;
+
+    let text = '';
+    if (months > 0) {
+        text = `${months} Month${months > 1 ? 's' : ''} (${totalDays} Days)`;
+    } else {
+        text = `${totalDays} Day${totalDays !== 1 ? 's' : ''}`;
+    }
+
+    return {
+        months,
+        days: totalDays,
+        daysExact: exactDays,
+        text
+    };
+}
+// END: calculateContractDuration - Calculates exact months and total calendar days count between start and end dates
+
