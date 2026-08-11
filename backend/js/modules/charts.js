@@ -107,7 +107,6 @@ function getAssignedUnitLabel(unit) {
     const value = String(unit || '').trim();
     const acronym = value.match(/\(([A-Z]{2,8})\)\s*$/i)?.[1];
     if (acronym) return acronym.toUpperCase();
-    if (/information technology/i.test(value)) return 'IT';
     return value.length > 18 ? `${value.slice(0, 16)}...` : value;
 }
 
@@ -127,7 +126,6 @@ function getCanonicalAssignedUnit(unit) {
     if (acronymMatch) return acronymMatch;
 
     const aliases = {
-        'INFORMATION TECHNOLOGY': 'Information Technology Unit (IT)',
         'WELFARE WORKERS UNIT': 'Wellfare Workers Unit (WWU)',
         'WELLFARE WORKERS UNIT': 'Wellfare Workers Unit (WWU)'
     };

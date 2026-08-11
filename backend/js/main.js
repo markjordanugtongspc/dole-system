@@ -162,12 +162,24 @@ export function initAutoYear() {
  * Fetch current user profile and update UI
  */
 async function loadUserProfile() {
+    // 1. Instantly hydrate from local storage cache
     try {
-        // Pass user_id for Vercel serverless (no PHP sessions)
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const userObj = JSON.parse(storedUser);
+            if (userObj && (userObj.full_name || userObj.username || userObj.name)) {
+                updateUIProfile(userObj);
+            }
+        }
+    } catch (e) { /* ignore */ }
+
+    // 2. Fetch fresh profile from backend API
+    try {
         let userId = '';
         try {
             const user = JSON.parse(localStorage.getItem('user'));
-            if (user && user.id) userId = `?user_id=${user.id}`;
+            const uid = user?.user_id || user?.id;
+            if (uid) userId = `?user_id=${encodeURIComponent(uid)}`;
         } catch (e) { /* ignore */ }
 
         const fetchWithRetry = async (url, options = {}, retries = 1, delayMs = 1200) => {
@@ -182,7 +194,8 @@ async function loadUserProfile() {
 
         const response = await fetchWithRetry(`${getBasePath()}api/profile.php${userId}`);
         const result = await response.json();
-        if (result.success) {
+        if (result.success && result.profile) {
+            localStorage.setItem('user', JSON.stringify(result.profile));
             updateUIProfile(result.profile);
         }
     } catch (error) {

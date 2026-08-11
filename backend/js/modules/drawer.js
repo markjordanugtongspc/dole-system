@@ -16,58 +16,206 @@ function calculateAge(birthday) {
     return age >= 0 ? age : 0;
 }
 
-function getOfficeClass(office) {
-    if (!office || office === 'N/A') return 'bg-gray-100 text-gray-700 border border-gray-200 dark:!text-white';
-    const u = office.toUpperCase();
-
-    if (u.includes('LGU')) {
-        return /ILIGAN/i.test(office)
-            ? 'bg-yellow-400 text-white border border-yellow-500'
-            : 'bg-yellow-100 text-yellow-700 border border-yellow-200 dark:!text-white';
+function formatContractDate(dStr) {
+    if (!dStr || dStr === 'N/A') return 'N/A';
+    const parts = String(dStr).split('/');
+    if (parts.length === 3) {
+        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        const m = parseInt(parts[0], 10);
+        if (m >= 1 && m <= 12) return `${months[m - 1]} ${parts[1].padStart(2, '0')}, ${parts[2]}`;
     }
-    if (u.includes('DOLE'))   return 'bg-blue-100 text-blue-700 border border-blue-200 dark:!text-white';
-    if (u.includes('DEPED'))  return 'bg-orange-100 text-orange-700 border border-orange-200 dark:!text-white';
-    if (u.includes('DICT'))   return 'bg-cyan-100 text-cyan-700 border border-cyan-200 dark:!text-white';
-    if (u.includes('DOH'))    return 'bg-red-100 text-red-700 border border-red-200 dark:!text-white';
-    if (u.includes('DSWD'))   return 'bg-pink-100 text-pink-700 border border-pink-200 dark:!text-white';
-    if (u.includes('DTI'))    return 'bg-green-100 text-green-700 border border-green-200 dark:!text-white';
-    if (u.includes('DPWH'))   return 'bg-stone-100 text-stone-700 border border-stone-200 dark:!text-white';
-    if (u.includes('DILG'))   return 'bg-indigo-100 text-indigo-700 border border-indigo-200 dark:!text-white';
-    if (u.includes('DOST'))   return 'bg-violet-100 text-violet-700 border border-violet-200 dark:!text-white';
-    if (u.includes('DENR'))   return 'bg-emerald-100 text-emerald-700 border border-emerald-200 dark:!text-white';
-    if (u.includes('CHED'))   return 'bg-sky-100 text-sky-700 border border-sky-200 dark:!text-white';
-    if (u.includes('TESDA'))  return 'bg-teal-100 text-teal-700 border border-teal-200 dark:!text-white';
-    if (u.includes('DOJ'))    return 'bg-slate-100 text-slate-700 border border-slate-200 dark:!text-white';
-    if (u.includes('DOT') || u.includes('TOURISM')) return 'bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 dark:!text-white';
-    if (u.includes('DA') && !u.includes('DPWH') && !u.includes('DILG')) return 'bg-lime-100 text-lime-700 border border-lime-200 dark:!text-white';
-    if (u.includes('PRC'))    return 'bg-rose-100 text-rose-700 border border-rose-200 dark:!text-white';
-    if (u.includes('SSS'))    return 'bg-amber-100 text-amber-700 border border-amber-200 dark:!text-white';
-    if (u.includes('GSIS'))   return 'bg-purple-100 text-purple-700 border border-purple-200 dark:!text-white';
-    if (u.includes('PHIC') || u.includes('PHILHEALTH')) return 'bg-blue-200 text-blue-800 border border-blue-300 dark:!text-white';
-    if (u.includes('NBI'))    return 'bg-zinc-100 text-zinc-700 border border-zinc-200 dark:!text-white';
-
-    // Hash-based fallback — any new office gets a consistent unique color.
-    const palette = [
-        'bg-purple-100 text-purple-700 border border-purple-200',
-        'bg-rose-100 text-rose-700 border border-rose-200',
-        'bg-amber-100 text-amber-700 border border-amber-200',
-        'bg-teal-100 text-teal-700 border border-teal-200',
-        'bg-indigo-100 text-indigo-700 border border-indigo-200',
-        'bg-lime-100 text-lime-700 border border-lime-200',
-        'bg-sky-100 text-sky-700 border border-sky-200',
-        'bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200',
-        'bg-emerald-100 text-emerald-700 border border-emerald-200',
-        'bg-orange-100 text-orange-700 border border-orange-200',
-        'bg-pink-100 text-pink-700 border border-pink-200',
-        'bg-green-100 text-green-700 border border-green-200',
-        'bg-violet-100 text-violet-700 border border-violet-200',
-        'bg-cyan-100 text-cyan-700 border border-cyan-200',
-        'bg-red-100 text-red-700 border border-red-200',
-    ];
-    let hash = 0;
-    for (let i = 0; i < office.length; i++) hash = (hash * 31 + office.charCodeAt(i)) >>> 0;
-    return palette[hash % palette.length] + ' dark:!text-white';
+    const isoParts = String(dStr).split('-');
+    if (isoParts.length === 3 && isoParts[0].length === 4) {
+        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        const m = parseInt(isoParts[1], 10);
+        if (m >= 1 && m <= 12) return `${months[m - 1]} ${isoParts[2].padStart(2, '0')}, ${isoParts[0]}`;
+    }
+    return String(dStr).toUpperCase();
 }
+
+// START: getOfficeClass - Returns dynamic CSS styling classes for office badges in drawer views
+function getOfficeClass(office, isSelected = true) {
+    if (!office || office === 'N/A') {
+        return isSelected
+            ? 'bg-gray-800 text-white font-black border-gray-900 shadow-md dark:bg-gray-100 dark:text-gray-900'
+            : 'bg-gray-100 text-gray-700 border border-gray-200 dark:!text-white';
+    }
+    const u = office.toUpperCase().trim();
+
+    let colors = {
+        inactive: 'bg-gray-100 text-gray-700 border border-gray-200 dark:!text-white',
+        active: 'bg-royal-blue text-white font-black border-blue-800 shadow-md'
+    };
+
+    if (u === 'LDNPFO' || u.startsWith('LDNPFO')) {
+        // LDNPFO = Primary Solid Blue (Active) | Soft Blue (Inactive)
+        colors = {
+            inactive: 'bg-blue-100 text-blue-800 border border-blue-200 dark:!text-white',
+            active: 'bg-royal-blue text-white font-black border-blue-800 shadow-md'
+        };
+    } else if (u.includes('BOT')) {
+        // 1: BOT = Yellow Solid Color (Active) | Soft Yellow (Inactive)
+        colors = {
+            inactive: 'bg-amber-100 text-amber-800 border border-amber-200 dark:!text-white',
+            active: 'bg-amber-400 text-slate-900 font-black border-amber-500 shadow-md'
+        };
+    } else if (u.includes('DICT')) {
+        // 2: DICT = Red Solid Color (Active) | Soft Red (Inactive)
+        colors = {
+            inactive: 'bg-red-100 text-red-700 border border-red-200 dark:!text-white',
+            active: 'bg-red-600 text-white font-black border-red-700 shadow-md'
+        };
+    } else if (u.includes('NLRC')) {
+        // 4: NLRC = Primary Color (Active) | Soft Primary Tint (Inactive)
+        colors = {
+            inactive: 'bg-blue-50 text-blue-700 border border-blue-100 dark:!text-white',
+            active: 'bg-royal-blue text-white font-black border-blue-800 shadow-md'
+        };
+    } else if (u.includes('PCUP')) {
+        // 5: PCUP = Navy Blue (Active) | Soft Navy/Indigo (Inactive)
+        colors = {
+            inactive: 'bg-indigo-100 text-indigo-900 border border-indigo-200 dark:!text-white',
+            active: 'bg-indigo-900 text-white font-black border-indigo-950 shadow-md'
+        };
+    } else if (u.includes('BACOLOD')) {
+        // 6: PESO - BACOLOD = Dark Red (Active) | Soft Rose (Inactive)
+        colors = {
+            inactive: 'bg-rose-100 text-rose-900 border border-rose-200 dark:!text-white',
+            active: 'bg-red-900 text-white font-black border-red-950 shadow-md'
+        };
+    } else if (u.includes('BALO-I') || u.includes('BALOI')) {
+        // 7: PESO - BALO-I = Sky Blue (Active) | Faded Sky (Inactive)
+        colors = {
+            inactive: 'bg-sky-100 text-sky-700 border border-sky-200 dark:!text-white',
+            active: 'bg-sky-500 text-white font-black border-sky-600 shadow-md'
+        };
+    } else if (u.includes('BAROY')) {
+        // 8: PESO - BAROY = Faded Blue Color / Slate Blue (Active) | Light Faded Slate (Inactive)
+        colors = {
+            inactive: 'bg-slate-100 text-slate-700 border border-slate-200 dark:!text-white',
+            active: 'bg-slate-600 text-white font-black border-slate-700 shadow-md'
+        };
+    } else if (u.includes('ILIGAN')) {
+        // 9: PESO - ILIGAN = Slight Faded Brown / Warm Stone (Active) | Light Warm Brown (Inactive)
+        colors = {
+            inactive: 'bg-amber-100 text-amber-900 border border-amber-200 dark:!text-white',
+            active: 'bg-amber-800 text-white font-black border-amber-900 shadow-md'
+        };
+    } else if (u.includes('KAUSWAGAN')) {
+        // 10: PESO - KAUSWAGAN = Gradient Sky Pink (Active) | Soft Pink Tint (Inactive)
+        colors = {
+            inactive: 'bg-pink-50 text-pink-700 border border-pink-200 dark:!text-white',
+            active: 'bg-gradient-to-r from-sky-400 to-pink-500 text-white font-black border-pink-500 shadow-md'
+        };
+    } else if (u.includes('KOLAMBUGAN')) {
+        // 11: PESO - KOLAMBUGAN = Dark Green (Active) | Soft Emerald (Inactive)
+        colors = {
+            inactive: 'bg-emerald-100 text-emerald-900 border border-emerald-200 dark:!text-white',
+            active: 'bg-emerald-900 text-white font-black border-emerald-950 shadow-md'
+        };
+    } else if (u.includes('LINAMON')) {
+        colors = {
+            inactive: 'bg-purple-100 text-purple-700 border border-purple-200 dark:!text-white',
+            active: 'bg-purple-600 text-white font-black border-purple-700 shadow-md'
+        };
+    } else if (u.includes('MAGSAYSAY')) {
+        colors = {
+            inactive: 'bg-cyan-100 text-cyan-700 border border-cyan-200 dark:!text-white',
+            active: 'bg-cyan-600 text-white font-black border-cyan-700 shadow-md'
+        };
+    } else if (u.includes('MAIGO')) {
+        colors = {
+            inactive: 'bg-blue-100 text-blue-700 border border-blue-200 dark:!text-white',
+            active: 'bg-blue-600 text-white font-black border-blue-700 shadow-md'
+        };
+    } else if (u.includes('MATUNGAO')) {
+        colors = {
+            inactive: 'bg-violet-100 text-violet-700 border border-violet-200 dark:!text-white',
+            active: 'bg-violet-600 text-white font-black border-violet-700 shadow-md'
+        };
+    } else if (u.includes('NUNUNGAN')) {
+        colors = {
+            inactive: 'bg-indigo-100 text-indigo-700 border border-indigo-200 dark:!text-white',
+            active: 'bg-indigo-600 text-white font-black border-indigo-700 shadow-md'
+        };
+    } else if (u.includes('PANTAO')) {
+        colors = {
+            inactive: 'bg-orange-100 text-orange-700 border border-orange-200 dark:!text-white',
+            active: 'bg-orange-600 text-white font-black border-orange-700 shadow-md'
+        };
+    } else if (u.includes('PANTAR')) {
+        colors = {
+            inactive: 'bg-amber-100 text-amber-700 border border-amber-200 dark:!text-white',
+            active: 'bg-amber-500 text-white font-black border-amber-600 shadow-md'
+        };
+    } else if (u.includes('POONA')) {
+        colors = {
+            inactive: 'bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 dark:!text-white',
+            active: 'bg-fuchsia-600 text-white font-black border-fuchsia-700 shadow-md'
+        };
+    } else if (u.includes('SALVADOR')) {
+        colors = {
+            inactive: 'bg-rose-100 text-rose-700 border border-rose-200 dark:!text-white',
+            active: 'bg-rose-600 text-white font-black border-rose-700 shadow-md'
+        };
+    } else if (u.includes('SAPAD')) {
+        colors = {
+            inactive: 'bg-lime-100 text-lime-700 border border-lime-200 dark:!text-white',
+            active: 'bg-lime-600 text-white font-black border-lime-700 shadow-md'
+        };
+    } else if (u.includes('SND')) {
+        colors = {
+            inactive: 'bg-red-100 text-red-700 border border-red-200 dark:!text-white',
+            active: 'bg-red-700 text-white font-black border-red-800 shadow-md'
+        };
+    } else if (u.includes('TAGOLOAN')) {
+        colors = {
+            inactive: 'bg-green-100 text-green-700 border border-green-200 dark:!text-white',
+            active: 'bg-green-600 text-white font-black border-green-700 shadow-md'
+        };
+    } else if (u.includes('TANGCAL')) {
+        colors = {
+            inactive: 'bg-purple-100 text-purple-800 border border-purple-200 dark:!text-white',
+            active: 'bg-purple-800 text-white font-black border-purple-900 shadow-md'
+        };
+    } else if (u.includes('TUBOD')) {
+        colors = {
+            inactive: 'bg-emerald-100 text-emerald-700 border border-emerald-200 dark:!text-white',
+            active: 'bg-emerald-600 text-white font-black border-emerald-700 shadow-md'
+        };
+    } else if (u.includes('PGLDN')) {
+        colors = {
+            inactive: 'bg-sky-100 text-sky-700 border border-sky-200 dark:!text-white',
+            active: 'bg-sky-600 text-white font-black border-sky-700 shadow-md'
+        };
+    } else if (u.includes('PRC')) {
+        colors = {
+            inactive: 'bg-pink-100 text-pink-700 border border-pink-200 dark:!text-white',
+            active: 'bg-pink-600 text-white font-black border-pink-700 shadow-md'
+        };
+    } else if (u.includes('SSS')) {
+        colors = {
+            inactive: 'bg-blue-100 text-blue-800 border border-blue-200 dark:!text-white',
+            active: 'bg-blue-800 text-white font-black border-blue-900 shadow-md'
+        };
+    } else {
+        const colorPairs = [
+            { inactive: 'bg-purple-100 text-purple-700 border border-purple-200 dark:!text-white', active: 'bg-purple-600 text-white font-black border-purple-700 shadow-md' },
+            { inactive: 'bg-rose-100 text-rose-700 border border-rose-200 dark:!text-white', active: 'bg-rose-600 text-white font-black border-rose-700 shadow-md' },
+            { inactive: 'bg-amber-100 text-amber-700 border border-amber-200 dark:!text-white', active: 'bg-amber-500 text-white font-black border-amber-600 shadow-md' },
+            { inactive: 'bg-teal-100 text-teal-700 border border-teal-200 dark:!text-white', active: 'bg-teal-600 text-white font-black border-teal-700 shadow-md' },
+            { inactive: 'bg-indigo-100 text-indigo-700 border border-indigo-200 dark:!text-white', active: 'bg-indigo-600 text-white font-black border-indigo-700 shadow-md' },
+            { inactive: 'bg-emerald-100 text-emerald-700 border border-emerald-200 dark:!text-white', active: 'bg-emerald-600 text-white font-black border-emerald-700 shadow-md' },
+            { inactive: 'bg-sky-100 text-sky-700 border border-sky-200 dark:!text-white', active: 'bg-sky-500 text-white font-black border-sky-600 shadow-md' },
+        ];
+        let hash = 0;
+        for (let i = 0; i < u.length; i++) hash = (hash * 31 + u.charCodeAt(i)) >>> 0;
+        colors = colorPairs[hash % colorPairs.length];
+    }
+
+    return isSelected ? colors.active : colors.inactive;
+}
+// END: getOfficeClass - Returns dynamic CSS styling classes for office badges in drawer views
 
 function getStatusClass(status) {
     if (!status) return 'bg-red-600 text-white border-red-700 dark:bg-red-700 dark:border-red-800';
@@ -268,7 +416,7 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
             <span class="mb-1.5 block text-[0.5625rem] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Office</span>
             ${isProfileLoading
                 ? '<span class="skeleton-wave block h-8 w-full border border-gray-200 bg-gray-200 dark:border-slate-700 dark:bg-slate-700"></span>'
-                : `<span class="block min-h-8 w-full truncate border border-red-700 border-l-4 bg-red-600 px-2 py-1.5 text-center text-[0.5625rem] font-black uppercase tracking-wider text-white shadow-sm dark:border-red-800 dark:bg-red-700" title="${data.office}">${data.office}</span>`}
+                : `<span class="${getOfficeClass(data.office, true)} block min-h-8 w-full truncate border border-l-4 px-2 py-1.5 text-center text-[0.5625rem] font-black uppercase tracking-wider shadow-sm" title="${data.office}">${data.office}</span>`}
         </div>
     </div>
 </div>
@@ -345,29 +493,60 @@ export function showBeneficiaryDrawer(data, initialPage = 0) {
                 <svg id="drawer-employment-details-icon" class="h-4 w-4 transition-transform duration-300" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m6 9 6 6 6-6"/></svg>
             </span>
         </button>
-
-        <div id="drawer-employment-details-panel" class="hidden flex flex-col gap-4 pt-1">
-        <div class="bg-gray-50/50 dark:bg-slate-800/50 rounded-xl p-4 border border-gray-100 dark:border-slate-700 shadow-sm w-full">
-            <p class="text-[0.5625rem] uppercase tracking-widest text-gray-400 dark:text-white font-black mb-3">Work Registry</p>
-            <div class="flex items-center gap-3">
-                <div class="p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800 shrink-0">
-                    <svg class="w-5 h-5 text-royal-blue dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <div id="drawer-employment-details-panel" class="hidden flex flex-col gap-3 pt-1 font-montserrat">
+            <!-- Contract Duration / Period Card -->
+            <div class="bg-gradient-to-br from-blue-50/60 via-gray-50/50 to-indigo-50/40 dark:from-slate-800/80 dark:via-slate-800/50 dark:to-slate-900/60 rounded-xl p-4 border border-blue-100/80 dark:border-slate-700/80 shadow-sm w-full transition-all">
+                <div class="flex items-center justify-between border-b border-blue-100/60 dark:border-slate-700/60 pb-2.5 mb-3">
+                    <p class="text-[0.5625rem] uppercase tracking-widest text-royal-blue dark:text-blue-400 font-black flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-royal-blue dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Contract Period
+                    </p>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.5625rem] font-bold uppercase tracking-wider bg-blue-100 text-royal-blue dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                        GIP Duration
+                    </span>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <label class="text-[0.5625rem] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest truncate">Series No.</label>
-                    <span class="text-sm sm:text-base font-black text-royal-blue dark:text-blue-400 font-mono whitespace-nowrap leading-none tracking-tight">${data.seriesNo || '2025-00-000'}</span>
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Start Date (Color Coded: Emerald Green) -->
+                    <div class="flex flex-col bg-emerald-50/60 dark:bg-emerald-950/30 p-3 rounded-lg border border-emerald-100 dark:border-emerald-900/50 shadow-2xs">
+                        <span class="text-[0.5625rem] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block mb-1">Start Date</span>
+                        ${isProfileLoading
+                            ? '<span class="skeleton-wave block h-4.5 w-24 rounded-full bg-emerald-200/70 dark:bg-emerald-900/50 my-0.5"></span>'
+                            : `<span class="text-xs sm:text-sm font-black text-emerald-700 dark:text-emerald-300 leading-tight font-mono">${formatContractDate(data.startDate)}</span>`}
+                    </div>
+                    <!-- End Date (Color Coded: Rose Red) -->
+                    <div class="flex flex-col bg-rose-50/60 dark:bg-rose-950/30 p-3 rounded-lg border border-rose-100 dark:border-rose-900/50 shadow-2xs">
+                        <span class="text-[0.5625rem] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest block mb-1">End Date</span>
+                        ${isProfileLoading
+                            ? '<span class="skeleton-wave block h-4.5 w-24 rounded-full bg-rose-200/70 dark:bg-rose-900/50 my-0.5"></span>'
+                            : `<span class="text-xs sm:text-sm font-black text-rose-700 dark:text-rose-300 leading-tight font-mono">${formatContractDate(data.endDate)}</span>`}
+                    </div>
                 </div>
             </div>
-        </div>
 
-         <div class="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-4 rounded-xl shadow-sm">
-            <label class="text-[0.5625rem] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest">Assigned Unit</label>
-            <p class="text-sm font-black text-heading break-words whitespace-normal leading-snug">${data.designation}</p>
-        </div>
-        
-         <div class="bg-gray-50/30 dark:bg-slate-800/30 p-4 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
-            <label class="text-[0.5625rem] text-gray-400 dark:text-gray-300 font-bold block mb-1 uppercase tracking-widest">Replacement History</label>
-             <p class="text-sm text-emerald-600 dark:text-emerald-400 font-bold italic underline decoration-emerald-500/30 underline-offset-4 cursor-default">${data.replacement || 'None found.'}</p>
+            <!-- Assigned Unit Card (Color Coded: Amber) -->
+            <div class="bg-amber-50/40 dark:bg-amber-950/20 border border-amber-100/80 dark:border-amber-900/40 p-4 rounded-xl shadow-sm transition-all">
+                <div class="flex items-center gap-2 mb-1.5">
+                    <div class="p-1.5 rounded-lg bg-amber-100/80 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <label class="text-[0.5625rem] text-amber-700 dark:text-amber-300 font-bold block uppercase tracking-widest">Assigned Unit</label>
+                </div>
+                ${isProfileLoading
+                    ? '<div class="pl-7"><span class="skeleton-wave block h-4 w-44 rounded-full bg-amber-200/70 dark:bg-amber-900/50 my-1"></span></div>'
+                    : `<p class="text-xs sm:text-sm font-black text-amber-900 dark:text-amber-200 break-words whitespace-normal leading-snug pl-7">${data.designation || 'N/A'}</p>`}
+            </div>
+            
+            <!-- Replacement History Card (Color Coded: Indigo/Blue) -->
+            <div class="bg-blue-50/30 dark:bg-blue-950/20 p-4 rounded-xl border border-dashed border-blue-200 dark:border-blue-900/50">
+                <label class="text-[0.5625rem] text-royal-blue dark:text-blue-400 font-bold block mb-1 uppercase tracking-widest">Replacement History</label>
+                ${isProfileLoading
+                    ? '<span class="skeleton-wave block h-4 w-36 rounded-full bg-blue-200/70 dark:bg-blue-900/50 my-1"></span>'
+                    : `<p class="text-xs sm:text-sm text-royal-blue dark:text-blue-300 font-bold italic underline decoration-blue-500/30 underline-offset-4 cursor-default">${data.replacement || 'None found.'}</p>`}
+            </div>
         </div>
 
         ${data.remarks === 'ABSORBED' ? `

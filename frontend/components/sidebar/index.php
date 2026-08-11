@@ -227,3 +227,39 @@ $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false || stripos($
         </div>
     </div>
 </aside>
+<script>
+(function() {
+    function hydrateSidebarUser() {
+        try {
+            var raw = localStorage.getItem('user');
+            var u = raw ? JSON.parse(raw) : null;
+            var name = u ? (u.full_name || u.name || u.username) : (localStorage.getItem('user_full_name') || 'System User');
+            var email = u ? (u.email || (u.username ? u.username + '@dole.gov.ph' : 'user@dole.gov.ph')) : 'user@dole.gov.ph';
+            var avatar = (u && u.profile_picture_path) ? u.profile_picture_path : localStorage.getItem('user_avatar');
+            var initials = (name || 'US').trim().split(' ').map(function(n){ return n[0]; }).join('').substring(0, 2).toUpperCase() || 'US';
+
+            document.querySelectorAll('.sidebar-user-name').forEach(function(el) { el.textContent = name; });
+            document.querySelectorAll('.sidebar-user-email').forEach(function(el) { el.textContent = email; });
+            document.querySelectorAll('.sidebar-user-avatar').forEach(function(container) {
+                var initEl = container.querySelector('.sidebar-avatar-initials');
+                var imgEl = container.querySelector('.sidebar-avatar-img');
+                if (avatar && imgEl) {
+                    var src = avatar.startsWith('http') ? avatar : (window.location.origin + '/' + avatar.replace(/^\//, ''));
+                    imgEl.src = src;
+                    imgEl.classList.remove('hidden');
+                    if (initEl) initEl.classList.add('hidden');
+                } else if (initEl) {
+                    initEl.textContent = initials;
+                    initEl.classList.remove('hidden');
+                    if (imgEl) imgEl.classList.add('hidden');
+                }
+            });
+        } catch (e) {}
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', hydrateSidebarUser);
+    } else {
+        hydrateSidebarUser();
+    }
+})();
+</script>

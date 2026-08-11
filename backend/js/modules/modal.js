@@ -427,26 +427,39 @@ function renderProfileModal(profile) {
  * Update global UI elements with new profile data
  */
 export function updateUIProfile(profile) {
-    const avatarUrl = profile.profile_picture_path ? `${getBasePath()}${profile.profile_picture_path}` : null;
-    const initials = profile.full_name ? profile.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'US';
+    if (!profile) return;
+    const name = profile.full_name || profile.name || profile.username || 'System User';
+    const email = profile.email || (profile.username ? `${profile.username}@dole.gov.ph` : 'user@dole.gov.ph');
+    const avatarUrl = profile.profile_picture_path
+        ? (profile.profile_picture_path.startsWith('http') ? profile.profile_picture_path : `${getBasePath()}${profile.profile_picture_path.replace(/^\//, '')}`)
+        : (localStorage.getItem('user_avatar') || null);
+    const initials = name.trim().split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'US';
 
     // Update Sidebar elements
-    const sidebarNameElements = document.querySelectorAll('.sidebar-user-name');
-    const sidebarEmailElements = document.querySelectorAll('.sidebar-user-email');
-    const sidebarAvatarElements = document.querySelectorAll('.sidebar-user-avatar');
-
-    sidebarNameElements.forEach(el => el.textContent = profile.full_name);
-    sidebarEmailElements.forEach(el => el.textContent = profile.email || 'No email set');
-    sidebarAvatarElements.forEach(el => {
+    document.querySelectorAll('.sidebar-user-name').forEach(el => el.textContent = name);
+    document.querySelectorAll('.sidebar-user-email').forEach(el => el.textContent = email);
+    document.querySelectorAll('.sidebar-user-avatar').forEach(container => {
+        const initialsEl = container.querySelector('.sidebar-avatar-initials');
+        const imgEl = container.querySelector('.sidebar-avatar-img');
         if (avatarUrl) {
-            el.innerHTML = `<img src="${avatarUrl}" class="w-full h-full object-cover" />`;
+            if (imgEl) {
+                imgEl.src = avatarUrl;
+                imgEl.classList.remove('hidden');
+            } else {
+                container.innerHTML = `<img src="${avatarUrl}" class="w-full h-full object-cover" />`;
+            }
+            if (initialsEl) initialsEl.classList.add('hidden');
+        } else if (initialsEl) {
+            initialsEl.textContent = initials;
+            initialsEl.classList.remove('hidden');
+            if (imgEl) imgEl.classList.add('hidden');
         } else {
-            el.textContent = initials;
+            container.textContent = initials;
         }
     });
 
     // Save to LocalStorage for other pages
-    localStorage.setItem('user_full_name', profile.full_name);
+    localStorage.setItem('user_full_name', name);
     if (avatarUrl) {
         localStorage.setItem('user_avatar', avatarUrl);
     }
@@ -1142,26 +1155,20 @@ export function showAddDataModal(data = null) {
                             <input type="hidden" name="id" value="${data?.id || ''}">
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="group">
-                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Assigned Office</label>
-                                <div class="relative" id="office-container">
-                                    <input type="text" name="office" id="office-input" autocomplete="off"
-                                        value="${data?.office || ''}" 
-                                        class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
-                                        placeholder="e.g. DOLE Field Office">
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                        <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                                    </div>
-                                    <div id="office-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
-                                        <!-- Will be populated by JS -->
-                                        <div class="px-3 py-4 text-center text-[0.625rem] font-bold ${t.textLabel} animate-pulse">Loading offices...</div>
-                                    </div>
+                        <div class="group">
+                            <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Assigned Office</label>
+                            <div class="relative" id="office-container">
+                                <input type="text" name="office" id="office-input" autocomplete="off"
+                                    value="${data?.office || ''}" 
+                                    class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-bold ${t.textInput} focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm ${t.placeholder}" 
+                                    placeholder="e.g. DOLE Field Office">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <svg class="w-4 h-4 ${t.iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                 </div>
-                            </div>
-                            <div class="group">
-                                <label class="text-[0.5625rem] ${t.textLabel} font-black uppercase block mb-1 transition-colors ${t.gfBlue}">Series Number</label>
-                                <input type="text" name="seriesNo" id="series-no-input" value="${data?.seriesNo || ''}" class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.75rem] font-black ${dk ? 'text-white' : 'text-royal-blue'} font-mono focus:ring-4 ${t.focusBlue} outline-none transition-all shadow-sm" placeholder="2025-00-000">
+                                <div id="office-suggestions" class="hidden absolute left-0 right-0 mt-2 ${t.bgSugg} border ${t.borderSugg} rounded-xl shadow-2xl z-100 max-h-48 overflow-y-auto font-montserrat ${t.borderDivide} p-1.5">
+                                    <!-- Will be populated by JS -->
+                                    <div class="px-3 py-4 text-center text-[0.625rem] font-bold ${t.textLabel} animate-pulse">Loading offices...</div>
+                                </div>
                             </div>
                         </div>
 
@@ -1878,7 +1885,7 @@ export function showAddDataModal(data = null) {
                                 ${filteredOffices.length > 0 ? filteredOffices.map(o => {
                                     const hasLocations = parseInt(o.location_count || 0) > 0;
                                     return `
-                                        <div class="office-code-option group/opt px-3 py-2 text-[0.5625rem] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg ${hasLocations ? 'cursor-pointer' : 'cursor-default opacity-60'} transition-all flex items-center justify-between group active:scale-[0.98] mx-1 mb-0.5" 
+                                        <div class="office-code-option group/opt px-3 py-2 text-[0.5625rem] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-lg cursor-pointer transition-all flex items-center justify-between group active:scale-[0.98] mx-1 mb-0.5" 
                                             data-id="${o.id}" data-name="${o.office}" data-has-locations="${hasLocations}">
                                             <div class="flex items-center gap-2.5">
                                                 <div class="w-2 h-2 rounded-md bg-blue-500/10 group-hover/opt:bg-blue-500/20 flex items-center justify-center transition-colors">

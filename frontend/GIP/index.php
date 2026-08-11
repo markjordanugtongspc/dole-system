@@ -231,28 +231,62 @@ require_once __DIR__ . '/../../config/vite.php';
                                         By</span>
                                 </div>
                                 <div class="p-4">
-                                    <!-- Year select -->
-                                    <div class="mb-3">
-                                        <label
-                                            class="block text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest mb-1">Year</label>
-                                        <select id="filter-year"
-                                            class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
-                                            <option value="ALL">All Years</option>
-                                            <!-- Dynamically populated -->
-                                        </select>
+                                    <!-- Red-rose Filter Mode Disabled Notice & Tooltip -->
+                                    <div id="filter-disabled-notice"
+                                        class="mb-3 hidden items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 p-2 text-[0.625rem] font-bold text-rose-600 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300 shadow-xs">
+                                        <svg class="h-3.5 w-3.5 shrink-0 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                        <span>Disabled. Click <strong>Filter Mode: OFF</strong> below to enable.</span>
                                     </div>
-                                    <!-- Status select -->
-                                    <div class="mb-4">
-                                        <label
-                                            class="block text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest mb-1">Status</label>
-                                        <select id="filter-status"
-                                            class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
-                                            <option value="ALL">All Status</option>
-                                            <option value="ONGOING">Ongoing</option>
-                                            <option value="EXPIRED">Expired</option>
-                                            <option value="RESIGNED">Resigned</option>
-                                            <option value="ABSORBED">Absorbed</option>
-                                        </select>
+                                    <!-- Select Filter Controls Container (Shown only when Filter Mode is ON) -->
+                                    <div id="filter-selects-container" class="hidden">
+                                        <!-- Year select -->
+                                        <div class="mb-3">
+                                            <label
+                                                class="block text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest mb-1">Year</label>
+                                            <select id="filter-year"
+                                                class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
+                                                <option value="ALL">All Years</option>
+                                                <!-- Dynamically populated -->
+                                            </select>
+                                        </div>
+                                        <!-- START: Filter Start Date and End Date Selects -->
+                                        <!-- Start Date select -->
+                                        <div class="mb-3">
+                                            <label
+                                                class="block text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest mb-1">Start Date</label>
+                                            <select id="filter-start-date"
+                                                class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
+                                                <option value="ALL">All Start Dates</option>
+                                                <!-- Dynamically populated from backend -->
+                                            </select>
+                                        </div>
+                                        <!-- End Date select -->
+                                        <div class="mb-3">
+                                            <label
+                                                class="block text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest mb-1">End Date</label>
+                                            <select id="filter-end-date"
+                                                class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
+                                                <option value="ALL">All End Dates</option>
+                                                <!-- Dynamically populated from backend -->
+                                            </select>
+                                        </div>
+                                        <!-- END: Filter Start Date and End Date Selects -->
+                                        <!-- Status select -->
+                                        <div class="mb-4">
+                                            <label
+                                                class="block text-[0.625rem] font-bold text-gray-500 uppercase tracking-widest mb-1">Status</label>
+                                            <select id="filter-status"
+                                                class="block w-full text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-royal-blue focus:border-royal-blue p-2 cursor-pointer transition-colors duration-200">
+                                                <option value="ALL">All Status</option>
+                                                <option value="ONGOING">Ongoing</option>
+                                                <option value="EXPIRED">Expired</option>
+                                                <option value="RESIGNED">Resigned</option>
+                                                <option value="ABSORBED">Absorbed</option>
+                                            </select>
+                                        </div>
                                     </div>
                                     <div class="mb-4 border-t border-gray-100 pt-3">
                                         <span class="mb-2 block text-[0.625rem] font-bold uppercase tracking-widest text-gray-500">Sort by Name</span>
@@ -412,7 +446,6 @@ require_once __DIR__ . '/../../config/vite.php';
                                             <button type="button" data-assigned-unit-filter="Internal Management Services Unit (IMSU)" class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700"><span>Internal Management Services Unit (IMSU)</span></button>
                                             <button type="button" data-assigned-unit-filter="Wellfare Workers Unit (WWU)" class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700"><span>Wellfare Workers Unit (WWU)</span></button>
                                             <button type="button" data-assigned-unit-filter="Labor Relation Unit (LRU)" class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700"><span>Labor Relation Unit (LRU)</span></button>
-                                            <button type="button" data-assigned-unit-filter="Information Technology Unit (IT)" class="flex w-full items-center gap-2 px-4 py-2 text-left text-[0.6875rem] font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-royal-blue cursor-pointer dark:text-gray-200 dark:hover:bg-slate-700"><span>Information Technology Unit (IT)</span></button>
                                         </div>
                                     </li>
                                 </ul>

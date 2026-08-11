@@ -1088,3 +1088,21 @@ select:focus {
 @media (prefers-reduced-motion: reduce) {
     .dashboard-skeleton-sweep { animation: none; }
 }
+
+/* Slow & smooth blinking pulse animation for active filter pills */
+@keyframes active-pill-pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+        opacity: 0.75;
+        transform: scale(1.01);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+}
+
+.animate-active-pill {
+    animation: active-pill-pulse 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}

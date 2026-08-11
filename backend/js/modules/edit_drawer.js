@@ -5,6 +5,7 @@ import { supabase } from './supabase-client.js';
 import Swal from 'sweetalert2';
 import { ASSURED_RELATIONSHIPS, COMMON_COURSES, COMMON_ASSIGNED_UNITS } from './modal.js';
 
+// START: showEditBeneficiaryDrawer - Opens slide-over drawer to edit GIP beneficiary details
 export function showEditBeneficiaryDrawer(data) {
     const dk = isDarkMode();
     const inputClass = 'w-full rounded-none border border-slate-300 bg-white px-3 py-2.5 text-sm font-bold text-slate-900 placeholder-slate-400 outline-none transition-colors focus:border-brand focus:ring-1 focus:ring-brand dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-600';
@@ -85,15 +86,9 @@ export function showEditBeneficiaryDrawer(data) {
         </button>
     </div>
 
-    <div class="flex flex-col sm:flex-row gap-4 w-full">
-        <div class="flex-1 flex flex-col gap-1 text-left">
-            <span class="text-[0.625rem] text-gray-500 font-bold uppercase tracking-widest pl-1">ROX-ID</span>
-            <input type="text" name="gip_id" value="${data.gip_id || data.id || ''}" class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-white text-[0.625rem] sm:text-[0.6875rem] font-black px-2.5 py-1.5 rounded-none border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full" placeholder="ROX-RD-ESIG-0000-0000">
-        </div>
-        <div class="flex-1 flex flex-col gap-1 text-left">
-            <span class="text-[0.625rem] text-gray-500 font-bold uppercase tracking-widest pl-1">SERIES NO.</span>
-            <input type="text" name="seriesNo" value="${data.seriesNo || ''}" class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-white text-[0.625rem] sm:text-[0.6875rem] font-black px-2.5 py-1.5 rounded-none border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full" placeholder="2025-00-000">
-        </div>
+    <div class="flex flex-col gap-1 text-left w-full">
+        <span class="text-[0.625rem] text-gray-500 font-bold uppercase tracking-widest pl-1">ROX-ID</span>
+        <input type="text" name="gip_id" value="${data.gip_id || data.id || ''}" class="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-white text-[0.625rem] sm:text-[0.6875rem] font-black px-2.5 py-1.5 rounded-none border border-gray-200 dark:border-slate-700 uppercase tracking-widest shadow-sm outline-none focus:ring-2 focus:ring-brand w-full" placeholder="ROX-RD-ESIG-0000-0000">
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mt-4 mb-4">
         <div class="flex flex-col gap-1 text-left overflow-hidden relative">
@@ -264,9 +259,9 @@ export function showEditBeneficiaryDrawer(data) {
 
 <div class="absolute bottom-0 left-0 right-0 grid w-full grid-cols-2 gap-3 border-t border-gray-100 bg-white/95 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 z-[60]">
     <button type="button" id="edit-drawer-cancel-btn" class="order-2 h-12 rounded-none border border-transparent bg-gray-100 px-4 py-3 text-[0.625rem] font-black uppercase tracking-widest text-gray-600 transition-all hover:border-[#ce1126] hover:bg-[#ce1126] hover:text-white cursor-pointer sm:text-xs">Cancel</button>
-    <button type="submit" form="edit-beneficiary-drawer-form" class="order-1 flex h-12 items-center justify-center gap-2 rounded-none bg-brand px-4 py-3 text-[0.625rem] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-brand-strong hover:shadow-brand/40 cursor-pointer sm:text-xs">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-        Save Changes
+    <button type="submit" id="edit-drawer-submit-btn" form="edit-beneficiary-drawer-form" class="order-1 flex h-12 items-center justify-center gap-2 rounded-none bg-brand px-4 py-3 text-[0.625rem] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-brand-strong hover:shadow-brand/40 cursor-pointer sm:text-xs">
+        <svg id="edit-drawer-submit-icon" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+        <span id="edit-drawer-submit-text">Save Changes</span>
     </button>
 </div>
 
@@ -833,7 +828,7 @@ export function showEditBeneficiaryDrawer(data) {
                             ${filteredOffices.length > 0 ? filteredOffices.map(o => {
                                 const hasLocations = parseInt(o.location_count || 0) > 0;
                                 return `
-                                    <div class="office-code-option group/opt px-3 py-2 text-[0.5625rem] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-none ${hasLocations ? 'cursor-pointer' : 'cursor-default opacity-60'} transition-all flex items-center justify-between group active:scale-[0.98] mx-1 mb-0.5"
+                                    <div class="office-code-option group/opt px-3 py-2 text-[0.5625rem] font-bold ${t.textCourseOpt} ${t.courseHover} rounded-none cursor-pointer transition-all flex items-center justify-between group active:scale-[0.98] mx-1 mb-0.5"
                                         data-id="${o.id}" data-name="${o.office}" data-has-locations="${hasLocations}">
                                         <div class="flex items-center gap-2.5">
                                             <div class="w-2 h-2 rounded-none bg-blue-500/10 group-hover/opt:bg-blue-500/20 flex items-center justify-center transition-colors">
@@ -1118,6 +1113,34 @@ export function showEditBeneficiaryDrawer(data) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
+            const submitBtn = drawerContainer.querySelector('#edit-drawer-submit-btn');
+            const submitIcon = drawerContainer.querySelector('#edit-drawer-submit-icon');
+            const submitText = drawerContainer.querySelector('#edit-drawer-submit-text');
+
+            const resetSubmitState = () => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }
+                const curIcon = drawerContainer.querySelector('#edit-drawer-submit-icon');
+                if (curIcon) {
+                    curIcon.outerHTML = `<svg id="edit-drawer-submit-icon" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>`;
+                }
+                if (submitText) submitText.textContent = 'Save Changes';
+            };
+
+            const showLoadingState = () => {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+                }
+                const curIcon = drawerContainer.querySelector('#edit-drawer-submit-icon');
+                if (curIcon) {
+                    curIcon.outerHTML = `<svg id="edit-drawer-submit-icon" class="animate-spin w-4 h-4 text-white shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+                }
+                if (submitText) submitText.textContent = 'Saving Changes...';
+            };
+
             const { isoBirthday, hasBirthdayInput } = syncBirthdayFromParts(true);
             if (hasBirthdayInput && !isoBirthday) {
                 birthMonthInput?.focus();
@@ -1132,6 +1155,9 @@ export function showEditBeneficiaryDrawer(data) {
                 });
                 return;
             }
+
+            // Immediately show loading spinner on SVG upon click
+            showLoadingState();
 
             const normalizeBackendDate = (value) => {
                 const raw = String(value || '').trim();
@@ -1160,29 +1186,39 @@ export function showEditBeneficiaryDrawer(data) {
 
             if (window.addBeneficiaryData) {
                 (async () => {
-                    const success = await window.addBeneficiaryData(beneficiaryData, true, false);
-                    if (success) {
-                        // Let the edit drawer finish closing before the success feedback appears.
-                        hideDrawerSafely();
-                        await new Promise((resolve) => setTimeout(resolve, 450));
+                    try {
+                        const success = await window.addBeneficiaryData(beneficiaryData, true, false);
+                        if (success) {
+                            // Let the edit drawer finish closing before the success feedback appears.
+                            hideDrawerSafely();
+                            await new Promise((resolve) => setTimeout(resolve, 450));
 
-                        await Swal.fire({
-                            toast: true,
-                            position: 'bottom-end',
-                            icon: 'success',
-                            title: 'RECORD UPDATED',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true
-                        });
+                            await Swal.fire({
+                                toast: true,
+                                position: 'bottom-end',
+                                icon: 'success',
+                                title: 'RECORD UPDATED',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true
+                            });
 
-                        // Rehydrate only after the toast closes so the refreshed drawer returns smoothly.
-                        if (window.viewBeneficiary) {
-                            await window.viewBeneficiary({ ...beneficiaryData, id: data.id, gip_id: data.id }, 0);
+                            // Rehydrate only after the toast closes so the refreshed drawer returns smoothly.
+                            if (window.viewBeneficiary) {
+                                await window.viewBeneficiary({ ...beneficiaryData, id: data.id, gip_id: data.id }, 0);
+                            }
+                        } else {
+                            resetSubmitState();
                         }
+                    } catch (err) {
+                        console.error('Save beneficiary data failed:', err);
+                        resetSubmitState();
                     }
                 })();
+            } else {
+                resetSubmitState();
             }
         });
     });
 }
+// END: showEditBeneficiaryDrawer - Manages GIP beneficiary edit form submission, SVG loading animation, and rehydration

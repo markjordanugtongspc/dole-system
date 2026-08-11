@@ -24,6 +24,17 @@ function translateDateToShortMonth(dateStr) {
             return `${months[month - 1]} ${day.padStart(2, '0')}, ${year}`;
         }
     }
+    // Handle YYYY-MM-DD format
+    const isoParts = dateStr.split('-');
+    if (isoParts.length === 3 && isoParts[0].length === 4) {
+        const year = isoParts[0];
+        const month = parseInt(isoParts[1]);
+        const day = isoParts[2];
+        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        if (month >= 1 && month <= 12) {
+            return `${months[month - 1]} ${day.padStart(2, '0')}, ${year}`;
+        }
+    }
     return dateStr.toUpperCase();
 }
 
@@ -42,6 +53,8 @@ let officeMap = {}; // keyed by offices.id → display name (e.g., "LGU - ILIGAN
 
 let currentStatusFilter = localStorage.getItem('gip_status_filter') || 'ONGOING';
 let currentYearFilter = localStorage.getItem('gip_year_filter') || 'ALL';
+let currentStartDateFilter = localStorage.getItem('gip_start_date_filter') || 'ALL';
+let currentEndDateFilter = localStorage.getItem('gip_end_date_filter') || 'ALL';
 let currentOfficeFilter = localStorage.getItem('gip_office_filter') || 'ALL';
 let currentEducationFilter = localStorage.getItem('gip_education_filter') || 'ALL';
 let currentBirthdayYearFilter = localStorage.getItem('gip_birthday_year_filter') || 'ALL';
@@ -55,6 +68,8 @@ const FILTER_MODE_COOKIE = 'gip_filter_mode';
 const FILTER_MODE_STORAGE_KEY = 'gip_filter_mode';
 const DEFAULT_STATUS_FILTER = 'ONGOING';
 const DEFAULT_YEAR_FILTER = 'ALL';
+const DEFAULT_START_DATE_FILTER = 'ALL';
+const DEFAULT_END_DATE_FILTER = 'ALL';
 let filterModeEnabled = (localStorage.getItem(FILTER_MODE_STORAGE_KEY) || 'OFF') === 'ON';
 
 function getPageFromUrl() {
@@ -109,6 +124,20 @@ function getFilteredBeneficiaries() {
                 const d = new Date(rawDateStr);
                 if (isNaN(d.getTime())) return false;
                 return d.getFullYear().toString() === currentYearFilter;
+            });
+        }
+
+        if (currentStartDateFilter !== 'ALL') {
+            result = result.filter(b => {
+                const sd = b.startDate ? String(b.startDate).trim() : '';
+                return sd === currentStartDateFilter || translateDateToShortMonth(sd) === currentStartDateFilter;
+            });
+        }
+
+        if (currentEndDateFilter !== 'ALL') {
+            result = result.filter(b => {
+                const ed = b.endDate ? String(b.endDate).trim() : '';
+                return ed === currentEndDateFilter || translateDateToShortMonth(ed) === currentEndDateFilter;
             });
         }
 
@@ -306,6 +335,8 @@ export function applyFilters() {
 
     const statusSelect = document.getElementById('filter-status');
     const yearSelect = document.getElementById('filter-year');
+    const startDateSelect = document.getElementById('filter-start-date');
+    const endDateSelect = document.getElementById('filter-end-date');
     if (statusSelect) {
         currentStatusFilter = statusSelect.value;
         localStorage.setItem('gip_status_filter', currentStatusFilter);
@@ -313,6 +344,14 @@ export function applyFilters() {
     if (yearSelect) {
         currentYearFilter = yearSelect.value;
         localStorage.setItem('gip_year_filter', currentYearFilter);
+    }
+    if (startDateSelect) {
+        currentStartDateFilter = startDateSelect.value;
+        localStorage.setItem('gip_start_date_filter', currentStartDateFilter);
+    }
+    if (endDateSelect) {
+        currentEndDateFilter = endDateSelect.value;
+        localStorage.setItem('gip_end_date_filter', currentEndDateFilter);
     }
     currentPage = 1;
     syncPageToUrl(currentPage);
@@ -327,8 +366,12 @@ export function applyFilters() {
 function updateFilterUI() {
     const statusSelect = document.getElementById('filter-status');
     const yearSelect = document.getElementById('filter-year');
+    const startDateSelect = document.getElementById('filter-start-date');
+    const endDateSelect = document.getElementById('filter-end-date');
     if (statusSelect) statusSelect.value = filterModeEnabled ? currentStatusFilter : DEFAULT_STATUS_FILTER;
     if (yearSelect) yearSelect.value = filterModeEnabled ? currentYearFilter : DEFAULT_YEAR_FILTER;
+    if (startDateSelect) startDateSelect.value = filterModeEnabled ? currentStartDateFilter : DEFAULT_START_DATE_FILTER;
+    if (endDateSelect) endDateSelect.value = filterModeEnabled ? currentEndDateFilter : DEFAULT_END_DATE_FILTER;
 }
 
 function persistFilterMode(enabled) {
@@ -353,10 +396,48 @@ function updateFilterToggleButtonUI() {
 }
 
 function updateFilterInputsAvailability() {
-    const statusSelect = document.getElementById('filter-status');
-    const yearSelect = document.getElementById('filter-year');
-    if (statusSelect) statusSelect.disabled = !filterModeEnabled;
-    if (yearSelect) yearSelect.disabled = !filterModeEnabled;
+    const selectsContainer = document.getElementById('filter-selects-container');
+    const noticeBanner = document.getElementById('filter-disabled-notice');
+    const selects = [
+        document.getElementById('filter-year'),
+        document.getElementById('filter-start-date'),
+        document.getElementById('filter-end-date'),
+        document.getElementById('filter-status')
+    ].filter(Boolean);
+
+    const disabledClasses = ['cursor-not-allowed', 'opacity-70', 'bg-rose-50/60', 'border-rose-300', 'text-rose-600', 'dark:bg-rose-950/30', 'dark:border-rose-800', 'dark:text-rose-400'];
+    const enabledClasses = ['cursor-pointer', 'bg-gray-50', 'border-gray-200', 'text-gray-700'];
+
+    selects.forEach(select => {
+        select.disabled = !filterModeEnabled;
+        if (!filterModeEnabled) {
+            select.classList.remove(...enabledClasses);
+            select.classList.add(...disabledClasses);
+            select.setAttribute('title', 'Filter Mode is OFF. Click "Filter Mode: OFF" below to enable option selection.');
+        } else {
+            select.classList.remove(...disabledClasses);
+            select.classList.add(...enabledClasses);
+            select.removeAttribute('title');
+        }
+    });
+
+    if (selectsContainer) {
+        if (!filterModeEnabled) {
+            selectsContainer.classList.add('hidden');
+        } else {
+            selectsContainer.classList.remove('hidden');
+        }
+    }
+
+    if (noticeBanner) {
+        if (!filterModeEnabled) {
+            noticeBanner.classList.remove('hidden');
+            noticeBanner.classList.add('flex');
+        } else {
+            noticeBanner.classList.add('hidden');
+            noticeBanner.classList.remove('flex');
+        }
+    }
 }
 
 function toggleFilterMode() {
@@ -366,15 +447,25 @@ function toggleFilterMode() {
     if (!nextMode) {
         currentStatusFilter = DEFAULT_STATUS_FILTER;
         currentYearFilter = DEFAULT_YEAR_FILTER;
+        currentStartDateFilter = DEFAULT_START_DATE_FILTER;
+        currentEndDateFilter = DEFAULT_END_DATE_FILTER;
         localStorage.setItem('gip_status_filter', currentStatusFilter);
         localStorage.setItem('gip_year_filter', currentYearFilter);
+        localStorage.setItem('gip_start_date_filter', currentStartDateFilter);
+        localStorage.setItem('gip_end_date_filter', currentEndDateFilter);
     } else {
         const statusSelect = document.getElementById('filter-status');
         const yearSelect = document.getElementById('filter-year');
+        const startDateSelect = document.getElementById('filter-start-date');
+        const endDateSelect = document.getElementById('filter-end-date');
         if (statusSelect) currentStatusFilter = statusSelect.value;
         if (yearSelect) currentYearFilter = yearSelect.value;
+        if (startDateSelect) currentStartDateFilter = startDateSelect.value;
+        if (endDateSelect) currentEndDateFilter = endDateSelect.value;
         localStorage.setItem('gip_status_filter', currentStatusFilter);
         localStorage.setItem('gip_year_filter', currentYearFilter);
+        localStorage.setItem('gip_start_date_filter', currentStartDateFilter);
+        localStorage.setItem('gip_end_date_filter', currentEndDateFilter);
     }
 
     updateFilterUI();
@@ -405,6 +496,47 @@ function populateYearFilter() {
     yearSelect.innerHTML = optionsHTML;
     yearSelect.value = currentYearFilter;
 }
+
+/* START: Populate Start and End Date Filters */
+function populateDateFilters() {
+    const startDateSelect = document.getElementById('filter-start-date');
+    const endDateSelect = document.getElementById('filter-end-date');
+
+    if (startDateSelect) {
+        const availableStartDates = [...new Set(beneficiaries.map(b => {
+            const d = b.startDate;
+            return (d && String(d).trim() !== '' && d !== 'N/A') ? String(d).trim() : null;
+        }).filter(Boolean))].sort();
+
+        let startOptionsHTML = '<option value="ALL">All Start Dates</option>';
+        availableStartDates.forEach(d => {
+            const formatted = translateDateToShortMonth(d);
+            const label = formatted !== d ? `${formatted}` : d;
+            startOptionsHTML += `<option value="${d}">${label}</option>`;
+        });
+
+        startDateSelect.innerHTML = startOptionsHTML;
+        startDateSelect.value = currentStartDateFilter;
+    }
+
+    if (endDateSelect) {
+        const availableEndDates = [...new Set(beneficiaries.map(b => {
+            const d = b.endDate;
+            return (d && String(d).trim() !== '' && d !== 'N/A') ? String(d).trim() : null;
+        }).filter(Boolean))].sort();
+
+        let endOptionsHTML = '<option value="ALL">All End Dates</option>';
+        availableEndDates.forEach(d => {
+            const formatted = translateDateToShortMonth(d);
+            const label = formatted !== d ? `${formatted}` : d;
+            endOptionsHTML += `<option value="${d}">${label}</option>`;
+        });
+
+        endDateSelect.innerHTML = endOptionsHTML;
+        endDateSelect.value = currentEndDateFilter;
+    }
+}
+/* END: Populate Start and End Date Filters */
 /**
  * Load beneficiaries from the server source of truth. Supabase Realtime refreshes open clients after database changes.
  */
@@ -472,7 +604,6 @@ export async function loadBeneficiaries() {
                         relationship_to_assured,
                         start_date,
                         end_date,
-                        series_number,
                         designation,
                         replacement_notes,
                         is_archived,
@@ -497,7 +628,6 @@ export async function loadBeneficiaries() {
                         relationshipToAssured: b.relationship_to_assured,
                         startDate: b.start_date,
                         endDate: b.end_date,
-                        seriesNo: b.series_number,
                         officeId: b.office_id ?? null,
                         office: (b.office_id && officeMap[b.office_id]) || 'N/A',
                         designation: b.designation,
@@ -523,6 +653,7 @@ export async function loadBeneficiaries() {
         beneficiaries = remoteData;
         syncExpiredStatusesLocally(beneficiaries);
         populateYearFilter();
+        populateDateFilters();
         updateFilterUI();
         const savedSort = localStorage.getItem('gip_sort_preference');
         sortData(savedSort || 'name_asc', false);
@@ -811,7 +942,9 @@ function initOfficeQuickFilter() {
             afterRender(); return;
         }
         list.innerHTML = offices.map(o => {
-            const cls = getOfficeClass(o.office);
+            const isSelected = currentOfficeFilter.toUpperCase() === o.office.toUpperCase() ||
+                               currentOfficeFilter.toUpperCase().startsWith(o.office.toUpperCase() + ' -');
+            const cls = getOfficeClass(o.office, isSelected);
             return `<button class="office-qf-opt shrink-0 px-3 py-1 rounded-full text-[0.6875rem] font-bold border transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95 ${cls}"
                 data-id="${o.id}" data-name="${o.office}" data-has-locations="${parseInt(o.location_count || 0) > 0}">
                 ${o.office}
@@ -840,13 +973,15 @@ function initOfficeQuickFilter() {
             list.innerHTML = `<span class="text-xs text-gray-400 italic px-2">No locations found.</span>`;
             afterRender(); return;
         }
-        const officeClass = getOfficeClass(office.name);
-        list.innerHTML = locations.map(l => `
-            <button class="loc-qf-opt shrink-0 px-3 py-1 rounded-full text-[0.6875rem] font-bold border transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95 ${officeClass}"
+        list.innerHTML = locations.map(l => {
+            const fullLoc = `${office.name} - ${l.location}`;
+            const isSelected = currentOfficeFilter.toUpperCase() === fullLoc.toUpperCase();
+            const cls = getOfficeClass(fullLoc, isSelected);
+            return `<button class="loc-qf-opt shrink-0 px-3 py-1 rounded-full text-[0.6875rem] font-bold border transition-all duration-150 cursor-pointer hover:scale-105 active:scale-95 ${cls}"
                 data-location="${l.location}" data-office="${office.name}">
                 📍 ${l.location}
-            </button>
-        `).join('');
+            </button>`;
+        }).join('');
         list.querySelectorAll('.loc-qf-opt').forEach(b => {
             b.addEventListener('click', () => {
                 window.setOfficeFilter(`${b.dataset.office} - ${b.dataset.location}`);
@@ -1199,7 +1334,7 @@ function syncHeaderWithFilter() {
     headerPrefix.textContent = currentOfficeFilter === 'ALL' ? 'ALL BENEFICIARIES' : currentOfficeFilter;
 
     // Show "Clear All Filter" whenever the view is not in default state.
-    const isNonDefault = filterModeEnabled || currentOfficeFilter !== 'ALL' || currentEducationFilter !== 'ALL' || currentBirthdayYearFilter !== 'ALL' || currentBirthdayMonthFilter !== 'ALL' || currentRelationshipFilter !== 'ALL' || currentAssignedUnitFilter !== 'ALL';
+    const isNonDefault = filterModeEnabled || currentOfficeFilter !== 'ALL' || currentEducationFilter !== 'ALL' || currentBirthdayYearFilter !== 'ALL' || currentBirthdayMonthFilter !== 'ALL' || currentRelationshipFilter !== 'ALL' || currentAssignedUnitFilter !== 'ALL' || currentStartDateFilter !== 'ALL' || currentEndDateFilter !== 'ALL';
     if (clearBtn) {
         clearBtn.classList.toggle('hidden', !isNonDefault);
         clearBtn.classList.toggle('flex', isNonDefault);
@@ -1236,6 +1371,8 @@ window.clearOfficeFilter = async () => {
     // Reset filter state to defaults
     currentStatusFilter = DEFAULT_STATUS_FILTER;
     currentYearFilter = DEFAULT_YEAR_FILTER;
+    currentStartDateFilter = DEFAULT_START_DATE_FILTER;
+    currentEndDateFilter = DEFAULT_END_DATE_FILTER;
     currentOfficeFilter = 'ALL';
     currentEducationFilter = 'ALL';
     currentBirthdayYearFilter = 'ALL';
@@ -1244,6 +1381,8 @@ window.clearOfficeFilter = async () => {
     currentAssignedUnitFilter = 'ALL';
     localStorage.setItem('gip_status_filter', currentStatusFilter);
     localStorage.setItem('gip_year_filter', currentYearFilter);
+    localStorage.setItem('gip_start_date_filter', currentStartDateFilter);
+    localStorage.setItem('gip_end_date_filter', currentEndDateFilter);
     localStorage.setItem('gip_office_filter', 'ALL');
     localStorage.setItem('gip_education_filter', 'ALL');
     localStorage.setItem('gip_birthday_year_filter', 'ALL');
@@ -1314,6 +1453,7 @@ export function initGIPPage() {
  * Initialize Supabase Realtime Subscription
  * Replaces polling with instant event-based updates
  */
+// START: initRealtimeSubscription - Establishes WebSocket subscription to Supabase Realtime for instant multi-client live sync
 function initRealtimeSubscription() {
     if (!isSupabaseMode() || !supabase) return;
 
@@ -1360,6 +1500,7 @@ function initRealtimeSubscription() {
             }
         });
 }
+// END: initRealtimeSubscription - Establishes WebSocket subscription to Supabase Realtime for instant multi-client live sync
 
 function updatePhoneVisibilityToggleUI() {
     const toggle = document.getElementById('phone-visibility-toggle');
@@ -1435,8 +1576,12 @@ function initFilterControls() {
 
     const statusSelect = document.getElementById('filter-status');
     const yearSelect = document.getElementById('filter-year');
+    const startDateSelect = document.getElementById('filter-start-date');
+    const endDateSelect = document.getElementById('filter-end-date');
     if (statusSelect) statusSelect.addEventListener('change', applyFilters);
     if (yearSelect) yearSelect.addEventListener('change', applyFilters);
+    if (startDateSelect) startDateSelect.addEventListener('change', applyFilters);
+    if (endDateSelect) endDateSelect.addEventListener('change', applyFilters);
 }
 
 
@@ -1656,58 +1801,206 @@ window.changePage = (page) => {
     renderTable(filteredDataGlobal);
 };
 
-function getOfficeClass(office) {
-    if (!office || office === 'N/A') return 'bg-gray-100 text-gray-700 border border-gray-200 dark:!text-white';
-    const u = office.toUpperCase();
-
-    if (u.includes('LGU')) {
-        return /ILIGAN/i.test(office)
-            ? 'bg-yellow-400 text-white border border-yellow-500'
-            : 'bg-yellow-100 text-yellow-700 border border-yellow-200 dark:!text-white';
+// START: getOfficeClass - Returns dynamic CSS styling classes for office badge pills (soft pastel for inactive vs solid vibrant for active/selected)
+function getOfficeClass(office, isSelected = false) {
+    if (!office || office === 'N/A') {
+        return isSelected
+            ? 'bg-gray-800 text-white font-black border-gray-900 shadow-md animate-active-pill dark:bg-gray-100 dark:text-gray-900'
+            : 'bg-gray-100 text-gray-700 border border-gray-200 dark:!text-white';
     }
-    if (u.includes('DOLE'))   return 'bg-blue-100 text-blue-700 border border-blue-200 dark:!text-white';
-    if (u.includes('DEPED') || u.includes('DEPED')) return 'bg-orange-100 text-orange-700 border border-orange-200 dark:!text-white';
-    if (u.includes('DICT'))   return 'bg-cyan-100 text-cyan-700 border border-cyan-200 dark:!text-white';
-    if (u.includes('DOH'))    return 'bg-red-100 text-red-700 border border-red-200 dark:!text-white';
-    if (u.includes('DSWD'))   return 'bg-pink-100 text-pink-700 border border-pink-200 dark:!text-white';
-    if (u.includes('DTI'))    return 'bg-green-100 text-green-700 border border-green-200 dark:!text-white';
-    if (u.includes('DPWH'))   return 'bg-stone-100 text-stone-700 border border-stone-200 dark:!text-white';
-    if (u.includes('DILG'))   return 'bg-indigo-100 text-indigo-700 border border-indigo-200 dark:!text-white';
-    if (u.includes('DOST'))   return 'bg-violet-100 text-violet-700 border border-violet-200 dark:!text-white';
-    if (u.includes('DENR'))   return 'bg-emerald-100 text-emerald-700 border border-emerald-200 dark:!text-white';
-    if (u.includes('CHED'))   return 'bg-sky-100 text-sky-700 border border-sky-200 dark:!text-white';
-    if (u.includes('TESDA'))  return 'bg-teal-100 text-teal-700 border border-teal-200 dark:!text-white';
-    if (u.includes('DOJ'))    return 'bg-slate-100 text-slate-700 border border-slate-200 dark:!text-white';
-    if (u.includes('DOT') || u.includes('TOURISM')) return 'bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 dark:!text-white';
-    if (u.includes('DA') && !u.includes('DPWH') && !u.includes('DILG')) return 'bg-lime-100 text-lime-700 border border-lime-200 dark:!text-white';
-    if (u.includes('PRC'))    return 'bg-rose-100 text-rose-700 border border-rose-200 dark:!text-white';
-    if (u.includes('SSS'))    return 'bg-amber-100 text-amber-700 border border-amber-200 dark:!text-white';
-    if (u.includes('GSIS'))   return 'bg-purple-100 text-purple-700 border border-purple-200 dark:!text-white';
-    if (u.includes('PHIC') || u.includes('PHILHEALTH')) return 'bg-blue-200 text-blue-800 border border-blue-300 dark:!text-white';
-    if (u.includes('NBI'))    return 'bg-zinc-100 text-zinc-700 border border-zinc-200 dark:!text-white';
+    const u = office.toUpperCase().trim();
 
-    // Hash-based fallback — any new office gets a consistent unique color.
-    const palette = [
-        'bg-purple-100 text-purple-700 border border-purple-200',
-        'bg-rose-100 text-rose-700 border border-rose-200',
-        'bg-amber-100 text-amber-700 border border-amber-200',
-        'bg-teal-100 text-teal-700 border border-teal-200',
-        'bg-indigo-100 text-indigo-700 border border-indigo-200',
-        'bg-lime-100 text-lime-700 border border-lime-200',
-        'bg-sky-100 text-sky-700 border border-sky-200',
-        'bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200',
-        'bg-emerald-100 text-emerald-700 border border-emerald-200',
-        'bg-orange-100 text-orange-700 border border-orange-200',
-        'bg-pink-100 text-pink-700 border border-pink-200',
-        'bg-green-100 text-green-700 border border-green-200',
-        'bg-violet-100 text-violet-700 border border-violet-200',
-        'bg-cyan-100 text-cyan-700 border border-cyan-200',
-        'bg-red-100 text-red-700 border border-red-200',
-    ];
-    let hash = 0;
-    for (let i = 0; i < office.length; i++) hash = (hash * 31 + office.charCodeAt(i)) >>> 0;
-    return palette[hash % palette.length] + ' dark:!text-white';
+    let colors = {
+        inactive: 'bg-gray-100 text-gray-700 border border-gray-200 dark:!text-white',
+        active: 'bg-royal-blue text-white font-black border-blue-800 shadow-md animate-active-pill'
+    };
+
+    if (u === 'LDNPFO' || u.startsWith('LDNPFO')) {
+        // LDNPFO = Primary Solid Blue (Active) | Soft Blue (Inactive)
+        colors = {
+            inactive: 'bg-blue-100 text-blue-800 border border-blue-200 dark:!text-white',
+            active: 'bg-royal-blue text-white font-black border-blue-800 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('BOT')) {
+        // 1: BOT = Yellow Solid Color (Active) | Soft Yellow (Inactive)
+        colors = {
+            inactive: 'bg-amber-100 text-amber-800 border border-amber-200 dark:!text-white',
+            active: 'bg-amber-400 text-slate-900 font-black border-amber-500 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('DICT')) {
+        // 2: DICT = Red Solid Color (Active) | Soft Red (Inactive)
+        colors = {
+            inactive: 'bg-red-100 text-red-700 border border-red-200 dark:!text-white',
+            active: 'bg-red-600 text-white font-black border-red-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('NLRC')) {
+        // 4: NLRC = Primary Color (Active) | Soft Primary Tint (Inactive)
+        colors = {
+            inactive: 'bg-blue-50 text-blue-700 border border-blue-100 dark:!text-white',
+            active: 'bg-royal-blue text-white font-black border-blue-800 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('PCUP')) {
+        // 5: PCUP = Navy Blue (Active) | Soft Navy/Indigo (Inactive)
+        colors = {
+            inactive: 'bg-indigo-100 text-indigo-900 border border-indigo-200 dark:!text-white',
+            active: 'bg-indigo-900 text-white font-black border-indigo-950 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('BACOLOD')) {
+        // 6: PESO - BACOLOD = Dark Red (Active) | Soft Rose (Inactive)
+        colors = {
+            inactive: 'bg-rose-100 text-rose-900 border border-rose-200 dark:!text-white',
+            active: 'bg-red-900 text-white font-black border-red-950 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('BALO-I') || u.includes('BALOI')) {
+        // 7: PESO - BALO-I = Sky Blue (Active) | Faded Sky (Inactive)
+        colors = {
+            inactive: 'bg-sky-100 text-sky-700 border border-sky-200 dark:!text-white',
+            active: 'bg-sky-500 text-white font-black border-sky-600 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('BAROY')) {
+        // 8: PESO - BAROY = Faded Blue Color / Slate Blue (Active) | Light Faded Slate (Inactive)
+        colors = {
+            inactive: 'bg-slate-100 text-slate-700 border border-slate-200 dark:!text-white',
+            active: 'bg-slate-600 text-white font-black border-slate-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('ILIGAN')) {
+        // 9: PESO - ILIGAN = Slight Faded Brown / Warm Stone (Active) | Light Warm Brown (Inactive)
+        colors = {
+            inactive: 'bg-amber-100 text-amber-900 border border-amber-200 dark:!text-white',
+            active: 'bg-amber-800 text-white font-black border-amber-900 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('KAUSWAGAN')) {
+        // 10: PESO - KAUSWAGAN = Gradient Sky Pink (Active) | Soft Pink Tint (Inactive)
+        colors = {
+            inactive: 'bg-pink-50 text-pink-700 border border-pink-200 dark:!text-white',
+            active: 'bg-gradient-to-r from-sky-400 to-pink-500 text-white font-black border-pink-500 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('KOLAMBUGAN')) {
+        // 11: PESO - KOLAMBUGAN = Dark Green (Active) | Soft Emerald (Inactive)
+        colors = {
+            inactive: 'bg-emerald-100 text-emerald-900 border border-emerald-200 dark:!text-white',
+            active: 'bg-emerald-900 text-white font-black border-emerald-950 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('LINAMON')) {
+        // 12: PESO - LINAMON = Rich Purple
+        colors = {
+            inactive: 'bg-purple-100 text-purple-700 border border-purple-200 dark:!text-white',
+            active: 'bg-purple-600 text-white font-black border-purple-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('MAGSAYSAY')) {
+        // 13: PESO - MAGSAYSAY = Vibrant Cyan
+        colors = {
+            inactive: 'bg-cyan-100 text-cyan-700 border border-cyan-200 dark:!text-white',
+            active: 'bg-cyan-600 text-white font-black border-cyan-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('MAIGO')) {
+        // 14: PESO - MAIGO = Deep Blue
+        colors = {
+            inactive: 'bg-blue-100 text-blue-700 border border-blue-200 dark:!text-white',
+            active: 'bg-blue-600 text-white font-black border-blue-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('MATUNGAO')) {
+        // 15: PESO - MATUNGAO = Electric Violet
+        colors = {
+            inactive: 'bg-violet-100 text-violet-700 border border-violet-200 dark:!text-white',
+            active: 'bg-violet-600 text-white font-black border-violet-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('NUNUNGAN')) {
+        // 16: PESO - NUNUNGAN = Deep Indigo
+        colors = {
+            inactive: 'bg-indigo-100 text-indigo-700 border border-indigo-200 dark:!text-white',
+            active: 'bg-indigo-600 text-white font-black border-indigo-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('PANTAO')) {
+        // 17: PESO - PANTAO RAGAT = Warm Orange
+        colors = {
+            inactive: 'bg-orange-100 text-orange-700 border border-orange-200 dark:!text-white',
+            active: 'bg-orange-600 text-white font-black border-orange-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('PANTAR')) {
+        // 18: PESO - PANTAR = Golden Amber
+        colors = {
+            inactive: 'bg-amber-100 text-amber-700 border border-amber-200 dark:!text-white',
+            active: 'bg-amber-500 text-white font-black border-amber-600 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('POONA')) {
+        // 19: PESO - POONA PIAGAPO = Vibrant Fuchsia
+        colors = {
+            inactive: 'bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 dark:!text-white',
+            active: 'bg-fuchsia-600 text-white font-black border-fuchsia-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('SALVADOR')) {
+        // 20: PESO - SALVADOR = Bright Rose
+        colors = {
+            inactive: 'bg-rose-100 text-rose-700 border border-rose-200 dark:!text-white',
+            active: 'bg-rose-600 text-white font-black border-rose-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('SAPAD')) {
+        // 21: PESO - SAPAD = Lime Green
+        colors = {
+            inactive: 'bg-lime-100 text-lime-700 border border-lime-200 dark:!text-white',
+            active: 'bg-lime-600 text-white font-black border-lime-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('SND')) {
+        // 22: PESO - SND = Crimson Red
+        colors = {
+            inactive: 'bg-red-100 text-red-700 border border-red-200 dark:!text-white',
+            active: 'bg-red-700 text-white font-black border-red-800 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('TAGOLOAN')) {
+        // 23: PESO - TAGOLOAN = Fresh Green
+        colors = {
+            inactive: 'bg-green-100 text-green-700 border border-green-200 dark:!text-white',
+            active: 'bg-green-600 text-white font-black border-green-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('TANGCAL')) {
+        // 24: PESO - TANGCAL = Dark Violet/Purple
+        colors = {
+            inactive: 'bg-purple-100 text-purple-800 border border-purple-200 dark:!text-white',
+            active: 'bg-purple-800 text-white font-black border-purple-900 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('TUBOD')) {
+        // 25: PESO - TUBOD = Emerald Green
+        colors = {
+            inactive: 'bg-emerald-100 text-emerald-700 border border-emerald-200 dark:!text-white',
+            active: 'bg-emerald-600 text-white font-black border-emerald-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('PGLDN')) {
+        // 26: PGLDN = Provincial Sky Blue
+        colors = {
+            inactive: 'bg-sky-100 text-sky-700 border border-sky-200 dark:!text-white',
+            active: 'bg-sky-600 text-white font-black border-sky-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('PRC')) {
+        // 27: PRC = PRC Magenta/Pink
+        colors = {
+            inactive: 'bg-pink-100 text-pink-700 border border-pink-200 dark:!text-white',
+            active: 'bg-pink-600 text-white font-black border-pink-700 shadow-md animate-active-pill'
+        };
+    } else if (u.includes('SSS')) {
+        // 28: SSS = SSS Navy Blue
+        colors = {
+            inactive: 'bg-blue-100 text-blue-800 border border-blue-200 dark:!text-white',
+            active: 'bg-blue-800 text-white font-black border-blue-900 shadow-md animate-active-pill'
+        };
+    } else {
+        const colorPairs = [
+            { inactive: 'bg-purple-100 text-purple-700 border border-purple-200 dark:!text-white', active: 'bg-purple-600 text-white font-black border-purple-700 shadow-md animate-active-pill' },
+            { inactive: 'bg-rose-100 text-rose-700 border border-rose-200 dark:!text-white', active: 'bg-rose-600 text-white font-black border-rose-700 shadow-md animate-active-pill' },
+            { inactive: 'bg-amber-100 text-amber-700 border border-amber-200 dark:!text-white', active: 'bg-amber-500 text-white font-black border-amber-600 shadow-md animate-active-pill' },
+            { inactive: 'bg-teal-100 text-teal-700 border border-teal-200 dark:!text-white', active: 'bg-teal-600 text-white font-black border-teal-700 shadow-md animate-active-pill' },
+            { inactive: 'bg-indigo-100 text-indigo-700 border border-indigo-200 dark:!text-white', active: 'bg-indigo-600 text-white font-black border-indigo-700 shadow-md animate-active-pill' },
+            { inactive: 'bg-emerald-100 text-emerald-700 border border-emerald-200 dark:!text-white', active: 'bg-emerald-600 text-white font-black border-emerald-700 shadow-md animate-active-pill' },
+            { inactive: 'bg-sky-100 text-sky-700 border border-sky-200 dark:!text-white', active: 'bg-sky-500 text-white font-black border-sky-600 shadow-md animate-active-pill' },
+        ];
+        let hash = 0;
+        for (let i = 0; i < u.length; i++) hash = (hash * 31 + u.charCodeAt(i)) >>> 0;
+        colors = colorPairs[hash % colorPairs.length];
+    }
+
+    return isSelected ? colors.active : colors.inactive;
 }
+// END: getOfficeClass - Returns dynamic CSS styling classes for office badge pills
 
 function getGenderClass(gender) {
     const normalized = String(gender || '').trim().toUpperCase();

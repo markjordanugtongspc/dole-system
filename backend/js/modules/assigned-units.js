@@ -3,6 +3,5 @@ export const COMMON_ASSIGNED_UNITS = [
     'Labor Standards Unit (LSU)',
     'Internal Management Services Unit (IMSU)',
     'Wellfare Workers Unit (WWU)',
-    'Labor Relation Unit (LRU)',
-    'Information Technology Unit (IT)'
+    'Labor Relation Unit (LRU)'
 ];

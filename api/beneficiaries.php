@@ -221,7 +221,6 @@ try {
     $aliasEndDate = $isSupabase ? '"endDate"' : 'endDate';
     $aliasStartDateFormatted = $isSupabase ? '"startDateFormatted"' : 'startDateFormatted';
     $aliasEndDateFormatted = $isSupabase ? '"endDateFormatted"' : 'endDateFormatted';
-    $aliasSeriesNo = $isSupabase ? '"seriesNo"' : 'seriesNo';
     $aliasAbsorbDate = $isSupabase ? '"absorbDate"' : 'absorbDate';
     $aliasResignedDate = $isSupabase ? '"resignedDate"' : 'resignedDate';
     $aliasIsArchived = $isSupabase ? '"isArchived"' : 'isArchived';
@@ -285,13 +284,13 @@ if ($method === 'GET') {
             $idCol = tableHasColumn($pdo, $isSupabase, 'offices', 'id') ? 'id' : 'office_id';
             $officeCol = tableHasColumn($pdo, $isSupabase, 'offices', 'office') ? 'office' : 'office_name';
             
-            // Get offices sorted: those with beneficiaries first, then by location count, then alphabetically
+            // Get offices sorted alphabetically A-Z
             $stmt = $pdo->prepare("
                 SELECT o.$idCol as id, o.$officeCol as office,
                        (SELECT COUNT(*) FROM office_locations ol WHERE ol.office_id = o.$idCol) as location_count,
                        (SELECT COUNT(*) FROM beneficiaries b WHERE b.office_id = o.$idCol) as beneficiary_count
                 FROM offices o
-                ORDER BY beneficiary_count DESC, location_count DESC, o.$officeCol ASC
+                ORDER BY o.$officeCol ASC
             ");
             $stmt->execute();
             $offices = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -393,23 +392,6 @@ if ($method === 'GET') {
             exit();
         }
 
-        if (isset($_GET['next_series_no'])) {
-            $year = $_GET['year'] ?? date('Y');
-            $prefix = $year . '-';
-            // Fast anchored query using index
-            $stmt = $pdo->prepare("SELECT series_number FROM beneficiaries WHERE series_number LIKE :prefix ORDER BY series_number DESC LIMIT 1");
-            $stmt->execute(['prefix' => $prefix . '%']);
-            $lastSeries = $stmt->fetchColumn();
-            
-            $nextSeries = $year . '-00-001';
-            if ($lastSeries && preg_match('/(\d{4})-(\d{2})-(\d{3})/', $lastSeries, $matches)) {
-                $nextSeries = sprintf('%s-%s-%03d', $matches[1], $matches[2], intval($matches[3]) + 1);
-            }
-
-            echo json_encode(['success' => true, 'nextSeries' => $nextSeries]);
-            exit();
-        }
-
         if ($id) {
             // Get single beneficiary
             $stmt = $pdo->prepare("
@@ -428,7 +410,6 @@ if ($method === 'GET') {
                     b.end_date as {$aliasEndDate},
                     {$startDateFmtExpr} as {$aliasStartDateFormatted},
                     {$endDateFmtExpr} as {$aliasEndDateFormatted},
-                    b.series_number as {$aliasSeriesNo},
                     COALESCE($officeNameColExpr, $beneficiaryOfficeNameExpr) as office,
                     b.designation,
                     b.replacement_notes as replacement,
@@ -491,7 +472,6 @@ if ($method === 'GET') {
                     b.end_date as {$aliasEndDate},
                     {$startDateFmtExpr} as {$aliasStartDateFormatted},
                     {$endDateFmtExpr} as {$aliasEndDateFormatted},
-                    b.series_number as {$aliasSeriesNo},
                     COALESCE($officeNameColExpr, $beneficiaryOfficeNameExpr) as office,
                     {$beneficiaryOfficeIdExpr} as officeId,
                     b.designation,
@@ -697,7 +677,7 @@ if ($method === 'GET') {
             $stmt = $pdo->prepare("
                 INSERT INTO beneficiaries (
                     gip_id, full_name, contact_number, address, birthday, age,
-                    gender_id, education, start_date, end_date, series_number,
+                    gender_id, education, start_date, end_date,
                     designation, replacement_notes, status_id, absorption_log_id, resigned_log_id
                     " . $officeColsStr . "
                     " . $beneficiaryExtraColumns . "
@@ -705,7 +685,7 @@ if ($method === 'GET') {
                     " . ($hasUpdatedBy ? ", updated_by" : "") . "
                 ) VALUES (
                     :gip_id, :name, :contact, :address, :birthday, :age,
-                    :gender_id, :education, :start_date, :end_date, :series_no,
+                    :gender_id, :education, :start_date, :end_date,
                     :designation, :replacement, :status_id, :absorption_log_id, :resigned_log_id
                     " . $officeValsStr . "
                     " . $beneficiaryExtraValues . "
@@ -717,7 +697,7 @@ if ($method === 'GET') {
             $stmt = $pdo->prepare("
                 INSERT INTO beneficiaries (
                     gip_id, full_name, contact_number, address, birthday, age,
-                    gender_id, education, start_date, end_date, series_number,
+                    gender_id, education, start_date, end_date,
                     designation, replacement_notes, status_id, absorption_log_id, resigned_log_id
                     " . $officeColsStr . "
                     " . $beneficiaryExtraColumns . "
@@ -725,7 +705,7 @@ if ($method === 'GET') {
                     " . ($hasUpdatedBy ? ", updated_by" : "") . "
                 ) VALUES (
                     :gip_id, :name, :contact, :address, :birthday, :age,
-                    :gender_id, :education, :start_date, :end_date, :series_no,
+                    :gender_id, :education, :start_date, :end_date,
                     :designation, :replacement, :status_id, :absorption_log_id, :resigned_log_id
                     " . $officeValsStr . "
                     " . $beneficiaryExtraValues . "
@@ -751,7 +731,6 @@ if ($method === 'GET') {
                 'education' => $data['education'] ?? null,
                 'start_date' => !empty($data['startDate']) ? $data['startDate'] : null,
                 'end_date' => !empty($data['endDate']) ? $data['endDate'] : null,
-                'series_no' => $data['seriesNo'] ?? null,
                 'designation' => $data['designation'],
                 'replacement' => (isset($data['replacement']) && trim($data['replacement']) !== '') ? trim($data['replacement']) : null,
                 'status_id' => $statusId,
@@ -956,7 +935,6 @@ if ($method === 'GET') {
                 education = :education,
                 start_date = :start_date,
                 end_date = :end_date,
-                series_number = :series_no,
                 " . $officeSetStr . "
                 designation = :designation,
                 replacement_notes = :replacement,
@@ -980,7 +958,6 @@ if ($method === 'GET') {
             'education' => $data['education'] ?? null,
             'start_date' => !empty($data['startDate']) ? $data['startDate'] : null,
             'end_date' => !empty($data['endDate']) ? $data['endDate'] : null,
-            'series_no' => $data['seriesNo'] ?? null,
             'designation' => $data['designation'],
             'replacement' => (isset($data['replacement']) && trim($data['replacement']) !== '') ? trim($data['replacement']) : null,
             'status_id' => $statusId,

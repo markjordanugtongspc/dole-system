@@ -379,19 +379,13 @@ export const BulkApp = {
                 // AUTO-SAVE MODE: Directly call the API without showing modal
                 if (window.addBeneficiaryData) {
                     (async () => {
-                        // Ensure ROX ID + Series No are generated before saving (no temp IDs).
+                        // Ensure ROX ID is generated before saving (no temp IDs).
                         try {
                             const year = data.startDate ? new Date(data.startDate).getFullYear() : new Date().getFullYear();
-                            const [idRes, seriesRes] = await Promise.all([
-                                apiGet(`api/beneficiaries.php?next_id&year=${year}`),
-                                apiGet(`api/beneficiaries.php?next_series_no&year=${year}`),
-                            ]);
+                            const idRes = await apiGet(`api/beneficiaries.php?next_id&year=${year}`);
                             if (idRes.success && idRes.data?.success && idRes.data?.nextId) {
                                 data.gip_id = idRes.data.nextId;
                                 data.id = null; // force POST branch in gip.js
-                            }
-                            if (seriesRes.success && seriesRes.data?.success && seriesRes.data?.nextSeries) {
-                                data.seriesNo = seriesRes.data.nextSeries;
                             }
                         } catch (e) {
                             console.warn('[Bulk Add] Identifier fetch failed, continuing:', e?.message || e);
