@@ -12,11 +12,13 @@ services:
     environment:
       SKIP_COMPOSER: "1"
       WEBROOT: /var/www/html
-      APP_ENV: production
-      APP_DEBUG: "false"
-      DEBUG_MODE: "false"
-      VITE_DEBUG: "false"
-      LOG_LEVEL: error
+      APP_ENV: "${APP_ENV:-development}"
+      ENV_KEY: ${ENV_KEY:-localhost}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      DEBUG_MODE: "${DEBUG_MODE:-true}"
+      VITE_DEBUG: "${VITE_DEBUG:-true}"
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+      VITE_CONTAINER_HOST: host.docker.internal
       PHP_MEMORY_LIMIT: 256M
       PHP_FPM_MAX_CHILDREN: 10
       PHP_FPM_START_SERVERS: 2

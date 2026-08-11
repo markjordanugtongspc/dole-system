@@ -378,15 +378,16 @@ if ($method === 'GET') {
         if (isset($_GET['next_id'])) {
             $year = $_GET['year'] ?? date('Y');
             $prefix = "ROX-RD-ESIG-$year-";
-            // Fast anchored query using index
-            $stmt = $pdo->prepare("SELECT gip_id FROM beneficiaries WHERE gip_id LIKE :prefix ORDER BY gip_id DESC LIMIT 1");
+            $stmt = $pdo->prepare("SELECT gip_id FROM beneficiaries WHERE gip_id LIKE :prefix");
             $stmt->execute(['prefix' => $prefix . '%']);
-            $lastId = $stmt->fetchColumn();
-            
-            $nextId = $prefix . '0001';
-            if ($lastId && preg_match('/ROX-RD-ESIG-(\d{4})-(\d{4})/', $lastId, $matches)) {
-                $nextId = sprintf('ROX-RD-ESIG-%s-%04d', $matches[1], intval($matches[2]) + 1);
+            $highestSequence = 0;
+            $idPattern = '/^ROX-RD-ESIG-' . preg_quote($year, '/') . '-(\d+)$/';
+            foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $existingId) {
+                if (preg_match($idPattern, (string) $existingId, $matches)) {
+                    $highestSequence = max($highestSequence, (int) $matches[1]);
+                }
             }
+            $nextId = sprintf('ROX-RD-ESIG-%s-%04d', $year, $highestSequence + 1);
 
             echo json_encode(['success' => true, 'nextId' => $nextId]);
             exit();
@@ -557,14 +558,19 @@ if ($method === 'GET') {
         $generateNextGipId = function (?string $year = null) use ($pdo): string {
             $year = $year ?: date('Y');
             $prefix = "ROX-RD-ESIG-$year-";
-            $stmt = $pdo->prepare("SELECT gip_id FROM beneficiaries WHERE gip_id LIKE :prefix ORDER BY gip_id DESC LIMIT 1");
+
+            // Text sorting cannot reliably determine the latest numeric suffix.
+            $stmt = $pdo->prepare("SELECT gip_id FROM beneficiaries WHERE gip_id LIKE :prefix");
             $stmt->execute(['prefix' => $prefix . '%']);
-            $lastId = $stmt->fetchColumn();
-            
-            if ($lastId && preg_match('/ROX-RD-ESIG-(\d{4})-(\d{4})/', $lastId, $matches)) {
-                return sprintf('ROX-RD-ESIG-%s-%04d', $matches[1], intval($matches[2]) + 1);
+            $highestSequence = 0;
+            $idPattern = '/^ROX-RD-ESIG-' . preg_quote($year, '/') . '-(\d+)$/';
+            foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $existingId) {
+                if (preg_match($idPattern, (string) $existingId, $matches)) {
+                    $highestSequence = max($highestSequence, (int) $matches[1]);
+                }
             }
-            return $prefix . '0001';
+
+            return sprintf('ROX-RD-ESIG-%s-%04d', $year, $highestSequence + 1);
         };
 
         // Get foreign key IDs
@@ -636,8 +642,28 @@ if ($method === 'GET') {
 
         // Generate GIP ID if not provided
         $candidateId = $data['gip_id'] ?? $data['id'] ?? null;
-        // Never accept temp/local IDs as real database identifiers
-        $gipId = (is_string($candidateId) && str_starts_with($candidateId, 'temp_')) ? null : $candidateId;
+        // Never accept temp/local IDs as real database identifiers.
+        $gipId = (is_string($candidateId) && str_starts_with($candidateId, 'temp_')) ? null : trim((string) $candidateId);
+        if ($gipId !== '' && !preg_match('/^ROX-RD-ESIG-\d{4}-\d{4}$/', $gipId)) {
+            http_response_code(422);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Invalid GIP ID. Use the generated ROX-RD-ESIG-YYYY-NNNN format.'
+            ]);
+            exit();
+        }
+        if ($gipId === '') {
+            $gipId = null;
+        }
+        // The modal pre-generates IDs for convenience, but another save can claim one
+        // before this request reaches the database. Generate a fresh value server-side.
+        if ($gipId) {
+            $existingIdStmt = $pdo->prepare('SELECT 1 FROM beneficiaries WHERE gip_id = :gip_id LIMIT 1');
+            $existingIdStmt->execute(['gip_id' => $gipId]);
+            if ($existingIdStmt->fetchColumn()) {
+                $gipId = null;
+            }
+        }
         if (!$gipId) {
             $bYear = !empty($data['startDate']) ? date('Y', strtotime($data['startDate'])) : null;
             $gipId = $generateNextGipId($bYear);

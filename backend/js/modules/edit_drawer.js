@@ -1162,14 +1162,24 @@ export function showEditBeneficiaryDrawer(data) {
                 (async () => {
                     const success = await window.addBeneficiaryData(beneficiaryData, true, false);
                     if (success) {
+                        // Let the edit drawer finish closing before the success feedback appears.
                         hideDrawerSafely();
-                        // Instead of full hide/show cycle (flicker), update the view data directly
+                        await new Promise((resolve) => setTimeout(resolve, 450));
+
+                        await Swal.fire({
+                            toast: true,
+                            position: 'bottom-end',
+                            icon: 'success',
+                            title: 'RECORD UPDATED',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+
+                        // Rehydrate only after the toast closes so the refreshed drawer returns smoothly.
                         if (window.viewBeneficiary) {
-                            // pass ONLY the id. This forces window.viewBeneficiary in modal.js 
-                            // to do a fresh fetch from Supabase/MySQL instead of using stale local memory.
-                            window.viewBeneficiary({ ...beneficiaryData, id: data.id, gip_id: data.id }, 0);
+                            await window.viewBeneficiary({ ...beneficiaryData, id: data.id, gip_id: data.id }, 0);
                         }
-                        Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Record Updated', showConfirmButton: false, timer: 3000 });
                     }
                 })();
             }

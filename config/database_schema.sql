@@ -1,5 +1,5 @@
 -- Reconstructed Schema for DOLE-GIP System
--- Based on db_inspector_results.json
+-- Based on ARCHIVED/development-tools/db_inspector_results.json
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;

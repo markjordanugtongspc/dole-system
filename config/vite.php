@@ -50,8 +50,8 @@ function isViteRunning()
 function isConfiguredDevelopmentMode()
 {
     $configuredEnv = getenv('APP_ENV');
-    if ($configuredEnv !== false && strtolower(trim((string) $configuredEnv)) !== 'development') {
-        return false;
+    if ($configuredEnv !== false && $configuredEnv !== '') {
+        return strtolower(trim((string) $configuredEnv)) === 'development';
     }
 
     $envPath = __DIR__ . '/.env';

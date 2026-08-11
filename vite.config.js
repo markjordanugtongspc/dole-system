@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
     base: './',
     envDir: 'config',
     plugins: [
@@ -52,8 +52,8 @@ export default defineConfig({
         devSourcemap: true,
         postcss: {},
     },
-    // Development keeps diagnostics; production strips every console/debug statement.
-    esbuild: { drop: ['console', 'debugger'] },
+    // Keep diagnostics during npm run dev; strip them only from production assets.
+    esbuild: command === 'build' ? { drop: ['console', 'debugger'] } : undefined,
     build: {
         outDir: 'dist',
         emptyOutDir: true,
@@ -86,4 +86,4 @@ export default defineConfig({
     optimizeDeps: {
         include: ['sweetalert2', 'apexcharts', 'flowbite'],
     },
-});
+}));

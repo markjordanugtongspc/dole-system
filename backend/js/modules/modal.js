@@ -1138,7 +1138,7 @@ export function showAddDataModal(data = null) {
                             <input type="text" name="gip_id" id="full-id-input" 
                                 value="${data?.id || ''}" 
                                 class="w-full ${t.bgInput} border ${t.borderInput} rounded-lg px-3 py-2 text-[0.6875rem] font-black ${t.idText} font-mono outline-none focus:ring-4 ${t.focusBlue} transition-all uppercase" 
-                                placeholder="ROX-RD-ESIG-2025-0001">
+                                placeholder="ROX-RD-ESIG-2025-0001" ${!isEdit ? 'readonly aria-readonly="true"' : ''}>
                             <input type="hidden" name="id" value="${data?.id || ''}">
                         </div>
 
@@ -2214,9 +2214,11 @@ export function showAddDataModal(data = null) {
             });
 
             // Form Submission Simulation
+            let isBeneficiarySubmitInFlight = false;
             if (form) {
-                form.addEventListener('submit', (e) => {
+                form.addEventListener('submit', async (e) => {
                     e.preventDefault();
+                    if (isBeneficiarySubmitInFlight) return;
 
                     // Clear previous error states
                     const inputs = form.querySelectorAll('input:not([type="hidden"]), select, textarea');
@@ -2242,6 +2244,10 @@ export function showAddDataModal(data = null) {
                     const startDate = formData.get('startDate');
                     const endDate = formData.get('endDate');
                     const designation = (formData.get('designation') || '').trim();
+                    const birthday = formData.get('birthday');
+                    const office = (formData.get('office') || '').trim();
+                    const remarks = formData.get('remarks');
+                    const gipId = (formData.get('gip_id') || '').trim();
 
                     // Name validation (required + no numbers)
                     if (!name || name.trim() === "" || /[0-9]/.test(name)) {
@@ -2253,9 +2259,20 @@ export function showAddDataModal(data = null) {
                         markError('contact');
                     }
 
-                    // Simple existence checks
-                    if (!startDate) markError('startDate');
-                    if (!endDate) markError('endDate');
+                    // Required fields and consistency checks.
+                    if (!birthday || !window.__parseFormattedDate(birthday)) markError('birthday');
+                    if (!startDate || !window.__parseFormattedDate(startDate)) markError('startDate');
+                    if (!endDate || !window.__parseFormattedDate(endDate)) markError('endDate');
+                    const parsedStart = window.__parseFormattedDate(startDate);
+                    const parsedEnd = window.__parseFormattedDate(endDate);
+                    if (parsedStart && parsedEnd && parsedEnd < parsedStart) {
+                        markError('startDate');
+                        markError('endDate');
+                    }
+                    if (!office) markError('office');
+                    if (!remarks) markError('remarks');
+                    if (!isEdit && !/^ROX-RD-ESIG-\d{4}-\d{4}$/.test(gipId)) markError('gip_id');
+                    if (!isEdit && dupWarning && !dupWarning.classList.contains('hidden')) markError('name');
                     // Designation is optional; default to N/A when blank.
 
                     // Strict Age Validation on Submit
@@ -2325,9 +2342,14 @@ export function showAddDataModal(data = null) {
                         }
                     }
 
-                    // Call the simulation function from gip.js
+                    // Keep one save request in flight so a second click cannot create a duplicate POST.
                     if (window.addBeneficiaryData) {
-                        (async () => {
+                        isBeneficiarySubmitInFlight = true;
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                        }
+                        try {
                             const success = await window.addBeneficiaryData(beneficiaryData);
 
                             if (success) {
@@ -2353,7 +2375,7 @@ export function showAddDataModal(data = null) {
                                 setTimeout(() => {
                                     Swal.fire({
                                         toast: true,
-                                        position: 'top-end',
+                                        position: 'bottom-end',
                                         icon: 'success',
                                         title: `Record ${isEdit ? 'Updated' : 'Added'} Successfully`,
                                         showConfirmButton: false,
@@ -2364,14 +2386,14 @@ export function showAddDataModal(data = null) {
                                         BulkApp.onSaveSuccess();
                                     }
                                 }, 100);
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Save Failed',
-                                    text: 'There was an error saving the record to the database.'
-                                });
                             }
-                        })();
+                        } finally {
+                            isBeneficiarySubmitInFlight = false;
+                            if (submitBtn && document.body.contains(submitBtn)) {
+                                submitBtn.disabled = false;
+                                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            }
+                        }
                     }
                 });
             }

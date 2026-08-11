@@ -1841,8 +1841,10 @@ export async function addBeneficiary(data) {
         }
     });
 
-    const hasRealId = Boolean(capitalizedData.id || capitalizedData.gip_id);
-    const method = hasRealId ? 'PUT' : 'POST';
+    // `gip_id` is generated for a new record before it is saved. Only the
+    // hidden persisted ID identifies an existing beneficiary for an update.
+    const hasPersistedId = Boolean(String(capitalizedData.id || '').trim());
+    const method = hasPersistedId ? 'PUT' : 'POST';
     const remoteResult = await apiRequest('api/beneficiaries.php', {
         method,
         body: JSON.stringify(capitalizedData)
@@ -1851,7 +1853,7 @@ export async function addBeneficiary(data) {
     if (!remoteResult.success || remoteResult.data?.success !== true) {
         const message = remoteResult.data?.error || remoteResult.error || 'The beneficiary could not be saved.';
         console.error('[GIP] Beneficiary save failed', { method, id: capitalizedData.id || capitalizedData.gip_id, message });
-        Swal.fire({ icon: 'error', title: hasRealId ? 'Update Failed' : 'Save Failed', text: message });
+        Swal.fire({ icon: 'error', title: hasPersistedId ? 'Update Failed' : 'Save Failed', text: message });
         return false;
     }
 
