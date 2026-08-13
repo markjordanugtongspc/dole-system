@@ -37,27 +37,47 @@ try {
         exit();
     }
 
-    $normalizeName = function ($name) {
-        return strtoupper(preg_replace('/\s+/', ' ', trim((string)$name)));
+    $normalizeForCompare = function ($name) {
+        if (!$name) return '';
+        $clean = strtoupper(trim((string)$name));
+        // Remove dots and normalize spaces
+        return str_replace('.', '', preg_replace('/\s+/', ' ', $clean));
     };
-
-    $nameExpr = "UPPER(TRIM(full_name))";
 
     if (!empty($data['names']) && is_array($data['names'])) {
         // Bulk check mode
         $duplicates = [];
-        $names = array_map($normalizeName, $data['names']);
-        $names = array_filter($names); // remove empty names
+        $rawNames = array_filter(array_map('trim', $data['names']));
         
-        if (count($names) > 0) {
-            $inQuery = implode(',', array_fill(0, count($names), '?'));
+        if (count($rawNames) > 0) {
+            $searchCandidates = [];
+            foreach ($rawNames as $n) {
+                $norm = $normalizeForCompare($n);
+                if ($norm !== '') $searchCandidates[] = $norm;
+                $upper = strtoupper($n);
+                if ($upper !== '') $searchCandidates[] = $upper;
+            }
+            $searchCandidates = array_values(array_unique($searchCandidates));
+
+            $inQuery = implode(',', array_fill(0, count($searchCandidates), '?'));
             $sql = $isSupabase 
-                ? "SELECT full_name FROM beneficiaries WHERE $nameExpr IN ($inQuery) AND is_archived = FALSE"
-                : "SELECT full_name FROM beneficiaries WHERE $nameExpr IN ($inQuery) AND is_archived = 0";
+                ? "SELECT full_name FROM beneficiaries WHERE (UPPER(REPLACE(full_name, '.', '')) IN ($inQuery) OR UPPER(full_name) IN ($inQuery)) AND is_archived = FALSE"
+                : "SELECT full_name FROM beneficiaries WHERE (UPPER(REPLACE(full_name, '.', '')) IN ($inQuery) OR UPPER(full_name) IN ($inQuery)) AND is_archived = 0";
                 
             $stmt = $pdo->prepare($sql);
-            $stmt->execute(array_values($names));
-            $duplicates = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            // Execute with parameters for both IN clauses
+            $params = array_merge($searchCandidates, $searchCandidates);
+            $stmt->execute($params);
+            $dbNames = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            $dbNormArray = array_map($normalizeForCompare, $dbNames);
+            foreach ($rawNames as $inputName) {
+                $normInput = $normalizeForCompare($inputName);
+                if (in_array($normInput, $dbNormArray, true)) {
+                    $duplicates[] = $inputName;
+                }
+            }
+            $duplicates = array_values(array_unique($duplicates));
         }
 
         echo json_encode([
@@ -66,15 +86,15 @@ try {
         ]);
     } else {
         // Single check mode
-        $name = $normalizeName($data['name']);
+        $inputName = trim((string)($data['name'] ?? ''));
+        $normInput = $normalizeForCompare($inputName);
         $excludeId = trim((string)($data['exclude_id'] ?? ''));
-        debugLog('check_duplicate', ['name' => $name]);
+        debugLog('check_duplicate', ['name' => $inputName, 'norm' => $normInput]);
         
-        // We check for exact match or very close match
         $sql = $isSupabase
-            ? "SELECT full_name FROM beneficiaries WHERE $nameExpr = :name AND is_archived = FALSE"
-            : "SELECT full_name FROM beneficiaries WHERE $nameExpr = :name AND is_archived = 0";
-        $params = ['name' => $name];
+            ? "SELECT full_name FROM beneficiaries WHERE (UPPER(REPLACE(full_name, '.', '')) = :norm OR UPPER(full_name) = :upper) AND is_archived = FALSE"
+            : "SELECT full_name FROM beneficiaries WHERE (UPPER(REPLACE(full_name, '.', '')) = :norm OR UPPER(full_name) = :upper) AND is_archived = 0";
+        $params = ['norm' => $normInput, 'upper' => strtoupper($inputName)];
 
         if ($excludeId !== '') {
             $sql .= " AND gip_id <> :exclude_id";
@@ -89,7 +109,7 @@ try {
         echo json_encode([
             'success' => true,
             'exists' => $match !== false,
-            'name' => $name,
+            'name' => $inputName,
             'match' => $match ?: null
         ]);
     }

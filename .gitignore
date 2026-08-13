@@ -1,4 +1,4 @@
-﻿# Environment Configuration
+# Environment Configuration
 .env
 config/.env
 config/.env.local
@@ -36,7 +36,6 @@ build/
 # Logs
 *.log
 logs/
-*.md
 
 # Temporary Files
 tmp/
@@ -57,3 +56,16 @@ htdocs/phpmyadmin/
 # Documents
 *.pdf
 *.pptx
+
+# Archived Documentation (except ARCHIVED/README.md)
+ARCHIVED/VITE_SERVER_SETUP.md
+ARCHIVED/VITE_QUICKSTART.md
+ARCHIVED/SYSTEM_PROTECTION_README.md
+ARCHIVED/REMOVAL_GUIDE.md
+ARCHIVED/README_VITE.md
+ARCHIVED/PROTECTION_SUMMARY.md
+ARCHIVED/IMPLEMENTATION_SUMMARY.md
+ARCHIVED/DATABASE_README.md
+ARCHIVED/ARCHITECTURE_DIAGRAM.md
+ARCHIVED/AJAX-REAL-TIME-IMPLEMENTATION-PLAN.md
+ARCHIVED/AJAX-IMPLEMENTATION-COMPLETE.md

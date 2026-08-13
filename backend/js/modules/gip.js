@@ -1720,13 +1720,14 @@ export function renderTable(dataToRender = null) {
     reinitFlowbite();
 }
 
+// START: renderPagination - Renders pagination controls with showing info on left and page numbers with inline page jump on right
 function renderPagination(totalItems, totalPages, activePage = currentPage) {
     const container = document.getElementById('pagination-controls');
     if (!container) return;
 
     if (totalItems <= itemsPerPage) {
         container.innerHTML = `
-            <span class="text-xs font-bold text-gray-500">Showing all ${totalItems} results</span>
+            <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Showing all ${totalItems} results</span>
             <div></div>
         `;
         return;
@@ -1736,13 +1737,17 @@ function renderPagination(totalItems, totalPages, activePage = currentPage) {
     const endIdx = Math.min(activePage * itemsPerPage, totalItems);
 
     container.innerHTML = `
-        <span class="text-xs font-bold text-gray-500 shrink-0">
-            Showing <span class="text-royal-blue">${startIdx}–${endIdx}</span> of <span class="text-royal-blue">${totalItems}</span>
+        <!-- LEFT SIDE: Info text -->
+        <span class="text-xs font-bold text-gray-500 dark:text-gray-400 shrink-0">
+            Showing <span class="text-royal-blue dark:text-blue-400">${startIdx}–${endIdx}</span> of <span class="text-royal-blue dark:text-blue-400">${totalItems}</span>
         </span>
+
+        <!-- RIGHT SIDE: Previous, Page Numbers (with inline page jump), Next -->
         <div class="flex items-center gap-1 flex-wrap justify-end">
             <!-- Previous -->
             <button onclick="changePage(${activePage - 1})" ${activePage === 1 ? 'disabled' : ''}
-                class="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:text-royal-blue hover:border-royal-blue/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shrink-0">
+                class="p-1.5 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:text-royal-blue hover:border-royal-blue/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shrink-0"
+                aria-label="Previous Page">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
             </button>
 
@@ -1750,51 +1755,64 @@ function renderPagination(totalItems, totalPages, activePage = currentPage) {
 
             <!-- Next -->
             <button onclick="changePage(${activePage + 1})" ${activePage === totalPages ? 'disabled' : ''}
-                class="p-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 hover:text-royal-blue hover:border-royal-blue/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shrink-0">
+                class="p-1.5 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:text-royal-blue hover:border-royal-blue/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shrink-0"
+                aria-label="Next Page">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </button>
-
-            <!-- Go To -->
-            <div class="flex items-center gap-1 ml-1 shrink-0">
-                <span class="text-[0.625rem] sm:text-xs font-bold text-gray-400 hidden sm:inline">Go to</span>
-                <input type="number" id="goto-page-input" min="1" max="${totalPages}" placeholder="—"
-                    class="w-14 h-8 text-center text-xs font-black rounded-lg border-2 border-gray-300 bg-gray-50 text-gray-800 focus:border-royal-blue focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all shadow-sm"
-                    aria-label="Go to page"
-                    onkeydown="if(event.key==='Enter'){const v=parseInt(this.value);if(v){window.changePage(Math.min(${totalPages},Math.max(1,v)));this.value='';this.blur();}}"
-                    >
-                <button
-                    onclick="const inp=document.getElementById('goto-page-input');const v=parseInt(inp.value);if(v){window.changePage(Math.min(${totalPages},Math.max(1,v)));inp.value='';inp.blur();}"
-                    class="h-8 px-3 text-xs font-black bg-royal-blue text-white rounded-lg hover:bg-blue-700 active:scale-95 transition-all cursor-pointer shrink-0">
-                    Go
-                </button>
-            </div>
         </div>
     `;
 }
+// END: renderPagination - Renders pagination controls with showing info on left and page numbers with inline page jump on right
 
+// START: generatePageNumbers - Generates page number buttons with interactive inline page jump input replacing ellipsis
 function generatePageNumbers(current, total) {
-    // Sliding window of 4 — no pinned last page, no ellipsis.
-    const WINDOW = 4;
-    const count = Math.min(WINDOW, total);
+    if (total <= 1) return '';
 
-    let start = Math.max(1, current - 1);
-    let end = start + count - 1;
-    if (end > total) {
-        end = total;
-        start = Math.max(1, end - count + 1);
+    const btn = (p) => `
+        <button onclick="changePage(${p})"
+            class="min-w-[32px] h-8 px-2 flex items-center justify-center rounded-lg text-xs font-black transition-all cursor-pointer
+            ${p === current 
+                ? 'bg-royal-blue text-white shadow-md shadow-royal-blue/20 dark:bg-blue-600' 
+                : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-royal-blue/10 hover:text-royal-blue dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'}">
+            ${p}
+        </button>`;
+
+    const jumpInput = `
+        <input type="text" inputmode="numeric" pattern="[0-9]*" placeholder="..."
+            title="Type page number and press Enter"
+            aria-label="Jump to page"
+            class="w-10 h-8 text-center text-xs font-black rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-royal-blue dark:text-blue-400 placeholder:text-gray-400 focus:border-royal-blue focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-royal-blue/20 outline-none transition-all cursor-pointer shadow-xs p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            onfocus="this.select();"
+            onkeydown="if(event.key==='Enter'){const v=parseInt(this.value);if(v){window.changePage(Math.min(${total},Math.max(1,v)));this.value='';this.blur();}}"
+            onblur="const v=parseInt(this.value);if(v){window.changePage(Math.min(${total},Math.max(1,v)));this.value='';}"
+        />`;
+
+    if (total <= 4) {
+        let html = '';
+        for (let p = 1; p <= total; p++) html += btn(p);
+        return html;
+    }
+
+    let pages = [];
+    if (current <= 2) {
+        pages = [1, 2, 3, 'jump', total];
+    } else if (current >= total - 1) {
+        pages = [1, 'jump', total - 2, total - 1, total];
+    } else {
+        pages = [1, 'jump', current, 'jump2', total];
     }
 
     let html = '';
-    for (let p = start; p <= end; p++) {
-        html += `
-            <button onclick="changePage(${p})"
-                class="min-w-[32px] h-8 flex items-center justify-center rounded-lg text-xs font-black transition-all cursor-pointer
-                ${p === current ? 'bg-royal-blue text-white shadow-md shadow-royal-blue/20' : 'bg-white text-gray-600 hover:bg-royal-blue/10 hover:text-royal-blue border border-gray-100'}">
-                ${p}
-            </button>`;
-    }
+    pages.forEach(p => {
+        if (p === 'jump' || p === 'jump2') {
+            html += jumpInput;
+        } else {
+            html += btn(p);
+        }
+    });
     return html;
 }
+// END: generatePageNumbers - Generates page number buttons with interactive inline page jump input replacing ellipsis
 
 window.changePage = (page) => {
     currentPage = page;
@@ -2155,7 +2173,9 @@ export async function addBeneficiary(data) {
     if (!remoteResult.success || remoteResult.data?.success !== true) {
         const message = remoteResult.data?.error || remoteResult.error || 'The beneficiary could not be saved.';
         console.error('[GIP] Beneficiary save failed', { method, id: capitalizedData.id || capitalizedData.gip_id, message });
-        Swal.fire({ icon: 'error', title: hasPersistedId ? 'Update Failed' : 'Save Failed', text: message });
+        if (!capitalizedData._isBulk) {
+            Swal.fire({ icon: 'error', title: hasPersistedId ? 'Update Failed' : 'Save Failed', text: message });
+        }
         return false;
     }
 

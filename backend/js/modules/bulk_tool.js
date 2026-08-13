@@ -11,10 +11,13 @@ export const BulkApp = {
     isAutoSave: false,
     lastInteractionTime: 0,
 
+    // START: init - Initializes the bulk tool application by launching the upload modal
     init() {
         this.showUploadModal();
     },
+    // END: init - Initializes the bulk tool application by launching the upload modal
 
+    // START: showUploadModal - Displays the SweetAlert modal for CSV drag-and-drop file upload and settings
     showUploadModal() {
         const dk = isDarkMode();
         const t = {
@@ -126,7 +129,9 @@ export const BulkApp = {
             }
         });
     },
+    // END: showUploadModal - Displays the SweetAlert modal for CSV drag-and-drop file upload and settings
 
+    // START: handleFile - Validates uploaded file format and reads text content asynchronously
     handleFile(file) {
         if (!file.name.toLowerCase().endsWith('.csv') && !file.name.toLowerCase().endsWith('.txt')) {
             Swal.fire('Invalid File', 'Please upload a valid .csv or .txt file.', 'error');
@@ -140,7 +145,115 @@ export const BulkApp = {
         };
         reader.readAsText(file);
     },
+    // END: handleFile - Validates uploaded file format and reads text content asynchronously
 
+    // START: formatFullName - Normalizes full name into FIRSTNAME MI. LASTNAME format (e.g., ALEGA, ANGELYN A -> ANGELYN A. ALEGA)
+    formatFullName(rawName) {
+        if (!rawName || !rawName.trim()) return '';
+        let name = rawName.trim().replace(/^["'\s]+|["'\s]+$/g, '');
+        name = name.replace(/\s+/g, ' ').toUpperCase();
+        
+        if (name.includes(',')) {
+            const parts = name.split(',');
+            const lastName = parts[0].trim();
+            let firstAndMiddle = parts.slice(1).join(',').trim();
+            
+            // Add trailing dot to single letter middle initial if missing (e.g. "ANGELYN A" -> "ANGELYN A.")
+            firstAndMiddle = firstAndMiddle.replace(/\b([A-Z])\b(?!\.)/g, '$1.');
+            
+            return `${firstAndMiddle} ${lastName}`.replace(/\s+/g, ' ').trim();
+        } else {
+            // Handle name already without comma e.g. "ANGELYN A ALEGA" -> "ANGELYN A. ALEGA"
+            name = name.replace(/\b([A-Z])\b(?!\.)(?=\s+[A-Z]+$)/g, '$1.');
+            return name;
+        }
+    },
+    // END: formatFullName - Normalizes full name into FIRSTNAME MI. LASTNAME format (e.g., ALEGA, ANGELYN A -> ANGELYN A. ALEGA)
+
+    // START: calculateAge - Calculates beneficiary age dynamically from birthday string
+    calculateAge(birthday) {
+        if (!birthday) return '';
+        const birthDate = new Date(birthday);
+        if (isNaN(birthDate.getTime())) return '';
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age >= 0 ? age : 0;
+    },
+    // END: calculateAge - Calculates beneficiary age dynamically from birthday string
+
+    // START: formatDateToMMDDYYYY - Converts raw date string (e.g. JUNE 16, 2026 or 8/29/2002) to standard MM/DD/YYYY format
+    formatDateToMMDDYYYY(dateStr) {
+        if (!dateStr || !dateStr.trim()) return '';
+        let str = dateStr.trim();
+        
+        // Try standard JS Date parse first
+        let d = new Date(str);
+        if (!isNaN(d.getTime())) {
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const yyyy = d.getFullYear();
+            return `${mm}/${dd}/${yyyy}`;
+        }
+        
+        // Fallback manual month regex parsing for strings like "JUNE 16, 2026"
+        const months = {
+            JANUARY: '01', JAN: '01', FEBRUARY: '02', FEB: '02',
+            MARCH: '03', MAR: '03', APRIL: '04', APR: '04',
+            MAY: '05', JUNE: '06', JUN: '06', JULY: '07', JUL: '07',
+            AUGUST: '08', AUG: '08', SEPTEMBER: '09', SEP: '09', SEPT: '09',
+            OCTOBER: '10', OCT: '10', NOVEMBER: '11', NOV: '11', DECEMBER: '12', DEC: '12'
+        };
+
+        const regex = /([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})/;
+        const match = str.toUpperCase().match(regex);
+        if (match) {
+            const mName = match[1];
+            const day = match[2].padStart(2, '0');
+            const year = match[3];
+            const monthNum = months[mName];
+            if (monthNum) {
+                return `${monthNum}/${day}/${year}`;
+            }
+        }
+
+        // Fallback for slash format like "8/29/2002"
+        const slashParts = str.split('/');
+        if (slashParts.length === 3) {
+            const m = slashParts[0].padStart(2, '0');
+            const d = slashParts[1].padStart(2, '0');
+            let y = slashParts[2];
+            if (y.length === 2) y = '20' + y;
+            return `${m}/${d}/${y}`;
+        }
+
+        return str;
+    },
+    // END: formatDateToMMDDYYYY - Converts raw date string (e.g. JUNE 16, 2026 or 8/29/2002) to standard MM/DD/YYYY format
+
+    // START: parsePeriodOfEmployment - Parses all-in-one period of employment string into startDate and endDate in MM/DD/YYYY format
+    parsePeriodOfEmployment(periodStr) {
+        if (!periodStr || !periodStr.trim()) return { startDate: '', endDate: '' };
+        const parts = periodStr.split(/\s*(?:-|–|—|\bTO\b|\bUNTIL\b|\bTHRU\b)\s*/i);
+        if (parts.length >= 2) {
+            return {
+                startDate: this.formatDateToMMDDYYYY(parts[0]),
+                endDate: this.formatDateToMMDDYYYY(parts[1])
+            };
+        } else if (parts.length === 1) {
+            return {
+                startDate: this.formatDateToMMDDYYYY(parts[0]),
+                endDate: ''
+            };
+        }
+        return { startDate: '', endDate: '' };
+    },
+    // END: parsePeriodOfEmployment - Parses all-in-one period of employment string into startDate and endDate in MM/DD/YYYY format
+
+    // START: parseCSV - Parses raw CSV text into beneficiary objects matching the new CSV format and initiates queue processing
     async parseCSV(text) {
         let rows = [];
         let currentRow = '';
@@ -187,53 +300,61 @@ export const BulkApp = {
             }
             cols.push(cur.replace(/(^"|"$)/g, '').trim());
 
-            // UPDATED MAPPING BASED ON PROVIDED CSV
-            // index 0: IGNORE (e.g. 2025-02-0190 or empty)
-            // index 1: Full Name
-            // index 2: Address
-            // index 3: Age
-            // index 4: Gender
-            // index 5: Education
-            // index 6: Assigned Office
-            // index 7: Assigned Unit
-            // index 8: Start Date
-            // index 9: End Date
+            // UPDATED MAPPING BASED ON NEW CSV HEADER SPECIFICATION (0-indexed A to K):
+            // Index 0 (A): NO. (e.g. 1 - ignore or row num)
+            // Index 1 (B): NAME OF ASSURED (Full Name: e.g. "ALEGA, ANGELYN A" -> "ANGELYN A. ALEGA")
+            // Index 2 (C): ASSIGNMENT / OFFICE (Assigned Office: e.g. "LDNPFO")
+            // Index 3 (D): DATE OF BIRTH (Birthday: e.g. "8/29/2002")
+            // Index 4 (E): AGE (Age: e.g. 23 - skipped/auto calculated from Date of Birth)
+            // Index 5 (F): ADDRESS (Address: e.g. "POB. MATUNGAO, LANAO DEL NORTE")
+            // Index 6 (G): DESIGNATED BENEFICIARY (Designated Beneficiary: e.g. "ALEGA, LEONISA A." -> "LEONISA A. ALEGA")
+            // Index 7 (H): RELATIONSHIP TO ASSURED (Relationship to Assured: e.g. "MOTHER")
+            // Index 8 (I): PERIOD OF EMPLOYMENT (Start & End Date: e.g. "JUNE 16, 2026 - DECEMBER 15, 2026")
+            // Index 9 (J): CONTACT NUMBER (Contact No.: e.g. "09XXXXXXXXX")
+            // Index 10 (K): REMARKS (Remarks: e.g. "ONGOING")
 
-            // Proceed only if there are enough columns up to the End Date (Index 9)
-            // Relaxed check: As long as name exists, we proceed
             if (cols.length >= 2) {
+                const name = this.formatFullName(cols[1]);
+                // Skip header or empty name rows
+                if (!name || name.toLowerCase() === 'name of assured' || name.toLowerCase() === 'name' || name.toLowerCase() === 'full name') continue;
+                const col0 = cols[0] ? cols[0].trim().toLowerCase() : '';
+                if (col0 === 'no.' || col0 === 'no') continue;
 
-                const age = cols[3];
-                // Strict validation: Skip row if Age is not a valid number (This ignores category headers like the first row)
-                if (!age || isNaN(parseInt(age))) continue;
+                const office = cols[2] ? cols[2].trim() : '';
+                const birthday = cols[3] ? this.formatDateToMMDDYYYY(cols[3]) : '';
+                const age = birthday ? this.calculateAge(birthday) : (cols[4] ? cols[4].trim() : '');
+                const address = cols[5] ? cols[5].trim() : '';
+                const designatedBeneficiary = cols[6] ? this.formatFullName(cols[6]) : '';
+                const relationshipToAssured = cols[7] ? cols[7].trim().toUpperCase() : '';
 
-                const name = cols[1];
-                // Skip if name is completely empty or just header text
-                if (!name || name.toLowerCase() === 'name' || name.toLowerCase() === 'full name') continue;
+                const period = cols[8] ? cols[8].trim() : '';
+                const { startDate, endDate } = this.parsePeriodOfEmployment(period);
 
-                const address = cols[2];
+                const contact = cols[9] ? cols[9].trim() : '';
+                let remarks = cols[10] ? cols[10].trim().toUpperCase() : '';
+                if (!remarks) {
+                    remarks = 'ONGOING';
+                }
 
-                let genderRaw = cols[4] ? cols[4].toUpperCase().trim() : '';
-                let gender = '';
-                if (genderRaw === 'F' || genderRaw.includes('FEMALE')) gender = 'Female';
-                if (genderRaw === 'M' || genderRaw.includes('MALE')) gender = 'Male';
-
-                const education = cols[5];
-                const office = cols[6];
-                const designation = cols[7];
-                const startDate = this.formatDate(cols[8]);
-                const endDate = this.formatDate(cols[9]);
+                // Gender and Education are skipped per user instructions for manual entry
+                const gender = '';
+                const education = '';
 
                 this.queue.push({
                     name: name,
+                    contact: contact,
                     address: address,
+                    birthday: birthday,
                     age: age,
                     gender: gender,
                     education: education,
+                    designatedBeneficiary: designatedBeneficiary,
+                    relationshipToAssured: relationshipToAssured,
+                    office: office,
+                    designation: 'N/A',
                     startDate: startDate,
                     endDate: endDate,
-                    office: office,
-                    designation: designation
+                    remarks: remarks
                 });
             }
         }
@@ -266,12 +387,13 @@ export const BulkApp = {
                 const checkResult = await checkResponse.json();
                 
                 if (checkResult.success && checkResult.duplicates && checkResult.duplicates.length > 0) {
-                    const duplicateSet = new Set(checkResult.duplicates.map(n => n.toLowerCase().trim()));
+                    const normalizeName = (str) => str ? str.toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ').trim() : '';
+                    const duplicateSet = new Set(checkResult.duplicates.map(n => normalizeName(n)));
                     const originalLength = this.queue.length;
                     
                     this.queue = this.queue.filter(item => {
-                        const isDup = duplicateSet.has(item.name.toLowerCase().trim());
-                        if (isDup) console.warn(`%c[Bulk Add] SKIPPED: ${item.name} already exists in database.`, "color: #ff9800; font-weight: bold;");
+                        const isDup = duplicateSet.has(normalizeName(item.name));
+                        if (isDup) console.warn(`%c[Bulk Add] SKIPPED (Duplicate): ${item.name} already exists in database.`, "color: #ff9800; font-weight: bold;");
                         return !isDup;
                     });
                     
@@ -294,16 +416,19 @@ export const BulkApp = {
             Swal.fire('Error', 'No valid beneficiary data found. Please ensure your CSV formatting matches the requirements.', 'error');
         }
     },
+    // END: parseCSV - Parses raw CSV text into beneficiary objects matching the new CSV format and initiates queue processing
 
+    // START: showProgressModal - Renders and updates the progress modal interface during bulk processing
     showProgressModal() {
         const dk = isDarkMode();
-        const progress = Math.round((this.currentIndex / this.queue.length) * 100);
+        const currentItem = Math.min(this.currentIndex + 1, this.queue.length);
+        const progress = Math.round((currentItem / this.queue.length) * 100);
         
         const html = `
             <div class="p-2 text-left font-montserrat">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-black text-blue-600 dark:text-blue-400 uppercase italic">Processing Data...</h3>
-                    <span class="text-[0.625rem] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">${this.currentIndex} / ${this.queue.length}</span>
+                    <span id="bulk-progress-counter" class="text-[0.625rem] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">${currentItem} / ${this.queue.length}</span>
                 </div>
                 
                 <div class="w-full bg-gray-100 dark:bg-slate-800 rounded-full h-4 mb-6 p-1 border border-gray-200 dark:border-slate-700">
@@ -326,10 +451,10 @@ export const BulkApp = {
         if (Swal.isVisible() && Swal.getPopup().querySelector('#bulk-progress-bar')) {
             // Just update the existing modal
             const bar = document.getElementById('bulk-progress-bar');
-            const counter = Swal.getPopup().querySelector('span.text-\\[10px\\]');
+            const counter = document.getElementById('bulk-progress-counter');
             const name = document.getElementById('bulk-current-name');
             if (bar) bar.style.width = `${progress}%`;
-            if (counter) counter.textContent = `${this.currentIndex} / ${this.queue.length}`;
+            if (counter) counter.textContent = `${currentItem} / ${this.queue.length}`;
             if (name) name.textContent = this.queue[this.currentIndex]?.name || '...';
         } else {
             // Create new progress modal
@@ -349,7 +474,9 @@ export const BulkApp = {
             });
         }
     },
+    // END: showProgressModal - Renders and updates the progress modal interface during bulk processing
 
+    // START: formatDate - Converts date string to YYYY-MM-DD format
     formatDate(dateStr) {
         if (!dateStr || dateStr.trim() === '') return '';
         const d = new Date(dateStr);
@@ -365,7 +492,9 @@ export const BulkApp = {
         const dd = String(d.getDate()).padStart(2, '0');
         return `${yyyy}-${mm}-${dd}`;
     },
+    // END: formatDate - Converts date string to YYYY-MM-DD format
 
+    // START: processNext - Processes the next item in the bulk queue sequentially with single-record duplicate verification
     async processNext() {
         if (this.currentIndex < this.queue.length) {
             const data = this.queue[this.currentIndex];
@@ -376,10 +505,39 @@ export const BulkApp = {
 
             if (this.isAutoSave) {
                 this.showProgressModal();
-                // AUTO-SAVE MODE: Directly call the API without showing modal
                 if (window.addBeneficiaryData) {
                     (async () => {
-                        // Ensure ROX ID is generated before saving (no temp IDs).
+                        // 1. Single record duplicate check by FULL NAME before attempting POST
+                        try {
+                            let userId = null;
+                            try {
+                                userId = JSON.parse(localStorage.getItem('user') || '{}')?.id || null;
+                            } catch (e) {
+                                userId = null;
+                            }
+
+                            const checkDup = await fetch(`${getBasePath()}api/check_duplicate.php`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    ...(userId ? { 'X-User-Id': String(userId) } : {})
+                                },
+                                body: JSON.stringify({ name: data.name, user_id: userId })
+                            });
+                            const dupRes = await checkDup.json();
+
+                            if (dupRes.success && dupRes.exists) {
+                                console.warn(`%c[Bulk Add] SKIPPED (Duplicate Name): ${data.name} already exists in database.`, "color: #ff9800; font-weight: bold;");
+                                if (this.isActive) {
+                                    this.onSaveSuccess();
+                                }
+                                return;
+                            }
+                        } catch (e) {
+                            console.warn('[Bulk Add] Single duplicate check error:', e?.message || e);
+                        }
+
+                        // 2. Fetch fresh ROX ID if not duplicate
                         try {
                             const year = data.startDate ? new Date(data.startDate).getFullYear() : new Date().getFullYear();
                             const idRes = await apiGet(`api/beneficiaries.php?next_id&year=${year}`);
@@ -391,13 +549,14 @@ export const BulkApp = {
                             console.warn('[Bulk Add] Identifier fetch failed, continuing:', e?.message || e);
                         }
 
+                        // 3. POST to Supabase
                         const success = await window.addBeneficiaryData(data);
-                        if (this.isActive) { // Check if still active (not cancelled during fetch)
+                        if (this.isActive) {
                             if (success) {
                                 this.onSaveSuccess();
                             } else {
-                                // If it fails, show the modal so user can fix issues
-                                showAddDataModal(data);
+                                console.warn(`[Bulk Add] Record save failed/duplicate conflict for ${data.name}, skipping.`);
+                                this.onSaveSuccess();
                             }
                         }
                     })();
@@ -419,7 +578,9 @@ export const BulkApp = {
             });
         }
     },
+    // END: processNext - Processes the next item in the bulk queue sequentially with single-record duplicate verification
 
+    // START: onSaveSuccess - Handles successful saving of a beneficiary record and schedules next item
     onSaveSuccess() {
         if (this.isActive) {
             this.currentIndex++;
@@ -430,7 +591,9 @@ export const BulkApp = {
             }, delay); 
         }
     },
+    // END: onSaveSuccess - Handles successful saving of a beneficiary record and schedules next item
 
+    // START: onCancel - Cancels the bulk processing session, resets queue state, and re-opens upload modal
     onCancel() {
         if (this.isActive) {
             this.isActive = false;
@@ -448,6 +611,7 @@ export const BulkApp = {
             });
         }
     }
+    // END: onCancel - Cancels the bulk processing session, resets queue state, and re-opens upload modal
 };
 
-window.BulkApp = BulkApp;
+window.BulkApp = BulkApp;

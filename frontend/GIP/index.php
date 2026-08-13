@@ -327,7 +327,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                         <!-- Sort actions -->
                         <div class="relative shrink-0 flex items-center gap-2">
-                            <button id="sort-dropdown-button" type="button" aria-pressed="false" data-dropdown-toggle="sort-dropdown"
+                            <button id="sort-dropdown-button" type="button" aria-pressed="false" data-dropdown-toggle="sort-dropdown" data-dropdown-placement="bottom-end"
                                 class="flex items-center justify-center p-2.5 text-gray-500 rounded-full hover:bg-orange-50 hover:text-orange-600 transition-all duration-300 border border-default hover:border-orange-100 group shadow-sm cursor-pointer">
                                 <svg class="w-5 h-5 transition-transform group-hover:rotate-180" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
@@ -351,7 +351,7 @@ require_once __DIR__ . '/../../config/vite.php';
                             </div>
                             <!-- Sort Dropdown Menu -->
                             <div id="sort-dropdown"
-                                class="z-50 hidden bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
+                                class="z-50 hidden absolute right-0 bg-white divide-y divide-gray-100 rounded-xl shadow-2xl w-56 border border-gray-100 font-montserrat">
                                 <div class="px-4 py-3 bg-orange-50/50 rounded-t-xl">
                                     <span
                                         class="block text-[0.625rem] font-black text-orange-600 uppercase tracking-wider">Table
@@ -538,7 +538,7 @@ require_once __DIR__ . '/../../config/vite.php';
 
                 <!-- Modern Pagination Footer -->
                 <div id="pagination-controls"
-                    class="px-4 py-3 bg-white border-t border-gray-100 flex items-center justify-between font-montserrat">
+                    class="px-4 py-3 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 font-montserrat">
                     <!-- Pagination will be injected by gip.js -->
                 </div>
             </div>

@@ -369,7 +369,7 @@ require_once __DIR__ . '/config/db.php';
                         <label for="username" class="block text-xs font-black text-gray-700 dark:text-slate-300 mb-2 uppercase tracking-[0.15em]">
                             Username*
                         </label>
-                        <input type="text" id="username" name="username" required
+                        <input type="text" id="username" name="username" required tabindex="1"
                             class="w-full px-6 py-5 rounded-2xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 transition-all outline-none text-lg font-semibold shadow-md"
                             placeholder="Enter your username" />
                     </div>
@@ -381,10 +381,10 @@ require_once __DIR__ . '/config/db.php';
                             </label>
                         </div>
                         <div class="relative">
-                            <input type="password" id="password" name="password" required
+                            <input type="password" id="password" name="password" required tabindex="2"
                                 class="w-full px-6 py-5 pr-16 rounded-2xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 transition-all outline-none text-lg font-semibold shadow-md"
                                 placeholder="Enter your password" />
-                            <button type="button" class="togglePassword absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-royal-blue dark:text-slate-500 transition-colors cursor-pointer">
+                            <button type="button" tabindex="-1" class="togglePassword absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-royal-blue dark:text-slate-500 transition-colors cursor-pointer">
                                 <svg class="eye-open w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -398,19 +398,19 @@ require_once __DIR__ . '/config/db.php';
 
                     <div class="flex items-center justify-between pt-6 px-1">
                         <div class="flex items-center">
-                            <input type="checkbox" id="rememberMe" name="rememberMe"
+                            <input type="checkbox" id="rememberMe" name="rememberMe" tabindex="3"
                                 class="w-5 h-5 rounded-md border-gray-300 text-royal-blue focus:ring-royal-blue/10 cursor-pointer" />
                             <label for="rememberMe"
                                 class="ml-3 text-sm lg:text-base font-bold text-gray-700 dark:text-slate-400 cursor-pointer">
                                 Remember me
                             </label>
                         </div>
-                        <a href="#" class="forgot-password-link text-sm lg:text-base font-black text-royal-blue hover:text-blue-700 transition-colors uppercase tracking-tight">
+                        <a href="#" tabindex="4" class="forgot-password-link text-sm lg:text-base font-black text-royal-blue hover:text-blue-700 transition-colors uppercase tracking-tight">
                             Forgot password?
                         </a>
                     </div>
 
-                    <button type="submit"
+                    <button type="submit" tabindex="5"
                         class="w-full bg-royal-blue text-white font-black py-4 lg:py-6 rounded-2xl hover:bg-blue-800 transition-all shadow-lg active:scale-[0.98] uppercase tracking-[0.2em] text-sm lg:text-lg mt-8 relative z-30 cursor-pointer">
                         Sign in
                     </button>
@@ -437,7 +437,7 @@ require_once __DIR__ . '/config/db.php';
                 <label for="username_mobile" class="block text-[0.625rem] font-black text-gray-500 dark:text-slate-400 mb-2 uppercase tracking-[0.2em]">
                     Username
                 </label>
-                <input type="text" id="username_mobile" name="username" required
+                <input type="text" id="username_mobile" name="username" required tabindex="1"
                     class="w-full px-5 py-4 rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-blue-500/10 transition-all outline-none text-base font-bold"
                     placeholder="Enter your username" />
             </div>
@@ -447,10 +447,10 @@ require_once __DIR__ . '/config/db.php';
                     Password
                 </label>
                 <div class="relative">
-                    <input type="password" id="password_mobile" name="password" required
+                    <input type="password" id="password_mobile" name="password" required tabindex="2"
                         class="w-full px-5 py-4 pr-14 rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-white focus:border-royal-blue focus:ring-4 focus:ring-blue-500/10 transition-all outline-none text-base font-bold"
                         placeholder="Enter your password" />
-                    <button type="button" class="togglePassword absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 transition-colors px-1 cursor-pointer">
+                    <button type="button" tabindex="-1" class="togglePassword absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 transition-colors px-1 cursor-pointer">
                         <svg class="eye-open w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -464,18 +464,18 @@ require_once __DIR__ . '/config/db.php';
 
             <div class="flex items-center justify-between py-2">
                 <div class="flex items-center">
-                    <input type="checkbox" id="rememberMe_mobile" name="rememberMe"
+                    <input type="checkbox" id="rememberMe_mobile" name="rememberMe" tabindex="3"
                         class="w-5 h-5 rounded-md border-gray-300 dark:border-slate-800 text-royal-blue focus:ring-blue-500/20 cursor-pointer" />
                     <label for="rememberMe_mobile" class="ml-2.5 text-[0.8125rem] font-bold text-gray-600 dark:text-slate-400 cursor-pointer">
                         Remember me
                     </label>
                 </div>
-                <a href="#" class="forgot-password-link text-[0.8125rem] font-black text-royal-blue uppercase tracking-tight">
+                <a href="#" tabindex="4" class="forgot-password-link text-[0.8125rem] font-black text-royal-blue uppercase tracking-tight">
                     Forgot?
                 </a>
             </div>
 
-            <button type="submit"
+            <button type="submit" tabindex="5"
                 class="w-full bg-royal-blue text-white font-black py-5 rounded-2xl shadow-[0_10px_25px_-5px_rgba(0,56,168,0.4)] active:scale-[0.98] uppercase tracking-[0.2em] text-xs transition-all cursor-pointer">
                 Sign in
             </button>

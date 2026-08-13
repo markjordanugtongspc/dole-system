@@ -129,8 +129,6 @@ try {
 
         if (empty($data['office'])) return null;
 
-        // Split "OFFICE - LOCATION" → officeNameOnly="OFFICE", locationFromString="LOCATION".
-        // The frontend sends the full display string (e.g. "LGU - TEST"); we must extract both parts.
         $raw = trim($data['office']);
         $locationFromString = null;
         if (strpos($raw, ' - ') !== false) {
@@ -140,33 +138,53 @@ try {
         } else {
             $officeNameOnly = $raw;
         }
-        // Prefer an explicit locationName from payload; fall back to what we parsed from the string.
         $effectiveLocationName = !empty($data['locationName']) ? trim($data['locationName']) : $locationFromString;
 
-        // Exact match first
-        $stmt = $pdo->prepare("SELECT $officeIdCol FROM offices WHERE $officeSearchCol = :name LIMIT 1");
-        $stmt->execute(['name' => $officeNameOnly]);
-        $officeId = $stmt->fetchColumn() ?: null;
-
-        // LIKE fallback
-        if (!$officeId) {
-            $stmt = $pdo->prepare("SELECT $officeIdCol FROM offices WHERE $officeSearchCol LIKE :name LIMIT 1");
-            $stmt->execute(['name' => '%' . $officeNameOnly . '%']);
-            $officeId = $stmt->fetchColumn() ?: null;
-        }
-
-        // Create new office if still not found
-        if (!$officeId) {
-            $stmt = $pdo->prepare("INSERT INTO offices ($officeSearchCol) VALUES (:name)" . ($isSupabase ? " RETURNING $officeIdCol" : ""));
+        try {
+            // Case-insensitive exact match
+            $stmt = $pdo->prepare("SELECT $officeIdCol FROM offices WHERE UPPER(TRIM($officeSearchCol)) = UPPER(:name) LIMIT 1");
             $stmt->execute(['name' => $officeNameOnly]);
-            $officeId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
-        }
+            $officeId = $stmt->fetchColumn() ?: null;
 
-        if ($officeId) {
-            ensureOfficeLocation($pdo, (int)$officeId, $effectiveLocationName, $isSupabase);
-        }
+            // Case-insensitive LIKE fallback
+            if (!$officeId) {
+                $stmt = $pdo->prepare("SELECT $officeIdCol FROM offices WHERE UPPER($officeSearchCol) LIKE UPPER(:name) LIMIT 1");
+                $stmt->execute(['name' => '%' . $officeNameOnly . '%']);
+                $officeId = $stmt->fetchColumn() ?: null;
+            }
 
-        return $officeId ? (int)$officeId : null;
+            // Create new office if still not found
+            if (!$officeId) {
+                try {
+                    // Sync sequence for Supabase if sequence is behind MAX(id)
+                    if ($isSupabase) {
+                        try {
+                            $pdo->exec("SELECT setval(pg_get_serial_sequence('offices', '$officeIdCol'), COALESCE(MAX($officeIdCol), 1)) FROM offices");
+                        } catch (Throwable $seqErr) {
+                            // ignore sequence fix error
+                        }
+                    }
+
+                    $stmt = $pdo->prepare("INSERT INTO offices ($officeSearchCol) VALUES (:name)" . ($isSupabase ? " RETURNING $officeIdCol" : ""));
+                    $stmt->execute(['name' => $officeNameOnly]);
+                    $officeId = $isSupabase ? $stmt->fetchColumn() : $pdo->lastInsertId();
+                } catch (Throwable $insErr) {
+                    // Fallback search after insert attempt / unique constraint conflict
+                    $stmt = $pdo->prepare("SELECT $officeIdCol FROM offices WHERE UPPER(TRIM($officeSearchCol)) = UPPER(:name) LIMIT 1");
+                    $stmt->execute(['name' => $officeNameOnly]);
+                    $officeId = $stmt->fetchColumn() ?: null;
+                }
+            }
+
+            if ($officeId) {
+                ensureOfficeLocation($pdo, (int)$officeId, $effectiveLocationName, $isSupabase);
+            }
+
+            return $officeId ? (int)$officeId : null;
+        } catch (Throwable $e) {
+            debugLog('resolve_office.error', ['msg' => $e->getMessage()]);
+            return null;
+        }
     }
 
     /**
@@ -534,6 +552,29 @@ if ($method === 'GET') {
 
     try {
         debugLog('beneficiaries.post', ['keys' => array_keys($data), 'id' => $data['id'] ?? null, 'gip_id' => $data['gip_id'] ?? null]);
+        
+        // Check if full_name already exists in database (ignoring dots and spaces)
+        $inputName = trim((string)($data['name'] ?? $data['full_name'] ?? ''));
+        if ($inputName !== '') {
+            $normInput = str_replace('.', '', preg_replace('/\s+/', ' ', strtoupper($inputName)));
+            $checkDupStmt = $pdo->prepare("
+                SELECT full_name FROM beneficiaries 
+                WHERE (UPPER(REPLACE(full_name, '.', '')) = :norm OR UPPER(full_name) = :upper) 
+                  AND is_archived = " . ($isSupabase ? "FALSE" : "0") . " 
+                LIMIT 1
+            ");
+            $checkDupStmt->execute(['norm' => $normInput, 'upper' => strtoupper($inputName)]);
+            $dupNameMatch = $checkDupStmt->fetchColumn();
+            if ($dupNameMatch !== false) {
+                http_response_code(409);
+                echo json_encode([
+                    'success' => false,
+                    'is_duplicate' => true,
+                    'error' => "Beneficiary '{$inputName}' already exists in database."
+                ]);
+                exit();
+            }
+        }
         
         $generateNextGipId = function (?string $year = null) use ($pdo): string {
             $year = $year ?: date('Y');
