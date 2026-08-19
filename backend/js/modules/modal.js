@@ -472,10 +472,9 @@ export function updateUIProfile(profile) {
 }
 
 
-/**
- * Configuration Modal for Reports
- */
+// START: showExportConfigModal - Configuration Modal for Reports, Filters, and Column Selection
 export function showExportConfigModal(callback) {
+    const defaultExportColumns = ['id', 'name', 'age', 'address', 'gender', 'assignedunit', 'status'];
     const currentFilters = window.getExportFilters ? window.getExportFilters() : {
         office: 'ALL',
         remarks: 'ALL',
@@ -488,43 +487,70 @@ export function showExportConfigModal(callback) {
         search: '',
         sort: 'name',
         section: 'ALL',
-        columns: ['id', 'name', 'age', 'office', 'assignedunit', 'startdate', 'enddate', 'status'],
+        columns: defaultExportColumns,
         preparedBy: localStorage.getItem('ldn_export_prepared') || '',
         approvedBy: localStorage.getItem('ldn_export_approved') || ''
     };
 
+    const activeCols = Array.isArray(currentFilters.columns) && currentFilters.columns.length > 0
+        ? currentFilters.columns
+        : defaultExportColumns;
+
+    const columnOptions = [
+        { id: 'id', label: 'ID Number' },
+        { id: 'name', label: 'Full Name' },
+        { id: 'age', label: 'Age' },
+        { id: 'address', label: 'Address' },
+        { id: 'gender', label: 'Gender' },
+        { id: 'office', label: 'Office' },
+        { id: 'assignedunit', label: 'Assigned Unit' },
+        { id: 'startdate', label: 'Start Date' },
+        { id: 'enddate', label: 'End Date' },
+        { id: 'status', label: 'Status' },
+        { id: 'dtrstatus', label: 'DTR Status' },
+        { id: 'arstatus', label: 'AR Status' },
+        { id: 'documentstatus', label: 'Document Status' },
+        { id: 'education', label: 'Educational Attainment' },
+        { id: 'contact', label: 'Contact Number' },
+        { id: 'birthday', label: 'Birthday' },
+        { id: 'designatedbeneficiary', label: 'Designated Beneficiary' },
+        { id: 'relationship', label: 'Relationship to Assured' }
+    ];
+
     const modalHtml = `
         <div class="w-full text-left font-montserrat">
-            <div class="flex flex-col gap-4 border-l-4 border-royal-blue bg-gradient-to-r from-blue-50 to-white p-4 dark:from-blue-950/40 dark:to-slate-900 sm:flex-row sm:items-center sm:p-5">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-royal-blue/10 sm:h-12 sm:w-12">
-                    <svg class="h-5 w-5 text-royal-blue sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <!-- Modal Header -->
+            <div class="flex flex-col gap-4 border-l-4 border-royal-blue bg-gradient-to-r from-blue-50 to-white p-4 dark:from-blue-950/40 dark:to-slate-900 sm:flex-row sm:items-center sm:p-5 rounded-t-xl">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-royal-blue/10 sm:h-12 sm:w-12">
+                    <svg class="h-6 w-6 text-royal-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </div>
-                <div>
-                    <h2 class="text-lg font-black leading-tight text-heading sm:text-xl">Report Generator</h2>
-                    <p class="mt-1 text-[0.6875rem] font-medium leading-relaxed text-gray-500 dark:text-gray-300 sm:text-xs">Choose who and what should appear in the report. Your selections apply to preview, Excel, and print.</p>
+                <div class="min-w-0 flex-1">
+                    <h2 class="text-lg font-black leading-tight text-heading sm:text-xl uppercase tracking-tight">Report &amp; Export Configurator</h2>
+                    <p class="mt-1 text-[0.6875rem] font-medium leading-relaxed text-gray-500 dark:text-gray-300 sm:text-xs">Customize filters, sort ordering, and visible output columns for live preview, Excel export, and printouts.</p>
                 </div>
             </div>
 
             <form id="export-config-form" class="mt-4 space-y-4">
-                <div class="border-y border-blue-100 bg-blue-50/60 p-3 dark:border-blue-900/60 dark:bg-blue-950/30 sm:p-4">
-                    <button type="submit" class="flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 bg-royal-blue px-4 py-2.5 text-xs font-black uppercase tracking-wide text-white shadow-md transition-all hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-[0.99] sm:min-h-11 sm:text-sm dark:focus:ring-blue-900">
+                <!-- Apply Actions Top Bar -->
+                <div class="rounded-xl border border-blue-100 bg-blue-50/80 p-3 dark:border-blue-900/60 dark:bg-blue-950/40 sm:p-4 shadow-xs">
+                    <button type="submit" class="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-royal-blue px-4 py-2.5 text-xs sm:text-sm font-black uppercase tracking-wider text-white shadow-md transition-all hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-[0.99] dark:focus:ring-blue-900">
                         <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
                         Apply Configuration &amp; Update Preview
                     </button>
                 </div>
 
-                <!-- Main Filter Grid (3 columns on MD) -->
-                <div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 dark:border-slate-700 dark:bg-slate-800/50">
-                    <div class="flex items-center gap-2 mb-3">
+                <!-- Section 1: Global Filters & Search -->
+                <div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 dark:border-slate-700 dark:bg-slate-800/50 space-y-4">
+                    <div class="flex items-center gap-2">
                         <span class="w-1.5 h-4 bg-royal-blue rounded-full"></span>
-                        <label class="text-xs font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Global Filters</label>
+                        <label class="text-xs font-black text-gray-500 dark:text-white! uppercase tracking-widest leading-none">Global Filters &amp; Sorting</label>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div class="space-y-1">
                             <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Search Beneficiary</label>
                             <div class="relative group">
-                                <input type="text" id="export-search" value="${currentFilters.search}" placeholder="Name or ID..." 
+                                <input type="text" id="export-search" value="${currentFilters.search || ''}" placeholder="Name or ID..." 
                                     class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-9 py-2.5 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue focus:ring-4 focus:ring-royal-blue/10 outline-none transition-all">
                                 <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             </div>
@@ -533,9 +559,9 @@ export function showExportConfigModal(callback) {
                         <div class="space-y-1">
                             <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Office Category</label>
                             <div class="relative group">
-                                <select id="export-office" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
+                                <select id="export-office" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-3 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
                                     <option value="ALL" ${currentFilters.office === 'ALL' ? 'selected' : ''}>ALL OFFICES</option>
-                                    <!-- Options will be populated dynamically -->
+                                    <!-- Options populated dynamically -->
                                 </select>
                                 <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
@@ -544,26 +570,31 @@ export function showExportConfigModal(callback) {
                         <div class="space-y-1">
                             <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Sort Data By</label>
                             <div class="relative group">
-                                <select id="export-sort" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
+                                <select id="export-sort" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-3 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
                                     <option value="name" ${currentFilters.sort === 'name' ? 'selected' : ''}>NAME (A-Z)</option>
-                                    <option value="startdate" ${currentFilters.sort === 'startdate' ? 'selected' : ''}>START DATE (NEWEST)</option>
+                                    <option value="name_desc" ${currentFilters.sort === 'name_desc' ? 'selected' : ''}>NAME (Z-A)</option>
                                     <option value="id" ${currentFilters.sort === 'id' ? 'selected' : ''}>ID NUMBER</option>
-                                    <option value="office" ${currentFilters.sort === 'office' ? 'selected' : ''}>OFFICE NAME</option>
+                                    <option value="address" ${currentFilters.sort === 'address' ? 'selected' : ''}>ADDRESS (A-Z)</option>
                                     <option value="assignedunit" ${currentFilters.sort === 'assignedunit' ? 'selected' : ''}>ASSIGNED UNIT</option>
+                                    <option value="office" ${currentFilters.sort === 'office' ? 'selected' : ''}>OFFICE NAME</option>
+                                    <option value="startdate" ${currentFilters.sort === 'startdate' ? 'selected' : ''}>START DATE (NEWEST FIRST)</option>
+                                    <option value="startdate_asc" ${currentFilters.sort === 'startdate_asc' ? 'selected' : ''}>START DATE (OLDEST FIRST)</option>
+                                    <option value="age" ${currentFilters.sort === 'age' ? 'selected' : ''}>AGE (YOUNGEST FIRST)</option>
+                                    <option value="age_desc" ${currentFilters.sort === 'age_desc' ? 'selected' : ''}>AGE (OLDEST FIRST)</option>
+                                    <option value="status" ${currentFilters.sort === 'status' ? 'selected' : ''}>STATUS / REMARKS</option>
                                 </select>
                                 <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Office location, assigned unit, and year row -->
-                    <div class="grid grid-cols-1 gap-3 mt-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <!-- Location, Assigned Unit, and Year row -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         <div class="space-y-1">
                             <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Office Location</label>
                             <div class="relative group">
-                                <select id="export-location" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none disabled:opacity-40 disabled:cursor-not-allowed" ${currentFilters.office === 'ALL' ? 'disabled' : ''}>
+                                <select id="export-location" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-3 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none disabled:opacity-40 disabled:cursor-not-allowed" ${currentFilters.office === 'ALL' ? 'disabled' : ''}>
                                     <option value="ALL">ALL LOCATIONS</option>
-                                    <!-- Populated when office changes -->
                                 </select>
                                 <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
@@ -572,64 +603,89 @@ export function showExportConfigModal(callback) {
                         <div class="space-y-1">
                             <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Assigned Unit</label>
                             <div class="relative group">
-                                <select id="export-assigned-unit" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
+                                <select id="export-assigned-unit" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-3 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
                                     <option value="ALL">ALL ASSIGNED UNITS</option>
                                 </select>
                                 <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-royal-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
                         </div>
-                        <div class="space-y-1">
+
+                        <div class="space-y-1 sm:col-span-2 lg:col-span-1">
                             <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Year (Start Date)</label>
                             <div class="relative group">
-                                <select id="export-year" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
+                                <select id="export-year" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-3 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all cursor-pointer appearance-none">
                                     <option value="ALL" ${(currentFilters.year || 'ALL') === 'ALL' ? 'selected' : ''}>ALL YEARS</option>
-                                    <!-- Populated dynamically from data -->
                                 </select>
                                 <svg class="w-3.5 h-3.5 text-gray-400 dark:text-white! absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2 min-[900px]:grid-cols-4 pt-4 border-t border-gray-100/50">
-                        <div class="min-[900px]:col-span-4">
-                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Submission Status</label>
-                            <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                                ${[
-                                    ['dtr', 'DTR STATUS', currentFilters.dtrStatus || 'ALL'],
-                                    ['ar', 'AR STATUS', currentFilters.arStatus || 'ALL'],
-                                    ['document', 'REQUIRED DOCUMENTS', currentFilters.documentStatus || 'ALL']
-                                ].map(([key, label, value]) => '<label class="flex items-center gap-2"><span class="w-24 shrink-0 text-[0.5625rem] font-black uppercase tracking-wider text-gray-500">' + label + '</span><select id="export-' + key + '-status" class="min-h-9 w-full cursor-pointer rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-[0.625rem] font-black uppercase text-heading dark:border-slate-600 dark:bg-slate-800"><option value="ALL" ' + (value === 'ALL' ? 'selected' : '') + '>ALL</option><option value="SUBMITTED" ' + (value === 'SUBMITTED' ? 'selected' : '') + '>SUBMITTED</option><option value="PENDING" ' + (value === 'PENDING' ? 'selected' : '') + '>PENDING</option><option value="REJECTED" ' + (value === 'REJECTED' ? 'selected' : '') + '>REJECTED</option><option value="NOT SUBMITTED" ' + (value === 'NOT SUBMITTED' ? 'selected' : '') + '>NOT SUBMITTED</option></select></label>').join('')}
+                <!-- Section 2: Submission Status Controls -->
+                <div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 dark:border-slate-700 dark:bg-slate-800/50 space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-emerald-600 rounded-full"></span>
+                        <label class="text-xs font-black text-gray-500 dark:text-white! uppercase tracking-widest leading-none">Submission Status Filter</label>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        ${[
+                            ['dtr', 'DTR STATUS', currentFilters.dtrStatus || 'ALL'],
+                            ['ar', 'AR STATUS', currentFilters.arStatus || 'ALL'],
+                            ['document', 'REQUIRED DOCUMENTS', currentFilters.documentStatus || 'ALL']
+                        ].map(([key, label, value]) => `
+                            <div class="space-y-1 bg-white dark:bg-slate-900/60 p-3 rounded-xl border border-gray-100 dark:border-slate-700/60">
+                                <label class="text-[0.625rem] font-black uppercase tracking-wider text-gray-500 dark:text-gray-300 block">${label}</label>
+                                <select id="export-${key}-status" class="w-full min-h-9 cursor-pointer rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-black uppercase text-heading dark:border-slate-600 dark:bg-slate-800">
+                                    <option value="ALL" ${value === 'ALL' ? 'selected' : ''}>ALL</option>
+                                    <option value="SUBMITTED" ${value === 'SUBMITTED' ? 'selected' : ''}>SUBMITTED</option>
+                                    <option value="PENDING" ${value === 'PENDING' ? 'selected' : ''}>PENDING</option>
+                                    <option value="REJECTED" ${value === 'REJECTED' ? 'selected' : ''}>REJECTED</option>
+                                    <option value="NOT SUBMITTED" ${value === 'NOT SUBMITTED' ? 'selected' : ''}>NOT SUBMITTED</option>
+                                </select>
                             </div>
-                        </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Section 3: Demographic & Status Category Badges -->
+                <div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 dark:border-slate-700 dark:bg-slate-800/50 space-y-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-indigo-600 rounded-full"></span>
+                        <label class="text-xs font-black text-gray-500 dark:text-white! uppercase tracking-widest leading-none">Categorical Filters</label>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Gender Filter -->
-                        <div>
-                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Gender Filter</label>
-                            <div class="flex flex-wrap gap-1.5">
+                        <div class="bg-white dark:bg-slate-900/60 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700/60 space-y-2">
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter block">Gender Filter</label>
+                            <div class="flex flex-wrap gap-2">
                                 ${['ALL', 'FEMALE', 'MALE'].map(s => {
-        const configs = { 'ALL': 'peer-checked:bg-blue-600', 'FEMALE': 'peer-checked:bg-pink-600', 'MALE': 'peer-checked:bg-indigo-600' };
-        return `
+                                    const configs = { 'ALL': 'peer-checked:bg-emerald-600', 'FEMALE': 'peer-checked:bg-pink-600', 'MALE': 'peer-checked:bg-indigo-600' };
+                                    return `
                                         <label class="cursor-pointer">
                                             <input type="radio" name="export-gender" value="${s}" ${currentFilters.gender === s ? 'checked' : ''} class="hidden peer">
-                                            <span class="flex min-h-9 sm:min-h-10 items-center justify-center whitespace-nowrap rounded-lg px-2.5 py-2 border border-gray-100 bg-white text-[0.625rem] sm:text-xs font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                            <span class="flex min-h-9 sm:min-h-10 items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 border border-gray-200 bg-white text-[0.625rem] sm:text-xs font-black text-gray-600 dark:text-white! uppercase tracking-wider ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all shadow-xs cursor-pointer hover:border-emerald-500/40">${s}</span>
                                         </label>
                                     `;
-    }).join('')}
+                                }).join('')}
                             </div>
                         </div>
 
-                        <!-- Display Section -->
-                        <div>
-                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Report Volume Section</label>
-                            <div class="flex gap-1.5">
+                        <!-- Report Volume Section -->
+                        <div class="bg-white dark:bg-slate-900/60 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700/60 space-y-2">
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter block">Report Volume Section</label>
+                            <div class="flex flex-wrap gap-2">
                                 ${[
-            { id: 'ALL', label: 'All', color: 'peer-checked:bg-emerald-600' },
-            { id: 'ACTIVE', label: 'Active', color: 'peer-checked:bg-green-500' },
-            { id: 'ARCHIVED', label: 'Archived', color: 'peer-checked:bg-red-600' }
-        ].map(s => `
-                                    <label class="min-w-0 flex-1 cursor-pointer">
+                                    { id: 'ALL', label: 'Overall (All)', color: 'peer-checked:bg-emerald-600' },
+                                    { id: 'ACTIVE', label: 'Active', color: 'peer-checked:bg-green-500' },
+                                    { id: 'ARCHIVED', label: 'Archived', color: 'peer-checked:bg-red-600' }
+                                ].map(s => `
+                                    <label class="cursor-pointer">
                                         <input type="radio" name="export-section" value="${s.id}" ${currentFilters.section === s.id ? 'checked' : ''} class="hidden peer">
-                                        <div class="min-h-9 py-2 sm:min-h-10 bg-white border border-gray-100 rounded-lg flex items-center justify-center gap-1.5 transition-all ${s.color} peer-checked:text-white peer-checked:border-transparent shadow-sm">
-                                            <span class="whitespace-nowrap text-[0.625rem] font-black uppercase tracking-tight sm:text-xs">${s.label}</span>
+                                        <div class="min-h-9 sm:min-h-10 px-3.5 py-2 bg-white border border-gray-200 rounded-lg flex items-center justify-center transition-all ${s.color} peer-checked:text-white peer-checked:border-transparent shadow-xs cursor-pointer hover:border-emerald-500/40">
+                                            <span class="whitespace-nowrap text-[0.625rem] sm:text-xs font-black uppercase tracking-wider">${s.label}</span>
                                         </div>
                                     </label>
                                 `).join('')}
@@ -637,71 +693,82 @@ export function showExportConfigModal(callback) {
                         </div>
 
                         <!-- Remarks Filter -->
-                        <div>
-                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Remarks Filter</label>
-                            <div class="flex flex-wrap gap-1.5">
+                        <div class="bg-white dark:bg-slate-900/60 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700/60 space-y-2">
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter block">Remarks Filter</label>
+                            <div class="flex flex-wrap gap-1.5 sm:gap-2">
                                 ${['ALL', 'ONGOING', 'EXPIRED', 'RESIGNED', 'ABSORBED'].map(s => {
-        const configs = { 'ALL': 'peer-checked:bg-blue-600', 'ONGOING': 'peer-checked:bg-green-500', 'EXPIRED': 'peer-checked:bg-red-600', 'RESIGNED': 'peer-checked:bg-slate-600', 'ABSORBED': 'peer-checked:bg-teal-600' };
-        return `
+                                    const configs = { 'ALL': 'peer-checked:bg-emerald-600', 'ONGOING': 'peer-checked:bg-green-600', 'EXPIRED': 'peer-checked:bg-red-600', 'RESIGNED': 'peer-checked:bg-slate-600', 'ABSORBED': 'peer-checked:bg-teal-600' };
+                                    return `
                                         <label class="cursor-pointer">
                                             <input type="radio" name="export-remarks" value="${s}" ${currentFilters.remarks === s ? 'checked' : ''} class="hidden peer">
-                                            <span class="flex min-h-9 sm:min-h-10 items-center justify-center whitespace-nowrap rounded-lg px-2.5 py-2 border border-gray-100 bg-white text-[0.625rem] sm:text-xs font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                            <span class="flex min-h-9 sm:min-h-10 items-center justify-center whitespace-nowrap rounded-lg px-2.5 sm:px-3 py-2 border border-gray-200 bg-white text-[0.625rem] sm:text-xs font-black text-gray-600 dark:text-white! uppercase tracking-wider ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all shadow-xs cursor-pointer hover:border-emerald-500/40">${s}</span>
                                         </label>
                                     `;
-    }).join('')}
+                                }).join('')}
                             </div>
                         </div>
 
                         <!-- Age Filter -->
-                        <div>
-                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1 mb-1.5 block">Age Group Filter</label>
-                            <div class="flex flex-wrap gap-1.5">
+                        <div class="bg-white dark:bg-slate-900/60 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700/60 space-y-2">
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter block">Age Group Filter</label>
+                            <div class="flex flex-wrap gap-1.5 sm:gap-2">
                                 ${['ALL', '18-24', '25-30', '31-40', '41+'].map(s => {
-        const configs = { 'ALL': 'peer-checked:bg-blue-600', '18-24': 'peer-checked:bg-emerald-600', '25-30': 'peer-checked:bg-yellow-600', '31-40': 'peer-checked:bg-orange-600', '41+': 'peer-checked:bg-slate-600' };
-        return `
+                                    const configs = { 'ALL': 'peer-checked:bg-emerald-600', '18-24': 'peer-checked:bg-teal-600', '25-30': 'peer-checked:bg-yellow-600', '31-40': 'peer-checked:bg-orange-600', '41+': 'peer-checked:bg-slate-600' };
+                                    return `
                                         <label class="cursor-pointer">
                                             <input type="radio" name="export-age-group" value="${s}" ${currentFilters.ageGroup === s ? 'checked' : ''} class="hidden peer">
-                                            <span class="flex min-h-9 sm:min-h-10 items-center justify-center whitespace-nowrap rounded-lg px-2.5 py-2 border border-gray-100 bg-white text-[0.625rem] sm:text-xs font-black text-gray-400 dark:text-white! uppercase tracking-widest ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all block shadow-sm">${s}</span>
+                                            <span class="flex min-h-9 sm:min-h-10 items-center justify-center whitespace-nowrap rounded-lg px-2.5 sm:px-3 py-2 border border-gray-200 bg-white text-[0.625rem] sm:text-xs font-black text-gray-600 dark:text-white! uppercase tracking-wider ${configs[s]} peer-checked:text-white peer-checked:border-transparent transition-all shadow-xs cursor-pointer hover:border-emerald-500/40">${s}</span>
                                         </label>
                                     `;
-    }).join('')}
+                                }).join('')}
                             </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100/50">
+                    <!-- Signatures Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-gray-200/80 dark:border-slate-700/80">
                         <div class="space-y-1">
-                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Prepared By (Signature)</label>
-                            <input type="text" id="export-prepared" value="${currentFilters.preparedBy}" placeholder="Mary Joy Q. Nuñez" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all uppercase">
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Prepared By (Signature Line)</label>
+                            <input type="text" id="export-prepared" value="${currentFilters.preparedBy || ''}" placeholder="e.g. Mary Joy Q. Nuñez" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-3 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all uppercase">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Approved By (Signature)</label>
-                            <input type="text" id="export-approved" value="${currentFilters.approvedBy}" placeholder="Noel B. Orias" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-2.5 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all uppercase">
+                            <label class="text-[0.625rem] sm:text-xs font-black text-gray-500 uppercase tracking-tighter ml-1">Approved By (Signature Line)</label>
+                            <input type="text" id="export-approved" value="${currentFilters.approvedBy || ''}" placeholder="e.g. Noel B. Orias" class="w-full bg-white border border-gray-200 rounded-xl min-h-10 sm:min-h-11 px-3 py-2 text-xs sm:text-sm font-bold text-heading focus:border-royal-blue outline-none transition-all uppercase">
                         </div>
                     </div>
                 </div>
 
-                <div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 dark:border-slate-700 dark:bg-slate-800/50 mt-4">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="w-1.5 h-4 bg-golden-yellow rounded-full"></span>
-                        <label class="text-xs font-black text-gray-400 dark:text-white! uppercase tracking-widest leading-none">Output Column Selection</label>
+                <!-- Section 4: Output Column Selection -->
+                <div class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 dark:border-slate-700 dark:bg-slate-800/50 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-1.5 h-4 bg-golden-yellow rounded-full"></span>
+                            <label class="text-xs font-black text-gray-500 dark:text-white! uppercase tracking-widest leading-none">Output Column Selection</label>
+                        </div>
+                        <div class="flex items-center gap-2 text-[0.625rem] font-bold">
+                            <button type="button" id="select-default-cols-btn" class="text-royal-blue hover:underline cursor-pointer">Set Recommended Default</button>
+                            <span class="text-gray-300">|</span>
+                            <button type="button" id="select-all-cols-btn" class="text-emerald-600 hover:underline cursor-pointer">Select All</button>
+                            <span class="text-gray-300">|</span>
+                            <button type="button" id="deselect-all-cols-btn" class="text-red-500 hover:underline cursor-pointer">Clear All</button>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                        ${['ID', 'Name', 'Age', 'Office', 'Assigned Unit', 'Start Date', 'End Date', 'Status', 'DTR Status', 'AR Status', 'Document Status'].map(col => {
-            const val = col.toLowerCase().replace(' ', '');
-            const isChecked = currentFilters.columns.includes(val);
-            const id = `col-switch-${val}`;
-            return `
-                                <label for="${id}" class="flex min-h-10 sm:min-h-11 items-center gap-3 bg-white px-2.5 py-2 border border-gray-100 rounded-lg cursor-pointer hover:border-emerald-500/30 transition-all group select-none shadow-sm">
-                                    <div class="relative flex items-center shrink-0 scale-90">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
+                        ${columnOptions.map(col => {
+                            const val = col.id;
+                            const isChecked = activeCols.includes(val);
+                            const id = `col-switch-${val}`;
+                            return `
+                                <label for="${id}" class="flex min-h-11 items-center justify-between gap-2 bg-white dark:bg-slate-900/70 px-3 py-2 border border-gray-200 dark:border-slate-700/80 rounded-xl cursor-pointer hover:border-emerald-500/40 hover:shadow-xs transition-all group select-none">
+                                    <span class="truncate text-[0.625rem] sm:text-xs font-black uppercase tracking-tight text-gray-700 dark:text-gray-200 group-hover:text-emerald-600">${col.label}</span>
+                                    <div class="relative flex items-center shrink-0">
                                         <input type="checkbox" id="${id}" name="export-column" value="${val}" ${isChecked ? 'checked' : ''} class="sr-only peer">
-                                        <div class="w-8 h-4.5 bg-gray-200 rounded-full peer peer-checked:bg-emerald-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:shadow-sm after:transition-all peer-checked:after:translate-x-3.5"></div>
+                                        <div class="w-9 h-5 bg-gray-200 dark:bg-slate-700 rounded-full peer peer-checked:bg-emerald-500 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:shadow-sm after:transition-all peer-checked:after:translate-x-4"></div>
                                     </div>
-                                    <span class="whitespace-nowrap text-[0.625rem] font-black uppercase tracking-tight text-gray-600 group-hover:text-emerald-600 sm:text-xs">${col}</span>
                                 </label>
                             `;
-        }).join('')}
+                        }).join('')}
                     </div>
                 </div>
             </form>
@@ -722,19 +789,46 @@ export function showExportConfigModal(callback) {
         didOpen: (popup) => {
             const form = popup.querySelector('#export-config-form');
             const officeSelect = form.querySelector('#export-office');
-            
             const locationSelect = form.querySelector('#export-location');
             const yearSelect = form.querySelector('#export-year');
             const assignedUnitSelect = form.querySelector('#export-assigned-unit');
 
-            // Populate the assigned-unit selector from live beneficiary records, preserving the GIP unit order.
+            // Quick column selection shortcuts
+            const selectDefaultBtn = popup.querySelector('#select-default-cols-btn');
+            const selectAllBtn = popup.querySelector('#select-all-cols-btn');
+            const deselectAllBtn = popup.querySelector('#deselect-all-cols-btn');
+
+            if (selectDefaultBtn) {
+                selectDefaultBtn.addEventListener('click', () => {
+                    form.querySelectorAll('input[name="export-column"]').forEach(cb => {
+                        cb.checked = defaultExportColumns.includes(cb.value);
+                    });
+                });
+            }
+            if (selectAllBtn) {
+                selectAllBtn.addEventListener('click', () => {
+                    form.querySelectorAll('input[name="export-column"]').forEach(cb => {
+                        cb.checked = true;
+                    });
+                });
+            }
+            if (deselectAllBtn) {
+                deselectAllBtn.addEventListener('click', () => {
+                    form.querySelectorAll('input[name="export-column"]').forEach(cb => {
+                        cb.checked = false;
+                    });
+                });
+            }
+
+            // Populate assigned-units
             if (assignedUnitSelect) {
                 const assignedUnits = window.getExportAssignedUnits ? window.getExportAssignedUnits() : COMMON_ASSIGNED_UNITS;
                 const selectedAssignedUnit = currentFilters.assignedUnit || 'ALL';
                 assignedUnitSelect.innerHTML = `<option value="ALL" ${selectedAssignedUnit === 'ALL' ? 'selected' : ''}>ALL ASSIGNED UNITS</option>`
                     + assignedUnits.map((unit) => `<option value="${unit}" ${selectedAssignedUnit === unit ? 'selected' : ''}>${unit}</option>`).join('');
             }
-            // Populate year dropdown from beneficiary data
+
+            // Populate years dropdown
             if (yearSelect && window.getExportYears) {
                 const years = window.getExportYears();
                 const currentYear = currentFilters.year || 'ALL';
@@ -745,49 +839,99 @@ export function showExportConfigModal(callback) {
                 yearSelect.innerHTML = yearHtml;
             }
 
-            // Helper: load locations for a given office id
+            // Helper: load locations
             const loadLocations = async (officeId, currentLoc) => {
                 if (!locationSelect) return;
                 if (!officeId) { locationSelect.disabled = true; locationSelect.innerHTML = '<option value="ALL">ALL LOCATIONS</option>'; return; }
                 locationSelect.disabled = false;
                 locationSelect.innerHTML = '<option value="ALL">Loading...</option>';
                 try {
-                    const res = await window.apiGet(`api/beneficiaries.php?get_office_locations=1&office_id=${officeId}`);
-                    const locs = (res.success && res.data?.success && Array.isArray(res.data.locations)) ? res.data.locations : [];
+                    const res = await apiGet(`api/beneficiaries.php?get_office_locations=1&office_id=${officeId}`);
+                    const locs = (res.success && res.data?.success && Array.isArray(res.data.locations))
+                        ? res.data.locations
+                        : (res.success && Array.isArray(res.locations) ? res.locations : (Array.isArray(res.data) ? res.data : []));
                     let html = `<option value="ALL">ALL LOCATIONS</option>`;
-                    locs.forEach(l => { html += `<option value="${l.location}" ${currentLoc === l.location ? 'selected' : ''}>${l.location}</option>`; });
+                    locs.forEach(l => {
+                        const locName = typeof l === 'string' ? l : (l.location || l.name || '');
+                        if (locName) {
+                            html += `<option value="${locName}" ${currentLoc === locName ? 'selected' : ''}>${locName}</option>`;
+                        }
+                    });
                     locationSelect.innerHTML = html;
-                } catch(e) { locationSelect.innerHTML = '<option value="ALL">ALL LOCATIONS</option>'; }
+                } catch(e) {
+                    locationSelect.innerHTML = '<option value="ALL">ALL LOCATIONS</option>';
+                }
             };
 
             if (officeSelect) {
                 (async () => {
-                    // Use advanced endpoint — returns sorted offices with location counts
                     let officeData = [];
+                    let locationsByOffice = {};
                     try {
-                        const res = await window.apiGet('api/beneficiaries.php?get_offices_advanced=1');
+                        const res = await apiGet('api/beneficiaries.php?get_offices_advanced=1');
                         if (res.success && res.data?.success && Array.isArray(res.data.offices)) {
                             officeData = res.data.offices;
+                            locationsByOffice = res.data.locations_by_office || {};
+                        } else if (res.success && Array.isArray(res.offices)) {
+                            officeData = res.offices;
+                            locationsByOffice = res.locations_by_office || {};
                         }
-                    } catch(e) {}
+                    } catch(e) {
+                        console.warn('Could not fetch advanced offices API, trying fallback', e);
+                    }
+
+                    // Fallback to distinct offices from current loaded beneficiaries if API returned empty
+                    if (!officeData || officeData.length === 0) {
+                        if (window.getExportOffices) {
+                            const fallbackList = window.getExportOffices();
+                            officeData = fallbackList.map((off, idx) => ({ id: idx + 1, office: off }));
+                        }
+                    }
+
                     const currentOffice = currentFilters.office || 'ALL';
                     let html = `<option value="ALL" ${currentOffice === 'ALL' ? 'selected' : ''}>ALL OFFICES</option>`;
                     officeData.forEach(o => {
-                        html += `<option value="${o.office}" data-id="${o.id}" ${currentOffice === o.office ? 'selected' : ''}>${o.office}</option>`;
+                        const officeName = typeof o === 'string' ? o : (o.office || o.office_name || '');
+                        const officeId = typeof o === 'object' ? (o.id || o.office_id || '') : '';
+                        if (officeName) {
+                            html += `<option value="${officeName}" data-id="${officeId}" ${currentOffice.toUpperCase() === officeName.toUpperCase() ? 'selected' : ''}>${officeName}</option>`;
+                        }
                     });
                     officeSelect.innerHTML = html;
 
-                    // Load locations for current selection if applicable
-                    const selectedOpt = officeSelect.options[officeSelect.selectedIndex];
-                    const selectedId = selectedOpt?.dataset?.id;
-                    if (selectedId && currentOffice !== 'ALL') {
-                        await loadLocations(selectedId, currentFilters.location || 'ALL');
-                    }
-
-                    // Re-load locations when office changes
-                    officeSelect.addEventListener('change', async () => {
+                    const loadLocationsForSelected = async () => {
                         const opt = officeSelect.options[officeSelect.selectedIndex];
-                        await loadLocations(opt?.dataset?.id, 'ALL');
+                        const selectedId = opt?.dataset?.id;
+                        const selectedOfficeName = officeSelect.value;
+                        if (!selectedOfficeName || selectedOfficeName === 'ALL') {
+                            locationSelect.disabled = true;
+                            locationSelect.innerHTML = '<option value="ALL">ALL LOCATIONS</option>';
+                            return;
+                        }
+                        locationSelect.disabled = false;
+
+                        if (selectedId && locationsByOffice[selectedId] && locationsByOffice[selectedId].length > 0) {
+                            const locs = locationsByOffice[selectedId];
+                            let locHtml = '<option value="ALL">ALL LOCATIONS</option>';
+                            locs.forEach(l => {
+                                const locName = typeof l === 'string' ? l : (l.location || l.name || '');
+                                if (locName) {
+                                    locHtml += `<option value="${locName}" ${currentFilters.location === locName ? 'selected' : ''}>${locName}</option>`;
+                                }
+                            });
+                            locationSelect.innerHTML = locHtml;
+                            return;
+                        }
+
+                        // Otherwise fetch from API
+                        await loadLocations(selectedId, currentFilters.location || 'ALL');
+                    };
+
+                    await loadLocationsForSelected();
+
+                    officeSelect.addEventListener('change', async () => {
+                        currentFilters.location = 'ALL';
+                        await loadLocationsForSelected();
                     });
                 })();
             }
@@ -796,7 +940,10 @@ export function showExportConfigModal(callback) {
                 e.preventDefault();
 
                 const columnCheckboxes = form.querySelectorAll('input[name="export-column"]:checked');
-                const selectedColumns = Array.from(columnCheckboxes).map(cb => cb.value);
+                let selectedColumns = Array.from(columnCheckboxes).map(cb => cb.value);
+                if (selectedColumns.length === 0) {
+                    selectedColumns = defaultExportColumns;
+                }
 
                 const genderRadio = form.querySelector('input[name="export-gender"]:checked');
                 const sectionRadio = form.querySelector('input[name="export-section"]:checked');
@@ -830,7 +977,6 @@ export function showExportConfigModal(callback) {
                 callback(filters);
                 Swal.close();
 
-                // Show tiny success feedback safely after modal destruction
                 setTimeout(() => {
                     Swal.fire({
                         toast: true,
@@ -849,6 +995,7 @@ export function showExportConfigModal(callback) {
         }
     });
 }
+// END: showExportConfigModal - Configuration Modal for Reports, Filters, and Column Selection
 
 export const COMMON_COURSES = [
     { name: "BS Information Technology", icon: `<svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>` },

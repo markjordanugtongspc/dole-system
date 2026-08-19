@@ -168,14 +168,13 @@ ob_start();
         <thead class="text-white bg-royal-blue font-bold uppercase tracking-wider text-[0.625rem]">
             <tr class="text-center">
                 <th class="px-2 py-2 border border-royal-blue w-[8%]">ID NO.</th>
-                <th class="px-2 py-2 border border-royal-blue w-[25%]" title="Last Name, First Name, Middle Initial">
+                <th class="px-2 py-2 border border-royal-blue w-[22%]" title="Last Name, First Name, Middle Initial">
                     NAME</th>
-                <th class="px-2 py-2 border border-royal-blue w-[8%]">AGE</th>
-                <th class="px-2 py-2 border border-royal-blue w-[18%]">OFFICE / PLACE OF ASSIGNMENT</th>
-                <th class="px-2 py-2 border border-royal-blue w-[13%] text-xs">ASSIGNED UNIT</th>
-                <th class="px-2 py-2 border border-royal-blue w-[10%]">START DATE</th>
-                <th class="px-2 py-2 border border-royal-blue w-[10%]">END DATE</th>
-                <th class="px-2 py-2 border border-royal-blue w-[8%]">STATUS</th>
+                <th class="px-2 py-2 border border-royal-blue w-[6%]">AGE</th>
+                <th class="px-2 py-2 border border-royal-blue w-[22%]">ADDRESS</th>
+                <th class="px-2 py-2 border border-royal-blue w-[10%]">GENDER</th>
+                <th class="px-2 py-2 border border-royal-blue w-[18%] text-xs">ASSIGNED UNIT</th>
+                <th class="px-2 py-2 border border-royal-blue w-[14%]">STATUS</th>
             </tr>
         </thead>
         <tbody id="print-table-body" class="text-[0.625rem] font-medium text-gray-700">
