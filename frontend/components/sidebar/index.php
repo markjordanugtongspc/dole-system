@@ -136,6 +136,41 @@ $is_aboutme = (stripos($current_uri, '/frontend/aboutme') !== false || stripos($
                     <span class="ms-3 whitespace-nowrap <?php echo $is_aboutme ? 'translate-x-1' : ''; ?>">ABOUT DEVELOPER</span>
                 </a>
             </li>
+
+            <!-- START: Go to Portal Navigation Item - Links to external DOLE portal -->
+            <li>
+                <a href="https://dole-portal.vercel.app/" target="_blank" rel="noopener noreferrer"
+                    class="flex items-center px-4 py-3 rounded-lg group cursor-pointer transition-all duration-200 border-b-2 text-white/80 hover:bg-white/10 hover:text-white border-transparent hover:scale-105">
+                    <span class="relative w-6 h-6 shrink-0 flex items-center justify-center">
+                        <!-- Static 24x24 Icon (Default) -->
+                        <svg class="absolute inset-0 w-6 h-6 text-white/80 transition-all duration-200 group-hover:hidden group-active:hidden"
+                            clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                            viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <g id="Icon">
+                                <path d="m21.722 21.57c.238.339.155.807-.184 1.044-.339.238-.807.155-1.044-.184l-1.619-2.312c-.238-.339-.155-.807.184-1.045.339-.237.807-.155 1.044.185z"/>
+                                <path d="m22.137 17.291c.421.243.659.711.606 1.194-.053.482-.386.888-.849 1.034l-2.067.652-1.319 1.719c-.295.385-.791.559-1.262.444-.472-.116-.831-.499-.915-.977l-.998-5.67c-.083-.469.114-.943.503-1.216.39-.272.903-.295 1.315-.057zm-5.224-1.283.787 4.472 1.081-1.41c.094-.122.223-.212.37-.259l1.694-.534z"/>
+                                <circle cx="5.25" cy="4.75" r=".75"/>
+                                <circle cx="7.75" cy="4.75" r=".75"/>
+                                <circle cx="10.25" cy="4.75" r=".75"/>
+                                <path d="m22.75 14c0 .414-.336.75-.75.75s-.75-.336-.75-.75v-9.5c0-.464-.184-.909-.513-1.237-.328-.329-.773-.513-1.237-.513h-15c-.967 0-1.75.783-1.75 1.75v15c0 .464.184.909.513 1.237.328.329.773.513 1.237.513h9.5c.414 0 .75.336.75.75s-.336.75-.75.75h-9.5c-.862 0-1.689-.342-2.298-.952-.61-.609-.952-1.436-.952-2.298v-15c0-1.795 1.455-3.25 3.25-3.25h15c.862 0 1.689.342 2.298.952.61.609.952 1.436.952 2.298z"/>
+                                <path d="m22 6.75c.414 0 .75.336.75.75s-.336.75-.75.75h-20c-.414 0-.75-.336-.75-.75s.336-.75.75-.75z"/>
+                            </g>
+                        </svg>
+                        <!-- Hover / Active / Focus Icon (Fill) -->
+                        <svg class="absolute inset-0 w-6 h-6 text-white transition-all duration-200 hidden group-hover:block group-active:block group-focus:block"
+                            clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"
+                            viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <g id="Icon">
+                                <path d="m21.722 21.57c.238.339.155.807-.184 1.044-.339.238-.807.155-1.044-.184l-1.619-2.312c-.238-.339-.155-.807.184-1.045.339-.237.807-.155 1.044.185z"/>
+                                <path d="m22.137 17.291c.421.243.659.711.606 1.194-.053.482-.386.888-.849 1.034l-2.067.652-1.319 1.719c-.295.385-.791.559-1.262.444-.472-.116-.831-.499-.915-.977l-.998-5.67c-.083-.469.114-.943.503-1.216.39-.272.903-.295 1.315-.057z"/>
+                                <path d="m1.25 6.75v-2.25c0-1.795 1.455-3.25 3.25-3.25h15c.862 0 1.689.342 2.298.952.61.609.952 1.436.952 2.298v2.25zm21.5 1.5v8.244c-.037-.024-.074-.047-.113-.069l-4.987-2.877c-.748-.432-1.679-.391-2.387.104-.708.496-1.065 1.357-.915 2.208l.998 5.67c.084.476.317.899.651 1.22h-11.497c-1.795 0-3.25-1.455-3.25-3.25v-11.25zm-17.5-4.75c-.414 0-.75.336-.75.75s.336.75.75.75.75-.336.75-.75-.336-.75-.75-.75zm2.5 0c-.414 0-.75.336-.75.75s.336.75.75.75.75-.336.75-.75-.336-.75-.75-.75zm2.5 0c-.414 0-.75.336-.75.75s.336.75.75.75.75-.336.75-.75-.336-.75-.75-.75z"/>
+                            </g>
+                        </svg>
+                    </span>
+                    <span class="ms-3 whitespace-nowrap transition-all duration-200">GO TO PORTAL</span>
+                </a>
+            </li>
+            <!-- END: Go to Portal Navigation Item -->
         </ul>
 
         <!-- Sidebar Footer with Profile Dropdown -->
