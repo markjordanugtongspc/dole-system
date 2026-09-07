@@ -360,20 +360,28 @@ export function initMobileSplash() {
     const reopenBtn = document.getElementById('reopen-login-drawer');
     const notifyBtn = document.getElementById('request-notifications-btn');
 
-    // Handle Notification Permissions immediately on first splash interaction or load
-    const requestNotifications = async () => {
+    // START: requestNotifications - Requests browser notification permission respecting snooze timer
+    const requestNotifications = async (force = false) => {
         if ('Notification' in window) {
+            const snoozeUntil = parseInt(localStorage.getItem('notification_prompt_snoozed_until') || '0', 10);
+            if (!force && Date.now() < snoozeUntil) {
+                return;
+            }
             const permission = await Notification.requestPermission();
             console.log('Notification permission:', permission);
             if (permission === 'granted') {
+                localStorage.removeItem('notification_prompt_snoozed_until');
                 if (notifyBtn) notifyBtn.classList.add('hidden');
+            } else {
+                localStorage.setItem('notification_prompt_snoozed_until', String(Date.now() + 30 * 60 * 1000));
             }
         }
     };
+    // END: requestNotifications - Requests browser notification permission respecting snooze timer
 
     if (Notification.permission === 'default' && notifyBtn) {
         notifyBtn.classList.remove('hidden');
-        notifyBtn.addEventListener('click', requestNotifications);
+        notifyBtn.addEventListener('click', () => requestNotifications(true));
     }
 
     const hideSplash = () => {
@@ -385,8 +393,8 @@ export function initMobileSplash() {
                 splash.style.pointerEvents = 'none';
                 splash.style.zIndex = '-1';
 
-                // On first hide (Login click), also ask for notifications if not yet asked
-                if (Notification.permission === 'default') requestNotifications();
+                // On first hide (Login click), also ask for notifications if not yet asked and not snoozed
+                if (Notification.permission === 'default') requestNotifications(false);
 
                 // DELAYED DRAWER OPENING: Wait until splash is gone
                 const drawer = document.getElementById('drawer-login');

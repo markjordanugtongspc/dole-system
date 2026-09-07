@@ -9,7 +9,8 @@ import { showEditBeneficiaryDrawer } from './edit_drawer.js';
 import { getLocalBeneficiaries, cacheBeneficiaries } from './db-manager.js';
 import { renderSearchStatsChart } from './charts.js';
 import { COMMON_ASSIGNED_UNITS } from './assigned-units.js';
-export { COMMON_ASSIGNED_UNITS };
+import { requestNotificationPermission } from './notifications.js';
+export { COMMON_ASSIGNED_UNITS, requestNotificationPermission };
 
 let drawerLogRealtimeChannel = null;
 let drawerLogRealtimeKey = null;
@@ -50,6 +51,10 @@ function subscribeDrawerLogRealtime(gipId, beneficiaryDbId, beneficiaryData, pag
 }
 
 export function initModalHandler() {
+    // START: exposeNotificationPermission - Exposes requestNotificationPermission to window
+    window.requestNotificationPermission = requestNotificationPermission;
+    // END: exposeNotificationPermission - Exposes requestNotificationPermission to window
+
     // Expose the functions to the global window object
     window.showAddDataModal = showAddDataModal;
     /**

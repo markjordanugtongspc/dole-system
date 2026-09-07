@@ -13,15 +13,16 @@ let unreadCount = 0;
 let notificationCheckInterval = null;
 let lastNotifiedId = localStorage.getItem('last_notified_id') ? parseInt(localStorage.getItem('last_notified_id')) : 0;
 
-/**
- * Initialize notification system
- */
+// START: initNotifications - Initializes notification sound, permission request, UI, and polling
 export function initNotifications() {
     // Load notification sound
     const basePath = getBasePath();
     notificationSound = new Audio(`${basePath}backend/src/assets/sounds/ping-ding.mp3`);
 
-    // Request notification permission
+    // Expose permission request to window for external or manual triggers
+    window.requestNotificationPermission = requestNotificationPermission;
+
+    // Request notification permission (respects 30-minute snooze)
     requestNotificationPermission();
 
     // Initialize UI elements
@@ -33,17 +34,24 @@ export function initNotifications() {
     // Load initial notifications
     loadNotifications();
 }
+// END: initNotifications - Initializes notification sound, permission request, UI, and polling
 
-/**
- * Request browser notification permission
- */
-async function requestNotificationPermission() {
+// START: requestNotificationPermission - Requests browser notification permission with a 30-minute snooze on dismissal
+export async function requestNotificationPermission(force = false) {
     if (!('Notification' in window)) {
         console.log('This browser does not support notifications');
         return;
     }
 
+    const SNOOZE_KEY = 'notification_prompt_snoozed_until';
+    const SNOOZE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+
     if (Notification.permission === 'default') {
+        const snoozeUntil = parseInt(localStorage.getItem(SNOOZE_KEY) || '0', 10);
+        if (!force && Date.now() < snoozeUntil) {
+            return;
+        }
+
         // Show custom prompt using SweetAlert2
         const { default: Swal } = await import('sweetalert2');
 
@@ -73,8 +81,8 @@ async function requestNotificationPermission() {
             cancelButtonColor: '#6b7280',
             customClass: {
                 popup: 'rounded-2xl',
-                confirmButton: 'font-bold',
-                cancelButton: 'font-bold'
+                confirmButton: 'font-bold cursor-pointer',
+                cancelButton: 'font-bold cursor-pointer'
             }
         });
 
@@ -83,6 +91,7 @@ async function requestNotificationPermission() {
             notificationPermission = permission;
 
             if (permission === 'granted') {
+                localStorage.removeItem(SNOOZE_KEY);
                 Swal.fire({
                     icon: 'success',
                     title: 'Notifications Enabled!',
@@ -90,12 +99,18 @@ async function requestNotificationPermission() {
                     timer: 3000,
                     showConfirmButton: false
                 });
+            } else {
+                localStorage.setItem(SNOOZE_KEY, String(Date.now() + SNOOZE_DURATION_MS));
             }
+        } else {
+            // User chose "Maybe Later" or dismissed modal - snooze for 30 minutes
+            localStorage.setItem(SNOOZE_KEY, String(Date.now() + SNOOZE_DURATION_MS));
         }
     } else {
         notificationPermission = Notification.permission;
     }
 }
+// END: requestNotificationPermission - Requests browser notification permission with a 30-minute snooze on dismissal
 
 /**
  * Initialize notification UI elements

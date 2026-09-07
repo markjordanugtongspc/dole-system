@@ -232,27 +232,35 @@ require_once __DIR__ . '/config/db.php';
     <!-- LEFT PANEL - Brand Panel (Desktop) -->
     <div id="left-panel" class="hidden lg:flex lg:w-1/2 bg-royal-blue dark:bg-slate-900 transition-colors duration-300 items-center justify-center p-12 relative overflow-hidden">
         
-<!-- Animated Background Waves (Positioned at the very top) -->
-<div class="absolute top-0 left-0 w-full leading-none z-0 opacity-50 scale-110 -translate-y-1/4">
-    <svg viewBox="0 0 1440 690" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
-        <path d="M 0,700 L 0,175 C 83.658,154.923 167.317,134.846 230,117 C 292.682,99.153 334.390,83.538 398,106 C 461.609,128.461 547.121,188.999 622,191 C 696.878,193.000 761.121,136.464 830,111 C 898.878,85.535 972.390,91.144 1043,101 C 1113.609,110.855 1181.317,124.958 1247,138 C 1312.682,151.041 1376.341,163.020 1440,175 L 1440,700 L 0,700 Z" 
-              stroke="none" stroke-width="0" fill="#0099ff" fill-opacity="0.3" class="left-panel-path-0" transform="rotate(-180 720 350)"></path>
-        <path d="M 0,700 L 0,408 C 87.735,443.436 175.470,478.873 232,453 C 288.529,427.126 313.851,339.943 380,338 C 446.148,336.056 553.122,419.352 630,459 C 706.877,498.647 753.657,494.647 806,467 C 858.342,439.352 916.245,388.056 992,374 C 1067.754,359.943 1161.358,383.126 1239,395 C 1316.641,406.873 1378.320,407.436 1440,408 L 1440,700 L 0,700 Z" 
-              stroke="none" stroke-width="0" fill="#0099ff" fill-opacity="0.6" class="left-panel-path-1" transform="rotate(-180 720 350)"></path>
-    </svg>
-</div>
+        <!-- Brand Background Image (Ambient Layer with prominent visibility) -->
+        <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
+            <img src="frontend/images/portal/gip.png" 
+                 alt="DOLE GIP Program" 
+                 class="w-full h-full object-cover object-center opacity-60 dark:opacity-50 mix-blend-luminosity brightness-105 contrast-110 pointer-events-none select-none">
+            <div class="absolute inset-0 bg-royal-blue/30 dark:bg-slate-900/40 mix-blend-multiply pointer-events-none"></div>
+        </div>
 
-<div id="left-panel-content" class="text-center max-w-md relative z-10">
-    <div id="left-panel-logo" class="mb-10">
-        <div class="w-56 h-56 mx-auto bg-white rounded-full shadow-2xl flex items-center justify-center p-6 border-4 border-white/10 overflow-hidden">
-            <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-full h-full object-contain rounded-full drop-shadow-2xl">
+        <!-- Animated Background Waves (Reduced opacity for better image balance) -->
+        <div class="absolute top-0 left-0 w-full leading-none z-[1] opacity-25 dark:opacity-20 scale-110 -translate-y-1/4 pointer-events-none">
+            <svg viewBox="0 0 1440 690" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                <path d="M 0,700 L 0,175 C 83.658,154.923 167.317,134.846 230,117 C 292.682,99.153 334.390,83.538 398,106 C 461.609,128.461 547.121,188.999 622,191 C 696.878,193.000 761.121,136.464 830,111 C 898.878,85.535 972.390,91.144 1043,101 C 1113.609,110.855 1181.317,124.958 1247,138 C 1312.682,151.041 1376.341,163.020 1440,175 L 1440,700 L 0,700 Z" 
+                      stroke="none" stroke-width="0" fill="#0099ff" fill-opacity="0.3" class="left-panel-path-0" transform="rotate(-180 720 350)"></path>
+                <path d="M 0,700 L 0,408 C 87.735,443.436 175.470,478.873 232,453 C 288.529,427.126 313.851,339.943 380,338 C 446.148,336.056 553.122,419.352 630,459 C 706.877,498.647 753.657,494.647 806,467 C 858.342,439.352 916.245,388.056 992,374 C 1067.754,359.943 1161.358,383.126 1239,395 C 1316.641,406.873 1378.320,407.436 1440,408 L 1440,700 L 0,700 Z" 
+                      stroke="none" stroke-width="0" fill="#0099ff" fill-opacity="0.6" class="left-panel-path-1" transform="rotate(-180 720 350)"></path>
+            </svg>
+        </div>
+
+        <div id="left-panel-content" class="text-center max-w-md relative z-10">
+            <div id="left-panel-logo" class="mb-10">
+                <div class="w-56 h-56 mx-auto bg-white rounded-full shadow-2xl flex items-center justify-center p-6 border-4 border-white/10 overflow-hidden">
+                    <img src="frontend/images/logo/doleiligan.png" alt="DOLE Logo" class="w-full h-full object-contain rounded-full drop-shadow-2xl">
+                </div>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-4 tracking-tight">DOLE GIP Monitoring System</h1>
+            <p class="text-lg text-white/90 font-medium tracking-wide">Department of Labor and Employment</p>
+            <p class="text-xs text-golden-yellow mt-4 font-bold uppercase tracking-[0.2em]">Republic of the Philippines</p>
         </div>
     </div>
-    <h1 class="text-4xl font-bold text-white mb-4 tracking-tight">DOLE GIP Monitoring System</h1>
-    <p class="text-lg text-white/90 font-medium tracking-wide">Department of Labor and Employment</p>
-    <p class="text-xs text-golden-yellow mt-4 font-bold uppercase tracking-[0.2em]">Republic of the Philippines</p>
-</div>
-</div>
 
     <!-- Right Content Centering Wrapper -->
     <div id="right-panel" class="flex-1 flex flex-col items-center justify-center p-6 lg:p-12 relative min-h-screen transition-all duration-500">

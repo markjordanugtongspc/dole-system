@@ -1,6 +1,6 @@
 {
-  "_modal-C5vT6YYR.js": {
-    "file": "assets/modal-C5vT6YYR.js",
+  "_modal-D_ljDmeR.js": {
+    "file": "assets/modal-D_ljDmeR.js",
     "name": "modal",
     "imports": [
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js",
@@ -8,6 +8,7 @@
       "_vendor-charts-C6WbJKf0.js"
     ],
     "dynamicImports": [
+      "node_modules/sweetalert2/dist/sweetalert2.esm.all.js",
       "_vendor-flowbite-BS-fTmyB.js",
       "_vendor-flowbite-BS-fTmyB.js"
     ]
@@ -29,7 +30,7 @@
     ]
   },
   "backend/js/main.js": {
-    "file": "assets/main-DhvmxPFH.js",
+    "file": "assets/main-CEbhV3nK.js",
     "name": "main",
     "src": "backend/js/main.js",
     "isEntry": true,
@@ -37,20 +38,17 @@
       "_vendor-DpcThRKv.js",
       "_vendor-flowbite-BS-fTmyB.js",
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js",
-      "_modal-C5vT6YYR.js",
+      "_modal-D_ljDmeR.js",
       "_vendor-charts-C6WbJKf0.js"
-    ],
-    "dynamicImports": [
-      "node_modules/sweetalert2/dist/sweetalert2.esm.all.js"
     ]
   },
   "backend/js/modules/settings.js": {
-    "file": "assets/settings-CdbIxJso.js",
+    "file": "assets/settings-CcLHUUAT.js",
     "name": "settings",
     "src": "backend/js/modules/settings.js",
     "isEntry": true,
     "imports": [
-      "_modal-C5vT6YYR.js",
+      "_modal-D_ljDmeR.js",
       "node_modules/sweetalert2/dist/sweetalert2.esm.all.js",
       "_vendor-DpcThRKv.js",
       "_vendor-charts-C6WbJKf0.js"
@@ -63,7 +61,7 @@
     "isDynamicEntry": true
   },
   "style.css": {
-    "file": "assets/style-Wd-pjdUk.css",
+    "file": "assets/style-BmuDmpQG.css",
     "src": "style.css"
   }
 }
